@@ -74,6 +74,7 @@ public class RunOffAWT {
     public static void runOffAWT(final Runnable what, String featureName, final AtomicBoolean cancelOut) {
         if (!SwingUtilities.isEventDispatchThread()) {
             what.run();
+            return; // running in a non-EDT
         }
 
         final CountDownLatch l = new CountDownLatch(1);
@@ -109,20 +110,20 @@ public class RunOffAWT {
         if (waitMomentarily(glassPane, wait, 1450, l))
             return ;
 
-            String warning = NbBundle.getMessage(GoToSupport.class, "LBL_Long", featureName);
-            String cancelButton = NbBundle.getMessage(GoToSupport.class, "BTN_Long_Cancel");
+        String warning = NbBundle.getMessage(GoToSupport.class, "LBL_Long", featureName);
+        String cancelButton = NbBundle.getMessage(GoToSupport.class, "BTN_Long_Cancel");
 
-            DialogDescriptor nd = new DialogDescriptor(warning, featureName, true, new Object[] {cancelButton}, cancelButton, DialogDescriptor.DEFAULT_ALIGN, null, new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    cancelOut.set(true);
-                    d.get().setVisible(false);
-                }
-            });
+        DialogDescriptor nd = new DialogDescriptor(warning, featureName, true, new Object[] {cancelButton}, cancelButton, DialogDescriptor.DEFAULT_ALIGN, null, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                cancelOut.set(true);
+                d.get().setVisible(false);
+            }
+        });
 
-            nd.setMessageType(NotifyDescriptor.INFORMATION_MESSAGE);
+        nd.setMessageType(NotifyDescriptor.INFORMATION_MESSAGE);
 
-            d.set(DialogDisplayer.getDefault().createDialog(nd));
-            d.get().setVisible(true);
+        d.set(DialogDisplayer.getDefault().createDialog(nd));
+        d.get().setVisible(true);
     }
 
     private static boolean waitMomentarily(Component glassPane, Cursor wait, int timeout, final CountDownLatch l) {

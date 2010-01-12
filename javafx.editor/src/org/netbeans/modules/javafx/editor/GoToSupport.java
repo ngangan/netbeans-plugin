@@ -50,10 +50,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.javafx.editor.Cancellable;
@@ -106,90 +108,116 @@ public class GoToSupport {
     }
 
     private static String performGoTo(final Document doc, final int off, final boolean goToSource, final boolean tooltip, final boolean javadoc) {
-        try {
-            final FileObject fo = getFileObject(doc);
-            
-            if (fo == null)
-                return null;
-            
-            JavaFXSource js = JavaFXSource.forFileObject(fo);
-            
-            if (js == null)
-                return null;
-            
-            final String[] result = new String[1];
-            
-            js.runUserActionTask(new Task<CompilationController>() {
-                public void run(CompilationController controller) throws Exception {
-                    if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED))
-                        return;
+        final FileObject fo = getFileObject(doc);
 
-                    @SuppressWarnings("unchecked")
-                    Token<JFXTokenId>[] token = new Token[1];
-                    int[] span = getIdentifierSpan(doc, off, token);
+        if (fo == null)
+            return null;
 
-                    if (span == null) {
-//                        CALLER.beep(goToSource, javadoc);
-                        return ;
-                    }
-                    
-                    final int offset = span[0] + 1;
-                    JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
-                    
-                    Tree leaf = path.getLeaf();
-                    if (leaf == null) return;
+        final JavaFXSource js = JavaFXSource.forFileObject(fo);
 
-                    Element el = controller.getTrees().getElement(path);
-                    if (el == null) return;
- 
-                    if (tooltip) {
-                        result[0] = FXSourceUtils.getElementTooltip(controller.getJavafxTypes(), el);
-                        return;
-                    } else if (javadoc) {
-                        result[0] = null;
-                        final URLResult res = FXSourceUtils.getJavadoc(el, controller);
-                        URL url = res != null ? res.url : null;
-                        if (url != null) {
-                            HtmlBrowser.URLDisplayer.getDefault().showURL(url);
-                        } else {
-//                            CALLER.beep(goToSource, javadoc);
-                        }
-                    } else {
-                        if (goToSource && el instanceof VariableElement) {
-                            Symbol sym = (Symbol)el;
-                            Type type = sym.asType();
-                            
-                            // handle sequences as their element type
-                            JavafxTypes types = controller.getJavafxTypes();
-                            if (types.isSequence(type)) {
-                                type = types.elementType(type);
+        if (js == null)
+            return null;
+
+        final String[] result = new String[1];
+
+        final AtomicBoolean cancelled = new AtomicBoolean();
+        final Runnable opener = new Runnable() {
+            public void run() {
+                try {
+                    js.runUserActionTask(new Task<CompilationController>() {
+                        public void run(final CompilationController controller) throws Exception {
+                            if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED))
+                                return;
+
+                            @SuppressWarnings("unchecked")
+                            Token<JFXTokenId>[] token = new Token[1];
+                            int[] span = getIdentifierSpan(doc, off, token);
+
+                            if (span == null) {
+        //                        CALLER.beep(goToSource, javadoc);
+                                return ;
                             }
-                            
-                            if (type != null && type.getKind() == TypeKind.DECLARED) {
-                                el = ((DeclaredType)type).asElement();
-                                
-                                if (el == null) return;
+
+                            final int offset = span[0] + 1;
+                            JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
+
+                            Tree leaf = path.getLeaf();
+                            if (leaf == null) return;
+
+                            Element el = controller.getTrees().getElement(path);
+                            if (el == null) return;
+
+                            if (tooltip) {
+                                result[0] = FXSourceUtils.getElementTooltip(controller.getJavafxTypes(), el);
+                                return;
+                            } else if (javadoc) {
+                                result[0] = null;
+                                final URLResult res = FXSourceUtils.getJavadoc(el, controller);
+                                URL url = res != null ? res.url : null;
+                                if (url != null) {
+                                    HtmlBrowser.URLDisplayer.getDefault().showURL(url);
+                                } else {
+        //                            CALLER.beep(goToSource, javadoc);
+                                }
+                            } else {
+                                if (goToSource && el instanceof VariableElement) {
+                                    Symbol sym = (Symbol)el;
+                                    Type type = sym.asType();
+
+                                    // handle sequences as their element type
+                                    JavafxTypes types = controller.getJavafxTypes();
+                                    if (types.isSequence(type)) {
+                                        type = types.elementType(type);
+                                    }
+
+                                    if (type != null && type.getKind() == TypeKind.DECLARED) {
+                                        el = ((DeclaredType)type).asElement();
+
+                                        if (el == null) return;
+                                    }
+                                }
+
+                                JavaFXTreePath elpath = controller.getPath(el);
+                                Tree tree = elpath != null && path.getCompilationUnit() == elpath.getCompilationUnit()? elpath.getLeaf(): null;
+
+                                if (!cancelled.get()) {
+                                    if (tree != null) {
+                                        long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
+
+                                        if (startPos != -1l) doOpen(fo, (int)startPos);
+                                    } else {
+                                        final Element opening = el;
+                                        SwingUtilities.invokeLater(new Runnable() {
+
+                                            public void run() {
+                                                try {
+                                                    ElementOpen.open(controller, opening);
+                                                } catch (Exception e) {}
+                                            }
+                                        });
+                                    }
+                                }
                             }
                         }
-                        
-                        JavaFXTreePath elpath = controller.getPath(el);
-                        Tree tree = elpath != null && path.getCompilationUnit() == elpath.getCompilationUnit()? elpath.getLeaf(): null;
-                        
-                        if (tree != null) {
-                            long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
-                            
-                            if (startPos != -1l) doOpen(fo, (int)startPos);
-                        } else {
-                            ElementOpen.open(controller, el);
-                        }
-                    }
+                    }, true);
+                } catch (IOException ioe) {
+                    throw new IllegalStateException(ioe);
                 }
-            }, true);
-            
-            return result[0];
-        } catch (IOException ioe) {
-            throw new IllegalStateException(ioe);
+            }
+        };
+
+        if (tooltip) {
+            opener.run();
+        } else {
+            RunOffAWT.runOffAWT(new Runnable() {
+
+                public void run() {
+                    opener.run();
+                }
+            }, "Go to Source", cancelled);
         }
+
+        return result[0];
     }
     
     

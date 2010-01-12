@@ -46,6 +46,7 @@ import java.util.Set;
 import javax.swing.text.Document;
 import org.netbeans.lib.editor.hyperlink.spi.HyperlinkProviderExt;
 import org.netbeans.lib.editor.hyperlink.spi.HyperlinkType;
+import org.openide.util.RequestProcessor;
 
 /**
  * Implementation of the hyperlink provider for the JavaFX language.
@@ -56,7 +57,8 @@ import org.netbeans.lib.editor.hyperlink.spi.HyperlinkType;
  *
  */
 public final class JavaFXHyperlinkProvider implements HyperlinkProviderExt {
- 
+    private String toolTip = null;
+
     /** Creates a new instance of JavaFXHyperlinkProvider */
     public JavaFXHyperlinkProvider() {
     }
@@ -77,8 +79,16 @@ public final class JavaFXHyperlinkProvider implements HyperlinkProviderExt {
         GoToSupport.goTo(doc, offset, false);
     }
 
-    public String getTooltipText(Document doc, int offset, HyperlinkType type) {
-        return GoToSupport.getGoToElementTooltip(doc, offset, false);
+    public String getTooltipText(final Document doc, final int offset, HyperlinkType type) {
+        if (toolTip == null) {
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    toolTip = GoToSupport.getGoToElementTooltip(doc, offset, false);
+                }
+            });
+            return "";
+        }
+        return toolTip;
     }
 
 }
