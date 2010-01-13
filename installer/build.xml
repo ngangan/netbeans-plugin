@@ -1,0 +1,571 @@
+<project name="javafx-plugin-installers" default="build-installers">
+  
+  <property name="javafx.version" value="6.9.1.2"/>
+  <property name="ant.build.javac.target" value="1.5"/>
+  
+  <target name="clean">
+    <exec executable="umount" osfamily="mac" failifexecutionfails="false">
+      <arg value="-f"/>
+      <arg file="build/mac-mount"/>
+    </exec>  
+    <delete dir="build"/>
+    <delete dir="../build/installers"/>
+    <condition property="running.on.mac">
+      <and>
+        <os family="mac"/>
+        <available file="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker"/>
+      </and>  
+    </condition>  
+  </target>
+
+  <target name="download-javase" depends="clean">
+      <property name="build.config" value="daily"/>
+      <property file="../build-${build.config}.properties"/>
+      <mkdir dir="external"/>
+      <property name="use.timestamp" value="true"/>
+      <get src="${netbeans.installers.url}" dest="installers.html" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+      <loadfile srcfile="installers.html" property="netbeans.windows.installer.url">
+          <filterchain>
+              <tokenfilter>
+                  <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*javase-windows.exe)&quot;.*" replace="${netbeans.installers.url}/\1" flags="im"/>
+              </tokenfilter>
+          </filterchain>
+      </loadfile>
+      <loadfile srcfile="installers.html" property="netbeans.linux.installer.url">
+          <filterchain>
+              <tokenfilter>
+                  <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*javase-linux.sh)&quot;.*" replace="${netbeans.installers.url}/\1" flags="im"/>
+              </tokenfilter>
+          </filterchain>
+      </loadfile>
+      <loadfile srcfile="installers.html" property="netbeans.macosx.installer.url">
+          <filterchain>
+              <tokenfilter>
+                  <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*javase-macosx.dmg)&quot;.*" replace="${netbeans.installers.url}/\1" flags="im"/>
+              </tokenfilter>
+          </filterchain>
+      </loadfile>
+      <loadfile srcfile="installers.html" property="netbeans.solaris.installer.url">
+          <filterchain>
+              <tokenfilter>
+                  <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*javase-solaris-x86.sh)&quot;.*" replace="${netbeans.installers.url}/\1" flags="im"/>
+              </tokenfilter>
+          </filterchain>
+      </loadfile>
+      <echo>netbeans.windows.installer.url resolved to ${netbeans.windows.installer.url}</echo>
+      <echo>netbeans.linux.installer.url resolved to ${netbeans.linux.installer.url}</echo>
+      <echo>netbeans.macosx.installer.url resolved to ${netbeans.macosx.installer.url}</echo>
+      <echo>netbeans.solaris.installer.url resolved to ${netbeans.solaris.installer.url}</echo>
+      <parallel>
+        <get src="${netbeans.windows.installer.url}" dest="external/netbeans-javase-windows.exe" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.linux.installer.url}" dest="external/netbeans-javase-linux.sh" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.macosx.installer.url}" dest="external/netbeans-javase-macosx.dmg" usetimestamp="${use.timestamp}" verbose="true"/>
+        <get src="${netbeans.solaris.installer.url}" dest="external/netbeans-javase-solaris.sh" usetimestamp="${use.timestamp}" verbose="true"/>
+      </parallel>  
+  </target>
+ 
+  <target name="build-mac-cluster" depends="clean" if="running.on.mac">
+    <mkdir dir="build/mac-cluster"/>
+    <exec executable="unzip">
+      <arg file="../build/clusters/common.jar"/>
+      <arg value="-d"/>
+      <arg file="build/mac-cluster"/>
+    </exec>
+    <exec executable="unzip">
+      <arg file="../build/clusters/mac.jar"/>
+      <arg value="-d"/>
+      <arg file="build/mac-cluster"/>
+    </exec>
+  </target>
+  
+  <target name="mount-mac-dmg" depends="download-javase,build-mac-cluster" if="running.on.mac">
+    <mkdir dir="build/mac-mount"/>
+    <exec executable="hdiutil" failonerror="yes">
+      <arg value="convert"/>
+      <arg value="-format"/>
+      <arg value="UDSP"/>
+      <arg file="external/netbeans-javase-macosx.dmg"/>
+      <arg value="-o"/>
+      <arg file="build/netbeans-6.9-javafx-macosx"/>
+    </exec>  
+    <exec executable="hdiutil" failonerror="yes">
+      <arg value="mount"/>
+      <arg value="-readwrite"/>
+      <arg value="-mountpoint"/>
+      <arg file="build/mac-mount"/>
+      <arg file="build/netbeans-6.9-javafx-macosx.sparseimage"/>
+    </exec>
+  </target>
+
+  <target name="build-servicetag" depends="clean">
+    <mkdir dir="build/servicetag"/>
+    <javac srcdir="servicetag-src" destdir="build/servicetag"/>
+    <mkdir dir="build/pkgscripts"/>
+    <jar destfile="build/pkgscripts/servicetag.jar">
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
+      <fileset dir="build/servicetag"/>
+      <manifest>
+        <attribute name="Main-Class" value="org.netbeans.installer.mac.ServiceTagGenerator"/>
+      </manifest>
+    </jar>  
+  </target>
+  
+  <target name="build-mac-pkg" depends="mount-mac-dmg,build-servicetag" if="running.on.mac">
+    <mkdir dir="build/pkgscripts"/>
+    <copy todir="build/pkgscripts">
+      <fileset dir="build/mac-mount/NetBeans 6.9.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
+      <fileset file="pkg-src"/>
+    </copy>
+    <exec executable="sh" failonerror="yes">
+        <arg value="-c"/>
+        <arg value="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -v -ds -p build/javafx.pkg -f build/mac-cluster -i pkg-src/Info.plist -r build/pkgscripts -d pkg-src/Description.plist"/>
+    </exec>                                         
+  </target>
+
+  <target name="patch-mac-dmg" depends="mount-mac-dmg,build-mac-pkg" if="running.on.mac">
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.9.mpkg/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
+        <arg value="-c"/>
+        <arg value="sed -i '' 's/addproduct_id.sh &quot;NB&quot;/addproduct_id.sh &quot;NBFX&quot;/' postflight"/>            
+    </exec>
+    <copy todir="build/mac-mount">
+      <fileset dir="mac-patch-src"/>
+    </copy>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/NetBeans 6.9.mpkg/Contents/Resources/License.txt"/>
+    <copy todir="build/mac-mount/NetBeans 6.9.mpkg/Contents/Packages/javafx.pkg">
+      <fileset dir="build/javafx.pkg"/>
+    </copy>
+    <exec executable="sh" dir="build/mac-mount/NetBeans 6.9.mpkg/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
+      <arg value="-c"/>
+      <arg value="chmod +x *"/>
+    </exec>  
+  </target>
+
+  <target name="build-mac-dmg" depends="patch-mac-dmg" if="running.on.mac">
+    <exec executable="hdiutil">
+      <arg value="detach"/>
+      <arg file="build/mac-mount"/>
+    </exec>  
+    <mkdir dir="../build/installers"/>
+    <exec executable="hdiutil" failonerror="yes">
+      <arg value="convert"/>
+      <arg value="-format"/>
+      <arg value="UDZO"/>
+      <arg file="build/netbeans-6.9-javafx-macosx.sparseimage"/>
+      <arg value="-o"/>
+      <arg file="../build/installers/netbeans-6.9-javafx-macosx.dmg"/>
+    </exec>  
+  </target>
+  
+  <target name="unzip-javase" depends="download-javase">
+    <mkdir dir="build/linux"/>
+    <exec executable="unzip">
+      <arg file="external/netbeans-javase-windows.exe"/>
+      <arg value="-d"/>
+      <arg file="build/windows"/>
+    </exec>
+    <mkdir dir="build/linux"/>
+    <exec executable="unzip">
+      <arg file="external/netbeans-javase-linux.sh"/>
+      <arg value="-d"/>
+      <arg file="build/linux"/>
+    </exec>
+    <mkdir dir="build/solaris"/>
+    <exec executable="unzip">
+      <arg file="external/netbeans-javase-solaris.sh"/>
+      <arg value="-d"/>
+      <arg file="build/solaris"/>
+    </exec>
+  </target>
+
+  <target name="build-ant-lib">
+    <mkdir dir="build/ant-lib"/>
+    <javac srcdir="ant-lib-src" destdir="build/ant-lib"/>
+    <taskdef name="currentmillis" classname="org.netbeans.installer.javafx.CurrentMillisTask" classpath="build/ant-lib"/>
+    <taskdef name="firstfname" classname="org.netbeans.installer.javafx.FirstFNameTask" classpath="build/ant-lib"/>
+    <taskdef name="genlist" classname="org.netbeans.installer.javafx.GenListTask" classpath="build/ant-lib"/>
+  </target>
+ 
+  <target name="build-logic" depends="unzip-javase">
+    <mkdir dir="build/logic"/>
+    <javac srcdir="logic-src" destdir="build/logic" classpath="build/windows"/>
+    <jar destfile="build/logic.jar">
+      <fileset dir="logic-src" excludes="**/*.java"/>
+      <fileset dir="build/logic"/>
+      <manifest>
+        <attribute name="Configuration-Logic-Class" value="org.netbeans.installer.products.nb.javafx.ConfigurationLogic"/>
+      </manifest>
+    </jar>  
+  </target>
+
+  <target name="build-data" depends="build-ant-lib">
+    <mkdir dir="build/data/common-cluster/javafx2"/>
+    <copy todir="build/data/common-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <exclude name="**/*-mac.*"/>
+        <exclude name="**/*-sol.*"/>
+        <exclude name="**/*-win.*"/>
+        <exclude name="**/*-lin.*"/>
+      </fileset>  
+    </copy>
+    <mkdir dir="build/data/win-cluster/javafx2"/>
+    <copy todir="build/data/win-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <include name="**/*-win.*"/>
+      </fileset>
+      <fileset dir="../javafx.sdk.win/release"/>  
+    </copy>
+    <mkdir dir="build/data/lin-cluster/javafx2"/>
+    <copy todir="build/data/lin-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <include name="**/*-lin.*"/>
+      </fileset>
+      <fileset dir="../javafx.sdk.lin/release"/>  
+    </copy>
+    <mkdir dir="build/data/sol-cluster/javafx2"/>
+    <copy todir="build/data/sol-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <include name="**/*-sol.*"/>
+      </fileset>
+      <fileset dir="../javafx.sdk.sol/release"/>  
+    </copy>
+    <mkdir dir="build/data/mac-cluster/javafx2"/>
+    <copy todir="build/data/mac-cluster/javafx2">
+      <fileset dir="../build/netbeans/javafx2">
+        <exclude name="javafx-sdk/**"/>
+        <include name="**/*-mac.*"/>
+      </fileset>
+      <fileset dir="../javafx.sdk.mac/release"/>  
+    </copy>
+    <mkdir dir="build/data/common-cluster/META-INF"/>
+    <antcall target="-list-files">
+      <param name="list.file" location="build/data/common-cluster/META-INF/files.list"/>
+      <param name="dir" location="build/data/common-cluster"/>
+    </antcall>
+    <mkdir dir="build/data/win-cluster/META-INF"/>
+    <antcall target="-list-files">
+      <param name="list.file" location="build/data/win-cluster/META-INF/files.list"/>
+      <param name="dir" location="build/data/win-cluster"/>
+    </antcall>
+    <mkdir dir="build/data/lin-cluster/META-INF"/>
+    <antcall target="-list-files">
+      <param name="list.file" location="build/data/lin-cluster/META-INF/files.list"/>
+      <param name="dir" location="build/data/lin-cluster"/>
+    </antcall>
+    <mkdir dir="build/data/sol-cluster/META-INF"/>
+    <antcall target="-list-files">
+      <param name="list.file" location="build/data/sol-cluster/META-INF/files.list"/>
+      <param name="dir" location="build/data/sol-cluster"/>
+    </antcall>
+  </target>
+
+  <target name="build-javafx-package" depends="build-logic,build-data">
+    <mkdir dir="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
+    <copy file="../build/clusters/common.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copy file="../build/clusters/windows.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <mkdir dir="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
+    <copy file="../build/clusters/common.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copy file="../build/clusters/linux.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <mkdir dir="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
+    <copy file="../build/clusters/common.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copy file="../build/clusters/solaris.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <copy file="build/logic.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
+    <copy file="build/logic.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
+    <copy file="build/logic.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
+    <copy file="resources/icon.png" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/icon.png"/>
+    <copy file="resources/icon.png" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/icon.png"/>
+    <copy file="resources/icon.png" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/icon.png"/>
+  </target>
+
+  <target name="build-registry" depends="build-javafx-package">
+    <property name="base.version" value="6.9.1.0"/>
+    <currentmillis property="timestamp"/>
+    <firstfname property="base.win.version" dir="build/windows/data/nb-base"/>
+    <firstfname property="javase.win.version" dir="build/windows/data/nb-javase"/>
+    <firstfname property="base.lin.version" dir="build/linux/data/nb-base"/>
+    <firstfname property="javase.lin.version" dir="build/linux/data/nb-javase"/>
+    <firstfname property="base.sol.version" dir="build/solaris/data/nb-base"/>
+    <firstfname property="javase.sol.version" dir="build/solaris/data/nb-javase"/>
+    <checksum property="icon.md5" file="resources/icon.png" algorithm="MD5"/>
+    <length property="icon.length" file="resources/icon.png"/>
+    <checksum property="logic.md5" file="build/logic.jar" algorithm="MD5"/>
+    <length property="logic.length" file="build/logic.jar"/>
+    <checksum property="data1.win.md5" file="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" algorithm="MD5"/>
+    <length property="data1.win.length" file="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <checksum property="data2.win.md5" file="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" algorithm="MD5"/>
+    <length property="data2.win.length" file="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <checksum property="data1.lin.md5" file="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" algorithm="MD5"/>
+    <length property="data1.lin.length" file="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <checksum property="data2.lin.md5" file="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" algorithm="MD5"/>
+    <length property="data2.lin.length" file="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <checksum property="data1.sol.md5" file="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar" algorithm="MD5"/>
+    <length property="data1.sol.length" file="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <checksum property="data2.sol.md5" file="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" algorithm="MD5"/>
+    <length property="data2.sol.length" file="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <length property="disk-space.win">
+      <fileset dir="build/data/common-cluster"/>
+      <fileset dir="build/data/win-cluster"/>
+    </length>
+    <length property="disk-space.lin">
+      <fileset dir="build/data/common-cluster"/>
+      <fileset dir="build/data/lin-cluster"/>
+    </length>
+    <length property="disk-space.sol">
+      <fileset dir="build/data/common-cluster"/>
+      <fileset dir="build/data/sol-cluster"/>
+    </length>
+    <echoxml file="build/data/fx-registry-windows.xml">
+        <product built="${timestamp}" expand="false" features="" offset="20000" platforms="windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86" status="not-installed" uid="nb-javafx" version="${javafx.version}" visible="true">
+            <display-name>
+                <default>JavaFX Plugin</default>
+            </display-name>
+            <description>
+                <default>JavaFX plugin for NetBeans IDE</default>
+            </description>
+            <icon md5="${icon.md5}" size="${icon.length}">
+                <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/icon.png</default-uri>
+            </icon>
+            <configuration-logic>
+                <file md5="${logic.md5}" size="${logic.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/logic/logic,1.jar</default-uri>
+                </file>
+            </configuration-logic>
+            <installation-data>
+                <file md5="${data1.win.md5}" size="${data1.win.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/data/data,1.jar</default-uri>
+                </file>
+                <file md5="${data2.win.md5}" size="${data2.win.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/data/data,2.jar</default-uri>
+                </file>
+            </installation-data>
+            <system-requirements>
+                <disk-space>${disk-space.win}</disk-space>
+            </system-requirements>
+            <dependencies>
+                <requirement uid="nb-base" version-lower="${base.win.version}" version-upper="${base.win.version}"/>
+                <requirement uid="nb-javase" version-lower="${javase.win.version}" version-upper="${javase.win.version}"/>
+            </dependencies>
+        </product>
+    </echoxml>
+    <echoxml file="build/data/fx-registry-linux.xml">
+        <product built="${timestamp}" expand="false" features="" offset="20000" platforms="windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86" status="not-installed" uid="nb-javafx" version="${javafx.version}" visible="true">
+            <display-name>
+                <default>JavaFX Plugin</default>
+            </display-name>
+            <description>
+                <default>JavaFX plugin for NetBeans IDE</default>
+            </description>
+            <icon md5="${icon.md5}" size="${icon.length}">
+                <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/icon.png</default-uri>
+            </icon>
+            <configuration-logic>
+                <file md5="${logic.md5}" size="${logic.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/logic/logic,1.jar</default-uri>
+                </file>
+            </configuration-logic>
+            <installation-data>
+                <file md5="${data1.lin.md5}" size="${data1.lin.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/data/data,1.jar</default-uri>
+                </file>
+                <file md5="${data2.lin.md5}" size="${data2.lin.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/data/data,2.jar</default-uri>
+                </file>
+            </installation-data>
+            <system-requirements>
+                <disk-space>${disk-space.lin}</disk-space>
+            </system-requirements>
+            <dependencies>
+                <requirement uid="nb-base" version-lower="${base.lin.version}" version-upper="${base.lin.version}"/>
+                <requirement uid="nb-javase" version-lower="${javase.lin.version}" version-upper="${javase.lin.version}"/>
+            </dependencies>
+        </product>
+    </echoxml>
+    <echoxml file="build/data/fx-registry-solaris.xml">
+        <product built="${timestamp}" expand="false" features="" offset="20000" platforms="windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86" status="not-installed" uid="nb-javafx" version="${javafx.version}" visible="true">
+            <display-name>
+                <default>JavaFX Plugin</default>
+            </display-name>
+            <description>
+                <default>JavaFX plugin for NetBeans IDE</default>
+            </description>
+            <icon md5="${icon.md5}" size="${icon.length}">
+                <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/icon.png</default-uri>
+            </icon>
+            <configuration-logic>
+                <file md5="${logic.md5}" size="${logic.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/logic/logic,1.jar</default-uri>
+                </file>
+            </configuration-logic>
+            <installation-data>
+                <file md5="${data1.sol.md5}" size="${data1.sol.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/data/data,1.jar</default-uri>
+                </file>
+                <file md5="${data2.sol.md5}" size="${data2.sol.length}">
+                    <default-uri>resource:data/nb-javafx/${javafx.version}/windows%20linux%20solaris-sparc%20solaris-x86%20macosx-ppc%20macosx-x86/data/data,2.jar</default-uri>
+                </file>
+            </installation-data>
+            <system-requirements>
+                <disk-space>${disk-space.sol}</disk-space>
+            </system-requirements>
+            <dependencies>
+                <requirement uid="nb-base" version-lower="${base.sol.version}" version-upper="${base.sol.version}"/>
+                <requirement uid="nb-javase" version-lower="${javase.sol.version}" version-upper="${javase.sol.version}"/>
+            </dependencies>
+        </product>
+    </echoxml>
+  </target>
+  
+  <target name="patch" depends="build-javafx-package,build-registry,build-servicetag">
+    <macrodef name="patch-property-file">
+        <attribute name="file"/>
+        <sequential>
+            <propertyfile file="@{file}">
+              <entry  key="nbi.overall.license.resource" value="$S{nbi.overall.license.javafx.resource}"/>
+              <entry  key="NWP.welcome.page.type" value="javafx"/>
+            </propertyfile>
+        </sequential>
+    </macrodef>    
+    <macrodef name="patch-properties">
+        <attribute name="dir"/>
+        <sequential>
+            <patch-property-file file="@{dir}/engine.properties"/>
+            <patch-property-file file="@{dir}/engine_ja.properties"/>
+            <patch-property-file file="@{dir}/engine_pt_BR.properties"/>
+            <patch-property-file file="@{dir}/engine_zh_CN.properties"/>
+        </sequential>
+    </macrodef>    
+    <patch-properties dir="build/windows/data"/>
+    <patch-properties dir="build/linux/data"/>
+    <patch-properties dir="build/solaris/data"/>
+    <loadfile property="original.registry.win" srcfile="build/windows/data/registry.xml">
+      <filterchain>
+        <linecontains negate="true">
+          <contains value="/components>"/>
+        </linecontains>  
+        <linecontains negate="true">
+          <contains value="/registry>"/>
+        </linecontains>  
+      </filterchain>
+    </loadfile>
+    <loadfile property="original.registry.lin" srcfile="build/linux/data/registry.xml">
+      <filterchain>
+        <linecontains negate="true">
+          <contains value="/components>"/>
+        </linecontains>  
+        <linecontains negate="true">
+          <contains value="/registry>"/>
+        </linecontains>  
+      </filterchain>
+    </loadfile>
+    <loadfile property="original.registry.sol" srcfile="build/solaris/data/registry.xml">
+      <filterchain>
+        <linecontains negate="true">
+          <contains value="/components>"/>
+        </linecontains>  
+        <linecontains negate="true">
+          <contains value="/registry>"/>
+        </linecontains>  
+      </filterchain>
+    </loadfile>
+    <loadfile property="javafx.registry.win" srcfile="build/data/fx-registry-windows.xml">
+      <filterchain>
+        <headfilter lines="-1" skip="1"/>
+      </filterchain>
+    </loadfile>
+    <loadfile property="javafx.registry.lin" srcfile="build/data/fx-registry-linux.xml">
+      <filterchain>
+        <headfilter lines="-1" skip="1"/>
+      </filterchain>
+    </loadfile>
+    <loadfile property="javafx.registry.sol" srcfile="build/data/fx-registry-solaris.xml">
+      <filterchain>
+        <headfilter lines="-1" skip="1"/>
+      </filterchain>
+    </loadfile>
+    <echo file="build/windows/data/registry.xml"><![CDATA[${original.registry.win}${javafx.registry.win}</components></registry>]]></echo>    
+    <echo file="build/linux/data/registry.xml"><![CDATA[${original.registry.lin}${javafx.registry.lin}</components></registry>]]></echo>    
+    <echo file="build/solaris/data/registry.xml"><![CDATA[${original.registry.lin}${javafx.registry.lin}</components></registry>]]></echo>    
+    <copy todir="build/windows" overwrite="true">
+      <fileset dir="build/servicetag"/>
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
+    </copy>
+    <copy todir="build/linux" overwrite="true">
+      <fileset dir="build/servicetag"/>
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
+    </copy>
+    <copy todir="build/solaris" overwrite="true">
+      <fileset dir="build/servicetag"/>
+      <fileset dir="servicetag-src" excludes="**/*.java"/>
+    </copy>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/windows/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/linux/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
+    <copy file="../netbeans-license-javafx.txt" tofile="build/solaris/org/netbeans/installer/product/components/netbeans-license-javafx.txt"/>
+  </target>
+  
+  <target name="jar-installers" depends="patch">
+    <zip destfile="build/netbeans-6.9-javafx-windows.jar" compress="true" level="9" basedir="build/windows"/>
+    <zip destfile="build/netbeans-6.9-javafx-linux.jar" compress="true" level="9" basedir="build/linux"/>
+    <zip destfile="build/netbeans-6.9-javafx-solaris.jar" compress="true" level="9" basedir="build/solaris"/>
+  </target>
+
+  <target name="build-installers" depends="build-mac-dmg,jar-installers">
+    <mkdir dir="../build/installers"/>
+    <java jar="build/netbeans-6.9-javafx-windows.jar" fork="true">
+      <arg value="--platform"/>
+      <arg value="windows"/>
+      <arg value="--silent"/>
+      <arg value="--create-bundle"/>
+      <arg file="../build/installers/netbeans-6.9-javafx-windows.jar"/>
+      <arg value="--ignore-lock"/>
+      <arg value="--userdir"/>
+      <arg file="build/userdir-windows"/>
+    </java>
+    <java jar="build/netbeans-6.9-javafx-linux.jar" fork="true">
+      <arg value="--platform"/>
+      <arg value="linux"/>
+      <arg value="--silent"/>
+      <arg value="--create-bundle"/>
+      <arg file="../build/installers/netbeans-6.9-javafx-linux.jar"/>
+      <arg value="--ignore-lock"/>
+      <arg value="--userdir"/>
+      <arg file="build/userdir-linux"/>
+    </java>
+    <java jar="build/netbeans-6.9-javafx-solaris.jar" fork="true">
+      <arg value="--platform"/>
+      <arg value="solaris-x86"/>
+      <arg value="--silent"/>
+      <arg value="--create-bundle"/>
+      <arg file="../build/installers/netbeans-6.9-javafx-solaris.jar"/>
+      <arg value="--ignore-lock"/>
+      <arg value="--userdir"/>
+      <arg file="build/userdir-solaris"/>
+    </java>
+  </target>
+
+
+<!-- helper subroutines -->
+  <target name="-list-files">
+      <echo file="${list.file}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<files-list>]]>   
+</echo>
+      <genlist dir="${dir}"/>
+      <echo file="${list.file}" append="true"><![CDATA[</files-list>]]></echo>
+  </target>  
+  
+  <target name="-list-dir">
+    <echoxml file="${list.file}" append="true">  <entry type="directory" modified="${lastMod}" empty="${empty}" permissions="755">${name}/</entry></echoxml>
+  </target>
+
+  <target name="-list-file">
+    <checksum property="md5" file="${file}" algorithm="MD5"/>
+    <length property="length" file="${file}"/>
+    <condition property="permissions" value="755" else="644">
+      <contains string="${name}" substring="javafx2/javafx-sdk/bin/"/>
+    </condition>
+    <echoxml file="${list.file}" append="true">  <entry type="file" size="${length}" md5="${md5}" jar="false" packed="false" signed="false" modified="${lastMod}" permissions="${permissions}">${name}</entry></echoxml>
+  </target>
+
+</project>
