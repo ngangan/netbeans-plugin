@@ -125,7 +125,7 @@
   </target>
 
   <target name="patch-mac-dmg" depends="mount-mac-dmg,build-mac-pkg" if="running.on.mac">
-    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
+    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/${pkg.fname}/Contents/Resources" failonerror="yes">
         <arg value="-c"/>
         <arg value="sed -i '' 's/addproduct_id.sh &quot;NB&quot;/addproduct_id.sh &quot;NBFX&quot;/' postflight"/>            
     </exec>
