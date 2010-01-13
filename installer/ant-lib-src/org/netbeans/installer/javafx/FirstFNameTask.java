@@ -23,7 +23,12 @@ public class FirstFNameTask extends Task {
     @Override
     public void execute() throws BuildException {
         String[] f = dir.list();
-        if (f != null && f.length > 0) getProject().setNewProperty(property, f[0]);
+        if (f != null && f.length > 0) 
+            for (int i=0; i<f.length; i++) 
+                if (!f[i].startsWith(".")) {
+                    getProject().setNewProperty(property, f[i]);
+                    return;
+                }    
     }
 
 }
