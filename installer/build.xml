@@ -113,8 +113,9 @@
   <target name="build-mac-pkg" depends="mount-mac-dmg,build-servicetag,build-ant-lib" if="running.on.mac">
     <mkdir dir="build/pkgscripts"/>
     <firstfname property="mpkg.fname" dir="build/mac-mount"/>
+    <firstfname property="pkg.fname" dir="build/mac-mount/${mpkg.fname}/Contents/Packages"/>
     <copy todir="build/pkgscripts">
-      <fileset dir="build/mac-mount/${mpkg.fname}/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
+      <fileset dir="build/mac-mount/${mpkg.fname}/Contents/Packages/${pkg.fname}/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
       <fileset file="pkg-src"/>
     </copy>
     <exec executable="sh" failonerror="yes">
