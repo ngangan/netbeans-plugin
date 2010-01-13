@@ -244,6 +244,10 @@
       <antcall target="jar-macosx" />
     </target>
 
+    <target name="build-installers" depends="zip-clusters">
+      <ant dir="installer"/>
+    </target>
+
     <target name="runtests" description="Run JavaFX tests">
       <subant buildpath="javafx.editor:javafx.lexer"
           target="test"

@@ -493,8 +493,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
         switch (statement.getJavaFXKind()) {
             case WHILE_LOOP:
-                if (((WhileLoopTree) statement).getStatement().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
-                    block = ((WhileLoopTree) statement).getStatement();
+                if (((WhileLoopTree) statement).getBody().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                    block = ((WhileLoopTree) statement).getBody();
                 }
                 break;
             case FOR_EXPRESSION_FOR:

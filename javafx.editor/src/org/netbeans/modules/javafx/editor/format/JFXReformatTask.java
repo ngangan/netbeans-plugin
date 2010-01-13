@@ -1821,7 +1821,7 @@ public class JFXReformatTask implements ReformatTask {
             if (redundantWhileBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(node) || endOffset < getEndPos(node))) {
                 redundantWhileBraces = CodeStyle.BracesGenerationStyle.LEAVE_ALONE;
             }
-            wrapStatement(cs.wrapWhileStatement(), redundantWhileBraces, cs.spaceBeforeWhileLeftBrace() ? 1 : 0, node.getStatement());
+            wrapStatement(cs.wrapWhileStatement(), redundantWhileBraces, cs.spaceBeforeWhileLeftBrace() ? 1 : 0, node.getBody());
             return true;
         }
 
@@ -3887,7 +3887,7 @@ public class JFXReformatTask implements ReformatTask {
 
             @Override
             public Void visitWhileLoop(WhileLoopTree node, Void p) {
-                return visit(node.getStatement(), p);
+                return visit(node.getBody(), p);
             }
         }
     }
