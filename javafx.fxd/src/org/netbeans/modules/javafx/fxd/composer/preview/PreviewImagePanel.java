@@ -6,8 +6,6 @@ package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
 import com.sun.javafx.geom.transform.BaseTransform;
-import com.sun.javafx.tk.Toolkit;
-import com.sun.javafx.tk.swing.SwingScene;
 import java.net.URL;
 
 import org.openide.util.NbBundle;
@@ -18,12 +16,12 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import org.netbeans.modules.javafx.fxd.composer.model.*;
 
-import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
 import com.sun.javafx.tools.fxd.PreviewLoader;
 import com.sun.javafx.tools.fxd.PreviewStatistics;
 import com.sun.javafx.tools.fxd.container.ContainerEntry;
-import com.sun.javafx.tools.fxd.container.misc.ProgressNotifier;
+import com.sun.javafx.tools.fxd.container.misc.ProgressHandler;
 import com.sun.javafx.tools.fxd.loader.Profile;
+import com.sun.javafx.tools.fxd.PreviewLoaderUtilities;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -34,11 +32,11 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Date;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -48,7 +46,6 @@ import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
 import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
 import org.openide.awt.MouseUtils;
-import org.openide.util.Exceptions;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
 
@@ -67,8 +64,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private final FXZDataObject m_dObj;
     private final Action []     m_actions;
     private final Color         m_defaultBackground;
-    //private       JSGPanel      m_sgPanel = null;
-    //private       SwingScenePanel m_scenePanel = null;
+    private       JComponent    m_fxScenePanel = null;
     private       Scene         m_fxScene = null;
     private       int           m_changeTickerCopy = -1;
     private       Profile m_previewProfileCopy = null;
@@ -96,20 +92,10 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         return getScene().impl_getRoot();
     }
 
-    public SwingScenePanel getScenePanel() {
-        //return m_scenePanel;
-        return getScenePanel(m_fxScene);
+    public JComponent getScenePanel() {
+        return m_fxScenePanel;
     }
     
-    private static SwingScenePanel getScenePanel(Scene scene) {
-        //return m_scenePanel;
-        return ((SwingScene) scene.$javafx$scene$Scene$impl_peer).scenePanel;
-    }
-
-//    public JSGPanel getJSGPanel() {
-//        return m_sgPanel;
-//    }
-
     protected JLabel createWaitPanel() {
         URL url = PreviewImagePanel.class.getClassLoader().getResource("org/netbeans/modules/javafx/fxd/composer/resources/clock.gif"); //NOI18N
         ImageIcon icon = new ImageIcon( url);
@@ -136,6 +122,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 add( label, BorderLayout.CENTER);
                 
                 m_fxScene = null;
+                m_fxScenePanel = null;
                 Thread th = new Thread() {
                     @Override
                     public void run() {
@@ -155,36 +142,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         }
                             try {
                                 fModel.readLock();
-                                PreviewStatistics statistics = new PreviewStatistics();
-                                PreviewProgressNotifier progress = new PreviewProgressNotifier();
-                                PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
-                                progress.setLoader(loader);
 
-                                PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
-                                // PreviewProgressNotifier.notify() will invoke showImagePanel to show the image panel
-
-                                // start temporary workaround for http://javafx-jira.kenai.com/browse/RT-6816
-                                while (loader.getIsDone() == false) {
-                                    try {
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException ex) {
-                                    }
-                                }
-                                if (loader.getIsFailed()) {
-                                    Object cause = loader.getCauseOfFailure();
-                                    Object msg = (cause != null && cause instanceof Throwable)
-                                            ? ((Throwable) cause).getLocalizedMessage()
-                                            : cause;
-                                    showError(MSG_CANNOT_SHOW, msg);
-                                }
-                                // end temporary workaround
-                                //System.out.println("    ******************* starter thread loader: isDone=" + loader.getIsDone() + " isStarted=" + loader.getIsStarted() + " isStopped=" + loader.getIsStopped() + " isSusscess=" + loader.getIsSucceeded() + " isFail=" + loader.getIsFailed() + " err: " + loader.getCauseOfFailure());
-                                /* TODO: 
-The progress support has been refactored. The class ProgressNotifier has been replaced with ProgressHandler. The source in fxdcomposer should be updated in this way:
-
+                               
                                PreviewStatistics statistics = new PreviewStatistics();
-                                ProgressHandler ph = new ProgressHandler();
-                                ph.setCallback( new ProgressHandler.Callback() {
+                                ProgressHandler progress = new ProgressHandler();
+                                final PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
+                                progress.setCallback( new ProgressHandler.Callback() {
                                     public void onProgress(float percentage, int phase, int phasePercentage, int eventNum) {
                                         //update progress
                                     }
@@ -192,16 +155,20 @@ The progress support has been refactored. The class ProgressNotifier has been re
                                     public void onDone(Throwable error) {
                                         //in case error == null than load was completed successfully
                                         //otherwise it failed
+                                        assert SwingUtilities.isEventDispatchThread();
+                                        if (error == null){
+                                            showImagePanel(loader);
+                                        
+                                        } else {
+                                            String msg = error != null ? error.getLocalizedMessage() : null;
+                                            showError(MSG_CANNOT_SHOW, msg);
+                                        }
                                     }
                                 });
-                                PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, ph);
 
                                 PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
 
-The fxdloader was updated in a way that new version should not break compilation of FXDComposer. However it will not work correctly and must be updated after this fix will be propagated in a promoted build of JavaFX SDK.
-[ Show » ]
-Pavel Benes added a comment - Dec, 15 2009 01:59 PM The progress support has been refactored. The class ProgressNotifier has been replaced with ProgressHandler. The source in fxdcomposer should be updated in this way:                                PreviewStatistics statistics = new PreviewStatistics();                                 ProgressHandler ph = new ProgressHandler();                                 ph.setCallback( new ProgressHandler.Callback() {                                     public void onProgress(float percentage, int phase, int phasePercentage, int eventNum) {                                         //update progress                                     }                                     public void onDone(Throwable error) {                                         //in case error == null than load was completed successfully                                         //otherwise it failed                                     }                                 });                                 PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, ph);                                 PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader); The fxdloader was updated in a way that new version should not break compilation of FXDComposer. However it will not work correctly and must be updated after this fix will be propagated in a promoted build of JavaFX SDK.
-                                 */
+
                             } finally {
                                 fModel.readUnlock();
                             }
@@ -227,22 +194,18 @@ Pavel Benes added a comment - Dec, 15 2009 01:59 PM The progress support has bee
         });
     }
 
-    private void showImagePanel(final Node node) {
+    private void showImagePanel(final PreviewLoader loader) {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
                 try {
-                    Scene fxScene = new Scene(true);
-                    fxScene.addTriggers$();
-                    fxScene.applyDefaults$();
-                    fxScene.loc$content.insert(node);
-                    fxScene.complete$();
-                    Toolkit.getToolkit().addSceneTkPulseListener(fxScene.get$javafx$scene$Scene$scenePulseListener());
+                    
 
-                    m_fxScene = fxScene;
+                    final JComponent scenePanel = PreviewLoaderUtilities.getScenePanel(loader);
 
-                    final SwingScenePanel scenePanel = getScenePanel(fxScene);
-
+                    m_fxScene = loader.getScene();
+                    m_fxScenePanel = scenePanel;
+                            
                     removeAll();
                     add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
@@ -272,47 +235,6 @@ Pavel Benes added a comment - Dec, 15 2009 01:59 PM The progress support has bee
         });
     }
 
-    private class PreviewProgressNotifier extends ProgressNotifier{
-        private PreviewLoader m_loader;
-
-        protected void setLoader(PreviewLoader loader){
-            assert loader != null;
-            m_loader = loader;
-        }
-
-        @Override
-        public void done() {
-            super.done();
-            //System.out.println("----------- done ---------------- loader: isDone=" + m_loader.getIsDone() + " isStarted=" + m_loader.getIsStarted() + " isStopped=" + m_loader.getIsStopped() + " isSusscess=" + m_loader.getIsSucceeded() + " isFail=" + m_loader.getIsFailed() + " err: " + m_loader.getCauseOfFailure());
-            new Thread() {
-
-                @Override
-                public void run() {
-                    //System.out.println("----------start waiting ");
-                    while (m_loader.getIsDone() == false) {
-                        try {
-                            Thread.sleep(50);
-                        } catch (InterruptedException ex) {
-                        }
-                    }
-                    //System.out.println("    loader: isDone=" + m_loader.getIsDone() + " isStarted=" + m_loader.getIsStarted() + " isStopped=" + m_loader.getIsStopped() + " isSusscess=" + m_loader.getIsSucceeded() + " isFail=" + m_loader.getIsFailed() + " err: " + m_loader.getCauseOfFailure());
-                    if (m_loader.getIsSucceeded()){
-                        Node node = m_loader.get$content().getRoot$$bound$().get();
-                        showImagePanel(node);
-                    } else {
-                        showError(MSG_CANNOT_SHOW, m_loader.getCauseOfFailure());
-                    }
-                }
-            }.start();
-        }
-
-        @Override
-        protected void notify(int phase, int percentage, int eventNum) {
-            // is not useful in current implementation
-            //System.out.println("----------- notify----------------");
-        }
-    };
-
     private void showError(final String bundleKey, final Object msg) {
         if (SwingUtilities.isEventDispatchThread()) {
             doShowError(bundleKey, msg);
@@ -337,7 +259,7 @@ Pavel Benes added a comment - Dec, 15 2009 01:59 PM The progress support has bee
     }
     
     private void updateZoom() {
-        SwingScenePanel scenePanel = getScenePanel();
+        JComponent scenePanel = getScenePanel();
         if (scenePanel != null){
             float zoom = m_dObj.getDataModel().getZoomRatio();
             Node node = getSceneRoot();
