@@ -238,18 +238,19 @@
     <checksum property="data2.sol.md5" file="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar" algorithm="MD5"/>
     <length property="data2.sol.length" file="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
     <length property="disk-space.win">
-      <fileset dir="build/data/common-cluster"/>
-      <fileset dir="build/data/win-cluster"/>
+      <zipfileset src="../build/clusters/common.jar"/>
+      <zipfileset src="../build/clusters/windows.jar"/>
     </length>
     <length property="disk-space.lin">
-      <fileset dir="build/data/common-cluster"/>
-      <fileset dir="build/data/lin-cluster"/>
+      <zipfileset src="../build/clusters/common.jar"/>
+      <zipfileset src="../build/clusters/linux.jar"/>
     </length>
     <length property="disk-space.sol">
-      <fileset dir="build/data/common-cluster"/>
-      <fileset dir="build/data/sol-cluster"/>
+      <zipfileset src="../build/clusters/common.jar"/>
+      <zipfileset src="../build/clusters/solaris.jar"/>
     </length>
     <tstamp/>
+    <mkdir dir="build/data"/>
     <echoxml file="build/data/fx-registry-windows.xml">
         <product built="${DSTAMP}${TSTAMP}" expand="false" features="" offset="20000" platforms="windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86" status="not-installed" uid="nb-javafx" version="${javafx.version}" visible="true">
             <display-name>
