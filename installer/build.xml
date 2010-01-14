@@ -117,7 +117,7 @@
     <firstfname property="pkg.fname" dir="build/mac-mount/${mpkg.fname}/Contents/Packages"/>
     <copy todir="build/pkgscripts">
       <fileset dir="build/mac-mount/${mpkg.fname}/Contents/Packages/${pkg.fname}/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
-      <fileset file="pkg-src"/>
+      <fileset dir="pkg-src"/>
     </copy>
     <exec executable="sh" failonerror="yes">
         <arg value="-c"/>
@@ -130,11 +130,11 @@
         <arg value="-c"/>
         <arg value="sed -i '' 's/addproduct_id.sh &quot;NB&quot;/addproduct_id.sh &quot;NBFX&quot;/' postflight"/>            
     </exec>
-    <copy todir="build/mac-mount/${mpkg.fname}">
+    <copy todir="build/mac-mount/${mpkg.fname}" overwrite="true">
       <fileset dir="mac-patch-src"/>
     </copy>
-    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/${mpkg.fname}/Contents/Resources/License.txt"/>
-    <copy todir="build/mac-mount/${mpkg.fname}/Contents/Packages/javafx.pkg">
+    <copy file="../netbeans-license-javafx.txt" tofile="build/mac-mount/${mpkg.fname}/Contents/Resources/License.txt" overwrite="true"/>
+    <copy todir="build/mac-mount/${mpkg.fname}/Contents/Packages/javafx.pkg" overwrite="true">
       <fileset dir="build/javafx.pkg"/>
     </copy>
     <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
