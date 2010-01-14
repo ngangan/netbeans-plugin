@@ -227,7 +227,7 @@
       </jar>
     </target>
 
-    <target name="zip-clusters" depends="build">
+    <target name="zip-clusters" depends="nbms">
       <mkdir dir="build/clusters"/>
       <jar destfile="build/clusters/common.jar" compress="true" level="9">
         <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
@@ -271,7 +271,7 @@
 
     <target name="full-build" depends="clean,nbms,zip-clusters,l10n-kit"/>
 
-    <target name="build-installers" depends="clean,nbms,zip-clusters,l10n-kit">
+    <target name="build-installers" depends="full-build">
       <ant dir="installer"/>
     </target>
 
