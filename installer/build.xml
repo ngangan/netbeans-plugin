@@ -1,5 +1,6 @@
 <project name="javafx-plugin-installers" default="build-installers">
   
+  <tstamp/>
   <property name="ant.build.javac.target" value="1.5"/>
   
   <target name="clean">
@@ -18,8 +19,8 @@
   </target>
 
   <target name="download-javase" depends="clean">
-      <property name="build.config" value="daily"/>
-      <property name="javafx.version" value="6.9.0.0"/>
+      <property name="build.config" value="promoted"/>
+      <property name="javafx.version" value="6.9.0.0.${DSTAMP}${TSTAMP}"/>
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
       <property name="use.timestamp" value="true"/>
@@ -250,7 +251,6 @@
       <zipfileset src="../build/clusters/common.jar"/>
       <zipfileset src="../build/clusters/solaris.jar"/>
     </length>
-    <tstamp/>
     <mkdir dir="build/data"/>
     <echoxml file="build/data/fx-registry-windows.xml">
         <product built="${DSTAMP}${TSTAMP}" expand="false" features="" offset="20000" platforms="windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86" status="not-installed" uid="nb-javafx" version="${javafx.version}" visible="true">
