@@ -118,7 +118,7 @@ made subject to such option by the copyright holder.
         </createmodulexml>
     </target>
 
-    <target name="nbms" depends="build" description="Build NBMs and an Auto Update site descriptor for all modules in the suite.">
+    <target name="nbms" depends="-init,branding,release" description="Build NBMs and an Auto Update site descriptor for all modules in the suite.">
         <property name="build.updates.dir" location="build/updates"/>
         <!-- reads from suite/project.properties first -->
         <condition property="help.target.cluster" value="${nbm.target.cluster}" >
@@ -148,6 +148,15 @@ made subject to such option by the copyright holder.
             <property name="nbm.target.dir" location="${build.updates.dir}"/>
             <property name="${nbm.target.cluster.name}" value="${help.target.cluster}" />
         </subant>
+        <mkdir dir="${cluster}/config/Modules"/>
+        <createmodulexml xmldir="${cluster}/config/Modules">
+            <hidden dir="${netbeans.dest.dir}">
+                <custom classpath="${harness.dir}/tasks.jar" classname="org.netbeans.nbbuild.ModuleSelector">
+                    <param name="excludeModules" value="${disabled.modules}"/>
+                    <param name="excluded" value="true"/>
+                </custom>
+            </hidden>
+        </createmodulexml>
         <property name="catalog.base.url" value="."/>
         <makeupdatedesc desc="${build.updates.dir}/updates.xml" distbase="${catalog.base.url}" automaticgrouping="true">
             <fileset dir="${build.updates.dir}">
