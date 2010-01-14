@@ -89,7 +89,7 @@ public final class PreviewTopComponent extends TopComponent implements Runnable 
 //        return m_imgPanel.getJSGPanel();
 //    }
 
-    public SwingScenePanel getScenePanel() {
+    public JComponent getScenePanel() {
         return m_imgPanel.getScenePanel();
     }
 
