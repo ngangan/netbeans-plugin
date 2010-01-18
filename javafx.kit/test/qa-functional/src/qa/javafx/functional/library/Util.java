@@ -29,6 +29,13 @@ import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.JProgressBarOperator;
 
+
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
@@ -261,6 +268,66 @@ public class Util {
         }
 
     }
+
+
+    public static void unzipFile(String src, String dst){
+        System.out.println("*** UNzip File");
+        System.out.println("   from: \"" + src + "\"");
+        System.out.println("   to  : \"" + dst + "\"");
+
+        String urlString = src;
+
+        try {
+            String destinationname = dst;
+            byte[] buf = new byte[1024];
+            ZipInputStream zipinputstream = null;
+            ZipEntry zipentry;
+            URL url = new URL(urlString);
+
+
+            zipinputstream = new ZipInputStream(url.openStream());
+
+            zipentry = zipinputstream.getNextEntry();
+            while (zipentry != null) {
+                //for each entry to be extracted
+                String entryName = zipentry.getName();
+                //System.out.println("entryname " + entryName);
+                int n;
+                FileOutputStream fileoutputstream;
+                File newFile = new File(entryName);
+                String directory = newFile.getParent();
+
+                if (directory == null) {
+                    if (newFile.isDirectory()) {
+                        break;
+                    }
+                }
+
+                if (zipentry.isDirectory()) {
+                    new File(destinationname + "/" + entryName).mkdirs();
+                } else {
+                    //System.out.println("Save: '" + destinationname + entryName + "'");
+                    fileoutputstream = new FileOutputStream(
+                            destinationname + entryName);
+
+                    while ((n = zipinputstream.read(buf, 0, 1024)) > -1) {
+                        fileoutputstream.write(buf, 0, n);
+                    }
+
+                    fileoutputstream.close();
+                }
+                zipinputstream.closeEntry();
+                zipentry = zipinputstream.getNextEntry();
+
+            }
+
+            zipinputstream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
 
     public static void waitProgressBar(ComponentOperator comp) {

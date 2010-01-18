@@ -27,6 +27,7 @@ import java.util.Collection;
 import javafx.fxd.FXDNode;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javax.swing.JComponent;
 import org.netbeans.modules.javafx.fxd.composer.source.SourceElement;
 
 /**
@@ -118,7 +119,7 @@ public final class FXDComposerController {
         return m_previewTopComponent.getScene();
     }
 
-    public SwingScenePanel getScenePanel() {
+    public JComponent getScenePanel() {
         return m_previewTopComponent.getScenePanel();
     }
 
