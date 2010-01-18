@@ -184,6 +184,7 @@
     <mkdir dir="build/ant-lib"/>
     <javac srcdir="ant-lib-src" destdir="build/ant-lib"/>
     <taskdef name="firstfname" classname="org.netbeans.installer.javafx.FirstFNameTask" classpath="build/ant-lib"/>
+    <taskdef name="copywithflist" classname="org.netbeans.installer.javafx.FilesListTask" classpath="build/ant-lib"/>
   </target>
  
   <target name="build-logic" depends="unzip-javase">
@@ -200,14 +201,14 @@
 
   <target name="build-javafx-package" depends="build-logic,build-ant-lib">
     <mkdir dir="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
-    <copy file="../build/clusters/common.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
-    <copy file="../build/clusters/windows.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <copywithflist file="../build/clusters/common.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copywithflist file="../build/clusters/windows.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
     <mkdir dir="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
-    <copy file="../build/clusters/common.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
-    <copy file="../build/clusters/linux.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <copywithflist file="../build/clusters/common.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copywithflist file="../build/clusters/linux.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
     <mkdir dir="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data"/>
-    <copy file="../build/clusters/common.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
-    <copy file="../build/clusters/solaris.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
+    <copywithflist file="../build/clusters/common.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,1.jar"/>
+    <copywithflist file="../build/clusters/solaris.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/data/data,2.jar"/>
     <copy file="build/logic.jar" tofile="build/windows/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
     <copy file="build/logic.jar" tofile="build/linux/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
     <copy file="build/logic.jar" tofile="build/solaris/data/nb-javafx/${javafx.version}/windows linux solaris-sparc solaris-x86 macosx-ppc macosx-x86/logic/logic,1.jar"/>
