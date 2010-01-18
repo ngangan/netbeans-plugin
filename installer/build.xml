@@ -122,11 +122,20 @@
         <arg value="-c"/>
         <arg value="mv javase*.pkg javase.pkg"/>            
     </exec>
+    <pathconvert property="app.fname" pathsep=".">
+        <chainedmapper>
+            <flattenmapper/>
+            <filtermapper>
+                <replacestring from=".mpkg" to=".app"/>
+            </filtermapper>
+        </chainedmapper>
+        <path path="${mpkg.fname}"/>
+    </pathconvert>
     <copy todir="build/pkgscripts">
       <fileset dir="build/mac-mount/${mpkg.fname}/Contents/Packages/baseide.pkg/Contents/Resources" includes="env.sh,addproduct_id.sh,add_cluster.sh,get_current_jdk.sh"/>
       <fileset dir="pkg-src"/>
       <filterset begintoken="__" endtoken="__">
-        <filter token="MPKGFNAME" value="${mpkg.fname}"/>
+        <filter token="APPFNAME" value="${app.fname}"/>
       </filterset>
     </copy>
     <exec executable="sh" failonerror="yes">
