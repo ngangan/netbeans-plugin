@@ -131,7 +131,7 @@
     </copy>
     <exec executable="sh" failonerror="yes">
         <arg value="-c"/>
-        <arg value="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -v -ds -p build/javafx.pkg -f build/mac-cluster -i pkg-src/Info.plist -r build/pkgscripts -d pkg-src/Description.plist"/>
+        <arg value="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker -build -v -ds -p build/javafx.pkg -f build/mac-cluster -i build/pkgscripts/Info.plist -r build/pkgscripts -d build/pkgscripts/Description.plist"/>
     </exec>                                         
   </target>
 
