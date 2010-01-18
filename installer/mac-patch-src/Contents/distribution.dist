@@ -4,7 +4,7 @@
     <welcome file="Welcome.html"></welcome>
     <license file="License.txt"></license>
     <background file="background.tif" scaling="none" alignment="topleft"></background>
-    <options allow-external-scripts="no" customize="allow" rootVolumeOnly="false"></options>
+    <options allow-external-scripts="no" customize="never" rootVolumeOnly="false"></options>
     <installation-check script="checkMemsize()"></installation-check>
     <volume-check script="checkSystemversion()"></volume-check>
     <script>
@@ -43,8 +43,15 @@ function volumeCheckTiger() {
 /* js:pkmk:start */
 function checkSystemversion() {
 	var result = false;
+	var version;	
 	try {
-		result = my.target.systemVersion.ProductVersion >= '10.4';
+		version = my.target.systemVersion.ProductVersion;
+		if(version == 'undefined') {
+			result = ( -1 != system.compareVersions(system.version.ProductVersion, '10.4'));
+		} else {
+			result = ( -1 != system.compareVersions(version, '10.4'));
+		}
+	
 	} catch (e) {}
 	
 	if(!result) {
@@ -52,15 +59,54 @@ function checkSystemversion() {
 		my.result.title = system.localizedStringWithFormat('ERR_INVALID_VERSION_TITLE');
 		my.result.message = system.localizedStringWithFormat('ERR_INVALID_VERSION_MSG');
 	} else {
-		//try {
-		//	result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.6') == true;
-		//} catch (e) {}
-		//if(!result) {
-		//	my.result.type = 'Fatal';
-		//	my.result.title = system.localizedStringWithFormat('ERR_NO_JAVA6_TITLE');
-		//	my.result.message = system.localizedStringWithFormat('ERR_NO_JAVA6_MSG');
-		//}
+		try {
+			result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.5') == true;
+		} catch (e) {}
+
+		if(!result) {
+		    try {
+                        result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0') == true;
+		    } catch (e) {}
+		}
+		if(!result) {
+		    try {
+                        result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.6') == true;
+		    } catch (e) {}
+		}
+		if(!result) {
+		    try {
+                        result = system.files.fileExistsAtPath('/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0') == true;
+		    } catch (e) {}
+		}
+		
+
+		if(!result) {
+			my.result.type = 'Fatal';
+			my.result.title = system.localizedStringWithFormat('ERR_NO_JAVA_TITLE');
+			my.result.message = system.localizedStringWithFormat('ERR_NO_JAVA_MSG');
+		}
         }
+
+	return result;
+}
+/* js:pkmk:end */
+</script>
+
+<script>
+/* js:pkmk:start */
+function choiceIsADowngrade() {
+	return  checkChoiceUpgradeAction() ;
+}
+/* js:pkmk:end */
+
+
+/* js:pkmk:start */
+function checkChoiceUpgradeAction() {
+	var result = false;
+	try {
+		result = my.choice.packageUpgradeAction == 'downgrade' || my.choice.packageUpgradeAction == 'mixed';
+	} catch (e) {}
+	
 	return result;
 }
 /* js:pkmk:end */
@@ -96,7 +142,7 @@ function checkChoiceUpgradeAction() {
    
     <choice id="netbeans" title="netbeans-title" description="netbeans-description" start_selected="true" start_enabled="true" start_visible="true"></choice>
     <choice id="baseide" title="baseide-title" description="baseide-description" start_selected="true" start_enabled="true" start_visible="true">
-        <pkg-ref id="org.netbeans.ide"></pkg-ref>
+        <pkg-ref id="ident.pkg.baseide"></pkg-ref>
     </choice>
     <choice id="javase" title="javase-title" description="javase-description" start_selected="true" start_enabled="true" start_visible="true" selected="choices.javase.selected &amp;&amp; choices.baseide.selected" enabled="choices.baseide.selected">
         <pkg-ref id="ident.pkg.javase"></pkg-ref>
@@ -105,7 +151,7 @@ function checkChoiceUpgradeAction() {
         <pkg-ref id="ident.pkg.javafx"></pkg-ref>
     </choice>
     
-    <pkg-ref id="org.netbeans.ide" version="0.0.0.0.1" installKBytes="77796	" auth="Root" onConclusion="None">file:./Contents/Packages/baseide.pkg</pkg-ref>
+    <pkg-ref id="ident.pkg.baseide" version="0.0.0.0.1" installKBytes="77796	" auth="Root" onConclusion="None">file:./Contents/Packages/baseide.pkg</pkg-ref>
     <pkg-ref id="ident.pkg.javase" version="0.0.0.0.1" installKBytes="68468	" auth="Root" onConclusion="None">file:./Contents/Packages/javase.pkg</pkg-ref>
     <pkg-ref id="ident.pkg.javafx" version="0.0.0.0.1" installKBytes="61792	" auth="Root" onConclusion="None">file:./Contents/Packages/javafx.pkg</pkg-ref>
  
