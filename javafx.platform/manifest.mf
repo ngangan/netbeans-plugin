@@ -5,4 +5,4 @@ OpenIDE-Module-Layer: org/netbeans/modules/javafx/platform/resources/layer.xml
 AutoUpdate-Show-In-Client: false
 OpenIDE-Module-Requires: javafx.sdk.v1_2, org.openide.modules.ModuleFormat2
 OpenIDE-Module-Specification-Version: 1.7.1
-OpenIDE-Module-Hide-Classpath-Packages: com.sun.javadoc.**, com.sun.source.**, javax.annotation.**, javax.lang.model.**, javax.tools.**, com.sun.tools.mjavac.** 
+OpenIDE-Module-Hide-Classpath-Packages: com.sun.javadoc.**, com.sun.source.**, javax.lang.model.**, javax.tools.**, com.sun.tools.mjavac.** 
