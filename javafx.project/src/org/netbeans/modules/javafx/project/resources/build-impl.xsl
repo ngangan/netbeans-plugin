@@ -51,7 +51,7 @@ made subject to such option by the copyright holder.
                 xmlns:projdeps2="http://www.netbeans.org/ns/ant-project-references/2"
                 exclude-result-prefixes="xalan p projdeps projdeps2">
 <xsl:comment> XXX should use namespaces for NB in-VM tasks from ant/browsetask and debuggerjavafx/ant (Ant 1.6.1 and higher only)</xsl:comment>
-    <xsl:output method="xml" indent="yes" encoding="UTF-8" xalan:indent-amount="4"/>
+    <xsl:output method="xml" indent="yes" encoding="UTF-8" xalan:indent-amount="4" cdata-section-elements="script"/>
     <xsl:template match="/">
         
         <xsl:comment><![CDATA[
@@ -328,7 +328,7 @@ is divided into following sections:
                     DEBUGGING SECTION
                     =================
     </xsl:comment>
-        <target depends="init" if="netbeans.home" name="-debug-start-debugger">
+        <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger">
             <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
@@ -344,7 +344,7 @@ is divided into following sections:
                 </sourcepath>
             </nbjpdastart>
         </target>
-        <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
+        <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger-stepinto">
             <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" stopclassname="${{main.class}}" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
@@ -378,12 +378,32 @@ is divided into following sections:
             <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
                 <istrue value="${{jad.install}}"/>
             </condition>
-             <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}">
-                <arg value="${{run.jvmargs}}"/>
-                <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
-                <arg value="-Xdebug"/>
-                <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
-            </exec>
+            <script language="javascript"><![CDATA[
+                importClass(java.net.Socket);
+                socket = new Socket();
+                socket.bind(null);
+                project.setNewProperty("javafx.address", socket.getLocalPort());
+                socket.close();
+            ]]></script>
+            <parallel failonany="true">
+                <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}">
+                    <arg value="${{run.jvmargs}}"/>
+                    <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
+                    <arg value="-Xdebug"/>
+                    <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=y,suspend=y"/>
+                </exec>
+                <sequential>
+                    <sleep seconds="6"/>
+                    <nbjpdaconnect address="${{javafx.address}}" name="${{application.title}}" transport="dt_socket">
+                        <classpath>
+                            <path path="${{javac.classpath}}"/>
+                        </classpath>
+                        <sourcepath>
+                            <path path="${{src.dir}}"/>
+                        </sourcepath>
+                    </nbjpdaconnect>
+                </sequential>
+            </parallel>
         </target>
         <target name="-debug-tv-debuggee" if="tv.execution.trigger">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
