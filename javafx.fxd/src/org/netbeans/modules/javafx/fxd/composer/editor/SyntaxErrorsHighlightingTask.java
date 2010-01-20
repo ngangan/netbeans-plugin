@@ -47,6 +47,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.editor.BaseDocument;
+import org.netbeans.editor.Utilities;
+import org.netbeans.modules.editor.indent.api.IndentUtils;
 import org.netbeans.modules.javafx.fxd.composer.editor.parser.FXDSyntaxErrorParser.FXDParserResult;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
@@ -79,12 +82,15 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
                 TokenSequence<?> ts = result.getSnapshot().getTokenHierarchy().tokenSequence();
                 ts.move(syntaxError.getOffset());
                 if (ts.moveNext()) {
+                    int ErrRow = getRow(syntaxError, (BaseDocument)document);
+                    int ErrPosition = getPosition(syntaxError, (BaseDocument)document);
+
                     Token token = ts.token();
                     int start = ts.offset();
                     int end = start + token.length();
                     ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
                             Severity.ERROR,
-                            syntaxError.getMessage(),
+                            syntaxError.getMessage()+ " at ["+ErrRow+","+ErrPosition+"]",
                             document,
                             document.createPosition(start),
                             document.createPosition(end));
@@ -100,6 +106,25 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
             Exceptions.printStackTrace (ex1);
         }
     }
+
+    private int getRow(FXDSyntaxErrorException syntaxError, BaseDocument document)
+            throws BadLocationException {
+        return Utilities.getRowCount(document, 0, syntaxError.getOffset());
+    }
+
+    private int getPosition(FXDSyntaxErrorException syntaxError, BaseDocument document)
+            throws BadLocationException {
+        int offset = syntaxError.getOffset();
+        int rowStart = Utilities.getRowStart((BaseDocument) document, offset);
+        int position = offset - rowStart;
+        int tabs = syntaxError.getTabsInLastRow();
+        if (tabs > 0){
+            // replace 1 tab char by number of spaces in tab
+            position = position - tabs + ( tabs * IndentUtils.tabSize(document));
+        }
+        return position;
+    }
+
 
     @Override
     public int getPriority() {

@@ -140,38 +140,43 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         } else {
                             updateLabelMessage(label, LBL_RENDERING, null);
                         }
-                            try {
-                                fModel.readLock();
+                        try {
+                            fModel.readLock();
 
-                               
-                               PreviewStatistics statistics = new PreviewStatistics();
-                                ProgressHandler progress = new ProgressHandler();
-                                final PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
-                                progress.setCallback( new ProgressHandler.Callback() {
-                                    public void onProgress(float percentage, int phase, int phasePercentage, int eventNum) {
-                                        //update progress
-                                    }
+                            SwingUtilities.invokeLater(new Runnable() {
 
-                                    public void onDone(Throwable error) {
-                                        //in case error == null than load was completed successfully
-                                        //otherwise it failed
-                                        assert SwingUtilities.isEventDispatchThread();
-                                        if (error == null){
-                                            showImagePanel(loader);
-                                        
-                                        } else {
-                                            String msg = error != null ? error.getLocalizedMessage() : null;
-                                            showError(MSG_CANNOT_SHOW, msg);
+                                public void run() {
+                                    PreviewStatistics statistics = new PreviewStatistics();
+                                    ProgressHandler progress = new ProgressHandler();
+                                    final PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
+                                    progress.setCallback(new ProgressHandler.Callback() {
+
+                                        public void onProgress(float percentage, int phase, int phasePercentage, int eventNum) {
+                                            //update progress
                                         }
-                                    }
-                                });
 
-                                PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
+                                        public void onDone(Throwable error) {
+                                            //in case error == null than load was completed successfully
+                                            //otherwise it failed
+                                            assert SwingUtilities.isEventDispatchThread();
+                                            if (error == null) {
+                                                showImagePanel(loader);
 
+                                            } else {
+                                                String msg = error != null ? error.getLocalizedMessage() : null;
+                                                showError(MSG_CANNOT_SHOW, msg);
+                                            }
+                                        }
+                                    });
 
-                            } finally {
-                                fModel.readUnlock();
-                            }
+                                    PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
+
+                                }
+                            });
+
+                        } finally {
+                            fModel.readUnlock();
+                        }
                     }
                 };
                 th.setName("ModelUpdate-Thread");  //NOI18N
@@ -205,7 +210,9 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                     m_fxScene = loader.getScene();
                     m_fxScenePanel = scenePanel;
-                            
+
+                    //DialogDescriptor dd = new DialogDescriptor(scenePanel, "xxxxxxxxxxx");
+                    //DialogDisplayer.getDefault().createDialog(dd).setVisible(true);
                     removeAll();
                     add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
