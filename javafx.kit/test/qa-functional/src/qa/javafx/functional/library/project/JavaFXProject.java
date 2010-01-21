@@ -80,10 +80,13 @@ public class JavaFXProject extends JavaProject {
         return new JavaFXProject(project, deploymentType);
     }
 
+    public String getMainPackage() {
+        return name.toLowerCase().replaceAll(" ", "");
+    }
+
     public String getMainFile() {
         return "Main.fx";
     }
-
     
     public EditorOperator openMainFile() {
         String pack = getName().toLowerCase();

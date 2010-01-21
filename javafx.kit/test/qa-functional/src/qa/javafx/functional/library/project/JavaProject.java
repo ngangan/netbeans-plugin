@@ -235,12 +235,15 @@ public class JavaProject extends Project {
 
 
         new JButtonOperator(newProject, "Finish").push();
-        newProject.waitClosed();
+        //Util.sleep(3000);
+        //newProject.waitClosed();
+        Util.waitDialog(newProject);
+        Util.sleep(TIME_WAIT);
         
-        try {
-            Thread.sleep(TIME_WAIT);
-        } catch (Exception e) {
-        }
+//        try {
+//            Thread.sleep(TIME_WAIT);
+//        } catch (Exception e) {
+//        }
 
         //Utils.waitScanningClassPath();
         Util.waitScanFinished();

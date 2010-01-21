@@ -28,6 +28,7 @@ import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.JProgressBarOperator;
+import org.netbeans.jemmy.operators.JDialogOperator;
 
 
 import java.io.FileOutputStream;
@@ -370,12 +371,24 @@ public class Util {
     
     
 // =================== Utility Operations  ===================
-    
+
+    public static void waitDialog(JDialogOperator  dialog) {
+          sleep(2000);
+          try{
+            dialog.waitClosed();
+          }catch(Throwable e){
+             //e.printStackTrace();
+            System.out.println("Dialog Wait Closed Exception: " + e.getMessage());
+            sleep(10000);
+          }
+    }
+
+
     public static void sleep() {
         sleep(WAIT_TIME);
     }
 
-    public static void sleep(int ms) {
+    public static void sleep(long ms) {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException ex) {
