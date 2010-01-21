@@ -106,11 +106,14 @@ public final class ReformatUtils {
     }
 
     // TODO check flags when it will work
-    // TODO create issue for compiler
-    public static boolean hasModifiers(ModifiersTree mods) {
+    public static boolean hasModifiers(ModifiersTree mods, JFXTokenId firstToken) {
+        if (!MODIFIER_KEYWORDS.contains(firstToken)) { //#179502
+            return false;
+        }
         if (mods == null) {
             return false;
         }
+
         final String p1 = "synthetic"; // NOI18N
         final String p2 = "script only (default)"; // NOI18N
         final String p3 = "static script only (default)"; // NOI18N
