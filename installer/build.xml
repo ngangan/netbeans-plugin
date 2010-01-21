@@ -116,11 +116,15 @@
     <firstfname property="mpkg.fname" dir="build/mac-mount"/>
     <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages" failonerror="yes">
         <arg value="-c"/>
-        <arg value="mv baseide*.pkg baseide.pkg"/>            
+        <arg value="mv baseide*.pkg baseide.pkg;mv javase*.pkg javase.pkg"/>            
     </exec>
-    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages" failonerror="yes">
+    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javase.pkg/Contents/Resources" failonerror="yes">
         <arg value="-c"/>
-        <arg value="mv javase*.pkg javase.pkg"/>            
+        <arg value="mv javase*.bom javase.bom;mv javase*.pax.gz javase.pax.gz;mv javase*.sizes javase.sizes"/>            
+    </exec>
+    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javase.pkg/Contents/Resources/English.lproj" failonerror="yes">
+        <arg value="-c"/>
+        <arg value="mv javase*.info javase.info"/>            
     </exec>
     <pathconvert property="app.fname" pathsep=".">
         <chainedmapper>
