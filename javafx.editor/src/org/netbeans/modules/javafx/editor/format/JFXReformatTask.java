@@ -847,7 +847,7 @@ public class JFXReformatTask implements ReformatTask {
             if (!isClassSynthetic) {
                 int old = indent;
                 ModifiersTree mods = node.getModifiers();
-                if (ReformatUtils.hasModifiers(mods)) {
+                if (ReformatUtils.hasModifiers(mods, tokens.token().id())) {
                     if (scan(mods, p)) {
                         indent += continuationIndentSize;
                         if (cs.placeNewLineAfterModifiers()) {
@@ -1089,7 +1089,7 @@ public class JFXReformatTask implements ReformatTask {
             Tree parent = getCurrentPath().getParentPath().getLeaf();
             boolean insideFor = parent.getJavaFXKind() == JavaFXKind.FOR_EXPRESSION_FOR;
             ModifiersTree mods = node.getModifiers();
-            if (ReformatUtils.hasModifiers(mods)) {
+            if (ReformatUtils.hasModifiers(mods, tokens.token().id())) {
                 if (scan(mods, p)) {
                     if (!insideFor) {
                         indent += continuationIndentSize;
@@ -1224,7 +1224,7 @@ public class JFXReformatTask implements ReformatTask {
                 // ---
             } else {
                 ModifiersTree mods = funcDef.getModifiers();
-                if (ReformatUtils.hasModifiers(mods)) {
+                if (ReformatUtils.hasModifiers(mods, tokens.token().id())) {
                     if (scan(mods, p)) {
                         indent += continuationIndentSize;
                         if (cs.placeNewLineAfterModifiers()) {
