@@ -99,6 +99,8 @@ public interface Constant {
     String DEPLOYMENT_WEB_START = "Web Start Execution";
     String DEPLOYMENT_BROWSER = "Run in Browser";
     String DEPLOYMENT_MOBILE = "Run in Mobile Emulator";
+    String DEPLOYMENT_TV = "Run in TV Emulator";
+
 
     String DEPLOYMENT_MOBILE_NOT_INCLUDED = "Current platform does not include mobile device emulator necessary for the execution.";
     // ================   Tests  ========================

@@ -348,6 +348,11 @@ public class JavaProject extends Project {
         //new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
         return new Output(getName() + " (jar) ");
     }
+    public Output getRunOutput() {
+
+        //new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
+        return new Output(getName() + " (run) ");
+    }
 
     public class Output extends OutputTabOperator{
 
@@ -372,7 +377,7 @@ public class JavaProject extends Project {
         boolean compiled = outputText.contains(BUILD_SUCCESSFUL);
         
         //if(!compiled){
-            System.out.println("Build Fails:\n" + outputText);
+            System.out.println("OUTPUT:\n" + outputText);
         //}
         
         return compiled;

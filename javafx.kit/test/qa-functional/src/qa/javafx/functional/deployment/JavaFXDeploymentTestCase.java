@@ -36,64 +36,64 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library.project;
+package qa.javafx.functional.deployment;
+
+import qa.javafx.smoke.*;
+import junit.framework.Test;
+import junit.textui.TestRunner;
+import org.netbeans.junit.NbModuleSuite;
+import org.netbeans.junit.NbTestSuite;
+import qa.javafx.functional.library.JavaFXTestCase;
+import qa.javafx.functional.library.Util;
+import qa.javafx.functional.library.project.DeploymentType;
+import qa.javafx.functional.library.project.JavaFXProject;
 
 /**
  *
  * @author andromeda
  */
-public enum OperationSystem {
+public class JavaFXDeploymentTestCase extends JavaFXTestCase {
 
-    LINUX,
-    SOLARIS,
-    MAC,
-    WINDOWS,
-    UNKNOWN;
+    public JavaFXDeploymentTestCase(String name) {
+        super(name);
+    }
+    static String[] TESTS = {
+        "testDeploymentMobile"
+    };
 
-    public static OperationSystem getOS() {
+    public static Test suite() {
+        return NbModuleSuite.create(JavaFXDeploymentTestCase.class, ".*", ".*", TESTS);
 
-        String os = System.getProperty("os.name");
-
-        if (os != null) {
-            os = os.toLowerCase();
-            if (os.contains("lin")) {
-                return LINUX;
-            } else if (os.contains("sol")) {
-                return SOLARIS;            
-            } else if (os.contains("mac")) {
-                return MAC;
-            } else if (os.contains("win")) {
-                return WINDOWS;
-            }
-        }
-        return UNKNOWN;
     }
 
-    public String getLabel() {
-
-        switch(this){
-            case WINDOWS: return "windows-i586";
-            case MAC: return "macosx-universal";
-            case LINUX: return "linux-i586";
-            case SOLARIS: return "solaris-i586";
-            default: return "unlnown-label";
-        }
-       
+    public static void main(String[] args) {
+        TestRunner.run(new NbTestSuite(JavaFXDeploymentTestCase.class));
     }
-    public boolean support(DeploymentType type) {
-        switch(type){
-            case DESKTOP: return true;
-            case BROWSER: return true;
-            case WEB_START: return true;
-            case MOBILE: switch(this){
-                case WINDOWS: return true;
-                case MAC: return true;
-                default: return false;
-            }
-            case TV: return true;
+
+    public String getProjectName(DeploymentType type){
+        return "Deployment_" + type.toString().replaceAll(" ", "");
+    }
+
+
+    public void testDeployment(DeploymentType type) {
+
+        JavaFXProject project = JavaFXProject.createProject(getProjectName(type),type);
+
+
+        try{
+            project.deploy();
+            project.build();
             
-            default: return false;
+            //String output = project.getOutput().getText();
+            //System.out.println("OUTPUT:");
+            //System.out.println(output);
+
+            assertTrue("Deployment " + type + " failed!", project.isDeployPass());
+
+        }catch(Exception e){
+            fail(e.getMessage());
         }
+
     }
 
 }

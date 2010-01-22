@@ -44,9 +44,10 @@ package qa.javafx.functional.library.project;
  * @author andromeda
  */
 public enum DeploymentType {
-    STANDARD,
+    DESKTOP,
     WEB_START,
     BROWSER,
-    MOBILE
+    MOBILE,
+    TV
 
 }

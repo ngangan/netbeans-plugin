@@ -46,6 +46,8 @@ import org.netbeans.jemmy.operators.JRadioButtonOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
 import qa.javafx.functional.library.Constant;
 
+import qa.javafx.functional.library.Util;
+
 /**
  *
  * @author Alexandr Scherbatiy
@@ -53,7 +55,7 @@ import qa.javafx.functional.library.Constant;
 public class JavaFXProject extends JavaProject {
 
 
-    public DeploymentType deploymentType = DeploymentType.STANDARD;
+    public DeploymentType deploymentType = DeploymentType.DESKTOP;
 
     public JavaFXProject(String name) {
         super(name, ProjectType.JAVAFX_APPLICATION);
@@ -100,11 +102,17 @@ public class JavaFXProject extends JavaProject {
     
     public EditorOperator getMainEditor() {
         return new EditorOperator(getMainFile());
+    }   
+    
+    public void deploy() throws Exception{
+        deploy(deploymentType);
     }
 
-    public void deploy() throws Exception{
+    public void deploy(DeploymentType type) throws Exception{
         System.out.println("==== Deploy  ====");
-        System.out.println("Deployment type = " + deploymentType);
+        System.out.println("Deployment type = " + type);
+
+
         rootNode.performPopupActionNoBlock(Constant.POPUP_MENU_ITEM_PROPERTIES);
         //JDialog dialog = JDialogOperator.waitJDialog(Constant.DIALOG_TITLE_ENABLE_PROFILING, false, true);
         JDialogOperator propertyDialog = new JDialogOperator(Constant.DIALOG_TITLE_PROPERTIES);
@@ -114,24 +122,35 @@ public class JavaFXProject extends JavaProject {
 
         categoryTree.selectPath(categoryTree.findPath("Run"));
 
-        if(deploymentType == DeploymentType.MOBILE){
+        OperationSystem os = OperationSystem.getOS();
+        if(os.support(type)){
 
-            JRadioButtonOperator button = new JRadioButtonOperator(propertyDialog, Constant.DEPLOYMENT_MOBILE);
-            OperationSystem os = OperationSystem.getOS();
+            String label = getDeploymentLabel(type);
+            System.out.println("[" + os + "] supported deployment type");
+            System.out.println("Deployment label = " + label);
 
-            if(os == OperationSystem.SOLARIS){
-                if (button.isEnabled()){
-                    new JButtonOperator(propertyDialog, Constant.BUTTON_CANCEL).push();
-                    throw new Exception("Mobile deployment is enabled on " + os);
-                }else{
-                    new JButtonOperator(propertyDialog, Constant.BUTTON_CANCEL).push();
-                }
-            } else {
-                button.push();
-                new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
-                propertyDialog.waitClosed();
-                run();
-            }
+
+            JRadioButtonOperator button = new JRadioButtonOperator(propertyDialog, label);
+            button.push();
+            new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
+            propertyDialog.waitClosed();
+            //run();
+            //build();
+
+
+//            if(os == OperationSystem.SOLARIS){
+//                if (button.isEnabled()){
+//                    new JButtonOperator(propertyDialog, Constant.BUTTON_CANCEL).push();
+//                    throw new Exception("Mobile deployment is enabled on " + os);
+//                }else{
+//                    new JButtonOperator(propertyDialog, Constant.BUTTON_CANCEL).push();
+//                }
+//            } else {
+//                button.push();
+//                new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
+//                propertyDialog.waitClosed();
+//                run();
+//            }
 
 //            if(os == OperationSystem.WINDOWS){
 //                button.push();
@@ -141,12 +160,40 @@ public class JavaFXProject extends JavaProject {
 //                }
 //            }
             //new JRadioButtonOperator(propertyDialog, Constant.DEPLOYMENT_MOBILE).push();
+        }else{
+            System.out.println("[" + os + "] NOT supported deployment type");
+            new JButtonOperator(propertyDialog, Constant.BUTTON_OK).push();
+            propertyDialog.waitClosed();
         }
 
         //Util.sleep(6000);
     }
 
     public boolean isDeployPass(){
-        return getOutput().isCompiled() || getOutput().getText().contains(Constant.DEPLOYMENT_MOBILE_NOT_INCLUDED);
+        //Util.sleep(7000);
+        return getOutput().isCompiled();
+        //return getOutput().isCompiled() || getOutput().getText().contains(Constant.DEPLOYMENT_MOBILE_NOT_INCLUDED);
+
+//        String text = getOutput().getText();
+//        boolean pass = true;
+//
+//        pass = pass && !text.contains("ERROR");
+//        pass = pass && !text.contains("Exception");
+//        pass = pass && !text.contains("Error");
+//
+//        return pass;
+    }
+    
+
+    String getDeploymentLabel(DeploymentType type){
+
+        switch(type){
+            case DESKTOP: return Constant.DEPLOYMENT_STANDARD;
+            case MOBILE: return Constant.DEPLOYMENT_MOBILE;
+            case WEB_START: return Constant.DEPLOYMENT_WEB_START;
+            case BROWSER: return Constant.DEPLOYMENT_BROWSER;
+            case TV: return Constant.DEPLOYMENT_TV;
+            default: return "";
+        }
     }
 }
