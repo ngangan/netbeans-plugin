@@ -26,7 +26,7 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl;
+package org.netbeans.modules.javafx.refactoring.transformations;
 
 import java.util.SortedSet;
 import java.util.TreeSet;

@@ -28,6 +28,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl;
 
+import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.logging.Level;

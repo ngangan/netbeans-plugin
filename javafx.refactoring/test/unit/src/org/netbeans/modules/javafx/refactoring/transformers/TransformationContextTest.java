@@ -31,7 +31,7 @@ package org.netbeans.modules.javafx.refactoring.transformers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
+import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import static org.junit.Assert.*;
 
 /**

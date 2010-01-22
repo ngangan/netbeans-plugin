@@ -42,6 +42,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
@@ -710,5 +711,28 @@ final public class SourceUtils {
                 waitDialog.dispose();
             }
         }
+    }
+
+    /**
+     * creates or finds FileObject according to
+     * @param url
+     * @return FileObject
+     */
+    public static FileObject getOrCreateFolder(URL url) throws IOException {
+        try {
+            FileObject result = URLMapper.findFileObject(url);
+            if (result != null)
+                return result;
+            File f = new File(url.toURI());
+
+            result = FileUtil.createFolder(f);
+            return result;
+        } catch (URISyntaxException ex) {
+            throw (IOException) new IOException().initCause(ex);
+        }
+    }
+
+    public static boolean isRefactorable(FileObject file) {
+        return isJavaFXFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file);
     }
 }

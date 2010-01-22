@@ -313,7 +313,7 @@ public final class JavaFXParser extends Parser {
                 long end = System.currentTimeMillis();
                 Logger.getLogger("TIMER").log(Level.FINE, "Analyzed", new Object[] {fileObject(), end-start}); // NOI18N
             } else {
-                classBytes = null;;
+                classBytes = null;
             }
             currentPhase = CompilationPhase.CODE_GENERATED;
         }

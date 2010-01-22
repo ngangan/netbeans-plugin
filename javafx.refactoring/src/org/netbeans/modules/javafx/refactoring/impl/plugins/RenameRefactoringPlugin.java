@@ -63,7 +63,7 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
-import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
+import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.refactoring.api.Problem;

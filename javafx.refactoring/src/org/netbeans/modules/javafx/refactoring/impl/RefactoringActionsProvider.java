@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,6 +57,8 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.ui.CopyClassUI;
+import org.netbeans.modules.javafx.refactoring.impl.ui.CopyClassesUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.MoveClassUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.MoveClassesUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.RenameRefactoringUI;
@@ -349,6 +352,59 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             };
         }
         SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.renameAction()));
+    }
+
+    @Override
+    public boolean canCopy(Lookup lkp) {
+        Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
+        if (nodes.size() < 1) {
+            return false;
+        }
+        for(Iterator<? extends Node> iter = nodes.iterator();iter.hasNext();) {
+            Node n = iter.next();
+            DataObject dob = n.getCookie(DataObject.class);
+            if (dob==null) {
+                return false;
+            }
+
+            ExplorerContext dict = lkp.lookup(ExplorerContext.class);
+            FileObject fob = getTarget(lkp);
+            if (dict!=null && dict.getTargetNode() != null && fob==null) { //NOI18N
+                //unknown target
+                return false;
+            }
+            if (fob != null) {
+                if (!fob.isFolder() || !SourceUtils.isOnSourceClasspath(fob))
+                    return false;
+                FileObject fo = dob.getPrimaryFile();
+                if (!SourceUtils.isRefactorable(fo)) { //NOI18N
+                    return false;
+                }
+
+            } else {
+                FileObject fo = dob.getPrimaryFile();
+                if (!SourceUtils.isRefactorable(fo)) { //NOI18N
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void doCopy(final Lookup lkp) {
+       Runnable task = new NodeToFileObjectTask(new HashSet<Node>(lkp.lookupAll(Node.class))) {
+                @Override
+                protected RefactoringUI createRefactoringUI(FileObject[] selectedElements, Collection<ElementLocation> handle) {
+                    if (selectedElements.length == 1) {
+                        return new CopyClassUI(selectedElements[0], getTarget(lkp), getPaste(lkp));
+                    } else {
+                        return new CopyClassesUI(new HashSet<FileObject>(Arrays.asList(selectedElements)), getTarget(lkp), getPaste(lkp));
+                    }
+                }
+            };
+//        }
+        SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.copyAction()));
     }
     
     static boolean isFromEditor(EditorCookie ec) {

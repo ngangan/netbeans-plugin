@@ -62,7 +62,7 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
-import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
+import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.RenamePackageScanner;
 import org.netbeans.modules.refactoring.api.*;

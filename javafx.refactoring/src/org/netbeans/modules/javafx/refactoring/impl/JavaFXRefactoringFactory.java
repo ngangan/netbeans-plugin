@@ -33,10 +33,13 @@ import org.netbeans.modules.javafx.refactoring.impl.plugins.RenamePackagePlugin;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.RenameRefactoringPlugin;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.CopyRefactoringPlugin;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
+import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
+import org.netbeans.modules.refactoring.api.SingleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.RefactoringPluginFactory;
@@ -84,6 +87,12 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
             }
         }
 
+        if (refactoring instanceof SingleCopyRefactoring  || refactoring instanceof MultipleCopyRefactoring) {
+            if (checkCopy(refactoring.getRefactoringSource())) {
+                return new CopyRefactoringPlugin(refactoring);
+            }
+        }
+
         return null;
     }
 
@@ -96,6 +105,13 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
                 return true;
             }
         }
+        return false;
+    }
+
+    private boolean checkCopy(Lookup object) {
+        FileObject f=object.lookup(FileObject.class);
+        if (f!=null && SourceUtils.isJavaFXFile(f))
+            return true;
         return false;
     }
 

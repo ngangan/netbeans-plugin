@@ -81,7 +81,7 @@ import org.netbeans.modules.javafx.refactoring.impl.DeleteTextRefactoringElement
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.InsertTextRefactoringElement;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
-import org.netbeans.modules.javafx.refactoring.impl.TransformationContext;
+import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
