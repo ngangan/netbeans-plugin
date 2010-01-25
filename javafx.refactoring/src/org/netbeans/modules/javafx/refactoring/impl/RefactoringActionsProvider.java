@@ -31,6 +31,8 @@ package org.netbeans.modules.javafx.refactoring.impl;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.CopyClassesUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.MoveClassUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.MoveClassesUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.RenameRefactoringUI;
+import org.netbeans.modules.javafx.refactoring.impl.ui.SafeDeleteUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.refactoring.api.ui.ExplorerContext;
 import org.netbeans.modules.refactoring.api.ui.RefactoringActionsFactory;
@@ -406,7 +409,121 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 //        }
         SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.copyAction()));
     }
-    
+
+    @Override
+    public boolean canDelete(Lookup lookup) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+        Collection<? extends Node> nodes = new HashSet<Node>(lookup.lookupAll(Node.class));
+        //We live with a 2 pass validation of the selected nodes for now since
+        //the code will become unreadable if we attempt to implement all checks
+        //in one pass.
+        if (isSelectionHeterogeneous(nodes)) {
+            return false;
+        }
+        for (Node n:nodes) {
+            ElementLocation tph = n.getLookup().lookup(ElementLocation.class);
+            if (tph != null) {
+                return SourceUtils.isRefactorable(tph.getSourceFile());
+            }
+            DataObject dataObject = n.getCookie(DataObject.class);
+            if (dataObject == null){
+                return false;
+            }
+            FileObject fileObject = dataObject.getPrimaryFile();
+            if (isRefactorableFolder(dataObject)){
+                return true;
+            }
+            if (!SourceUtils.isRefactorable(fileObject)) {
+                return false;
+            }
+        }
+        return !nodes.isEmpty();
+    }
+
+    @Override
+    public void doDelete(final Lookup lookup) {
+        Runnable task;
+        EditorCookie ec = lookup.lookup(EditorCookie.class);
+        final boolean b = lookup.lookup(ExplorerContext.class)!=null;
+        if (isFromEditor(ec)) {
+            task = new TextComponentTask(ec) {
+                @Override
+                protected RefactoringUI createRefactoringUI(ElementLocation selectedLocation,int startOffset,int endOffset, CompilationInfo info) {
+                    Element selected = selectedLocation.getElement(info);
+                    if (selected == null) {
+                        LOGGER.log(Level.INFO, "doDelete: " + selectedLocation, new NullPointerException("selected")); // NOI18N
+                        return null;
+                    }
+                    if (selected.getKind() == ElementKind.PACKAGE || selected.getEnclosingElement().getKind() == ElementKind.PACKAGE) {
+                        FileObject file = SourceUtils.getFile(selected, info.getClasspathInfo());
+                        if (file==null) {
+                            return null;
+                        }
+                        if (file.getName().equals(selected.getSimpleName().toString())) {
+                            return new SafeDeleteUI(new FileObject[]{file}, Collections.singleton(selectedLocation), b);
+                        }
+                    }
+                        return new SafeDeleteUI(new ElementLocation[]{selectedLocation});
+                    }
+            };
+        } else if (nodeHandle(lookup)) {
+            task = new TreePathHandleTask(new HashSet<Node>(lookup.lookupAll(Node.class))) {
+
+                @Override
+                protected RefactoringUI createRefactoringUI(Collection<ElementLocation> handles) {
+                    if (renameFile) {
+                        FileObject[] files = new FileObject[handles.size()];
+                        int i=0;
+                        for (ElementLocation handle:handles) {
+                            files[i++] = handle.getSourceFile();
+                        }
+                        return new SafeDeleteUI(files, handles, b);
+                    } else {
+                        return new SafeDeleteUI(handles.toArray(new ElementLocation[handles.size()]));
+                    }
+                }
+
+            };
+        } else {
+            task = new NodeToFileObjectTask(new HashSet<Node>(lookup.lookupAll(Node.class))) {
+                @Override
+                protected RefactoringUI createRefactoringUI(FileObject[] selectedElements, Collection<ElementLocation> handles) {
+                    if (pkg[0]!= null) {
+                        return new SafeDeleteUI(pkg[0],b);
+                    } else{
+                        return new SafeDeleteUI(selectedElements, handles, b);
+                    }
+                }
+
+            };
+        }
+        SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.safeDeleteAction()));
+    }
+
+    private static boolean isSelectionHeterogeneous(Collection<? extends Node> nodes){
+        boolean folderSelected = false;
+        boolean nonFolderNodeSelected = false;
+        for (Node node : nodes) {
+            DataObject dataObject = node.getCookie(DataObject.class);
+            if (dataObject == null){
+                continue;
+            }
+            if (isRefactorableFolder(dataObject)){
+                if (folderSelected || nonFolderNodeSelected) {
+                    return true;
+                }else{
+                    folderSelected = true;
+                }
+            }else{
+                nonFolderNodeSelected = true;
+            }
+        }
+
+        return false;
+    }
+
     static boolean isFromEditor(EditorCookie ec) {
         if (ec != null && ec.getOpenedPanes() != null) {
             TopComponent activetc = TopComponent.getRegistry().getActivated();
@@ -587,7 +704,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             if (unit.getTypeDecls().isEmpty()) {
                 ui = createRefactoringUI(null, info);
             } else {
-                Element e = info.getElementUtilities().elementFor(0);
+                Element e = JavafxTreeInfo.symbolFor((JFXTree)unit.getTypeDecls().get(0));
                 ui = createRefactoringUI(new ElementLocation(e, 0, info), info);
             }
         }
