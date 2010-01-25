@@ -60,6 +60,8 @@ import org.openide.loaders.DataObject;
 import org.openide.text.DataEditorSupport;
 import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
+import org.openide.util.lookup.Lookups;
+import org.openide.util.lookup.ProxyLookup;
 
 /**
  * An element in the refactoring preview list which holds information about the find-usages-match
@@ -79,9 +81,13 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     private final ElementLocation location;
     private final Lookup context;
 
+    private WhereUsedElement(ElementLocation location) throws IOException {
+        this(location, Lookup.EMPTY);
+    }
+
     private WhereUsedElement(ElementLocation location, Lookup context) throws IOException {
         this.location = location;
-        this.context = context;
+        this.context = new ProxyLookup(context, Lookups.singleton(location));
         init();
     }
 
@@ -180,6 +186,15 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     public static WhereUsedElement create(ElementLocation location, Lookup context) {
         try {
             return new WhereUsedElement(location, context);
+        } catch (IOException e) {
+
+        }
+        return null;
+    }
+
+    public static WhereUsedElement create(ElementLocation location) {
+        try {
+            return new WhereUsedElement(location);
         } catch (IOException e) {
 
         }

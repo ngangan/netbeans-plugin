@@ -35,10 +35,12 @@ import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.CopyRefactoringPlugin;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.SafeDeleteRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
+import org.netbeans.modules.refactoring.api.SafeDeleteRefactoring;
 import org.netbeans.modules.refactoring.api.SingleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
@@ -91,6 +93,10 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
             if (checkCopy(refactoring.getRefactoringSource())) {
                 return new CopyRefactoringPlugin(refactoring);
             }
+        }
+
+        if (refactoring instanceof SafeDeleteRefactoring) {
+            return new SafeDeleteRefactoringPlugin((SafeDeleteRefactoring)refactoring);
         }
 
         return null;

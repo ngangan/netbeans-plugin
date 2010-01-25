@@ -119,9 +119,8 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
                     collectSubclasses(e, cc, usageLocations);
                 }
             }, true);
-            Lookup lkp = Lookups.singleton(location);
-            for(ElementLocation location : usageLocations) {
-                elements.add(refactoring, WhereUsedElement.create(location, lkp));
+            for(ElementLocation loc : usageLocations) {
+                elements.add(refactoring, WhereUsedElement.create(loc));
             }
         } catch (IOException ex) {
             return new Problem(true, ex.getLocalizedMessage());

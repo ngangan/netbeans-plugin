@@ -72,13 +72,7 @@ public class WhereUsedQueryUI implements RefactoringUI {
 
     public WhereUsedQueryUI(ElementLocation location, CompilationInfo info) {
         this.query = new WhereUsedQuery(Lookups.singleton(location));
-        // XXX - Parsing API
-//        ClasspathInfo classpathInfoFor = RetoucheUtils.getClasspathInfoFor(jmiObject);
-//        if (classpathInfoFor != null) {
-//            this.query.getContext().add(classpathInfoFor);
-//        }
         this.location = location;
-//        this.handle = tph;
         Element e = location.getElement(info);
         name = e.getSimpleName().toString();
         kind = e.getKind();
