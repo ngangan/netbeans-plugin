@@ -990,7 +990,8 @@ public class JFXReformatTask implements ReformatTask {
                         final BlockExpressionTree blockExpTree = (BlockExpressionTree) member;
                         boolean hasStatements = !(blockExpTree).getStatements().isEmpty();
                         boolean hasValue = (blockExpTree).getValue() != null;
-                        if (semiRead && !(blockExpTree).isStatic() && !hasStatements && !hasValue) {
+//                        if (semiRead && !(blockExpTree).isStatic() && !hasStatements && !hasValue) {
+                        if (semiRead && !hasStatements && !hasValue) {
                             semiRead = false;
                             continue;
                         }
@@ -1337,9 +1338,9 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitBlockExpression(BlockExpressionTree node, Void p) {
-            if (node.isStatic()) {
-                accept(JFXTokenId.STATIC);
-            }
+//            if (node.isStatic()) {
+//                accept(JFXTokenId.STATIC);
+//            }
             CodeStyle.BracePlacement bracePlacement;
             boolean spaceBeforeLeftBrace = false;
 
@@ -1358,9 +1359,9 @@ public class JFXReformatTask implements ReformatTask {
                     case INSTANTIATE_NEW:
                     case ON_REPLACE:
                         bracePlacement = cs.getClassDeclBracePlacement();
-                        if (node.isStatic()) {
-                            spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
-                        }
+//                        if (node.isStatic()) {
+//                            spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
+//                        }
                         break;
                     case INIT_DEFINITION:
                         bracePlacement = cs.getMethodDeclBracePlacement();
