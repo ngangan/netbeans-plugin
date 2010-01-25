@@ -40,6 +40,7 @@
  */
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -47,6 +48,10 @@ import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.code.JavafxFlags;
+import com.sun.tools.javafx.tree.JFXIdent;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.mjavac.code.Symbol;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -60,6 +65,7 @@ import javax.lang.model.element.TypeElement;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
@@ -160,7 +166,10 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         String newPkgName = getTargetPackageName();
         String oldPkgName = getSourcePackageName();
 
+        Problem problem = null;
         for(FileObject fobj : refactoring.getRefactoringSource().lookupAll(FileObject.class)) {
+            problem = checkForProblem(fobj, problem);
+            // Refactoring API doesn't handle copy of multiple files
             if (refactoring instanceof MultipleCopyRefactoring) {
                 refactoringElements.add(refactoring, new CopyFile(fobj, refactoringElements.getSession()));
             }
@@ -169,7 +178,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
             }
             refactoringElements.add(refactoring, new FixReferences(fobj));
         }
-        return null;
+        return problem;
     }
 
     private FileObject getTargetFO(FileObject srcFO) {
@@ -199,6 +208,69 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
 
     private String getSourcePackageName() {
         return SourceUtils.getPackageName(refactoring.getRefactoringSource().lookup(FileObject.class).getParent());
+    }
+
+    private Problem checkForProblem(FileObject fobj, final Problem p) {
+        final Problem[] problem = new Problem[]{p};
+
+        JavaFXSource jfxs = JavaFXSource.forFileObject(fobj);
+        try {
+            jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                public void run(final CompilationController cc) throws Exception {
+                    JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
+                        private String clzName = "";
+                        @Override
+                        public Void visitIdentifier(IdentifierTree node, Void p) {
+                            Element e = cc.getTrees().getElement(getCurrentPath());
+                            if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
+                                TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
+                                String message = "";
+                                if (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) {
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()});
+                                } else {
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()});
+                                }
+                                problem[0] = createProblem(problem[0], false, message);
+                            }
+                            return super.visitIdentifier(node, p);
+                        }
+
+                        @Override
+                        public Void visitMemberSelect(MemberSelectTree node, Void p) {
+                            Element e = cc.getTrees().getElement(getCurrentPath());
+                            if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
+                                TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
+                                String message = "";
+                                if (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) {
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()});
+                                } else {
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()});
+                                }
+                                problem[0] = createProblem(problem[0], false, message);
+                            }
+                            return super.visitMemberSelect(node, p);
+                        }
+
+                        @Override
+                        public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                            String clzNameBak = clzName;
+                            try {
+                                clzName = node.getSimpleName().toString();
+                                return super.visitClassDeclaration(node, p);
+                            } finally {
+                                clzName = clzNameBak;
+                            }
+                        }
+                    };
+
+                    scanner.scan(cc.getCompilationUnit(), null);
+                }
+            }, true);
+        } catch (IOException iOException) {
+            problem[0] = createProblem(problem[0], true, iOException.getLocalizedMessage());
+        }
+        return problem[0];
     }
 
     private class UpdatePackage extends SimpleRefactoringElementImplementation implements RefactoringElementImplementation {
