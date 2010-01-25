@@ -1175,6 +1175,8 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
+            indent = old;
+
             OnReplaceTree onReplaceTree = node.getOnReplaceTree();
             if (onReplaceTree != null) {
                 // TODO introduce cs.wrapOnReplace and invoke wrapTree
@@ -1188,7 +1190,6 @@ public class JFXReformatTask implements ReformatTask {
             if (accept(JFXTokenId.SEMI) != JFXTokenId.SEMI) {
                 rollback(index, c, d);
             }
-            indent = old;
             return true;
         }
 
@@ -2379,6 +2380,15 @@ public class JFXReformatTask implements ReformatTask {
             if (oldValue != null) {
                 space();
                 scan(oldValue, p);
+                if (node.getFirstIndex() != null) {
+                    accept(JFXTokenId.LBRACKET);
+                    spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+                    scan(node.getFirstIndex(), p);
+                    accept(JFXTokenId.DOTDOT);
+                    scan(node.getLastIndex(), p);
+                    spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+                    accept(JFXTokenId.RBRACKET);
+                }
             }
 
             int index = tokens.index();
