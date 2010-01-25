@@ -2432,6 +2432,14 @@ public class JFXReformatTask implements ReformatTask {
             List<ExpressionTree> partList = node.getPartList();
             if (partList != null && !partList.isEmpty()) {
                 for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
+                    // #178966
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
+                        rollback(index, c, d);
+                    }
+
                     ExpressionTree tree = it.next();
                     scan(tree, p);
                     if (it.hasNext()) {
