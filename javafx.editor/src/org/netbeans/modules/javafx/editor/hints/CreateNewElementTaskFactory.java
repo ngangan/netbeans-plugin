@@ -4,46 +4,37 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.ErroneousTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.LiteralTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javafx.tree.JFXBlock;
+import com.sun.javafx.api.tree.VariableInvalidateTree;
+import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
-import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.mjavac.code.Type.ClassType;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.javafx.tree.JFXFunctionInvocation;
 import com.sun.tools.mjavac.util.JCDiagnostic;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.swing.text.BadLocationException;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClasspathInfo.PathKind;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.netbeans.modules.javafx.editor.imports.ui.FixItem;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -51,10 +42,6 @@ import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
-import org.openide.loaders.DataFolder;
-import org.openide.loaders.DataObject;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -68,10 +55,16 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
     private static final String FUNCTION_VALUE = "function"; //NOI18N
     private static final String CLASS_VALUE = "class"; //NOI18N
     private static final String VAR_VALUE = "variable"; //NOI18N
+    private static Logger log = Logger.getLogger(CreateNewElementTaskFactory.class.getName());
 
     public CreateNewElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
+
+    private enum Kind {
+
+        CLASS, FUNCTION, VARIABLE
+    };
 
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
@@ -92,18 +85,12 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (!isValidError(diagnostic, compilationInfo)
-                            || cancel.get()
-                            || !(diagnostic instanceof JCDiagnostic)) {
-                        continue;
-                    }
+                    if (isValidError(diagnostic, compilationInfo)
+                            && !cancel.get()
+                            && (diagnostic instanceof JCDiagnostic)) {
 
-                    JCDiagnostic jCDiagnostic = (JCDiagnostic) diagnostic;
-                    if (!(jCDiagnostic.getArgs()[5] instanceof ClassType)) {
-                        continue;
+                        errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic));
                     }
-
-                    errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic));
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
             }
@@ -112,11 +99,11 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
 
     private boolean isValidError(Diagnostic diagnostic, CompilationInfo compilationInfo) {
         if (diagnostic.getCode().equals(ERROR_CODE)) {
-            for (Diagnostic d : compilationInfo.getDiagnostics()) {
-                if (d != diagnostic && d.getLineNumber() == diagnostic.getLineNumber()) {
-                    return false;
-                }
-            }
+//            for (Diagnostic d : compilationInfo.getDiagnostics()) {
+//                if (d.getLineNumber() == diagnostic.getLineNumber()) {
+//                    return false;
+//                }
+//            }
             return true;
         }
 
@@ -127,309 +114,183 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
             final CompilationInfo compilationInfo,
             final JCDiagnostic diagnostic) {
 
-        List<Fix> fixes = new ArrayList<Fix>();
-        String fixType = diagnostic.getArgs()[0].toString();
-        if (fixType.equals(VAR_VALUE)) {
 
-            final boolean isInsideMainFunction[] = new boolean[1];
-            JavaFXTreePathScanner visitor = new JavaFXTreePathScanner() {
+        String message = diagnostic.getMessage(Locale.ENGLISH);
+        Kind kind = getKind(message);
 
-                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-
-                @Override
-                public Object visitIdentifier(IdentifierTree node, Object p) {
-                    int treePosition = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
-                    if (treePosition == diagnostic.getPosition()) {
-                        JavaFXTreePath parentPath = getCurrentPath().getParentPath();
-                        if (parentPath != null && parentPath.getParentPath() != null) {
-                            String functionName = parentPath.getParentPath().getLeaf().toString();
-                            if (functionName.contains("_$UNUSED$_$ARGS$_")) { //NOI18N
-                                isInsideMainFunction[0] = true;
-                            }
-                        }
-
-                        return null;
-                    }
-
-                    return super.visitIdentifier(node, p);
-                }
-            };
-            visitor.scan(compilationInfo.getCompilationUnit(), null);
-
-
-            if (!isInsideMainFunction[0]) {
-                fixes.add(new CreateElementFix(fixType, diagnostic, document, compilationInfo, false));
-            }
-            fixes.add(new CreateElementFix(fixType, diagnostic, document, compilationInfo, true));
-        } else {
-            fixes.add(new CreateElementFix(fixType, diagnostic, document, compilationInfo, false));
+        if (kind == null) {
+            return null;
         }
-        ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Create missing elements", fixes, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
+        Fix fix = new VariableFix(kind, document, diagnostic, compilationInfo);
+        ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "Create missing elements", Collections.singletonList(fix), compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
         return errorDescription;
     }
 
-    private class CreateElementFix implements Fix {
+    private Kind getKind(String message) {
+        Kind kind = null;
+        if (message.contains("symbol  : class")) {
+            kind = Kind.CLASS;
+        } else if (message.contains("symbol  : variable")) {
+            kind = Kind.VARIABLE;
+        } else if (message.contains("symbol  : function")) {
+            kind = Kind.FUNCTION;
+        }
+        return kind;
+    }
 
-        private String fixType;
-        private JCDiagnostic diagnostic;
-        private JavaFXDocument document;
-        private CompilationInfo compilationInfo;
-        private boolean localPosition;
+    private class VariableFix implements Fix {
 
-        public CreateElementFix(String fixType, JCDiagnostic diagnostic, JavaFXDocument document, CompilationInfo compilationInfo, boolean localPosition) {
-            this.fixType = fixType;
-            this.diagnostic = diagnostic;
+        private final Kind kind;
+        private final Document document;
+        private final JCDiagnostic diagnostic;
+        private final CompilationInfo compilationInfo;
+
+        public VariableFix(Kind kind, Document document, JCDiagnostic diagnostic, CompilationInfo compilationInfo) {
+            this.kind = kind;
             this.document = document;
+            this.diagnostic = diagnostic;
             this.compilationInfo = compilationInfo;
-            this.localPosition = localPosition;
         }
 
         public String getText() {
-            if (localPosition) {
-                return "Local" + NbBundle.getMessage(CreateNewElementTaskFactory.class, "TITLE_CREATE_ELEMENT_" + fixType.toUpperCase(), diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString()); //NOI18N
-            }
-            return NbBundle.getMessage(CreateNewElementTaskFactory.class, "TITLE_CREATE_ELEMENT_" + fixType.toUpperCase(), diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString()); //NOI18N
+            return "Create " + kind;
         }
 
         public ChangeInfo implement() throws Exception {
-            StringBuffer code = new StringBuffer();
-            //TODO Must be redone with formating API
-            JTextComponent target = HintsUtils.getEditorComponent(document);
-            if (target == null) {
-                return null;
+            final GeneratedCode[] generatedCode = new GeneratedCode[1];
+            if (kind == Kind.FUNCTION) {
+                generatedCode[0] = createFunction();
+            } else if (kind == Kind.VARIABLE) {
+                // generatedCode[0] = createVariable(diagnostic);
+            } else {
+                // generatedCode = createInnerClass();
             }
-            Object[] args = diagnostic.getArgs();
-            ClassType classType = (ClassType) args[5];
-            int position = -1;
-            if (fixType.equals(FUNCTION_VALUE)) {
-                final Map<String, Type> typesMap = new HashMap<String, Type>();
-                final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+            if (generatedCode[0] == null) {
+               return null;
+            }
+            SwingUtilities.invokeLater(new Runnable() {
 
-                JavaFXTreePathScanner vistor = new JavaFXTreePathScanner() {
-
-                    @Override
-                    public Object visitMethodInvocation(FunctionInvocationTree node, Object p) {
-                        long position = sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
-                        if (position != diagnostic.getPosition()) {
-                            return super.visitMethodInvocation(node, p);
+                public void run() {
+                    try {
+                        document.insertString(generatedCode[0].getPositon(), generatedCode[0].getCode(), null);
+                        if (kind != Kind.FUNCTION) {
+                            return;
                         }
-                        for (ExpressionTree expressionTree : node.getArguments()) {
-                            if (expressionTree instanceof JFXIdent) {
-                                JFXIdent argument = (JFXIdent) expressionTree;
-                                typesMap.put(argument.getName().toString(), argument.sym.asType());
-                            }
+                        JTextComponent target = HintsUtils.getEditorComponent(document);
+                        if (target == null) {
+                            log.severe("No GUI component for editor document " + document); //NOI18N
+                            return;
                         }
-                        return super.visitMethodInvocation(node, p);
+                        Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
-                };
-
-                vistor.scan(compilationInfo.getCompilationUnit(), null);
-                Iterator iterator = typesMap.keySet().iterator();
-                while (iterator.hasNext()) {
-                    String argName = (String) iterator.next();
-                    Type typeFQN = typesMap.get(argName);
-                    code.append(argName).append(" : ").append(HintsUtils.getClassSimpleName(typeFQN.toString()));
-                    if (iterator.hasNext()) {
-                        code.append(" , "); //NOI!8N
-                    }
-                    if (typeFQN.toString().contains("java.lang")) { //NOI18N
-                        continue;
-                    }
-                    Imports.addImport(target, typeFQN.toString());
                 }
-                Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
-                position = getPositonAtEnd(classType.tsym, compilationInfo, document);
-                String space = HintsUtils.calculateSpace(position, document);
-                code.append("\n").append(space).append(FUNCTION_VALUE).append(" ").append(diagnostic.getArgs()[1]).append("(");//NOI18N
-                code.append("){\n"); //NOI18N)
-                code.append(space).append(HintsUtils.TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
-                code.append(space).append("}\n"); //NOI18N
-                //code = new StringBuffer(JFXReformatTask.reformat(code.toString(), CodeStyle.getDefault(document)));
-
-            } else if (fixType.equals(CLASS_VALUE)) {
-                code.append(CLASS_VALUE).append(" ").append(diagnostic.getArgs()[5]).append(" {"); //NOI18N
-                code.append("}"); //NOI18N
-                ClassPath cp = compilationInfo.getClasspathInfo().getClassPath(PathKind.SOURCE);
-                FileObject root = cp.findOwnerRoot(compilationInfo.getFileObject());
-
-                if (root == null) { //File not part of any project
-                    return null;
-                }
-
-                TypeElement outer = ElementUtilities.enclosingTypeElement(classType.asElement());
-                ClassSymbol classSymbol = (ClassSymbol) classType.asElement();
-
-                PackageElement packageElement = classSymbol.packge();
-
-                FileObject pack = FileUtil.createFolder(compilationInfo.getFileObject(), packageElement.toString()); // NOI18N
-//                FileObject classTemplate/*???*/ = FileUtil.getConfigFile(template(kind));
-//                DataObject classTemplateDO = DataObject.find(classTemplate);
-//                DataObject od = classTemplateDO.createFromTemplate(DataFolder.findFolder(pack), simpleName);
-//                FileObject target = od.getPrimaryFile();
-
-//                JavaSource.forFileObject(target).runModificationTask(new Task<WorkingCopy>() {
-//
-//                    public void run(WorkingCopy parameter) throws Exception {
-//                        parameter.toPhase(Phase.RESOLVED);
-//
-//                        ClassTree source = (ClassTree) parameter.getCompilationUnit().getTypeDecls().get(0);
-//                        ClassTree nue = createConstructor(parameter, TreePath.getPath(parameter.getCompilationUnit(), source));
-//
-//                        parameter.rewrite(source, nue);
-//                    }
-//                }).commit();
-
-                // return new ChangeInfo(target, null, null);
-            } else if (fixType.equals(VAR_VALUE)) {
-                code.append(HintsUtils.TAB).append("\n");
-                code.append("var ").append(diagnostic.getArgs()[1]).append(";\n"); //NOI18N
-                if (localPosition) {
-                    position = getLocalPostion(compilationInfo, diagnostic);
-                } else {
-                    position = getPositonAtStart(classType.tsym, compilationInfo, diagnostic);
-                }
-            }
-            if (position < 0) {
-                return null;
-            }
-            document.insertString(position, code.toString(), null);
+            });
 
             return null;
         }
-    }
 
-    private static int getLocalPostion(CompilationInfo compilationInfo, JCDiagnostic diagnostic) {
-        //Object[] args = diagnostic.getArgs();
-        //ClassType classType = (ClassType) args[5];
+        private GeneratedCode createFunction() {
+            StringBuffer function = new StringBuffer();
+            Object name = diagnostic.getArgs()[1];
 
-        //Tree classElement = compilationInfo.getTrees().getTree(classType.tsym);
-        JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        Tree tree = path.getParentPath().getLeaf();
-        path.getLeaf();
-        compilationInfo.getTrees().getElement(path);
-        int position = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-        if (tree instanceof JFXBlock) {
-            position++;
-        }
-        if (diagnostic.getPosition() < position) {
-            return (int) diagnostic.getPosition();
-        }
-        return position;
-    }
+            final int position[] = new int[1];
+            new JavaFXTreePathScanner<Void, Void>() {
 
-    private static int getPositonAtEnd(final Element element, final CompilationInfo compilationInfo, JavaFXDocument document) {
+                private ClassDeclarationTree currentClass;
 
-        Tree enclosingTree = compilationInfo.getTrees().getTree(element);
-        final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-
-        if (HintsUtils.isAnnon(element)) {
-            start = findPosition(compilationInfo, start, end - start, element);
-        }
-        if (document.isPosGuarded(start)) {
-            start = -1;
-        }
-
-        return start;
-    }
-//
-//    private static int getEnclosingPositionInside(final CompilationInfo compilationInfo, final Diagnostic diagnostic) {
-//        final int[] lp = {-1};
-//        JavaFXTreePathScanner visitor = new JavaFXTreePathScanner() {
-//
-//            SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-//
-//            @Override
-//            public Object visitIdentifier(IdentifierTree node, Object p) {
-//                int treePosition = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
-//                if (treePosition == diagnostic.getPosition()) {
-//                    lp[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), getCurrentPath().getParentPath().getLeaf());
-//
-//                    return null;
-//                }
-//
-//                return super.visitIdentifier(node, p);
-//            }
-//        };
-//        visitor.scan(compilationInfo.getCompilationUnit(), null);
-//
-//        return lp[0] -1 ;
-//    }
-//
-
-    private static int getEnclosingPositionBefore(final CompilationInfo compilationInfo, Element element, int errorPosition) {
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        for (Element e : element.getEnclosedElements()) {
-            Tree tree = compilationInfo.getTrees().getTree(e);
-            if (tree != null) {
-                int startTree = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
-                int endTree = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
-                if (startTree <= errorPosition && endTree >= errorPosition) {
-                    return startTree - 1;
+                @Override
+                public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                    this.currentClass = node;
+                    
+                    return super.visitClassDeclaration(node, p);
                 }
+
+                @Override
+                public Void visitMethodInvocation(FunctionInvocationTree node, Void p) {
+                    SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                    int startPosition = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
+                    ((JCDiagnostic)diagnostic.getArgs()[4]).getEndPosition();
+                    if (startPosition == diagnostic.getStartPosition()) {
+                        position[0] = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), currentClass.getClassMembers().get(currentClass.getClassMembers().size() -1 ));
+
+                        return null;
+                    }
+
+                    return super.visitMethodInvocation(node, p);
+                }
+            }.scan(compilationInfo.getCompilationUnit(), null);
+
+            String space = HintsUtils.calculateSpace(position[0], document);
+            if (space.length() > 0) {
+                space = space.substring(0, space.length() - 1);
             }
+            function.append("\n\n"); //NOI18N
+            function.append(space).append("function ").append(name).append("() {\n");
+            function.append(space).append(HintsUtils.TAB).append("throw new UnsupportedOperationException('Not implemented yet');\n"); //NOI18N
+            function.append(space).append("}\n"); //NOI18N
+
+            return new GeneratedCode(position[0], function.toString());
         }
 
-        return -1;
+        private GeneratedCode createVariable(final JCDiagnostic diagnostic) {
+            StringBuffer function = new StringBuffer();
+            Object name = diagnostic.getArgs()[1];
+
+            final int position[] = new int[1];
+            new JavaFXTreePathScanner<Void, Void>() {
+
+                @Override
+                public Void visitIdentifier(IdentifierTree node, Void p) {
+                    SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                    int startPosition = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
+                    if (startPosition == diagnostic.getStartPosition()) {
+                        Tree parentTree = getCurrentPath().getParentPath().getLeaf();
+                        position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), parentTree) + 1;
+                        if (position[0] < startPosition) {
+                            position[0] = startPosition;
+                        }
+                        return null;
+                    }
+                    return super.visitIdentifier(node, p);
+                }
+            }.scan(compilationInfo.getCompilationUnit(), null);
+
+            String space = HintsUtils.calculateSpace(position[0], document);
+            function.append("\n");
+            function.append(space).append(HintsUtils.TAB).append("var ").append(name).append(";");
+
+
+            return new GeneratedCode(position[0], function.toString());
+        }
+
+        private String createInnerClass() {
+            StringBuffer function = new StringBuffer();
+            Object name = diagnostic.getArgs()[1];
+            function.append("class ").append(name).append("{};\n");
+
+            return function.toString();
+        }
     }
-//
 
-    private static int getPositonAtStart(Element element, CompilationInfo compilationInfo, Diagnostic diagnostic) {
-        Tree enclosingTree = compilationInfo.getTrees().getTree(element);
+    private class GeneratedCode {
 
-        SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-        int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-        int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), enclosingTree);
-        int position = findPosition(compilationInfo, start, end - start, element);
-        if (position < 0 && enclosingTree instanceof JFXClassDeclaration) {
-            position = getEnclosingPositionBefore(compilationInfo, element, (int) diagnostic.getPosition());
+        private int positon;
+        private String code;
+
+        GeneratedCode(int position, String code) {
+            this.code = code;
+            this.positon = position;
         }
 
-        return position;
-    }
-//
-
-    private static int findPosition(CompilationInfo compilationInfo, int start, int lenght, Element element) {
-        Document document = compilationInfo.getDocument();
-        try {
-            String text = document.getText(start, lenght);
-            StringTokenizer st = new StringTokenizer(text);
-            boolean isExtends = false;
-            boolean isClass = false;
-
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                if (token.equals("extends")) { //NOI18N
-                    isExtends = true;
-                }
-                if (token.equals("class")) { //NOI18N
-                    isClass = true;
-                }
-            }
-            boolean isAnon = HintsUtils.isAnnon(element);
-            if (!isAnon && !isClass && !isExtends) {
-                return -1;
-            }
-            int index = text.indexOf("{"); //NOI18N
-            if (index > 0) {
-                return start + index + 1;
-            } else if (text.contains("(") || text.contains(")")) { //NOI18N
-                return -1;
-            } else {
-                text = document.getText(start, document.getLength() - start);
-                index = text.indexOf("{"); //NOI18N
-                if (index < 0) {
-                    return -1;
-                }
-                return start + index + 1;
-            }
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
+        public String getCode() {
+            return code;
         }
 
-        return -1;
+        public int getPositon() {
+            return positon;
+        }
     }
 }
