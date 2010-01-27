@@ -990,7 +990,8 @@ public class JFXReformatTask implements ReformatTask {
                         final BlockExpressionTree blockExpTree = (BlockExpressionTree) member;
                         boolean hasStatements = !(blockExpTree).getStatements().isEmpty();
                         boolean hasValue = (blockExpTree).getValue() != null;
-                        if (semiRead && !(blockExpTree).isStatic() && !hasStatements && !hasValue) {
+//                        if (semiRead && !(blockExpTree).isStatic() && !hasStatements && !hasValue) {
+                        if (semiRead && !hasStatements && !hasValue) {
                             semiRead = false;
                             continue;
                         }
@@ -1174,6 +1175,8 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
+            indent = old;
+
             OnReplaceTree onReplaceTree = node.getOnReplaceTree();
             if (onReplaceTree != null) {
                 // TODO introduce cs.wrapOnReplace and invoke wrapTree
@@ -1187,7 +1190,6 @@ public class JFXReformatTask implements ReformatTask {
             if (accept(JFXTokenId.SEMI) != JFXTokenId.SEMI) {
                 rollback(index, c, d);
             }
-            indent = old;
             return true;
         }
 
@@ -1337,9 +1339,9 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitBlockExpression(BlockExpressionTree node, Void p) {
-            if (node.isStatic()) {
-                accept(JFXTokenId.STATIC);
-            }
+//            if (node.isStatic()) {
+//                accept(JFXTokenId.STATIC);
+//            }
             CodeStyle.BracePlacement bracePlacement;
             boolean spaceBeforeLeftBrace = false;
 
@@ -1358,9 +1360,9 @@ public class JFXReformatTask implements ReformatTask {
                     case INSTANTIATE_NEW:
                     case ON_REPLACE:
                         bracePlacement = cs.getClassDeclBracePlacement();
-                        if (node.isStatic()) {
-                            spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
-                        }
+//                        if (node.isStatic()) {
+//                            spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
+//                        }
                         break;
                     case INIT_DEFINITION:
                         bracePlacement = cs.getMethodDeclBracePlacement();
@@ -2378,6 +2380,15 @@ public class JFXReformatTask implements ReformatTask {
             if (oldValue != null) {
                 space();
                 scan(oldValue, p);
+                if (node.getFirstIndex() != null) {
+                    accept(JFXTokenId.LBRACKET);
+                    spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+                    scan(node.getFirstIndex(), p);
+                    accept(JFXTokenId.DOTDOT);
+                    scan(node.getLastIndex(), p);
+                    spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+                    accept(JFXTokenId.RBRACKET);
+                }
             }
 
             int index = tokens.index();
@@ -2421,6 +2432,14 @@ public class JFXReformatTask implements ReformatTask {
             List<ExpressionTree> partList = node.getPartList();
             if (partList != null && !partList.isEmpty()) {
                 for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
+                    // #178966
+                    int index = tokens.index();
+                    int c = col;
+                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                    if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
+                        rollback(index, c, d);
+                    }
+
                     ExpressionTree tree = it.next();
                     scan(tree, p);
                     if (it.hasNext()) {
