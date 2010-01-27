@@ -1262,10 +1262,16 @@ public class JFXReformatTask implements ReformatTask {
 
             JFXType retType = funcDef.getJFXReturnType();
             if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN && !magicOverridenFunc) {
-                accept(JFXTokenId.COLON);
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-
-                scan(retType, p);
+                // #179454, if function is overriden then return type could be not specified
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.COLON) == JFXTokenId.COLON) {
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                    scan(retType, p);
+                } else {
+                    rollback(index, c, d);
+                }
             }
             indent = old;
 
