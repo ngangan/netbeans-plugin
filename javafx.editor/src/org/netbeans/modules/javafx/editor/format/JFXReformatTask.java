@@ -868,9 +868,18 @@ public class JFXReformatTask implements ReformatTask {
                 }
 
                 List<ExpressionTree> exts = new ArrayList<ExpressionTree>();
-                exts.addAll(node.getExtends());
-                exts.addAll(node.getImplements());
-                exts.addAll(node.getMixins());
+                List<ExpressionTree> anExtends = node.getExtends();
+                if (anExtends != null && !anExtends.isEmpty()) {
+                    exts.addAll(anExtends);
+                }
+                List<ExpressionTree> anImplements = node.getImplements();
+                if (anImplements != null && !anImplements.isEmpty()) {
+                    exts.addAll(anImplements);
+                }
+                List<ExpressionTree> aMixins = node.getMixins();
+                if (aMixins != null && !aMixins.isEmpty()) {
+                    exts.addAll(aMixins);
+                }
                 if (exts != null && !exts.isEmpty()) {
                     wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
                     wrapExtendsList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, exts); // TODO cs.alignMultilineExtends()
@@ -1480,7 +1489,10 @@ public class JFXReformatTask implements ReformatTask {
             }
 //            boolean isEmpty = true;
             final List<ExpressionTree> expressions = new ArrayList<ExpressionTree>();
-            expressions.addAll(node.getStatements());
+            List<? extends ExpressionTree> statements = node.getStatements();
+            if (statements != null && !statements.isEmpty()) {
+                expressions.addAll(statements);
+            }
             // JFXC-3284
             if (expressions.isEmpty()) {
                 final ExpressionTree value = node.getValue();
