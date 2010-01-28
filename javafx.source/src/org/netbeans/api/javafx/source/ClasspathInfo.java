@@ -244,7 +244,7 @@ public class ClasspathInfo {
         if (compilePathOrig != null) {
             for(ClassPath.Entry entry : compilePathOrig.entries()) {
                 Result2 rslt = SourceForBinaryQuery.findSourceRoots2(entry.getURL());
-                if (rslt.preferSources()) {
+                if (rslt.preferSources() && rslt.getRoots().length > 0) {
                     for(FileObject root : rslt.getRoots()) {
                         try {
                             srcUrls.add(root.getURL());
