@@ -237,6 +237,10 @@ public class ElementHandle<T extends Element> {
                     final List<? extends Element> members = type.getEnclosedElements();
                     for (Element member : members) {
                         if (this.kind == member.getKind()) {
+                            if (((Symbol)member).completer != null) {
+                                LOG.fine(member.getSimpleName().toString() + " in " + ci.getFileObject().getNameExt() + " has not got a complete type info. Completing...");
+                                ((Symbol)member).complete();
+                            }
                             String[] desc = createFieldDescriptor((VariableElement)member);
                             assert desc.length == 3;
                             if (signatures[1].equals(desc[1]) && signatures[2].equals(desc[2])) {
