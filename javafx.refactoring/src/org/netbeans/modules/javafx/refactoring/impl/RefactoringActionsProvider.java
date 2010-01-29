@@ -312,7 +312,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                             throw (RuntimeException) new RuntimeException().initCause(ex);
                         }
                     }
-                    if (info.getTrees().getPath(e).getLeaf().getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT) {
+                    if (info.getPath(e).getLeaf().getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT) {
                         try {
                             return new MoveClassUI(DataObject.find(info.getFileObject()));
                         } catch (DataObjectNotFoundException ex) {
@@ -650,21 +650,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
         public void run(CompilationController cc) throws Exception {
             Element selectedElement = cc.getElementUtilities().elementFor(caret);
-            ui = createRefactoringUI(new ElementLocation(selectedElement, caret, cc), start, end, cc);
-//            JavaFXTreePath selectedElement = null;
-//            selectedElement = cc.getTreeUtilities().pathFor(caret);
-//            TreePathHandle searchHandle = null;
-//            //workaround for issue 89064
-//            if (selectedElement.getLeaf().getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT) {
-//                List<? extends Tree> decls = cc.getCompilationUnit().getTypeDecls();
-//                if (!decls.isEmpty()) {
-//                    searchHandle = TreePathHandle.create(JavaFXTreePath.getPath(cc.getCompilationUnit(), decls.get(0)), cc);
-//                }
-//            }
-//            if (searchHandle == null) {
-//                searchHandle = TreePathHandle.create(caret, selectedElement, cc);
-//            }
-//            ui = createRefactoringUI(searchHandle, start, end, cc);
+            ui = selectedElement != null ? createRefactoringUI(new ElementLocation(selectedElement, caret, cc), start, end, cc) : null;
         }
 
         public final void run() {
