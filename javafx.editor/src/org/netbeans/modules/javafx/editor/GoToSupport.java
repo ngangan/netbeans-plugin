@@ -269,13 +269,19 @@ public class GoToSupport {
                 if (doc != null) {
                     int line = NbDocument.findLineNumber(doc, offset);
                     int lineOffset = NbDocument.findLineOffset(doc, line);
-                    int column = offset - lineOffset;
+                    final int column = offset - lineOffset;
                     
                     if (line != -1) {
-                        Line l = lc.getLineSet().getCurrent(line);
+                        final Line l = lc.getLineSet().getCurrent(line);
                         
                         if (l != null) {
-                            l.show(Line.ShowOpenType.OPEN, Line.ShowVisibilityType.FOCUS, column);
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                public void run() {
+                                    l.show(Line.ShowOpenType.OPEN, Line.ShowVisibilityType.FOCUS, column);
+                                }
+                            });
+                            
                             return true;
                         }
                     }
