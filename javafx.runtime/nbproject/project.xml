@@ -53,10 +53,6 @@
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-swing.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-charts.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-charts.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-common.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-common.jar</binary-origin>
             </class-path-extension>
