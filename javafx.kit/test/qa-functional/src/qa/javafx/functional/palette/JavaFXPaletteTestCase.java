@@ -182,6 +182,18 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
     }
 
     public void testItems(String category) {
+        testItems(category, "", "");
+    }
+
+    
+//    public void testItems(String category, String template) {
+//
+//        testItems(category, template, 0, 0);
+//    }
+
+
+    public void testItems(String category, String begin, String end) {
+    //public void testItems(String category, String template, int deltaX, int deltaY) {
         JavaFXProject project = JavaFXProject.createProject(getProjectName(category));
         project.openOutput();
         project.build();
@@ -197,11 +209,15 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
         ListModel model = list.getModel();
         for (int i = 0; i < model.getSize(); i++) {
             //editor.setText("package testpalette_" + category + ";\n");
-            editor.setText("package " + project.getMainPackage() + ";\n");
-            
+            editor.setText("package " + project.getMainPackage() + ";\n" + begin);
+
+            //int line = 4;
+            //editor.setCaretPosition(line, 0);
+            //Util.sleep(5000);
             Object item = model.getElementAt(i);
             System.out.println("=============   Test Item: " + item + "====================");
             palette.dragNDrop(list, i, editor);
+            editor.insert("\n" + end, editor.getLineNumber(), 0);
             project.build();
             Util.sleep(2000);
 
