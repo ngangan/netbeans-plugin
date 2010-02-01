@@ -86,6 +86,18 @@ public class FXPaletteOperator extends PaletteOperator{
         
     }
 
+     public void dragNDrop(JListOperator list, int index, JComponentOperator comp, int x, int y){
+        Point point = list.getClickPoint(index);
+        
+        int x1 = point.x;
+        int y1 = point.y;
+
+        System.out.println("[palette] Drag and Drop");
+
+        MouseRobot.dragNDrop(list, x1, y1, comp, x, y);
+
+        
+    }
 
     public void dragNDrop(JListOperator list, int index, JComponentOperator comp){
         //JListOperator list = lstComponents();
@@ -103,5 +115,8 @@ public class FXPaletteOperator extends PaletteOperator{
 
 
     }
+
+
+
 
 }

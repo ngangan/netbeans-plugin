@@ -110,5 +110,6 @@ public interface Constant {
     String SMOKE_DEBUGGER_FILE_PATH = "debugger/smoke/Debugger.fx";
 
 
+    String PALETTE_FILE_PATH = "palette";
     
 }
