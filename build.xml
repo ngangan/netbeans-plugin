@@ -156,26 +156,26 @@
 
     <target name="jar-windows" if="isWin">
       <jar destfile="build/clusters/windows.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
+        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-win.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.win/release" prefix="javafx2"/>
+        <zipfileset dir="javafx.sdk.win/release" prefix="javafx"/>
       </jar>
     </target>
 
     <target name="jar-linux" if="isLin">
       <jar destfile="build/clusters/linux.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
+        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-lin.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx2">
+        <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx">
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/emulator/mobile/bin/*"/>
           <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.lin/release" prefix="javafx2">
+        <zipfileset dir="javafx.sdk.lin/release" prefix="javafx">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
           <exclude name="javafx-sdk/emulator/tv/bin/*"/>
@@ -185,16 +185,16 @@
 
     <target name="jar-solaris" if="isSol">
       <jar destfile="build/clusters/solaris.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
+        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-sol.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx2">
+        <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx">
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/emulator/mobile/bin/*"/>
           <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.sol/release" prefix="javafx2">
+        <zipfileset dir="javafx.sdk.sol/release" prefix="javafx">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
           <exclude name="javafx-sdk/emulator/tv/bin/*"/>
@@ -204,11 +204,11 @@
 
     <target name="jar-macosx" if="isMacOSX">
       <jar destfile="build/clusters/mac.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
+        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-mac.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx2">
+        <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx">
           <include name="javafx-sdk/bin/*"/>
           <include name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
           <include name="javafx-sdk/emulator/mobile/bin/*"/>
@@ -216,7 +216,7 @@
           <include name="javafx-sdk/emulator/mobile/device-manager.app/Contents/MacOS/JavaApplicationStub"/>
           <include name="javafx-sdk/emulator/tv/bin/*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.mac/release" prefix="javafx2">
+        <zipfileset dir="javafx.sdk.mac/release" prefix="javafx">
           <exclude name="javafx-sdk/bin/*"/>
           <exclude name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
           <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
@@ -230,7 +230,7 @@
     <target name="zip-clusters" depends="nbms">
       <mkdir dir="build/clusters"/>
       <jar destfile="build/clusters/common.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx2" prefix="javafx2">
+        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <exclude name="**/*-mac.*"/>
           <exclude name="**/*-sol.*"/>

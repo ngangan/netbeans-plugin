@@ -18,75 +18,75 @@
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/javafxrt.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/shared/javafxrt.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/javafxrt.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/shared/fxdtools.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/fxdtools.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/fxdloader.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/fxdloader.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/fxdloader.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-common.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-common.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-swing.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-sg-swing.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-sg-swing.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-geom.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-geom.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-geom.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-anim.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-anim.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-anim.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-sg-common.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-sg-common.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-swing.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-swing.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-swing.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-common.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-common.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-controls.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-controls.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-controls.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-desktop.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/javafx-ui-desktop.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-desktop.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/jmc.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/jmc.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/jmc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-runtime.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-runtime.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-j2d.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-j2d.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d-rsl.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-j2d-rsl.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-j2d-rsl.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/prism/decora-prism.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/prism/decora-prism.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/prism/decora-prism.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/decora-jsw.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx2/javafx-sdk/lib/desktop/decora-jsw.jar</binary-origin>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-jsw.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

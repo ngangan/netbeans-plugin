@@ -112,12 +112,12 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
 
                 if( descriptionFile.canRead()) {
                     LayerBuilder.File desc = layer(e).file("SDKSamples/" + sampleName + "/description.html"); // NOI18N
-                    desc.url("nbinst://javafx2/javafx-sdk/samples/" + sampleName + "/comment.html");
+                    desc.url("nbinst://javafx/javafx-sdk/samples/" + sampleName + "/comment.html");
                     desc.write();
                 }
 
                 LayerBuilder.File l = layer(e).file("Templates/Project/Samples/JavaFX/" + spaceName(sampleName));
-                l.url("nbinst://javafx2/javafx-sdk/samples/" + sampleName + "/" + zip.getName());
+                l.url("nbinst://javafx/javafx-sdk/samples/" + sampleName + "/" + zip.getName());
                 l.urlvalue("SystemFileSystem.icon", "nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"); // NOI18N
                 l.stringvalue("SystemFileSystem.localizingBundle", "org.netbeans.modules.javafx.sdksamples.Bundle"); // NOI18N
                 l.methodvalue("instantiatingIterator", "org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator", "createIterator"); // NOI18N
