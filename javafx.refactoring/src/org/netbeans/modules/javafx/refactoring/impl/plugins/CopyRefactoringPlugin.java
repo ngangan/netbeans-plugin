@@ -49,8 +49,6 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.code.JavafxFlags;
-import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +67,6 @@ import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
@@ -83,13 +80,11 @@ import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.ErrorManager;
-import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
-import org.openide.text.DataEditorSupport;
 import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -100,6 +95,7 @@ import org.openide.util.lookup.Lookups;
  * Implemented abilities:
  * <ul>
  * <li>Copy file</li>
+ * <li>Copy files</li>
   * </ul>
  */
 public class CopyRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin  {
@@ -175,6 +171,8 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
             }
             if (!newPkgName.equals(oldPkgName)) {
                 refactoringElements.add(refactoring, new UpdatePackage(fobj));
+            } else if (refactoring instanceof SingleCopyRefactoring) {
+                refactoringElements.add(refactoring, new RenameClass(fobj));
             }
             refactoringElements.add(refactoring, new FixReferences(fobj));
         }
@@ -183,15 +181,16 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
 
     private FileObject getTargetFO(FileObject srcFO) {
         try {
-            String srcName = srcFO.getNameExt();
+            String targetName = srcFO.getNameExt();
             URL targetURL = null;
             if (refactoring instanceof SingleCopyRefactoring) {
                 targetURL = ((SingleCopyRefactoring) refactoring).getTarget().lookup(URL.class);
+                targetName = ((SingleCopyRefactoring)refactoring).getNewName() + ".fx";
             } else {
                 targetURL = ((MultipleCopyRefactoring) refactoring).getTarget().lookup(URL.class);
             }
             FileObject targetFolder = FileUtil.toFileObject(new File(targetURL.toURI()));
-            FileObject targetFile = targetFolder.getFileObject(srcName);
+            FileObject targetFile = targetFolder.getFileObject(targetName);
             return targetFile;
         } catch (URISyntaxException uRISyntaxException) {
         }
@@ -392,6 +391,109 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 };
 
                                 scanner.scan(cc.getCompilationUnit(), null);
+                            }
+                        }, true);
+                    } catch (Exception ioe) {
+                        ErrorManager.getDefault().notify(ioe);
+                    }
+                }
+            }
+            return transformations;
+        }
+    }
+
+    private class RenameClass extends SimpleRefactoringElementImplementation implements RefactoringElementImplementation {
+        private FileObject srcFO;
+        public RenameClass(FileObject srcFO) {
+            this.srcFO = srcFO;
+        }
+
+        public String getDisplayText() {
+            return new MessageFormat (NbBundle.getMessage(CopyRefactoringPlugin.class, "TXT_RenameClass")).format ( // NOI18N
+                new Object[] {((SingleCopyRefactoring)refactoring).getNewName()}
+            );
+        }
+
+        public Lookup getLookup() {
+            return Lookups.fixed(srcFO);
+        }
+
+        public FileObject getParentFile() {
+            return srcFO;
+        }
+
+        public PositionBounds getPosition() {
+            return null;
+        }
+
+        public String getText() {
+            return getDisplayText();
+        }
+
+        public void performChange() {
+            FileObject targetFO = getTargetFO(srcFO);
+            if (targetFO != null) {
+                Transformer t = Transformer.forFileObject(targetFO);
+                if (t != null) {
+                    t.addTransformations(getTransformations());
+                    t.transform();
+                }
+            }
+        }
+
+        @Override
+        protected String getNewFileContent() {
+            Transformer t = Transformer.forFileObject(srcFO).newClone();
+            t.addTransformations(getTransformations());
+            return t.preview();
+        }
+
+        final private Object transformationsLock = new Object();
+        // @GuarddBy transformationsLock
+        private Set<Transformation> transformations = null;
+
+        private Set<Transformation> getTransformations() {
+            synchronized(transformationsLock) {
+                if (transformations == null) {
+                    transformations = new HashSet<Transformation>();
+                    try {
+                        JavaFXSource jfxs = JavaFXSource.forFileObject(srcFO);
+
+                        jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                            public void run(final CompilationController cc) throws Exception {
+                                JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
+                                    @Override
+                                    public Object visitClassDeclaration(ClassDeclarationTree node, Object p) {
+                                        String oldName = node.getSimpleName().toString();
+                                        String newName = ((SingleCopyRefactoring)refactoring).getNewName();
+                                        if (cc.getFileObject().getName().equals(node.getSimpleName().toString())) {
+                                            int[] pos = findClassNamePos(node, cc);
+                                            transformations.add(new ReplaceTextTransformation(pos[0], oldName, newName));
+                                        }
+                                        return super.visitClassDeclaration(node, p);
+                                    }
+                                };
+
+                                scanner.scan(cc.getCompilationUnit(), null);
+                            }
+
+                            private int[] findClassNamePos(ClassDeclarationTree cdt, CompilationController cc) {
+                                int start = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), cdt);
+                                int end = start;
+                                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                                ts.move(start);
+
+                                while (ts.moveNext()) {
+                                    Token<JFXTokenId> t = ts.token();
+                                    if (t.id() != JFXTokenId.IDENTIFIER) {
+                                        start += t.length();
+                                    } else {
+                                        end = start + t.length();
+                                        break;
+                                    }
+                                }
+                                return new int[]{start, end};
                             }
                         }, true);
                     } catch (Exception ioe) {

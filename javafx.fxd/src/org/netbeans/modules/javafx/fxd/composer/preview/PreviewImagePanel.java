@@ -64,7 +64,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     private final FXZDataObject m_dObj;
     private final Action []     m_actions;
     private final Color         m_defaultBackground;
-    private       JComponent    m_fxScenePanel = null;
     private       Scene         m_fxScene = null;
     private       int           m_changeTickerCopy = -1;
     private       Profile m_previewProfileCopy = null;
@@ -93,7 +92,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
 
     public JComponent getScenePanel() {
-        return m_fxScenePanel;
+        return getScenePanel(getScene());
+    }
+
+    private JComponent getScenePanel(Scene scene) {
+        return PreviewLoaderUtilities.getScenePanel(scene);
     }
     
     protected JLabel createWaitPanel() {
@@ -122,7 +125,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 add( label, BorderLayout.CENTER);
                 
                 m_fxScene = null;
-                m_fxScenePanel = null;
                 Thread th = new Thread() {
                     @Override
                     public void run() {
@@ -140,12 +142,12 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                         } else {
                             updateLabelMessage(label, LBL_RENDERING, null);
                         }
-                        try {
-                            fModel.readLock();
+                        SwingUtilities.invokeLater(new Runnable() {
 
-                            SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                try {
+                                    fModel.readLock();
 
-                                public void run() {
                                     PreviewStatistics statistics = new PreviewStatistics();
                                     ProgressHandler progress = new ProgressHandler();
                                     final PreviewLoader loader = PreviewLoader.createLoader(profileCopy, statistics, progress);
@@ -161,7 +163,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             assert SwingUtilities.isEventDispatchThread();
                                             if (error == null) {
                                                 showImagePanel(loader);
-
                                             } else {
                                                 String msg = error != null ? error.getLocalizedMessage() : null;
                                                 showError(MSG_CANNOT_SHOW, msg);
@@ -171,22 +172,21 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
                                     PreviewLoader.loadOnBackground(ContainerEntry.create(fxz, selectedEntryCopy), loader);
 
+                                } finally {
+                                    fModel.readUnlock();
                                 }
-                            });
-
-                        } finally {
-                            fModel.readUnlock();
-                        }
+                            }
+                        });
                     }
                 };
                 th.setName("ModelUpdate-Thread");  //NOI18N
-                th.start();            
+                th.start();
             } else {
                 updateZoom();
             }
         } else {
             Exception error = m_dObj.getDataModel().getFXDContainerLoadError();
-            showError( MSG_CANNOT_SHOW, error.getLocalizedMessage());
+            showError(MSG_CANNOT_SHOW, error.getLocalizedMessage());
         }
     }
 
@@ -200,46 +200,36 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
 
     private void showImagePanel(final PreviewLoader loader) {
-        SwingUtilities.invokeLater(new Runnable() {
+        assert SwingUtilities.isEventDispatchThread();
+        try {
+            m_fxScene = loader.createScene();
+            JComponent scenePanel = getScenePanel(m_fxScene);
 
-            public void run() {
-                try {
-                    
+            removeAll();
+            add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
-                    final JComponent scenePanel = PreviewLoaderUtilities.getScenePanel(loader);
+            MouseEventCollector mec = new MouseEventCollector();
+            scenePanel.addMouseListener(mec);
+            scenePanel.addMouseMotionListener(mec);
+            //zooming
+            scenePanel.addMouseWheelListener(mec);
+            addMouseWheelListener(mec);
+            // popup
+            PopupListener popupL = new PopupListener();
+            scenePanel.addMouseListener(popupL);
+            addMouseListener(popupL);
 
-                    m_fxScene = loader.getScene();
-                    m_fxScenePanel = scenePanel;
-
-                    //DialogDescriptor dd = new DialogDescriptor(scenePanel, "xxxxxxxxxxx");
-                    //DialogDisplayer.getDefault().createDialog(dd).setVisible(true);
-                    removeAll();
-                    add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
-
-                    MouseEventCollector mec = new MouseEventCollector();
-                    scenePanel.addMouseListener(mec);
-                    scenePanel.addMouseMotionListener(mec);
-                    //zooming
-                    scenePanel.addMouseWheelListener(mec);
-                    addMouseWheelListener(mec);
-                    // popup
-                    PopupListener popupL = new PopupListener();
-                    scenePanel.addMouseListener(popupL);
-                    addMouseListener(popupL);
-
-                    revalidate();
-                    updateZoom();
-                } catch (OutOfMemoryError oom) {
-                    oom.printStackTrace();
-                    showError(MSG_CANNOT_SHOW_OOM, oom.getLocalizedMessage());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    showError(MSG_CANNOT_SHOW, e.getLocalizedMessage());
-                } finally {
-                    System.gc();
-                }
-            }
-        });
+            revalidate();
+            updateZoom();
+        } catch (OutOfMemoryError oom) {
+            oom.printStackTrace();
+            showError(MSG_CANNOT_SHOW_OOM, oom.getLocalizedMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError(MSG_CANNOT_SHOW, e.getLocalizedMessage());
+        } finally {
+            System.gc();
+        }
     }
 
     private void showError(final String bundleKey, final Object msg) {

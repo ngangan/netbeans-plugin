@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
+import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -479,6 +480,28 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                     addTail[0] = false;
                                     importLastLine[0] = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
                                 }
+                                Set<ExpressionTree> extern = new HashSet<ExpressionTree>();
+                                extern.addAll(node.getExtends());
+                                extern.addAll(node.getImplements());
+                                extern.addAll(node.getMixins());
+                                for(ExpressionTree et : extern) {
+                                    Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
+                                    if (e != null && (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)) {
+                                        ImportParts ip = getImportParts(et);
+                                        String myTargetPkg = renameMap.get(myPkgName);
+                                        if (myTargetPkg == null) myTargetPkg = myPkgName;
+                                        if (ip.packageName != null) {
+                                            if (!myTargetPkg.contains(ip.packageName)) {
+                                                String typeName = ((TypeElement)e).getQualifiedName().toString();
+                                                if (!typeName.equals(et.toString())) { // not a FQN
+                                                    if (!isImported(typeName)) {
+                                                        toImport.add(typeName);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 return super.visitClassDeclaration(node, p);
                             }
 
@@ -487,22 +510,25 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 ExpressionTree et = node.getClassName();
                                 String usedName = et.toString();
                                 Element e = cc.getTrees().getElement(getCurrentPath());
-                                
-                                String fqn = ((TypeElement)e).getQualifiedName().toString();
-                                if (!fqn.equals(usedName)) {
-                                    ImportParts parts = getImportParts(et);
-                                    String newPkg = renameMap.isEmpty() ? parts.packageName : renameMap.get(parts.packageName);
 
-                                    if (parts.typeName != null) {
-                                        String importName = parts.typeName;
-                                        if (newPkg != null) {
-                                            if (movedClasses.contains(parts.typeName)) {
-                                                importName = parts.typeName.replace(parts.packageName, newPkg);
-                                            } else {
-                                                importName = parts.typeName;
-                                            }
-                                            if (!isImported(importName)) {
-                                                toImport.add(importName);
+                                // #179948: Need to check for the type not being resolvable to TypeElement (nasty, nasty, nasty)
+                                if (e != null) {
+                                    String fqn = ((TypeElement)e).getQualifiedName().toString();
+                                    if (!fqn.equals(usedName)) {
+                                        ImportParts parts = getImportParts(et);
+                                        String newPkg = renameMap.isEmpty() ? parts.packageName : renameMap.get(parts.packageName);
+
+                                        if (parts.typeName != null) {
+                                            String importName = parts.typeName;
+                                            if (newPkg != null) {
+                                                if (movedClasses.contains(parts.typeName)) {
+                                                    importName = parts.typeName.replace(parts.packageName, newPkg);
+                                                } else {
+                                                    importName = parts.typeName;
+                                                }
+                                                if (!isImported(importName)) {
+                                                    toImport.add(importName);
+                                                }
                                             }
                                         }
                                     }

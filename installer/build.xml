@@ -118,14 +118,6 @@
         <arg value="-c"/>
         <arg value="mv baseide*.pkg baseide.pkg;mv javase*.pkg javase.pkg"/>            
     </exec>
-    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javase.pkg/Contents/Resources" failonerror="yes">
-        <arg value="-c"/>
-        <arg value="mv javase*.bom javase.bom;mv javase*.pax.gz javase.pax.gz;mv javase*.sizes javase.sizes"/>            
-    </exec>
-    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javase.pkg/Contents/Resources/English.lproj" failonerror="yes">
-        <arg value="-c"/>
-        <arg value="mv javase*.info javase.info"/>            
-    </exec>
     <pathconvert property="app.fname" pathsep=".">
         <chainedmapper>
             <flattenmapper/>
@@ -160,6 +152,14 @@
     <copy todir="build/mac-mount/${mpkg.fname}/Contents/Packages/javafx.pkg" overwrite="true">
       <fileset dir="build/javafx.pkg"/>
     </copy>
+    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/baseide.pkg/Contents/Resources" failonerror="yes">
+      <arg value="-c"/>
+      <arg value="chmod +x *"/>
+    </exec>  
+    <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javase.pkg/Contents/Resources" failonerror="yes">
+      <arg value="-c"/>
+      <arg value="chmod +x *"/>
+    </exec>  
     <exec executable="sh" dir="build/mac-mount/${mpkg.fname}/Contents/Packages/javafx.pkg/Contents/Resources" failonerror="yes">
       <arg value="-c"/>
       <arg value="chmod +x *"/>
