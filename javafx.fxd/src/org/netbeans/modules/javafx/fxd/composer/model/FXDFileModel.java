@@ -139,13 +139,13 @@ public final class FXDFileModel implements DocumentModelStateListener {
     protected DocumentElement findElement( final DocumentElement de, final String id) {
         //TODO Do not use the String id, use number instead and use fact that the sequence is monotonuous
         DocumentElement result = null;
-        
-        if ( id.equals(getElementId(de))) {
+
+        if (id.equals(getElementId(de))) {
             return de;
         } else {
-            int childNum = de.getElementCount();
-            for (int i = 0; i < childNum; i++) {
-                if ( (result=findElement(de.getElement(i), id)) != null) {
+            List<DocumentElement> children = de.getChildren();
+            for (DocumentElement cde : children) {
+                if ((result = findElement(cde, id)) != null) {
                     return result;
                 }
             }
@@ -241,9 +241,9 @@ public final class FXDFileModel implements DocumentModelStateListener {
     
     private boolean visitElements( DocumentElement de, ElementVisitor visitor) throws Exception {
         visitor.visitElement( de.getType(), de.getName(), de.getAttributes());
-        int num = de.getElementCount();
-        for ( int i = 0; i < num; i++) {
-            if (!visitElements( de.getElement(i), visitor)) {
+        List<DocumentElement> children = de.getChildren();
+        for (DocumentElement cde : children) {
+            if (!visitElements(cde, visitor)) {
                 return false;
             }
         }
