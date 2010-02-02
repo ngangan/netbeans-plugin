@@ -86,9 +86,9 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
                     pkg, "package-info.java").toUri(); // NOI18N
                 File f;
                 if (uri.isAbsolute()) {
-                    f = new File(uri);
+                    f = new File(uri).getParentFile();
                 } else {
-                    f = new File(uri.toString());
+                    f = new File(uri.toString()).getParentFile();
                 }
                 sdkRoot = new File(f, samples.pathToSamples());
             } catch (Exception ioe) {
