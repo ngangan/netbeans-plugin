@@ -1,7 +1,44 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
  */
+
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
@@ -33,7 +70,7 @@ import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
-import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -88,7 +125,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                         }
                     }
                 }
-                HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
+                HintsController.setErrors(compilationInfo.getDocument(), "", errorDescriptions);
             }
         };
     }
@@ -114,8 +151,9 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         if (kind == null) {
             return null;
         }
-        Fix fix = new ElementFix(kind, document, diagnostic, compilationInfo);
-        ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, kind.toString(), Collections.singletonList(fix), compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
+        String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString());
+        Fix fix = new ElementFix(kind, document, diagnostic, compilationInfo, message);
+        ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, message, Collections.singletonList(fix), compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
         return errorDescription;
     }
@@ -132,22 +170,45 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         throw new IllegalStateException();
     }
 
+    private static String getMessage(Kind kind, String elementName, String classFullName) {
+        String message = null;
+        if (kind == Kind.FUNCTION) {
+                message = "TITLE_CREATE_ELEMENT_FUNCTION"; //NOI18N
+            } else if (kind == Kind.VARIABLE) {
+                message = "TITLE_CREATE_ELEMENT_VARIABLE"; //NOI18N
+            } else if (kind == Kind.LOCAL_VARIABLE) {
+                message = "TITLE_CREATE_ELEMENT_LOCAL_VARIABLE"; //NOI18N
+            } else if (kind == Kind.LOCAL_CLASS) {
+                message = "TITLE_CREATE_ELEMENT_CLASS"; //NOI18N
+            }
+
+            return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, elementName, classFullName);
+            //return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString());
+    }
+
     private class ElementFix implements Fix {
 
         private final Kind kind;
         private final Document document;
         private final JCDiagnostic diagnostic;
         private final CompilationInfo compilationInfo;
+        private final String message;
 
-        public ElementFix(Kind kind, Document document, JCDiagnostic diagnostic, CompilationInfo compilationInfo) {
+        public ElementFix(Kind kind,
+                          Document document,
+                          JCDiagnostic diagnostic,
+                          CompilationInfo compilationInfo,
+                          String message) {
+
             this.kind = kind;
             this.document = document;
             this.diagnostic = diagnostic;
             this.compilationInfo = compilationInfo;
+            this.message = message;
         }
 
         public String getText() {
-            return "Create " + kind; //TODO
+            return message;
         }
 
         public ChangeInfo implement() throws Exception {
