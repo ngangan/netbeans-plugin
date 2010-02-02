@@ -88,9 +88,8 @@ public final class FXDElement {
     }
 
     public boolean isVisible() {
-        //TODO use FXDNode to determine this.
-        // getController().getNode(m_id).get$visible() caused NPE 
-        return getController().getNode(m_id) != null;
+        return getController().getNode(m_id).get$visible();
+        //return getController().getNode(m_id) != null;
 
     }
     
