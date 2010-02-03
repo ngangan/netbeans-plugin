@@ -294,7 +294,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
             if (kind == Kind.LOCAL_VARIABLE) {
                 generatedCode = generateLocalVar(varName.toString());
             } else if (kind == Kind.VARIABLE) {
-                generatedCode = generateGlobalVar(varName.toString());
+                generatedCode = generatelVar(varName.toString());
             }
             
             return generatedCode;
@@ -303,6 +303,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         private GeneratedCode generateLocalVar(String varName) {
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+            position[0] = -1;
             new JavaFXTreePathScanner<Void, Void>() {
 
                 @Override
@@ -319,14 +320,18 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
             }.scan(compilationInfo.getCompilationUnit(), null);
             String space = HintsUtils.calculateSpace(position[0], document);
             StringBuffer code = new StringBuffer().append("var ").append(varName).append(";\n").append(space); //NOI18N
+            if (position[0] < 0) {
+                position[0] = (int) diagnostic.getStartPosition();
+            }
 
             return new GeneratedCode(position[0], code.toString());
         }
 
-        private GeneratedCode generateGlobalVar(final String varName) {
+        private GeneratedCode generatelVar(final String varName) {
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
             final StringBuffer code = new StringBuffer();
+            position[0] = -1;
             new JavaFXTreePathScanner<Void, Void>() {
 
                 private ClassDeclarationTree currentClass;
@@ -377,6 +382,9 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                     return super.visitIdentifier(node, p);
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
+            if (position[0] < 0) {
+                return generateLocalVar(varName);
+            }
             
             return diagnostic.getStartPosition() < position[0] ? generateLocalVar(varName) : new GeneratedCode(position[0], code.toString());
         }
