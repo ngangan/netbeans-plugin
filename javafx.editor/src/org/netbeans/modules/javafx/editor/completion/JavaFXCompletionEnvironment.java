@@ -397,6 +397,10 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 if (JavaFXCompletionProvider.startsWith(s, getPrefix())) {
                     boolean isInherited = !te.equals(((Symbol) member.getEnclosingElement()).enclClass());
                     boolean isDeprecated = elements.isDeprecated(member);
+
+                    // Prevent potential NPEs (#180191)
+                    if (member.asType() == null) ((Symbol)member).complete();
+
                     addResult(
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
