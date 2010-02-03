@@ -148,69 +148,28 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     }
 
     // TODO move coloring attributes to xml
-    // TODO uncomment after fixing #169055
     private static AttributeSet getAttributeSet(Result result) {
         switch (result.type) {
             case METHOD:
-                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-                            StyleConstants.StrikeThrough, Color.BLACK);
-                } else {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
-                }
-//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
-//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
+                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case METHOD_INVOCATION:
-                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-                            StyleConstants.StrikeThrough, Color.BLACK);
-                } else {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
-                }
-//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
-//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
+                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK,
+                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case FIELD:
-                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-                            StyleConstants.StrikeThrough, Color.BLACK);
-                } else {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
-                }
-//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
-//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
+                return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0),
+                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case VARIABLE:
-                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
-                    return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-                            StyleConstants.StrikeThrough, Color.BLACK);
-                } else {
-                    return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
-                }
-//                return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
-//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
+                return AttributesUtilities.createImmutable(StyleConstants.Background, new Color(255, 127, 127),
+                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             case CLASS:
-                if (result.attributes.contains(ColoringAttributes.DEPRECATED)) {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-                            StyleConstants.StrikeThrough, Color.BLACK);
-                } else {
-                    return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
-                            StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE);
-                }
-//                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
-//                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
-//                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
+                return AttributesUtilities.createImmutable(StyleConstants.Foreground, Color.BLACK, StyleConstants.Bold, Boolean.TRUE,
+                        StyleConstants.Italic, result.attributes.contains(ColoringAttributes.STATIC) ? Boolean.TRUE : Boolean.FALSE,
+                        StyleConstants.StrikeThrough, result.attributes.contains(ColoringAttributes.DEPRECATED) ? Boolean.TRUE : Boolean.FALSE);
             default:
                 return AttributesUtilities.createImmutable(StyleConstants.Foreground, new Color(0, 153, 0));
         }
