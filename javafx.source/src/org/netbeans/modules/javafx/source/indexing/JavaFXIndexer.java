@@ -9,6 +9,7 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
+import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
 import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
@@ -40,7 +41,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
@@ -64,7 +64,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
 
     final public static String NAME = "fx";
-    final public static int VERSION = 2;
+    final public static int VERSION = 3;
 
     public enum IndexKey {
         PACKAGE_NAME,
@@ -466,6 +466,35 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         }
                     }
                     return super.visitObjectLiteralPart(node, document);
+                }
+
+                @Override
+                public Void visitIdentifier(IdentifierTree node, IndexDocument document) {
+                    Element el = fxresult.getTrees().getElement(getCurrentPath());
+                    if (el == null) {
+                        return super.visitIdentifier(node, document);
+                    }
+                    switch (el.getKind()) {
+                        case FIELD: {
+                            ElementHandle eh = ElementHandle.create(el);
+                            if (eh == null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Error while processing identifier: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                }
+                                return super.visitIdentifier(node, document);
+                            }
+                            String indexVal = IndexingUtilities.getIndexValue(eh);
+                            if (indexVal != null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
+                                }
+                                index(document, IndexKey.FIELD_REF, indexVal);
+                            } else {
+                                LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
+                            }
+                        }
+                    }
+                    return super.visitIdentifier(node, document);
                 }
 
                 @Override
