@@ -14,8 +14,8 @@ abstract public class Transformation {
         t.insertText(pos, text);
     }
 
-    final protected void removeText(int pos, int len, Transformer t) {
-        t.removeText(pos, len);
+    final protected String removeText(int pos, int len, Transformer t) {
+        return t.removeText(pos, len);
     }
 
     final protected void replaceText(int pos, String oldText, String newText, Transformer t) {
@@ -23,4 +23,5 @@ abstract public class Transformation {
     }
 
     abstract public void perform(Transformer t);
+    abstract public void revert(Transformer t);
 }

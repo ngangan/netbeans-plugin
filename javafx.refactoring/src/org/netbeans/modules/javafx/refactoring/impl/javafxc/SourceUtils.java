@@ -57,11 +57,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -86,10 +84,7 @@ import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
@@ -295,64 +290,11 @@ final public class SourceUtils {
     }
 
     public static Collection<ExecutableElement> getOverridingMethods(ExecutableElement e, CompilationInfo info) {
-        Collection<ExecutableElement> result = new ArrayList();
-        TypeElement parentType = (TypeElement) e.getEnclosingElement();
-        //XXX: Fixme IMPLEMENTORS_RECURSIVE were removed
-        Set<? extends ElementHandle> subTypes = info.getClasspathInfo().getClassIndex().getElements(ElementHandle.create(parentType), EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
-        for (ElementHandle<TypeElement> subTypeHandle: subTypes){
-            TypeElement type = subTypeHandle.resolve(info);
-            if (type == null) {
-                // #120577: log info to find out what is going wrong
-                FileObject file = getFile(subTypeHandle, info.getClasspathInfo());
-                throw new NullPointerException("#120577: Cannot resolve " + subTypeHandle + "; file: " + file);
-            }
-            for (ExecutableElement method: ElementFilter.methodsIn(type.getEnclosedElements())) {
-                try {
-                    if (info.getElements().overrides(method, e, type)) {
-                        result.add(method);
-                    }
-                } catch (NullPointerException ex) {
-                    LOG.warning("Error while getting overrides for " + method + ", " + e + ", " + type);
-                }
-            }
-        }
-        return result;
+        return JavaFXSourceUtils.getOverridingMethods(e, info);
     }
 
     public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, CompilationInfo info) {
-        return getOverridenMethods(e, ElementUtilities.enclosingTypeElement(e), info);
-    }
-
-    private static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, TypeElement parent, CompilationInfo info) {
-        ArrayList<ExecutableElement> result = new ArrayList<ExecutableElement>();
-
-        TypeMirror sup = parent.getSuperclass();
-        if (sup.getKind() == TypeKind.DECLARED) {
-            TypeElement next = (TypeElement) ((DeclaredType)sup).asElement();
-            ExecutableElement overriden = getMethod(e, next, info);
-                result.addAll(getOverridenMethods(e,next, info));
-            if (overriden!=null) {
-                result.add(overriden);
-            }
-        }
-        for (TypeMirror tm:parent.getInterfaces()) {
-            TypeElement next = (TypeElement) ((DeclaredType)tm).asElement();
-            ExecutableElement overriden2 = getMethod(e, next, info);
-            result.addAll(getOverridenMethods(e,next, info));
-            if (overriden2!=null) {
-                result.add(overriden2);
-            }
-        }
-        return result;
-    }
-
-    private static ExecutableElement getMethod(ExecutableElement method, TypeElement type, CompilationInfo info) {
-        for (ExecutableElement met: ElementFilter.methodsIn(type.getEnclosedElements())){
-            if (info.getElements().overrides(method, met, type)) {
-                return met;
-            }
-        }
-        return null;
+        return JavaFXSourceUtils.getOverridenMethods(e, info);
     }
 
     public static String getPackageName(FileObject folder) {

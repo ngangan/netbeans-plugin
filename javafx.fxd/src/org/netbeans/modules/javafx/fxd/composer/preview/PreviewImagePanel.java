@@ -5,7 +5,6 @@
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.BaseTransform;
 import java.net.URL;
 
 import org.openide.util.NbBundle;
@@ -32,6 +31,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javax.swing.Action;
@@ -261,9 +261,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             float zoom = m_dObj.getDataModel().getZoomRatio();
             Node node = getSceneRoot();
 
-            Bounds2D bounds = new Bounds2D();
-            node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
-
+            Bounds2D bounds = getNodeLocalBounds(node);
             node.set$scaleX(zoom);
             node.set$scaleY(zoom);
             float cx = (bounds.x1 + bounds.x2) / 2;
@@ -276,6 +274,17 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 scenePanel.getParent().validate();
             }
         }
+    }
+
+    private Bounds2D getNodeLocalBounds(Node node) {
+        Bounds2D bounds = new Bounds2D();
+        //node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
+        Bounds localBounds = node.get$boundsInLocal();
+        bounds.x1 = localBounds.$minX;
+        bounds.x2 = localBounds.$maxX;
+        bounds.y1 = localBounds.$minY;
+        bounds.y2 = localBounds.$maxY;
+        return bounds;
     }
 
     private Action[] getPopupActions() {
