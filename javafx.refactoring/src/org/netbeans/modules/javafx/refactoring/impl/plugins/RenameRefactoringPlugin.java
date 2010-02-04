@@ -63,10 +63,13 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
+import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
+import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
 import org.netbeans.modules.refactoring.api.Problem;
+import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.openide.filesystems.FileObject;
@@ -324,11 +327,34 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         return preCheckProblem;
     }
 
-    public Problem prepare(final RefactoringElementsBag bag) {
-        Lookup l = refactoring.getRefactoringSource();
-        final Set<ElementLocation> references = new HashSet<ElementLocation>();
-        final Map<FileObject, TransformationContext> contextMap = new HashMap<FileObject, TransformationContext>();
+    private class RenameOccurences extends BaseRefactoringElementImplementation {
 
+        public RenameOccurences(FileObject srcFO, RefactoringSession session) {
+            super(srcFO, session);
+        }
+
+        @Override
+        protected Set<Transformation> prepareTransformations(CompilationController cc) {
+            final Set<ElementLocation> references = new HashSet<ElementLocation>();
+            final Set<Transformation> transforms = new HashSet<Transformation>();
+
+            JavaFXTreePathScanner<Void, Set<ElementLocation>> scanner = new BaseRefactoringScanner(location, cc);
+            scanner.scan(cc.getCompilationUnit(), references);
+
+            for(ElementLocation el : references) {
+                transforms.add(new ReplaceTextTransformation(el.getStartPosition(), el.getSimpleName(), refactoring.getNewName()));
+            }
+
+            return transforms;
+        }
+
+        public String getDisplayText() {
+            return "Rename Occurences";
+        }
+
+    }
+
+    public Problem prepare(final RefactoringElementsBag bag) {
         JavaFXSource jfxs = JavaFXSource.forFileObject(location.getSourceFile());
         try {
             final Set<FileObject> refFos = new HashSet<FileObject>();
@@ -386,25 +412,17 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
             }, true);
 
             for(FileObject fo : refFos) {
-                contextMap.put(fo, new TransformationContext());
-                jfxs = JavaFXSource.forFileObject(fo);
-                jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                    public void run(final CompilationController cc) throws Exception {
-                        JavaFXTreePathScanner<Void, Set<ElementLocation>> scanner = new BaseRefactoringScanner(location, cc);
-                        scanner.scan(cc.getCompilationUnit(), references);
-                    }
-                }, true);
+                bag.add(refactoring, new RenameOccurences(fo, bag.getSession()));
             }
 
-            for(ElementLocation loc : references) {
-                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(loc, refactoring.getNewName(), loc.getElement().getSimpleName().toString(), new ProxyLookup(l, Lookups.singleton(contextMap.get(loc.getSourceFile()))));
-                if (refImpl != null) {
-                    bag.add(refactoring, refImpl);
-                } else {
-                    // ignore
-                }
-            }
+//            for(ElementLocation loc : references) {
+//                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(loc, refactoring.getNewName(), loc.getElement().getSimpleName().toString(), new ProxyLookup(l, Lookups.singleton(contextMap.get(loc.getSourceFile()))));
+//                if (refImpl != null) {
+//                    bag.add(refactoring, refImpl);
+//                } else {
+//                    // ignore
+//                }
+//            }
         } catch (IOException e) {
             return new Problem(true, e.getLocalizedMessage());
         }
