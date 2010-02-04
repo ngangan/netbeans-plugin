@@ -1135,25 +1135,33 @@ public class JFXReformatTask implements ReformatTask {
 
             final Tree type = node.getType();
             if (type != null && type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
-                accept(JFXTokenId.COLON);
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-                if (type instanceof TypeArrayTree) {
-                    index = tokens.index();
-                    c = col;
-                    d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (accept(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
-                        space();
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                // #180145
+                if (accept(JFXTokenId.COLON) == JFXTokenId.COLON) {
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                    if (type instanceof TypeArrayTree) {
+                        index = tokens.index();
+                        c = col;
+                        d = diffs.isEmpty() ? null : diffs.getFirst();
+                        if (accept(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
+                            space();
 //                        accept(JFXTokenId.OF);
-                        accept(JFXTokenId.IDENTIFIER); // lexer bug?
-                        space();
-                    } else {
-                        rollback(index, c, d);
-                    }
+                            accept(JFXTokenId.IDENTIFIER); // lexer bug?
+                            space();
+                        } else {
+                            rollback(index, c, d);
+                        }
 //                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
 //                    accept(JFXTokenId.FUNCTION);
 //                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+                    }
+                    scan(type, p);
+                } else {
+                    rollback(index, c, d);
                 }
-                scan(type, p);
+
             }
 
             ExpressionTree initTree = node.getInitializer();
@@ -1318,9 +1326,15 @@ public class JFXReformatTask implements ReformatTask {
 
             TypeTree retType = node.getType();
             if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
-                accept(JFXTokenId.COLON);
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-                scan(retType, p);
+                int index = tokens.index();
+                int c = col;
+                Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.COLON) == JFXTokenId.COLON) {
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                    scan(retType, p);
+                } else {
+                    rollback(index, c, d);
+                }
             }
             indent = old;
 
@@ -2081,10 +2095,15 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.RPAREN);
             TypeTree retType = node.getReturnType();
             if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
-                accept(JFXTokenId.COLON);
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
-
-                scan(retType, p);
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (accept(JFXTokenId.COLON) == JFXTokenId.COLON) {
+                    spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
+                    scan(retType, p);
+                } else {
+                    rollback(index, c, d);
+                }
             }
             return true;
         }

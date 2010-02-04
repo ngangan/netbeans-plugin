@@ -71,7 +71,7 @@ import org.openide.util.NbBundle;
  */
 public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
     private interface MoveProblemCallback {
-        Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature);
+        Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing);
     }
 
     private String myPkgName;
@@ -121,8 +121,8 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
 
         problem = chainProblems(problem, checkVisibilty(e, new MoveProblemCallback() {
 
-            public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature) {
-                return new Problem(true, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass", new String[]{srcTypeName, targetTypeName, newPkgName}));
+            public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass" + (outgoing ? "" : "1"), new String[]{srcTypeName, targetTypeName, newPkgName}));
             }
         }));
 
@@ -135,8 +135,8 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
         problem = chainProblems(problem,
             checkVisibilty(clzElement, new MoveProblemCallback() {
 
-                public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature) {
-                    return new Problem(true, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass", new String[]{srcTypeName, targetTypeName, newPkgName}));
+                public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                    return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass"  + (outgoing ? "" : "1"), new String[]{srcTypeName, targetTypeName, newPkgName}));
                 }
             })
         );
@@ -147,8 +147,8 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
     public R visitObjectLiteralPart(ObjectLiteralPartTree node, P p) {
         Element e = cc.getTrees().getElement(getCurrentPath());
         problem = chainProblems(problem, checkVisibilty(e, new MoveProblemCallback() {
-            public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature) {
-                return new Problem(true, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature", new String[]{srcTypeName, feature, targetTypeName}));
+            public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature"  + (outgoing ? "" : "1"), new String[]{srcTypeName, feature, targetTypeName}));
             }
         }));
         return super.visitObjectLiteralPart(node, p);
@@ -159,8 +159,8 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
         Element e = cc.getTrees().getElement(getCurrentPath());
         if (e != null && e.getKind() == ElementKind.FIELD) {
             problem = chainProblems(problem, checkVisibilty(e, new MoveProblemCallback() {
-                public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature) {
-                    return new Problem(true, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature", new String[]{srcTypeName, feature, targetTypeName}));
+                public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                    return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature"  + (outgoing ? "" : "1"), new String[]{srcTypeName, feature, targetTypeName}));
                 }
             }));
         }
@@ -172,8 +172,8 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
         Element e = cc.getTrees().getElement(getCurrentPath());
         problem = chainProblems(problem, checkVisibilty(e, new MoveProblemCallback() {
 
-            public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature) {
-                return new Problem(true, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature", new String[]{srcTypeName, feature, targetTypeName}));
+            public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature"  + (outgoing ? "" : "1"), new String[]{srcTypeName, feature, targetTypeName}));
             }
         }));
         return super.visitMethodInvocation(node, p);
@@ -185,20 +185,32 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
             boolean packageAccess = true;
 
             String feature = e.toString();
-            String targetTypeName = null;
+            String ownerTypeName = null;
+            Element targetElement = e;
             while (e != null && e.getKind() != ElementKind.PACKAGE) {
-                if (targetTypeName == null && e.getKind() == ElementKind.CLASS) {
-                    targetTypeName = e.asType().toString();
-                    if (isProtected(e) && cc.getTypes().isSubtype(e.asType(), currentClass)) {
+                if (ownerTypeName == null && e.getKind() == ElementKind.CLASS) {
+                    ownerTypeName = e.asType().toString();
+                    if (isProtected(targetElement) && cc.getTypes().isSubtype(currentClass, e.asType())) {
                         packageAccess = false;
                     }
                 }
                 e = e.getEnclosingElement();
             }
-            if (e != null && !movedClasses.contains(targetTypeName) && packageAccess) {
-                String pkgName = ((PackageElement)e).getQualifiedName().toString();
-                String newPkgName = renameMap.get(pkgName);
-                return callback.createProblem(pkgName, newPkgName, currentClass.toString(), targetTypeName, feature);
+            if (ownerTypeName.equals(currentClass.toString())) {
+                // the owner of the element is the same class as the currently processed one
+                // no need to check visibility
+                return null;
+            }
+
+            Element pkgElement = e;
+            if (pkgElement != null) {
+                String ownerPkgName = ((PackageElement)pkgElement).getQualifiedName().toString();
+                String newOwnerPkgName = movedClasses.contains(ownerTypeName) ? renameMap.get(ownerPkgName) : ownerPkgName;
+                String myNewPkgName = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
+                if (packageAccess && !myNewPkgName.equals(newOwnerPkgName)) {
+                    boolean outgoing = !ownerPkgName.equals(newOwnerPkgName);
+                    return callback.createProblem(newOwnerPkgName, myNewPkgName, currentClass.toString(), ownerTypeName, feature, outgoing);
+                }
             }
         }
         return null;

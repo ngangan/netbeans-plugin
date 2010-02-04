@@ -15,7 +15,7 @@ final public class InsertTextTransformation extends Transformation {
 
     public InsertTextTransformation(int pos, String newText) {
         this.pos = pos;
-        this.newText = newText;
+        this.newText = newText != null ? newText : "";
     }
 
     @Override
@@ -23,4 +23,34 @@ final public class InsertTextTransformation extends Transformation {
         insertText(pos, newText, t);
     }
 
+    @Override
+    public void revert(Transformer t) {
+        removeText(pos, newText.length(), t);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final InsertTextTransformation other = (InsertTextTransformation) obj;
+        if (this.pos != other.pos) {
+            return false;
+        }
+        if ((this.newText == null) ? (other.newText != null) : !this.newText.equals(other.newText)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 41 * hash + this.pos;
+        hash = 41 * hash + (this.newText != null ? this.newText.hashCode() : 0);
+        return hash;
+    }
 }

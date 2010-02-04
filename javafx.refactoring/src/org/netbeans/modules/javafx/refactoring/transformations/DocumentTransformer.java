@@ -28,13 +28,12 @@ public class DocumentTransformer extends Transformer {
     }
 
     @Override
-    public synchronized void transform() {
-        final String modified = preview();
+    protected void saveTransformed(final String transformed) {
         Runnable r = new Runnable() {
             public void run() {
                 try {
                     doc.remove(0, doc.getLength());
-                    doc.insertString(0, modified, null);
+                    doc.insertString(0, transformed, null);
                 } catch (BadLocationException badLocationException) {
                 }
             }

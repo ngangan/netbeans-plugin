@@ -28,8 +28,9 @@
 
 package org.netbeans.modules.javafx.refactoring.transformations;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -49,7 +50,19 @@ final public class TransformationContext {
         }
         
         public int compareTo(Change o) {
-            return Integer.valueOf(offset).compareTo(Integer.valueOf(o.offset));
+            if (offset < o.offset) {
+                return -1;
+            } else if (offset > o.offset) {
+                return 1;
+            } else {
+                if (charDiff < o.charDiff) {
+                    return -1;
+                } else if (charDiff > o.charDiff) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
         }
 
         @Override
@@ -64,28 +77,33 @@ final public class TransformationContext {
             if (this.offset != other.offset) {
                 return false;
             }
+            if (this.charDiff != other.charDiff) {
+                return false;
+            }
             return true;
         }
 
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 29 * hash + this.offset;
+            hash = 71 * hash + this.offset;
+            hash = 71 * hash + this.charDiff;
             return hash;
         }
-
         
     }
 
-    final private SortedSet<Change> changes = new TreeSet<Change>();
+    final private List<Change> changes = new ArrayList<Change>();
 
     public void replaceText(int offset, int oldLen, int newLen) {
         int offsetDiff = newLen > oldLen ? oldLen : newLen;
         int changeDiff = newLen - oldLen;
+        if (changeDiff == 0) return;
 
         offset = getRealOffset(offset);
 
         changes.add(new Change(offset + offsetDiff, changeDiff));
+        Collections.sort(changes);
     }
 
     public int getRealOffset(int offset) {

@@ -36,8 +36,8 @@ final class DocumentElementWrapper {
 
     private static abstract class FXDElementWrapper implements com.sun.javafx.tools.fxd.FXDElement {
         protected DocumentElement m_de;
-        private FXDParser m_parser;
-        
+        private static FXDParser m_parser = createParser();
+
         public FXDElementWrapper( final DocumentElement de) {
             m_de = de;
         }
@@ -46,21 +46,19 @@ final class DocumentElementWrapper {
             m_de = null;
         }
 
-        private FXDParser getFxdParser() {
-            if (m_parser == null) {
-                try {
-                    m_parser = new FXDParser(new FakeReader(), new FakeContentHandler());
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+        private static FXDParser createParser() {
+            try {
+                return new FXDParser(new FakeReader(), new FakeContentHandler());
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
             }
-            return m_parser;
+            return null;
         }
 
         Object parseValue(String strValue) {
             try {
                 // TODO: providing FXDParser will allow to support references
-                return FXDParser.parseValue(strValue, getFxdParser());
+                return FXDParser.parseValue(strValue, m_parser);
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
                         log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value", ex);
@@ -106,7 +104,7 @@ final class DocumentElementWrapper {
         }
 
         public Object getAttrValue(String name) {
-            if ( FXDObjectElement.ATTR_NAME_ID.equals(name)) {
+          if ( FXDObjectElement.ATTR_NAME_ID.equals(name)) {
                 //override existing ID with the element start offset
                 return FXDFileModel.getElementId(m_de);
             } else {
@@ -115,9 +113,8 @@ final class DocumentElementWrapper {
                     return parseValue(strValue);
                 } else {
                     if ( m_de.getAttributes().isDefined(name)) {
-                        int elemCount = m_de.getElementCount();
-                        for ( int i = 0; i < elemCount; i++) {
-                            DocumentElement de = m_de.getElement(i);
+                        List<DocumentElement> children = m_de.getChildren();
+                        for ( DocumentElement de : children) {
                             if ( name.equals(de.getName())) {
                                 if ( FXDFileModel.FXD_ATTRIBUTE.equals( de.getType())) {
                                     assert de.getElementCount() == 1;
@@ -137,7 +134,7 @@ final class DocumentElementWrapper {
 
         @SuppressWarnings("unchecked")         
         public Enumeration getAttrNames() {
-            Enumeration attrNames = m_de.getAttributes().getAttributeNames();
+           Enumeration attrNames = m_de.getAttributes().getAttributeNames();
             assert attrNames != null;
 
             if ( m_injectID) {
@@ -187,7 +184,7 @@ final class DocumentElementWrapper {
         }
 
         public Object nextElement() {
-            assert m_attrEnum != null;
+           assert m_attrEnum != null;
             Object o = m_attrEnum.nextElement();
             if ( m_attrEnum == ID_ELEM) {
                 m_attrEnum = m_de.getAttributes().getAttributeNames();
@@ -228,8 +225,8 @@ final class DocumentElementWrapper {
     }
 
     private static void collectChildren( final DocumentElement de, List<DocumentElement> childrenList) {
-        for ( int i = 0; i < de.getElementCount(); i++) {
-            DocumentElement child = de.getElement(i);
+        List<DocumentElement> children = de.getChildren();
+        for (DocumentElement child : children){
             String type = child.getType();
             if ( FXDFileModel.FXD_NODE.equals( type) || 
                  FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
@@ -272,7 +269,7 @@ final class DocumentElementWrapper {
 
         public Object elementAt(int index) {
             DocumentElement de = m_de.getElement(index);
-        
+
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
                 return parseValue(de.getName());
             } else {
