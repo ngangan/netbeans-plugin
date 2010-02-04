@@ -336,6 +336,34 @@
                 <attr name="position" intvalue="900"/>
             </file>
         </folder>
+        <folder name="Transition">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="750"/>
+            <file name="PauseTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PauseTransition.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="TranslateTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/TranslateTransition.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="FadeTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/FadeTransition.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="ParallelTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ParallelTransition.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="PathTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PathTransition.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+             <file name="RotateTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RotateTransition.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="ScaleTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScaleTransition.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="SequentialTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SequentialTransition.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+        </folder>
         <folder name="Media">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="800"/>
