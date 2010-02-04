@@ -26,6 +26,8 @@ import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
@@ -37,8 +39,11 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
+import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.netbeans.modules.parsing.spi.Parser.Result;
@@ -294,35 +299,42 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     }
                     if (el.getKind() == ElementKind.METHOD) {
                         ExecutableElement e = (ExecutableElement)el;
-                        ElementHandle eh = ElementHandle.create(e);
-                        if (eh == null) {
-                            if (DEBUG) {
-                                LOG.log(Level.FINEST, "Error while processing method invocation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                        Collection<ExecutableElement> overridenMethods = JavaFXSourceUtils.getOverridenMethods(e, CompilationController.create(fxresult));
+                        Collection<ExecutableElement> methods = new ArrayList<ExecutableElement>();
+
+                        methods.add(e);
+                        methods.addAll(overridenMethods);
+                        for(ExecutableElement ee : methods) {
+                            ElementHandle eh = ElementHandle.create(ee);
+                            if (eh == null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Error while processing method invocation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                }
+                                return super.visitMethodInvocation(node, document);
                             }
-                            return super.visitMethodInvocation(node, document);
-                        }
-                        String indexVal = IndexingUtilities.getIndexValue(eh);
-                        if (DEBUG) {
-                            LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
-                        }
-                        index(document, IndexKey.FUNCTION_INV, indexVal);
-                        indexVal = e.getEnclosingElement() != null ? IndexingUtilities.getIndexValue(ElementHandle.create(e.getEnclosingElement())) : null;
-                        if (indexVal != null) {
+                            String indexVal = IndexingUtilities.getIndexValue(eh);
                             if (DEBUG) {
-                                LOG.log(Level.FINEST, "Indexing function inv owner type reference {0}\n", new String[]{indexVal});
+                                LOG.log(Level.FINEST, "Indexing method invocation {0} as {1}\n", new String[]{node.toString(), indexVal});
                             }
-                            index(document, IndexKey.TYPE_REF, indexVal);
-                        } else {
-                            LOG.log(Level.FINE, "Can not determine function owner inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
-                        }
-                        indexVal = e.asType() != null ? e.asType().toString() : null;
-                        if (indexVal != null) {
-                            if (DEBUG) {
-                                LOG.log(Level.FINEST, "Indexing function inv return type reference {0}\n", new String[]{indexVal});
+                            index(document, IndexKey.FUNCTION_INV, indexVal);
+                            indexVal = e.getEnclosingElement() != null ? IndexingUtilities.getIndexValue(ElementHandle.create(e.getEnclosingElement())) : null;
+                            if (indexVal != null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Indexing function inv owner type reference {0}\n", new String[]{indexVal});
+                                }
+                                index(document, IndexKey.TYPE_REF, indexVal);
+                            } else {
+                                LOG.log(Level.FINE, "Can not determine function owner inv type for: {0}", node != null ? node.getJavaFXKind() : "null");
                             }
-                            index(document, IndexKey.TYPE_REF, indexVal);
-                        } else {
-                            LOG.log(Level.FINE, "Can not determine function inv return type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                            indexVal = e.asType() != null ? e.asType().toString() : null;
+                            if (indexVal != null) {
+                                if (DEBUG) {
+                                    LOG.log(Level.FINEST, "Indexing function inv return type reference {0}\n", new String[]{indexVal});
+                                }
+                                index(document, IndexKey.TYPE_REF, indexVal);
+                            } else {
+                                LOG.log(Level.FINE, "Can not determine function inv return type for: {0}", node != null ? node.getJavaFXKind() : "null");
+                            }
                         }
                     }
                     return super.visitMethodInvocation(node, document);
