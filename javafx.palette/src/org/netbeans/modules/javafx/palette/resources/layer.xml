@@ -336,7 +336,7 @@
                 <attr name="position" intvalue="900"/>
             </file>
         </folder>
-        <folder name="Transition">
+        <folder name="Transitions">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="750"/>
             <file name="PauseTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PauseTransition.xml">
