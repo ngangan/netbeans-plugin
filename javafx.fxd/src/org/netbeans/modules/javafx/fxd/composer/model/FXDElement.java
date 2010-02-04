@@ -89,8 +89,8 @@ public final class FXDElement {
 
     public boolean isVisible() {
         //return getController().getNode(m_id).get$visible();
-        return getController().getNode(m_id) != null;
-
+        Node n = getController().getNode(m_id);
+        return n != null ? n.get$visible() : false;
     }
     
     public String getName() {
