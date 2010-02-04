@@ -80,6 +80,7 @@ import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.ErrorManager;
+import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
@@ -170,11 +171,11 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                 refactoringElements.add(refactoring, new CopyFile(fobj, refactoringElements.getSession()));
             }
             if (!newPkgName.equals(oldPkgName)) {
-                refactoringElements.add(refactoring, new UpdatePackage(fobj));
+                refactoringElements.add(refactoring, new UpdatePackage(fobj, refactoringElements.getSession()));
             } else if (refactoring instanceof SingleCopyRefactoring) {
-                refactoringElements.add(refactoring, new RenameClass(fobj));
+                refactoringElements.add(refactoring, new RenameClass(fobj, refactoringElements.getSession()));
             }
-            refactoringElements.add(refactoring, new FixReferences(fobj));
+            refactoringElements.add(refactoring, new FixReferences(fobj, refactoringElements.getSession()));
         }
         return problem;
     }
@@ -272,10 +273,9 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         return problem[0];
     }
 
-    private class UpdatePackage extends SimpleRefactoringElementImplementation implements RefactoringElementImplementation {
-        private FileObject srcFO;
-        public UpdatePackage(FileObject srcFO) {
-            this.srcFO = srcFO;
+    private class UpdatePackage extends BaseRefactoringElementImplementation {
+        public UpdatePackage(FileObject srcFO, RefactoringSession session) {
+            super(srcFO, session);
         }
 
         public String getDisplayText() {
@@ -284,128 +284,79 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
             );
         }
 
-        public Lookup getLookup() {
-            return Lookups.fixed(srcFO);
-        }
-
-        public FileObject getParentFile() {
-            return srcFO;
-        }
-
-        public PositionBounds getPosition() {
-            return null;
-        }
-
-        public String getText() {
-            return getDisplayText();
-        }
-
-        public void performChange() {
-            FileObject targetFO = getTargetFO(srcFO);
-            if (targetFO != null) {
-                Transformer t = Transformer.forFileObject(targetFO);
-                if (t != null) {
-                    t.addTransformations(getTransformations());
-                    t.transform();
-                }
-            }
-        }
-
         @Override
-        protected String getNewFileContent() {
-            Transformer t = Transformer.forFileObject(srcFO).newClone();
-            t.addTransformations(getTransformations());
-            return t.preview();
+        protected FileObject getTargetFO() {
+            return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
         }
 
-        final private Object transformationsLock = new Object();
-        // @GuarddBy transformationsLock
-        private Set<Transformation> transformations = null;
+        protected Set<Transformation> prepareTransformations(final CompilationController cc) {
+            final Set<Transformation> transformations = new HashSet<Transformation>();
+            JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
 
-        private Set<Transformation> getTransformations() {
-            synchronized(transformationsLock) {
-                if (transformations == null) {
-                    transformations = new HashSet<Transformation>();
-                    try {
-                        JavaFXSource jfxs = JavaFXSource.forFileObject(srcFO);
+                @Override
+                public Object visitCompilationUnit(UnitTree node, Object p) {
+                    Tree pkgNameTree = node.getPackageName();
+                    if (pkgNameTree == null) { // default package; no package statement
+                        TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                        ts.moveStart();
+                        ts.moveNext();
+                        int pos = 0;
+                        Token<JFXTokenId> token = ts.token();
+                        while (token.id() == JFXTokenId.COMMENT && ts.moveNext()) {
+                            pos += token.length();
+                            token = ts.token();
+                        }
+                        String separator = (token.text().toString().equals("\n")) ? "" : "\n";
 
-                        jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                            public void run(final CompilationController cc) throws Exception {
-                                JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
-
-                                    @Override
-                                    public Object visitCompilationUnit(UnitTree node, Object p) {
-                                        Tree pkgNameTree = node.getPackageName();
-                                        if (pkgNameTree == null) { // default package; no package statement
-                                            TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                                            ts.moveStart();
-                                            ts.moveNext();
-                                            int pos = 0;
-                                            Token<JFXTokenId> token = ts.token();
-                                            while (token.id() == JFXTokenId.COMMENT && ts.moveNext()) {
-                                                pos += token.length();
-                                                token = ts.token();
-                                            }
-                                            String separator = (token.text().toString().equals("\n")) ? "" : "\n";
-
-                                            transformations.add(new InsertTextTransformation(pos, "\npackage " + getTargetPackageName() + ";" + separator)); // NOI18N
-                                        } else {
-                                            long startPos = cc.getTrees().getSourcePositions().getStartPosition(node, pkgNameTree);
-                                            long endPos = cc.getTrees().getSourcePositions().getEndPosition(node, pkgNameTree);
-                                            String tgtPkgName = getTargetPackageName();
-                                            if (tgtPkgName != null && tgtPkgName.length() > 0) {
-                                                transformations.add(new ReplaceTextTransformation((int)startPos, pkgNameTree.toString(), getTargetPackageName()));
-                                            } else {
-                                                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                                                ts.move((int)startPos);
-                                                ts.movePrevious();
-                                                int decrement = 0;
-                                                Token<JFXTokenId> token = ts.token();
-                                                while (token.id() != JFXTokenId.PACKAGE && ts.movePrevious()) {
-                                                    decrement += token.length();
-                                                    token = ts.token();
-                                                }
-                                                if (token != null && token.id() == JFXTokenId.PACKAGE) {
-                                                    decrement += token.length();
-                                                    startPos = startPos - decrement;
-                                                    ts.move((int)endPos);
-                                                    ts.moveNext();
-                                                    int increment = 0;
-                                                    token = ts.token();
-                                                    while (token.id() != JFXTokenId.SEMI && ts.moveNext()) {
-                                                        increment += token.length();
-                                                        token = ts.token();
-                                                    }
-                                                    if (token != null && token.id() == JFXTokenId.SEMI) {
-                                                        increment += token.length();
-                                                        endPos = endPos + increment;
-                                                        transformations.add(new RemoveTextTransformation((int)startPos, (int)(endPos - startPos + 1)));
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        return super.visitCompilationUnit(node, p);
-                                    }
-                                };
-
-                                scanner.scan(cc.getCompilationUnit(), null);
+                        transformations.add(new InsertTextTransformation(pos, "\npackage " + getTargetPackageName() + ";" + separator)); // NOI18N
+                    } else {
+                        long startPos = cc.getTrees().getSourcePositions().getStartPosition(node, pkgNameTree);
+                        long endPos = cc.getTrees().getSourcePositions().getEndPosition(node, pkgNameTree);
+                        String tgtPkgName = getTargetPackageName();
+                        if (tgtPkgName != null && tgtPkgName.length() > 0) {
+                            transformations.add(new ReplaceTextTransformation((int)startPos, pkgNameTree.toString(), getTargetPackageName()));
+                        } else {
+                            TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                            ts.move((int)startPos);
+                            ts.movePrevious();
+                            int decrement = 0;
+                            Token<JFXTokenId> token = ts.token();
+                            while (token.id() != JFXTokenId.PACKAGE && ts.movePrevious()) {
+                                decrement += token.length();
+                                token = ts.token();
                             }
-                        }, true);
-                    } catch (Exception ioe) {
-                        ErrorManager.getDefault().notify(ioe);
+                            if (token != null && token.id() == JFXTokenId.PACKAGE) {
+                                decrement += token.length();
+                                startPos = startPos - decrement;
+                                ts.move((int)endPos);
+                                ts.moveNext();
+                                int increment = 0;
+                                token = ts.token();
+                                while (token.id() != JFXTokenId.SEMI && ts.moveNext()) {
+                                    increment += token.length();
+                                    token = ts.token();
+                                }
+                                if (token != null && token.id() == JFXTokenId.SEMI) {
+                                    increment += token.length();
+                                    endPos = endPos + increment;
+                                    transformations.add(new RemoveTextTransformation((int)startPos, (int)(endPos - startPos + 1)));
+                                }
+                            }
+                        }
                     }
+
+                    return super.visitCompilationUnit(node, p);
                 }
-            }
+            };
+
+            scanner.scan(cc.getCompilationUnit(), null);
             return transformations;
         }
     }
 
-    private class RenameClass extends SimpleRefactoringElementImplementation implements RefactoringElementImplementation {
-        private FileObject srcFO;
-        public RenameClass(FileObject srcFO) {
-            this.srcFO = srcFO;
+    private class RenameClass extends BaseRefactoringElementImplementation {
+        public RenameClass(FileObject srcFO, RefactoringSession session) {
+            super(srcFO, session);
         }
 
         public String getDisplayText() {
@@ -413,108 +364,48 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                 new Object[] {((SingleCopyRefactoring)refactoring).getNewName()}
             );
         }
+        
+        protected Set<Transformation> prepareTransformations(final CompilationController cc) {
+            final Set<Transformation> transformations = new HashSet<Transformation>();
+            JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
+                private int[] findClassNamePos(ClassDeclarationTree cdt, CompilationController cc) {
+                    int start = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), cdt);
+                    int end = start;
+                    TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                    ts.move(start);
 
-        public Lookup getLookup() {
-            return Lookups.fixed(srcFO);
-        }
-
-        public FileObject getParentFile() {
-            return srcFO;
-        }
-
-        public PositionBounds getPosition() {
-            return null;
-        }
-
-        public String getText() {
-            return getDisplayText();
-        }
-
-        public void performChange() {
-            FileObject targetFO = getTargetFO(srcFO);
-            if (targetFO != null) {
-                Transformer t = Transformer.forFileObject(targetFO);
-                if (t != null) {
-                    t.addTransformations(getTransformations());
-                    t.transform();
-                }
-            }
-        }
-
-        @Override
-        protected String getNewFileContent() {
-            Transformer t = Transformer.forFileObject(srcFO).newClone();
-            t.addTransformations(getTransformations());
-            return t.preview();
-        }
-
-        final private Object transformationsLock = new Object();
-        // @GuarddBy transformationsLock
-        private Set<Transformation> transformations = null;
-
-        private Set<Transformation> getTransformations() {
-            synchronized(transformationsLock) {
-                if (transformations == null) {
-                    transformations = new HashSet<Transformation>();
-                    try {
-                        JavaFXSource jfxs = JavaFXSource.forFileObject(srcFO);
-
-                        jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                            public void run(final CompilationController cc) throws Exception {
-                                JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
-                                    @Override
-                                    public Object visitClassDeclaration(ClassDeclarationTree node, Object p) {
-                                        String oldName = node.getSimpleName().toString();
-                                        String newName = ((SingleCopyRefactoring)refactoring).getNewName();
-                                        if (cc.getFileObject().getName().equals(node.getSimpleName().toString())) {
-                                            int[] pos = findClassNamePos(node, cc);
-                                            transformations.add(new ReplaceTextTransformation(pos[0], oldName, newName));
-                                        }
-                                        return super.visitClassDeclaration(node, p);
-                                    }
-                                };
-
-                                scanner.scan(cc.getCompilationUnit(), null);
-                            }
-
-                            private int[] findClassNamePos(ClassDeclarationTree cdt, CompilationController cc) {
-                                int start = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), cdt);
-                                int end = start;
-                                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                                ts.move(start);
-
-                                while (ts.moveNext()) {
-                                    Token<JFXTokenId> t = ts.token();
-                                    if (t.id() != JFXTokenId.IDENTIFIER) {
-                                        start += t.length();
-                                    } else {
-                                        end = start + t.length();
-                                        break;
-                                    }
-                                }
-                                return new int[]{start, end};
-                            }
-                        }, true);
-                    } catch (Exception ioe) {
-                        ErrorManager.getDefault().notify(ioe);
+                    while (ts.moveNext()) {
+                        Token<JFXTokenId> t = ts.token();
+                        if (t.id() != JFXTokenId.IDENTIFIER) {
+                            start += t.length();
+                        } else {
+                            end = start + t.length();
+                            break;
+                        }
                     }
+                    return new int[]{start, end};
                 }
-            }
+
+                @Override
+                public Object visitClassDeclaration(ClassDeclarationTree node, Object p) {
+                    String oldName = node.getSimpleName().toString();
+                    String newName = ((SingleCopyRefactoring)refactoring).getNewName();
+                    if (cc.getFileObject().getName().equals(node.getSimpleName().toString())) {
+                        int[] pos = findClassNamePos(node, cc);
+                        transformations.add(new ReplaceTextTransformation(pos[0], oldName, newName));
+                    }
+                    return super.visitClassDeclaration(node, p);
+                }
+            };
+
+            scanner.scan(cc.getCompilationUnit(), null);
             return transformations;
         }
     }
 
-    private class FixReferences extends SimpleRefactoringElementImplementation implements RefactoringElementImplementation {
-        private FileObject srcFO;
-
-        public FixReferences(FileObject srcFO) {
-            this.srcFO = srcFO;
-        }
-
-        @Override
-        public void undoChange() {
-            super.undoChange();
+    private class FixReferences extends BaseRefactoringElementImplementation {
+        public FixReferences(FileObject srcFO, RefactoringSession session) {
+            super(srcFO, session);
         }
 
         public String getDisplayText() {
@@ -523,202 +414,153 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
             );
         }
 
-        public Lookup getLookup() {
-            return Lookups.singleton(srcFO);
-        }
-
-        public FileObject getParentFile() {
-            return srcFO;
-        }
-
-        public PositionBounds getPosition() {
-            return null;
-        }
-
-        public String getText() {
-            return getDisplayText();
-        }
-
-        public void performChange() {
-            FileObject targetFO = getTargetFO(srcFO);
-            if (targetFO != null) {
-                Transformer t = Transformer.forFileObject(targetFO);
-                if (t != null) {
-                    t.addTransformations(getTransformations());
-                    t.transform();
-                }
-            }
-        }
-
         @Override
-        protected String getNewFileContent() {
-            Transformer t = Transformer.forFileObject(srcFO).newClone();
-            t.addTransformations(getTransformations());
-
-            return t.preview();
+        protected FileObject getTargetFO() {
+            return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
         }
 
-        final private Object transformationsLock = new Object();
-        // @GuarddBy transformationsLock
-        private Set<Transformation> transformations = null;
+        protected Set<Transformation> prepareTransformations(final CompilationController cc) {
+            final Set<Transformation> transformations = new HashSet<Transformation>();
+            final Set<String> toImport = new HashSet<String>();
+            final long[] lastImportEndPos = new long[]{Long.MIN_VALUE};
 
-        private Set<Transformation> getTransformations() {
-            synchronized(transformationsLock) {
-                if (transformations == null) {
-                    transformations = new HashSet<Transformation>();
+            JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
+                final private Set<String> imported = new HashSet<String>();
+
+                private boolean inImport = false;
+                private boolean inSelect = false;
+                private boolean wildcard = false;
+
+                @Override
+                public Object visitCompilationUnit(UnitTree node, Object p) {
                     try {
-                        final Set<String> toImport = new HashSet<String>();
-                        final long[] lastImportEndPos = new long[]{Long.MIN_VALUE};
+                        return super.visitCompilationUnit(node, p);
+                    } finally {
+                        TokenSequence ts = cc.getTokenHierarchy().tokenSequence();
+                        ts.move((int)lastImportEndPos[0]);
+                        ts.moveNext();
+                        Token<JFXTokenId> token = ts.token();
+                        int increment = 0;
+                        while (token.id() != JFXTokenId.SEMI && ts.moveNext()) {
+                            increment += token.length();
+                            token = ts.token();
+                        }
+                        if (token != null && token.id() == JFXTokenId.SEMI) {
+                            lastImportEndPos[0] += increment;
+                        }
+                    }
+                }
 
-                        JavaFXSource jfxs = JavaFXSource.forFileObject(srcFO);
-
-                        jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                            public void run(final CompilationController cc) throws Exception {
-                                JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
-                                    final private Set<String> imported = new HashSet<String>();
-
-                                    private boolean inImport = false;
-                                    private boolean inSelect = false;
-                                    private boolean wildcard = false;
-
-                                    @Override
-                                    public Object visitCompilationUnit(UnitTree node, Object p) {
-                                        try {
-                                            return super.visitCompilationUnit(node, p);
-                                        } finally {
-                                            TokenSequence ts = cc.getTokenHierarchy().tokenSequence();
-                                            ts.move((int)lastImportEndPos[0]);
-                                            ts.moveNext();
-                                            Token<JFXTokenId> token = ts.token();
-                                            int increment = 0;
-                                            while (token.id() != JFXTokenId.SEMI && ts.moveNext()) {
-                                                increment += token.length();
-                                                token = ts.token();
-                                            }
-                                            if (token != null && token.id() == JFXTokenId.SEMI) {
-                                                lastImportEndPos[0] += increment;
+                @Override
+                public Object visitIdentifier(IdentifierTree node, Object p) {
+                    if (!inSelect) {
+                        Element e = cc.getTrees().getElement(getCurrentPath());
+                        if (isTypeElement(e)) {
+                            PackageElement pe = getTypePackage((TypeElement)e);
+                            if (pe.getQualifiedName().contentEquals(getSourcePackageName())) {
+                                if (inImport) {
+                                    long pos = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
+                                    transformations.add(new InsertTextTransformation((int)pos, getSourcePackageName() + ".")); // NOI18N
+                                } else {
+                                    String usedId = node.toString();
+                                    if (!usedId.startsWith(getSourcePackageName())) {
+                                        String newImport = getSourcePackageName() + "." + usedId; // NOI18N
+                                        if (!imported.contains(newImport)) {
+                                            String wildCard = getSourcePackageName() + ".*"; // NOI18N
+                                            if (!imported.contains(wildCard)) {
+                                                toImport.add(newImport);
                                             }
                                         }
                                     }
+                                }
+                            }
+                        }
+                    } else {
+                        wildcard = false;
+                    }
+                    return super.visitIdentifier(node, p);
+                }
 
-                                    @Override
-                                    public Object visitIdentifier(IdentifierTree node, Object p) {
-                                        if (!inSelect) {
-                                            Element e = cc.getTrees().getElement(getCurrentPath());
-                                            if (isTypeElement(e)) {
-                                                PackageElement pe = getTypePackage((TypeElement)e);
-                                                if (pe.getQualifiedName().contentEquals(getSourcePackageName())) {
-                                                    if (inImport) {
-                                                        long pos = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
-                                                        transformations.add(new InsertTextTransformation((int)pos, getSourcePackageName() + ".")); // NOI18N
-                                                    } else {
-                                                        String usedId = node.toString();
-                                                        if (!usedId.startsWith(getSourcePackageName())) {
-                                                            String newImport = getSourcePackageName() + "." + usedId; // NOI18N
-                                                            if (!imported.contains(newImport)) {
-                                                                String wildCard = getSourcePackageName() + ".*"; // NOI18N
-                                                                if (!imported.contains(wildCard)) {
-                                                                    toImport.add(newImport);
-                                                                }
-                                                            }
-                                                        }
-                                                    }
+                @Override
+                public Object visitImport(ImportTree node, Object p) {
+                    inImport = true;
+                    try {
+                        long endPos = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
+                        if (endPos > lastImportEndPos[0]) {
+                            lastImportEndPos[0] = endPos;
+                        }
+                        Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getQualifiedIdentifier()));
+                        if (e != null) {
+                            if (isTypeElement(e)) {
+                                imported.add(((TypeElement)e).getQualifiedName().toString());
+                            } else {
+                                imported.add(node.getQualifiedIdentifier().toString());
+                            }
+                        }
+                        return super.visitImport(node, p);
+                    } finally {
+                        inImport = false;
+                    }
+                }
+
+                @Override
+                public Object visitMemberSelect(MemberSelectTree node, Object p) {
+                    try {
+                        if (inImport) {
+                            if (node.getIdentifier().contentEquals("*")) {
+                                wildcard = true;
+                            } else {
+                                Element e = cc.getTrees().getElement(getCurrentPath());
+                                if (e != null && e.getKind() == ElementKind.PACKAGE) {
+                                    PackageElement pe = (PackageElement)e;
+                                    if (pe.getQualifiedName().contentEquals(getTargetPackageName())) {
+                                        long startPos = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
+                                        long endPos = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
+                                        if (wildcard) {
+                                            TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                                            ts.move((int)startPos);
+                                            ts.movePrevious();
+                                            Token<JFXTokenId> token = ts.token();
+                                            int decrement = 0;
+                                            while (token.id() != JFXTokenId.IMPORT && ts.movePrevious()) {
+                                                decrement += token.length();
+                                                token = ts.token();
+                                            }
+                                            if (token != null && token.id() == JFXTokenId.IMPORT) {
+                                                decrement += token.length();
+                                                startPos -= decrement;
+                                                ts.move((int)endPos);
+                                                ts.moveNext();
+                                                int increment = 0;
+                                                token = ts.token();
+                                                while (token.id() != JFXTokenId.SEMI && ts.moveNext()) {
+                                                    increment += token.length();
+                                                    token = ts.token();
+                                                }
+                                                if (token != null && token.id() == JFXTokenId.SEMI) {
+                                                    increment += token.length();
+                                                    endPos = endPos + increment;
+                                                    transformations.add(new RemoveTextTransformation((int)startPos, (int)(endPos - startPos + 1)));
                                                 }
                                             }
                                         } else {
-                                            wildcard = false;
-                                        }
-                                        return super.visitIdentifier(node, p);
-                                    }
-
-                                    @Override
-                                    public Object visitImport(ImportTree node, Object p) {
-                                        inImport = true;
-                                        try {
-                                            long endPos = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
-                                            if (endPos > lastImportEndPos[0]) {
-                                                lastImportEndPos[0] = endPos;
-                                            }
-                                            Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getQualifiedIdentifier()));
-                                            if (e != null) {
-                                                if (isTypeElement(e)) {
-                                                    imported.add(((TypeElement)e).getQualifiedName().toString());
-                                                } else {
-                                                    imported.add(node.getQualifiedIdentifier().toString());
-                                                }
-                                            }
-                                            return super.visitImport(node, p);
-                                        } finally {
-                                            inImport = false;
+                                            transformations.add(new RemoveTextTransformation((int)startPos, node.toString().length() + 2));
                                         }
                                     }
-
-                                    @Override
-                                    public Object visitMemberSelect(MemberSelectTree node, Object p) {
-                                        try {
-                                            if (inImport) {
-                                                if (node.getIdentifier().contentEquals("*")) {
-                                                    wildcard = true;
-                                                } else {
-                                                    Element e = cc.getTrees().getElement(getCurrentPath());
-                                                    if (e != null && e.getKind() == ElementKind.PACKAGE) {
-                                                        PackageElement pe = (PackageElement)e;
-                                                        if (pe.getQualifiedName().contentEquals(getTargetPackageName())) {
-                                                            long startPos = cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
-                                                            long endPos = cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
-                                                            if (wildcard) {
-                                                                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                                                                ts.move((int)startPos);
-                                                                ts.movePrevious();
-                                                                Token<JFXTokenId> token = ts.token();
-                                                                int decrement = 0;
-                                                                while (token.id() != JFXTokenId.IMPORT && ts.movePrevious()) {
-                                                                    decrement += token.length();
-                                                                    token = ts.token();
-                                                                }
-                                                                if (token != null && token.id() == JFXTokenId.IMPORT) {
-                                                                    decrement += token.length();
-                                                                    startPos -= decrement;
-                                                                    ts.move((int)endPos);
-                                                                    ts.moveNext();
-                                                                    int increment = 0;
-                                                                    token = ts.token();
-                                                                    while (token.id() != JFXTokenId.SEMI && ts.moveNext()) {
-                                                                        increment += token.length();
-                                                                        token = ts.token();
-                                                                    }
-                                                                    if (token != null && token.id() == JFXTokenId.SEMI) {
-                                                                        increment += token.length();
-                                                                        endPos = endPos + increment;
-                                                                        transformations.add(new RemoveTextTransformation((int)startPos, (int)(endPos - startPos + 1)));
-                                                                    }
-                                                                }
-                                                            } else {
-                                                                transformations.add(new RemoveTextTransformation((int)startPos, node.toString().length() + 2));
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            inSelect = true;
-                                            return super.visitMemberSelect(node, p);
-                                        } finally {
-                                            inSelect = false;
-                                        }
-                                    }
-                                };
-
-                                scanner.scan(cc.getCompilationUnit(), null);
-                                for(String imprt : toImport) {
-                                    transformations.add(new InsertTextTransformation((int)lastImportEndPos[0] + 1, "\nimport " + imprt + ";")); // NOI18N
                                 }
                             }
-                        }, true);
-                    } catch (Exception ioe) {
-                        ErrorManager.getDefault().notify(ioe);
+                        }
+                        inSelect = true;
+                        return super.visitMemberSelect(node, p);
+                    } finally {
+                        inSelect = false;
                     }
                 }
+            };
+
+            scanner.scan(cc.getCompilationUnit(), null);
+            for(String imprt : toImport) {
+                transformations.add(new InsertTextTransformation((int)lastImportEndPos[0] + 1, "\nimport " + imprt + ";")); // NOI18N
             }
             return transformations;
         }

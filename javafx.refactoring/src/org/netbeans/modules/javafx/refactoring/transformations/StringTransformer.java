@@ -20,4 +20,9 @@ public class StringTransformer extends Transformer {
     public Transformer newClone() {
         return new StringTransformer(backup);
     }
+
+    @Override
+    protected void saveTransformed(String transformed) {
+        // just ignore this
+    }
 }

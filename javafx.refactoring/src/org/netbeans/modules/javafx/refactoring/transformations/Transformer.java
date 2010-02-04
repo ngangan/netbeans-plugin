@@ -12,7 +12,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.netbeans.editor.BaseDocument;
+import org.netbeans.modules.refactoring.api.ProgressEvent;
+import org.netbeans.modules.refactoring.api.ProgressListener;
+import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
@@ -24,21 +29,37 @@ import org.openide.text.DataEditorSupport;
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
 abstract public class Transformer {
-    private StringBuilder builder;
-    private TransformationContext context;
+    final private static Logger LOGGER = Logger.getLogger(Transformer.class.getName());
     
-    final private static Map<FileObject, Transformer> foTransformers = new WeakHashMap<FileObject, Transformer>();
+    private StringBuilder builder;
+    private TransformationContext context = new TransformationContext();
+    
+    final private static Map<RefactoringSession, Map<FileObject, Transformer>> foTransformers = new WeakHashMap<RefactoringSession, Map<FileObject, Transformer>>();
 
     final private List<Transformation> transformations;
-    private int lastAppliedTransformation = -1;
-    
-    final private String contentBackup;
+
+    private int applyMark = -1, revertMark = -1;
+
+    final private ProgressListener pl = new ProgressListener() {
+
+        public void start(ProgressEvent pe) {
+            applyMark = -1;
+            revertMark = -1;
+        }
+
+        public void step(ProgressEvent pe) {
+            // ignore
+        }
+
+        public void stop(ProgressEvent pe) {
+            applyMark = -1;
+            revertMark = -1;
+        }
+    };
 
     protected Transformer(CharSequence content) {
         builder = new StringBuilder(content);
-        context = new TransformationContext();
         transformations = new ArrayList<Transformation>();
-        contentBackup = builder.toString();
     }
 
     public static Transformer forText(String text) {
@@ -49,22 +70,32 @@ abstract public class Transformer {
         return new DocumentTransformer(doc);
     }
 
-    public static Transformer forFileObject(FileObject fo) {
+    public static Transformer forFileObject(FileObject fo, RefactoringSession session) {
+        return forFileObject(fo, session, true);
+    }
+
+    public static Transformer forFileObject(FileObject fo, RefactoringSession session, boolean shared) {
         synchronized(foTransformers) {
-            Transformer t = foTransformers.get(fo);
+            Map<FileObject, Transformer> map = foTransformers.get(session);
+            if (map == null) {
+                map = new WeakHashMap<FileObject, Transformer>();
+                foTransformers.put(session, map);
+            }
+            Transformer t = map.get(fo);
             if (t == null) {
                 try {
                     DataObject dobj = DataObject.find(fo);
                     DataEditorSupport des = (DataEditorSupport) dobj.getCookie(EditorCookie.class);
                     t = forDocument((BaseDocument) des.openDocument());
-                    foTransformers.put(fo, t);
+                    map.put(fo, t);
+                    session.addProgressListener(t.pl);
                 } catch (DataObjectNotFoundException dataObjectNotFoundException) {
-                    // LOG
+                    LOGGER.log(Level.WARNING, null, dataObjectNotFoundException);
                 } catch (IOException e) {
-                    // LOG
+                    LOGGER.log(Level.WARNING, null, e);
                 }
             }
-            return t;
+            return shared ? t : t.newClone();
         }
     }
 
@@ -74,10 +105,12 @@ abstract public class Transformer {
         context.replaceText(pos, 0, text.length());
     }
 
-    final synchronized void removeText(int pos, int len) {
+    final synchronized String removeText(int pos, int len) {
         int realPos = context.getRealOffset(pos);
-        builder.delete(realPos, realPos + len - 1);
+        String removed = builder.subSequence(realPos, realPos + len).toString();
+        builder.delete(realPos, realPos + len);
         context.replaceText(pos, len, 0);
+        return removed;
     }
 
     final synchronized void replaceText(int pos, String oldText, String newText) {
@@ -87,7 +120,7 @@ abstract public class Transformer {
     }
 
     final public void addTransformation(Transformation t) {
-        transformations.add(t);
+        if (!transformations.contains(t)) transformations.add(t);
     }
 
     final public void removeTransformation(Transformation t) {
@@ -95,28 +128,62 @@ abstract public class Transformer {
     }
 
     final public void addTransformations(Collection<Transformation> ts) {
-        transformations.addAll(ts);
-    }
-
-    final public void addTransformations(Transformation ... ts) {
-        transformations.addAll(Arrays.asList(ts));
-    }
-
-    synchronized public String preview() {
-        try {
-            for(Transformation t : transformations) {
-                t.perform(this);
-            }
-            return builder.toString();
-        } finally {
-            context = new TransformationContext();
-            builder = new StringBuilder(contentBackup);
+        for(Transformation t : ts) {
+            addTransformation(t);
         }
     }
 
-    synchronized public void transform() {
-        throw new UnsupportedOperationException();
+    final public void addTransformations(Transformation ... ts) {
+        addTransformations(Arrays.asList(ts));
     }
 
-    abstract public Transformer newClone();
+    synchronized private String applyTransforms() {
+        try {
+            int transformationCounter = 0;
+
+            for(Transformation t : transformations) {
+                if (transformationCounter > applyMark) {
+                    t.perform(this);
+                    applyMark = transformationCounter;
+                }
+                transformationCounter++;
+            }
+            return builder.toString();
+        } finally {
+
+        }
+    }
+
+    synchronized private String revertTransforms() {
+        try {
+            int transformationCounter = 0;
+            for(Transformation t : transformations) {
+                if (transformationCounter > revertMark) {
+                    t.revert(this);
+                    revertMark = transformationCounter;
+                }
+                transformationCounter++;
+            }
+            return builder.toString();
+        } finally {
+
+        }
+    }
+
+    final synchronized public String preview() {
+        return applyTransforms();
+    }
+
+    final synchronized public void transform() {
+        String transformed = applyTransforms();
+        saveTransformed(transformed);
+    }
+
+    final synchronized public void revert() {
+        String transformed = revertTransforms();
+        saveTransformed(transformed);
+    }
+
+    abstract protected void saveTransformed(String transformed);
+    abstract protected Transformer newClone();
 }
