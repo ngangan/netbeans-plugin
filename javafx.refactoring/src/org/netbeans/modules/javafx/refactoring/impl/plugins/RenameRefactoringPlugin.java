@@ -409,27 +409,8 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                     bag.add(refactoring, rename);
                 }
             }
-
-//            for(ElementLocation loc : references) {
-//                RefactoringElementImplementation refImpl = RenameRefactoringElement.create(loc, refactoring.getNewName(), loc.getElement().getSimpleName().toString(), new ProxyLookup(l, Lookups.singleton(contextMap.get(loc.getSourceFile()))));
-//                if (refImpl != null) {
-//                    bag.add(refactoring, refImpl);
-//                } else {
-//                    // ignore
-//                }
-//            }
         } catch (IOException e) {
             return new Problem(true, e.getLocalizedMessage());
-        }
-        return null;
-    }
-
-    private Problem checkFileNameClash(String newName, FileObject target) {
-        for(FileObject fo : target.getParent().getChildren()) {
-            if (!fo.equals(target) && newName.equals(fo.getName())) {
-                String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fo.isFolder() ? "MSG_PackageExists" : "MSG_FileExists", fo.getName()); // NOI18N
-                return new Problem(true, msg);
-            }
         }
         return null;
     }
@@ -515,23 +496,4 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         }
         return null;
     }
-
-//    private static Element hides(Element field, String name, CompilationInfo info) {
-//        Elements elements = info.getElements();
-//        TypeElement jc = ElementUtilities.enclosingTypeElement(field);
-//        for (Element el:elements.getAllMembers(jc)) {
-////TODO:
-////            if (utils.willHide(el, field, name)) {
-////                return el;
-////            }
-//            if (el.getKind().isField()) {
-//                if (el.getSimpleName().toString().equals(name)) {
-//                    if (!el.getEnclosingElement().equals(field.getEnclosingElement())) {
-//                        return el;
-//                    }
-//                }
-//            }
-//        }
-//        return null;
-//    }
 }
