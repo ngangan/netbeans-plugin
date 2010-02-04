@@ -80,6 +80,7 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
+import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
@@ -94,6 +95,7 @@ import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
+import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -337,7 +339,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                         if (targetPkg.length() > 0) { // non-default target package
                             if (packageName.length() > 0) { // from non-default package
-                                JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), node.getPackageName());
                                 int pos = (int)cc.getTrees().getSourcePositions().getStartPosition(node, node.getPackageName());
                                 transformations.add(new ReplaceTextTransformation(pos, packageName, targetPkg));
                             } else {
@@ -477,9 +478,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 //                            String name = qualidTree.toString();
                             SourcePositions sp = cc.getTrees().getSourcePositions();
                             int start = (int)sp.getStartPosition(cc.getCompilationUnit(), node);
-                            int end = (int)sp.getEndPosition(cc.getCompilationUnit(), node);
-                            int startFQN = (int)sp.getStartPosition(cc.getCompilationUnit(), node.getQualifiedIdentifier());
-                            int endFQN = (int)sp.getEndPosition(cc.getCompilationUnit(), node.getQualifiedIdentifier());
+                            int end = getImportLastPos((int)sp.getEndPosition(cc.getCompilationUnit(), node), cc);
+                            int startFQN = (int)sp.getStartPosition(cc.getCompilationUnit(), qualidTree);
+                            int endFQN = (int)sp.getEndPosition(cc.getCompilationUnit(), qualidTree);
 
                             ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
                             if (DEBUG) {
@@ -492,7 +493,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             }
                         }
                         addTail[0] = true;
-                        importLastLine[0] = (int)cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node);
+                        importLastLine[0] = getImportLastPos((int)cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node), cc);
                         return super.visitImport(node, p);
                     } finally {
                         handlingImport = false;
@@ -514,14 +515,14 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         Import imprt = iter.next();
                         String otherPkg = movedClasses.contains(imprt.fqn) ? renameMap.get(imprt.packageName) : imprt.packageName;
                         if (thisPkg.equals(otherPkg)) { // import from the same package can be removed
-                            transformations.add(new RemoveTextTransformation(imprt.start, imprt.end - imprt.start + 2));
+                            transformations.add(new RemoveTextTransformation(imprt.start, imprt.end - imprt.start));
                             iter.remove();
                         }
                     }
                     for(Iterator<Import> iter = origImports.iterator();iter.hasNext();) {
                         Import imprt = iter.next();
                         if (thisPkg.equals(imprt.packageName)) { // import from the same package can be removed
-                            transformations.add(new RemoveTextTransformation(imprt.start, imprt.end - imprt.start + 2));
+                            transformations.add(new RemoveTextTransformation(imprt.start, imprt.end - imprt.start));
                             iter.remove();
                         }
                     }
@@ -558,25 +559,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 }
 
                 @Override
-                public Void visitTypeClass(TypeClassTree node, Void p) {
-//                    ExpressionTree et = node.getClassName();
-//                    ImportParts parts = getImportParts(et);
-//                    if (parts.fqn != null && !parts.fqn.equals(et.toString())) {
-//                        String thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
-//                        if (parts.packageName != null) {
-//                            String otherPkg = movedClasses.contains(parts.fqn) ? renameMap.get(parts.packageName) : parts.packageName;
-//
-//                            if (myPkgName.equals(parts.packageName) || isImported(parts.fqn, origImports)) {
-//                                if (!thisPkg.equals(otherPkg) && !isImported(otherPkg + "." + parts.typeName, imports)) {
-//                                    imports.add(new Import(otherPkg, parts.typeName));
-//                                }
-//                            }
-//                        }
-//                    }
-                    return super.visitTypeClass(node, p);
-                }
-
-                @Override
                 public Void visitMemberSelect(MemberSelectTree node, Void p) {
                     if (currentClass != null) {
                         if (!handlingImport) {
@@ -609,7 +591,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 String otherPkg = movedClasses.contains(parts.fqn) ? renameMap.get(parts.packageName) : parts.packageName;
 
                                 if (myPkgName.equals(parts.packageName) || isImported(parts.fqn, origImports)) {
-                                    if (!thisPkg.equals(otherPkg) && !isImported(otherPkg + "." + parts.typeName, imports)) {
+                                    if (!thisPkg.equals(otherPkg) && !isImported(otherPkg + "." + parts.typeName, imports) && !isImported(otherPkg + "." + parts.typeName, origImports)) {
                                         imports.add(new Import(otherPkg, parts.typeName));
                                     }
                                 }
@@ -624,34 +606,31 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 private ImportParts getImportParts(Tree t) {
                     JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), t);
                     if (tp == null) tp = getCurrentPath();
-                    Element e = null;
-                    while ((e = cc.getTrees().getElement(tp)) == null) {
-                        if (t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
-                            tp = JavafxcTrees.getPath(getCurrentPath(), ((MemberSelectTree)t).getExpression());
-                            t = tp.getLeaf();
-                        } else {
-                            break;
+                    if (t.toString().endsWith(".*")) {
+                        return new ImportParts("*", ((MemberSelectTree)t).getExpression().toString(), tp);
+                    } else {
+                        Element e = null;
+                        while ((e = cc.getTrees().getElement(tp)) == null) {
+                            if (t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                                tp = JavafxcTrees.getPath(getCurrentPath(), ((MemberSelectTree)t).getExpression());
+                                t = tp.getLeaf();
+                            } else {
+                                break;
+                            }
                         }
-                    }
-                    String[] types = new String[2];
-                    while (e != null && tp != null && e.getKind() != ElementKind.PACKAGE) {
-                        if (e.getKind() == ElementKind.CLASS && ((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL) {
-                            types[0] = ((TypeElement)e).getQualifiedName().toString();
+                        String[] types = new String[2];
+                        while (e != null && tp != null && e.getKind() != ElementKind.PACKAGE) {
+                            if (e.getKind() == ElementKind.CLASS && ((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL) {
+                                types[0] = ((TypeElement)e).getQualifiedName().toString();
+                            }
+                            e = e.getEnclosingElement();
                         }
-                        e = e.getEnclosingElement();
-//                        if (t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
-//                            tp = JavafxcTrees.getPath(getCurrentPath(), ((MemberSelectTree)t).getExpression());
-//                            t = tp.getLeaf();
-//                        } else {
-//                            tp = null;
-//                            t = null;
-//                        }
+                        if (e != null) {
+                            types[1] = ((PackageElement)e).getQualifiedName().toString();
+                            types[0] = types[0] != null ? types[0].substring(types[1].length() + 1) : "*";
+                        }
+                        return new ImportParts(types[0], types[1], tp);
                     }
-                    if (e != null) {
-                        types[1] = ((PackageElement)e).getQualifiedName().toString();
-                        types[0] = types[0] != null ? types[0].substring(types[1].length() + 1) : "*";
-                    }
-                    return new ImportParts(types[0], types[1], tp);
                 }
                 private boolean isImported(String typeName, Collection<Import> usingImports) {
                     for(Import imp : usingImports) {
@@ -678,6 +657,24 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
         public String getDisplayText() {
             return "Fix Imports";
+        }
+
+        private int getImportLastPos(int pos, CompilationController cc) {
+            TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+            ts.move(pos);
+            OUTER:
+            while (ts.moveNext()) {
+                Token<JFXTokenId> token = ts.token();
+                pos += token.length();
+                if (token.id() == JFXTokenId.SEMI) {
+                    while (ts.moveNext()) {
+                        token = ts.token();
+                        pos += token.length();
+                        if (token.text().charAt(0) == '\n') break OUTER;
+                    }
+                }
+            }
+            return pos;
         }
 
     }
