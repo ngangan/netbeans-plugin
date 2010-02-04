@@ -132,7 +132,19 @@ final public class ElementLocation {
         return element.toString() + " @ " + startPosition + " in " + sourceFile.getPath();
     }
 
-    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS, JFXTokenId.LPAREN, JFXTokenId.RPAREN, JFXTokenId.DOT, JFXTokenId.COMMA, JFXTokenId.SEMI, JFXTokenId.COLON, JFXTokenId.LBRACE, JFXTokenId.RBRACE, JFXTokenId.LBRACKET, JFXTokenId.RBRACKET);
+    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS,
+                                                                        JFXTokenId.LPAREN,
+                                                                        JFXTokenId.RPAREN,
+                                                                        JFXTokenId.DOT,
+                                                                        JFXTokenId.COMMA,
+                                                                        JFXTokenId.SEMI,
+                                                                        JFXTokenId.COLON,
+                                                                        JFXTokenId.LBRACE,
+                                                                        JFXTokenId.RBRACE,
+                                                                        JFXTokenId.LBRACKET,
+                                                                        JFXTokenId.RBRACKET,
+                                                                        JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
+                                                                        JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
     private void setPositions(int pos, CompilationInfo ci) {
         String simpleText = element.getSimpleName().toString();
 
