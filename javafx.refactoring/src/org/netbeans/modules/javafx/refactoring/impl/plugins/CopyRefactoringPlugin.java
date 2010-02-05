@@ -90,7 +90,6 @@ import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
-import org.openide.util.lookup.Lookups;
 
 /**
  * Implemented abilities:
@@ -171,11 +170,20 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                 refactoringElements.add(refactoring, new CopyFile(fobj, refactoringElements.getSession()));
             }
             if (!newPkgName.equals(oldPkgName)) {
-                refactoringElements.add(refactoring, new UpdatePackage(fobj, refactoringElements.getSession()));
+                UpdatePackage up = new UpdatePackage(fobj, refactoringElements.getSession());
+                if (up.hasChanges()) {
+                    refactoringElements.add(refactoring, up);
+                }
             } else if (refactoring instanceof SingleCopyRefactoring) {
-                refactoringElements.add(refactoring, new RenameClass(fobj, refactoringElements.getSession()));
+                RenameClass rc = new RenameClass(fobj, refactoringElements.getSession());
+                if (rc.hasChanges()) {
+                    refactoringElements.add(refactoring, rc);
+                }
             }
-            refactoringElements.add(refactoring, new FixReferences(fobj, refactoringElements.getSession()));
+            FixReferences fr = new FixReferences(fobj, refactoringElements.getSession());
+            if (fr.hasChanges()) {
+                refactoringElements.add(refactoring, fr);
+            }
         }
         return problem;
     }
@@ -364,7 +372,12 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                 new Object[] {((SingleCopyRefactoring)refactoring).getNewName()}
             );
         }
-        
+
+        @Override
+        protected FileObject getTargetFO() {
+            return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
+        }
+
         protected Set<Transformation> prepareTransformations(final CompilationController cc) {
             final Set<Transformation> transformations = new HashSet<Transformation>();
             JavaFXTreePathScanner scanner = new JavaFXTreePathScanner() {
