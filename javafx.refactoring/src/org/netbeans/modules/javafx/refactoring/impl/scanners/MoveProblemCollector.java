@@ -53,6 +53,9 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.javafx.code.JavafxFlags;
+import com.sun.tools.javafx.tree.JFXInstanciate;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Element;
@@ -107,11 +110,16 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
     }
 
     private TypeMirror currentClass = null;
+    final private Deque<TypeMirror> currentClassStack = new ArrayDeque<TypeMirror>();
 
     @Override
     public R visitClassDeclaration(ClassDeclarationTree node, P p) {
         TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-        currentClass = te.asType();
+        if (!cc.getElementUtilities().isSynthetic(te)) {
+            currentClass = te.asType();
+        } else {
+            return null;
+        }
         return super.visitClassDeclaration(node, p);
     }
 
@@ -131,16 +139,22 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
 
     @Override
     public R visitInstantiate(InstantiateTree node, P p) {
-        TypeElement clzElement = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-        problem = chainProblems(problem,
-            checkVisibilty(clzElement, new MoveProblemCallback() {
+        try {
+            currentClassStack.push(currentClass);
+            TypeElement clzElement = (TypeElement)((JFXInstanciate)node).type.tsym;
+            if (clzElement != null) currentClass = clzElement.asType();
+            problem = chainProblems(problem,
+                checkVisibilty(clzElement, new MoveProblemCallback() {
 
-                public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
-                    return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass"  + (outgoing ? "" : "1"), new String[]{srcTypeName, targetTypeName, newPkgName}));
-                }
-            })
-        );
-        return super.visitInstantiate(node, p);
+                    public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                        return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass"  + (outgoing ? "" : "1"), new String[]{srcTypeName, targetTypeName, newPkgName}));
+                    }
+                })
+            );
+            return super.visitInstantiate(node, p);
+        } finally {
+            currentClass = currentClassStack.pop();
+        }
     }
 
     @Override
@@ -221,7 +235,9 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
     }
 
     private boolean isAffected(Element e) {
-        return (((Symbol)e).flags_field & (JavafxFlags.PACKAGE_ACCESS | Flags.PROTECTED)) != 0L;
+        long flags =((Symbol)e).flags_field;
+        return (flags & (JavafxFlags.PACKAGE_ACCESS | Flags.PROTECTED)) != 0L &&
+               (flags & (JavafxFlags.PUBLIC_INIT | JavafxFlags.PUBLIC_READ)) == 0L; // for simplicity just check for any public modifier that can be used in addition with the protected modifier
     }
 
     private static Problem chainProblems(Problem p,Problem p1) {

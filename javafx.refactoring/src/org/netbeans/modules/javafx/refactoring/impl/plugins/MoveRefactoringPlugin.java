@@ -49,10 +49,8 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -80,7 +78,6 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
-import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
@@ -95,7 +92,6 @@ import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
-import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -304,7 +300,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
                                 ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
                                 movedClasses.add(eh.getQualifiedName());
-                                related.addAll(cc.getClasspathInfo().getClassIndex().getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                                Set<FileObject> refs = cc.getClasspathInfo().getClassIndex().getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class));
+                                refs.remove(fo);
+                                related.addAll(refs);
                                 return super.visitClassDeclaration(node, p);
                             }
 
@@ -507,6 +505,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         importLastLine[0] = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
                     }
                     TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                    // shortcut; don't even try to enter the mangled syntehtic inner classes generated for object literals; they !@#$ everything
+                    if (cc.getElementUtilities().isSynthetic(te)) return null;
+                    
                     currentClass = te.asType();
 
                     // check the existing imports and remove the ones not needed
