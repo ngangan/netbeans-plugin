@@ -79,7 +79,7 @@ public class BaseRefactoringScanner extends JavaFXTreePathScanner<Void, Set<Elem
             if (tree != null && (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals("")))) {
                 int start = (int)positions.getStartPosition(getCC().getCompilationUnit(), tree);
                 int end = (int)positions.getEndPosition(getCC().getCompilationUnit(), tree);
-                if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && start != -1 && start != end) {
+                if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && tree.getJavaFXKind() != Tree.JavaFXKind.FUNCTION_VALUE && start != -1 && start != end) {
                     // check for javafx$run$ magic
                     if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
                         JavaFXTreePath path = (tree != null && oldPath != null) ? JavafxcTrees.getPath(oldPath, tree) : null;
