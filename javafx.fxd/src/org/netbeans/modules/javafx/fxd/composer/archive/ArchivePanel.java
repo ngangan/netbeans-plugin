@@ -385,7 +385,7 @@ final class ArchivePanel extends javax.swing.JPanel implements ActionLookup {
     private boolean isFXDEntrySelected(){
         int row = tableContent.getSelectedRow();
         String entryName = getNameAt(row);
-        return PreviewToolbar.isFXDContent(entryName);
+        return FXZArchive.isFXDEntry(entryName);
     }
 
     protected String getNameAt(int row) {
