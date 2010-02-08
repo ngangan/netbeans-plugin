@@ -49,10 +49,8 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -80,7 +78,6 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
-import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
@@ -95,7 +92,6 @@ import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
-import org.openide.text.NbDocument;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
@@ -304,7 +300,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
                                 ElementHandle eh = ElementHandle.create(cc.getTrees().getElement(getCurrentPath()));
                                 movedClasses.add(eh.getQualifiedName());
-                                related.addAll(cc.getClasspathInfo().getClassIndex().getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                                Set<FileObject> refs = cc.getClasspathInfo().getClassIndex().getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class));
+                                refs.remove(fo);
+                                related.addAll(refs);
                                 return super.visitClassDeclaration(node, p);
                             }
 
@@ -507,6 +505,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         importLastLine[0] = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
                     }
                     TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
+                    // shortcut; don't even try to enter the mangled syntehtic inner classes generated for object literals; they !@#$ everything
+                    if (cc.getElementUtilities().isSynthetic(te)) return null;
+                    
                     currentClass = te.asType();
 
                     // check the existing imports and remove the ones not needed
@@ -530,7 +531,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     // check for import renames
                     for(Import imprt : origImports) {
                         String otherPkg = movedClasses.contains(imprt.fqn) ? renameMap.get(imprt.packageName) : imprt.packageName;
-                        if (isImported(otherPkg + "." + imprt.typeName, imports)) {
+                        if (isImported(otherPkg, imprt.typeName, imports)) {
                             transformations.add(new ReplaceTextTransformation(imprt.startFQN, imprt.packageName, otherPkg));
                         }
                     }
@@ -546,7 +547,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 String otherPkg = movedClasses.contains(ip.fqn) ? renameMap.get(ip.packageName) : ip.packageName;
                                 if (!thisPkg.equals(otherPkg)) {
                                     if (!ip.fqn.equals(et.toString())) { // not a FQN
-                                        if (!isImported(otherPkg + "." + ip.typeName, movedClasses.contains(ip.fqn) ? imports : origImports)) {
+                                        if (!isImported(otherPkg, ip.typeName, movedClasses.contains(ip.fqn) ? imports : origImports)) {
                                             imports.add(new Import(otherPkg, ip.typeName));
                                         }
                                     }
@@ -590,8 +591,8 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             if (parts.packageName != null) {
                                 String otherPkg = movedClasses.contains(parts.fqn) ? renameMap.get(parts.packageName) : parts.packageName;
 
-                                if (myPkgName.equals(parts.packageName) || isImported(parts.fqn, origImports)) {
-                                    if (!thisPkg.equals(otherPkg) && !isImported(otherPkg + "." + parts.typeName, imports) && !isImported(otherPkg + "." + parts.typeName, origImports)) {
+                                if (myPkgName.equals(parts.packageName) || isImported(parts.packageName, parts.typeName, origImports)) {
+                                    if (!thisPkg.equals(otherPkg) && !isImported(otherPkg, parts.typeName, imports) && !isImported(otherPkg, parts.typeName, origImports)) {
                                         imports.add(new Import(otherPkg, parts.typeName));
                                     }
                                 }
@@ -632,9 +633,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         return new ImportParts(types[0], types[1], tp);
                     }
                 }
-                private boolean isImported(String typeName, Collection<Import> usingImports) {
+                private boolean isImported(String pkgName, String typeName, Collection<Import> usingImports) {
                     for(Import imp : usingImports) {
-                        if (imp.fqn.equals(typeName) || (imp.fqn.endsWith(".*") && typeName.startsWith(imp.fqn.substring(0, imp.fqn.length() - 1)))) { // NOI18N
+                        if (imp.fqn.equals(pkgName + "." + typeName) || (imp.typeName.equals("*") && pkgName.equals(imp.packageName))) { // NOI18N
                             return true;
                         }
                     }

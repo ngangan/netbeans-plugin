@@ -88,17 +88,23 @@ public final class FXDElement {
     }
 
     public boolean isVisible() {
-        //return getController().getNode(m_id).get$visible();
         Node n = getController().getNode(m_id);
         return n != null ? n.get$visible() : false;
     }
     
     public String getName() {
-        return getDocumentElement().getName();
+        DocumentElement de = getDocumentElement();
+        if (de != null){
+            return de.getName();
+        }
+        return null;
     }
     
     public void visitAttributes( FXDFileModel.ElementAttrVisitor visitor) {
-        FXDFileModel.visitAttributes( getDocumentElement(), visitor, true);
+        DocumentElement de = getDocumentElement();
+        if (de != null){
+            FXDFileModel.visitAttributes( de, visitor, true);
+        }
     }
     
     //TODO should be private
@@ -115,7 +121,11 @@ public final class FXDElement {
     }
     
     public int getStartOffset() {
-        return getDocumentElement().getStartOffset();
+        DocumentElement de = getDocumentElement();
+        while ( de != null) {
+            return de.getStartOffset();
+        }
+        return -1;
     }
     
     public FXDElement getVisibleParent() {

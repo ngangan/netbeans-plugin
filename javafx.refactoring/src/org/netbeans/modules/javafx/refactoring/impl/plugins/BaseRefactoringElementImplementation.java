@@ -51,6 +51,8 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformer;
+import org.netbeans.modules.refactoring.api.ProgressEvent;
+import org.netbeans.modules.refactoring.api.ProgressListener;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.filesystems.FileChangeAdapter;
@@ -73,7 +75,7 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
 
     final private Set<Transformation> transformations = new HashSet<Transformation>();
 
-    private FileChangeListener fcl = new FileChangeAdapter() {
+    final private FileChangeListener fcl = new FileChangeAdapter() {
 
         @Override
         public void fileChanged(FileEvent fe) {
@@ -94,10 +96,26 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
         }
     };
 
+    final private ProgressListener pl = new ProgressListener() {
+
+        public void start(ProgressEvent pe) {
+            srcFO.removeFileChangeListener(fcl);
+        }
+
+        public void step(ProgressEvent pe) {
+            //
+        }
+
+        public void stop(ProgressEvent pe) {
+            //
+        }
+    };
+
     public BaseRefactoringElementImplementation(FileObject srcFO, RefactoringSession session) {
         this.srcFO = srcFO;
-        this.srcFO.addFileChangeListener(fcl);
         this.session = session;
+        srcFO.addFileChangeListener(fcl);
+        session.addProgressListener(pl);
     }
 
     public Lookup getLookup() {
@@ -119,7 +137,6 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
     final public void performChange() {
         FileObject targetFO = getTargetFO();
         if (targetFO != null) {
-            srcFO.removeFileChangeListener(fcl);
             final Transformer t = Transformer.forFileObject(targetFO, session);
             if (t != null) {
                 t.addTransformations(getTransformations());

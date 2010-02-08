@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -157,7 +158,9 @@ abstract public class Transformer {
     synchronized private String revertTransforms() {
         try {
             int transformationCounter = 0;
-            for(Transformation t : transformations) {
+            
+            for(int i=transformations.size() - 1;i>=0;i--) {
+                Transformation t = transformations.get(i);
                 if (transformationCounter > revertMark) {
                     t.revert(this);
                     revertMark = transformationCounter;
@@ -166,7 +169,7 @@ abstract public class Transformer {
             }
             return builder.toString();
         } finally {
-
+            
         }
     }
 

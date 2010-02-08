@@ -416,6 +416,9 @@
             <file name="Hyperlink.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Hyperlink.xml">
                 <attr name="position" intvalue="1200"/>
             </file>
+            <file name="PasswordBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PasswordBox.xml">
+                <attr name="position" intvalue="1300"/>
+            </file>
         </folder>
         <folder name="Layouts">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>

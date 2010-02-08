@@ -46,6 +46,8 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
  */
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
     private final static Charset UTF_8       = FXDFileEncodingQueryImplementation.UTF_8;
+    // TODO store to properties. do not hardcode
+    long MAX_FXD_SIZE_FOR_EDITOR             = 500000; // max fxd size to be loaded with enabled selection
     private final    FXZDataObject             m_dObj;
     // controls the access to the FXDFileModel object
     private final    Object                    m_lock = new Object();
@@ -268,6 +270,10 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
         m_tableListeners = new ArrayList<TableModelListener>();
     }
 
+    public static boolean isFXDEntry(String name) {
+        return (name != null && name.endsWith(FXD_EXTENSION));
+    }
+    
     public synchronized void setDirty() {
         m_entries.clear();
         m_entries = null;
@@ -484,11 +490,29 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
     @Override
     public FXDRootElement getRoot(String entryName, DocumentParser parser) throws IOException, FXDException {
-        FXDFileModel model = getFileModel(entryName);
-        if (model != null){
-            return model.getRootNode();
+        long size = getFXDEntriesSize();
+        if (size < MAX_FXD_SIZE_FOR_EDITOR) {
+            FXDFileModel model = getFileModel(entryName);
+            if (model != null) {
+                return model.getRootNode();
+            }
         }
-        return null;
+        return super.getRoot(entryName, parser);
+    }
+
+    /**
+     * calculates total uncompressed size of fxd entries
+     * @return fxd entries uncompressed size
+     */
+    protected synchronized long getFXDEntriesSize(){
+        checkEntries();
+        long sum = 0;
+        for ( FXZArchiveEntry entry : m_entries) {
+            if (isFXDEntry(entry.getName())){
+                sum += entry.m_size;
+            }
+        }
+        return sum;
     }
 
     @Override

@@ -44,6 +44,7 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -292,18 +293,20 @@ public class JavaFXSourceUtils {
                             @Override
                             public Void visitClassDeclaration(ClassDeclarationTree node, Collection<ElementHandle<TypeElement>> p) {
                                 TypeElement te = (TypeElement) cc.getTrees().getElement(getCurrentPath());
-                                if (superTypeQN != null) {
-                                    if (te.getSuperclass().toString().equals(superTypeQN)) {
-                                        p.add(ElementHandle.create(te));
-                                    } else {
-                                        for(TypeMirror tm : te.getInterfaces()) {
-                                            if (tm.toString().equals(superTypeQN)) {
-                                                p.add(ElementHandle.create(te));
+                                if (!cc.getElementUtilities().isSynthetic(te)) {
+                                    if (superTypeQN != null) {
+                                        if (te.getSuperclass().toString().equals(superTypeQN)) {
+                                            p.add(ElementHandle.create(te));
+                                        } else {
+                                            for(TypeMirror tm : te.getInterfaces()) {
+                                                if (tm.toString().equals(superTypeQN)) {
+                                                    p.add(ElementHandle.create(te));
+                                                }
                                             }
                                         }
+                                    } else {
+                                        p.add(ElementHandle.create(te));
                                     }
-                                } else {
-                                    p.add(ElementHandle.create(te));
                                 }
                                 return super.visitClassDeclaration(node, p);
                             }
