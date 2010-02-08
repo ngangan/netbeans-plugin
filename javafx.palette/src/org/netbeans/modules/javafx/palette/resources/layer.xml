@@ -151,6 +151,13 @@
             <file name="Text.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Text.xml">
                 <attr name="position" intvalue="900"/>
             </file>
+            <file name="CubicCurve.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CubicCurve.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+             <file name="QuadCurve.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/QuadCurve.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+
         </folder>
         <folder name="Paths">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
