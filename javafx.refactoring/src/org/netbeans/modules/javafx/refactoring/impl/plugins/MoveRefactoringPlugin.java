@@ -485,9 +485,12 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 LOG.finest("Import: " + parts.packageName + "." + parts.typeName); // NOI18N
                             }
 
-                            origImports.add(new Import(parts.packageName, parts.typeName, start, end, startFQN, endFQN));
                             if (movedClasses.contains(parts.fqn)) {
-                                imports.add(new Import(renameMap.get(parts.packageName) != null ? renameMap.get(parts.packageName) : parts.packageName, parts.typeName, start, end, startFQN, endFQN));
+                                Import imprt = new Import(renameMap.get(parts.packageName) != null ? renameMap.get(parts.packageName) : parts.packageName, parts.typeName, start, end, startFQN, endFQN);
+                                imports.add(imprt);
+                                transformations.add(new ReplaceTextTransformation(startFQN, parts.packageName, imprt.packageName));
+                            } else {
+                                origImports.add(new Import(parts.packageName, parts.typeName, start, end, startFQN, endFQN));
                             }
                         }
                         addTail[0] = true;
@@ -512,6 +515,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                     // check the existing imports and remove the ones not needed
                     String thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
+                    // remove same-package imports from the newly added ones
                     for(Iterator<Import> iter = imports.iterator();iter.hasNext();) {
                         Import imprt = iter.next();
                         String otherPkg = movedClasses.contains(imprt.fqn) ? renameMap.get(imprt.packageName) : imprt.packageName;
@@ -520,6 +524,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             iter.remove();
                         }
                     }
+                    // remove the same-package imports from the original imports
                     for(Iterator<Import> iter = origImports.iterator();iter.hasNext();) {
                         Import imprt = iter.next();
                         if (thisPkg.equals(imprt.packageName)) { // import from the same package can be removed
@@ -538,17 +543,19 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                     // check the supertypes and add imports as needed
                     for(ExpressionTree et : node.getSupertypeList()) {
-                        Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
-                        if (e != null && (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)) {
-                            ImportParts ip = getImportParts(et);
-                            thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
+                        if (et != null) {
+                            Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
+                            if (e != null && (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)) {
+                                ImportParts ip = getImportParts(et);
+                                thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
 
-                            if (ip.packageName != null) {
-                                String otherPkg = movedClasses.contains(ip.fqn) ? renameMap.get(ip.packageName) : ip.packageName;
-                                if (!thisPkg.equals(otherPkg)) {
-                                    if (!ip.fqn.equals(et.toString())) { // not a FQN
-                                        if (!isImported(otherPkg, ip.typeName, movedClasses.contains(ip.fqn) ? imports : origImports)) {
-                                            imports.add(new Import(otherPkg, ip.typeName));
+                                if (ip.packageName != null) {
+                                    String otherPkg = movedClasses.contains(ip.fqn) ? renameMap.get(ip.packageName) : ip.packageName;
+                                    if (!thisPkg.equals(otherPkg)) {
+                                        if (!ip.fqn.equals(et.toString())) { // not a FQN
+                                            if (!isImported(otherPkg, ip.typeName, movedClasses.contains(ip.fqn) ? imports : origImports)) {
+                                                imports.add(new Import(otherPkg, ip.typeName));
+                                            }
                                         }
                                     }
                                 }

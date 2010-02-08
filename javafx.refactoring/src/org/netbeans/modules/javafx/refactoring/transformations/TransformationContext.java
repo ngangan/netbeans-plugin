@@ -40,6 +40,10 @@ import java.util.logging.Logger;
 final public class TransformationContext {
     final private static Logger LOGGER = Logger.getLogger(TransformationContext.class.getName());
 
+    final private Object sortedLock = new Object();
+    // @GuardedBy sortedLock
+    private boolean isSorted = true;
+
     final private static class Change implements Comparable<Change> {
         final private int offset;
         final private int charDiff;
@@ -96,18 +100,23 @@ final public class TransformationContext {
     final private List<Change> changes = new ArrayList<Change>();
 
     public void replaceText(int offset, int oldLen, int newLen) {
-        int offsetDiff = newLen > oldLen ? oldLen : newLen;
         int changeDiff = newLen - oldLen;
         if (changeDiff == 0) return;
 
-        offset = getRealOffset(offset);
-
-        changes.add(new Change(offset + offsetDiff, changeDiff));
-        Collections.sort(changes);
+        changes.add(new Change(offset, changeDiff));
+        synchronized(sortedLock) {
+            isSorted = false;
+        }
     }
 
     public int getRealOffset(int offset) {
         int diff = 0;
+        synchronized(sortedLock) {
+            if (!isSorted) {
+                Collections.sort(changes);
+                isSorted = true;
+            }
+        }
         for(Change ch : changes) {
             if (offset > ch.offset) {
                 diff += ch.charDiff;
