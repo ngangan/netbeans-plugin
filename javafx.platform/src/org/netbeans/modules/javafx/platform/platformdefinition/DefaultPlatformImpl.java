@@ -90,7 +90,7 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         }
         if ((fxPath!= null) && (sources == null || javadoc == null)) {
             List<URL> src = new ArrayList<URL>(), jdc = new ArrayList<URL>();
-            findSourcesAndJavadoc(src, jdc, javaHome, fxPath);
+            findSourcesAndJavadoc(src, jdc, javaHome, fxPath, javaHome.getParentFile());
             if (sources == null) sources = src;
             if (javadoc == null) javadoc = jdc;
         }
