@@ -477,6 +477,9 @@ public class ElementHandle<T extends Element> {
             final StringBuilder retType = new StringBuilder();
             if (kind == ElementKind.METHOD) {
                 result[1] = ee.getSimpleName().toString();
+                if (ee.asType() == null) {
+                    ((Symbol.MethodSymbol)ee).complete();
+                }
                 encodeType(ee.getReturnType(), retType);
             } else {
                 result[1] = "<init>";   // NOI18N
