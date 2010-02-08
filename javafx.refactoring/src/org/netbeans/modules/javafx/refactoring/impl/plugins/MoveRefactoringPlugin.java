@@ -464,6 +464,30 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 @Override
                 public Void visitCompilationUnit(UnitTree node, Void p) {
                     myPkgName = node.getPackageName() != null ? node.getPackageName().toString() : "";
+
+                    TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                    int pos = (int)cc.getTrees().getSourcePositions().getEndPosition(node, node.getPackageName());
+                    ts.move(pos);
+                    boolean semiFound = false;
+                    while (ts.moveNext()) {
+                        Token<JFXTokenId> token = ts.token();
+                        pos += token.length();
+                        if (token.id() == JFXTokenId.SEMI) {
+                            semiFound = true;
+                            break;
+                        }
+                    }
+                    if (semiFound) {
+                        while (ts.moveNext()) {
+                            Token<JFXTokenId> token = ts.token();
+                            pos += token.length();
+                            if (token.text().charAt(0) == '\n') {
+                                importLastLine[0] = pos;
+                                break;
+                            }
+                        }
+                    }
+
                     return super.visitCompilationUnit(node, p);
                 }
 
