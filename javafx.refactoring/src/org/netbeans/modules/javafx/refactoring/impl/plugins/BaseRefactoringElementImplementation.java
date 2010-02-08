@@ -137,10 +137,14 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
     final public void performChange() {
         FileObject targetFO = getTargetFO();
         if (targetFO != null) {
-            final Transformer t = Transformer.forFileObject(targetFO, session);
-            if (t != null) {
-                t.addTransformations(getTransformations());
-                t.transform();
+            try {
+                final Transformer t = Transformer.forFileObject(targetFO, session);
+                if (t != null) {
+                    t.addTransformations(getTransformations());
+                    t.transform();
+                }
+            } finally {
+                srcFO.removeFileChangeListener(fcl);
             }
         }
     }
