@@ -158,7 +158,7 @@ abstract public class Transformer {
     synchronized private String revertTransforms() {
         try {
             int transformationCounter = 0;
-            
+
             for(int i=transformations.size() - 1;i>=0;i--) {
                 Transformation t = transformations.get(i);
                 if (transformationCounter > revertMark) {

@@ -144,37 +144,44 @@ final public class ElementLocation {
                                                                         JFXTokenId.LBRACKET,
                                                                         JFXTokenId.RBRACKET,
                                                                         JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
-                                                                        JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+                                                                        JFXTokenId.RBRACE_QUOTE_STRING_LITERAL,
+                                                                        JFXTokenId.EQ, JFXTokenId.LT);
     private void setPositions(int pos, CompilationInfo ci) {
-        String simpleText = element.getSimpleName().toString();
-
         TokenSequence<JFXTokenId> tokens = ci.getTokenHierarchy().tokenSequence();
         tokens.moveStart();
         tokens.move(pos);
-        boolean start = true;
-        while (tokens.moveNext()) {
-            Token<JFXTokenId> token = tokens.token();
-            if (start) {
-                if (closingTokens.contains(token.id())){
-                    while (closingTokens.contains(token.id())) {
-                        tokens.movePrevious();
-                        token = tokens.token();
-                    }
+        tokens.moveNext();
+        Token<JFXTokenId> token = tokens.token();
+        pos += token.length();
+        
+        boolean found = false;
+        if (token.id() != JFXTokenId.IDENTIFIER) {
+            if (tokens.movePrevious()) {
+                token = tokens.token();
+                pos -= token.length();
+                if (token.id() == JFXTokenId.IDENTIFIER) {
+                    startPosition = pos;
+                    endPosition = pos + token.length();
+                    found = true;
+                } else {
+                    pos += token.length();
+                    tokens.moveNext();
+                }
+            }
+            if (!found) {
+                while (tokens.moveNext()) {
+                    token = tokens.token();
+                    pos += token.length();
                     if (token.id() == JFXTokenId.IDENTIFIER) {
-                        startPosition = token.offset(ci.getTokenHierarchy());
-                        endPosition = startPosition + token.length();
+                        startPosition = pos - token.length();
+                        endPosition = pos;
                         break;
                     }
                 }
-                start = false;
             }
-            if (token != null && token.id() == JFXTokenId.IDENTIFIER) {
-                if (token.text().toString().equals(simpleText)) {
-                    startPosition = token.offset(ci.getTokenHierarchy());
-                    endPosition = startPosition + token.length();
-                    break;
-                }
-            }
+        } else {
+            startPosition = pos - token.length();
+            endPosition = pos;
         }
     }
 }
