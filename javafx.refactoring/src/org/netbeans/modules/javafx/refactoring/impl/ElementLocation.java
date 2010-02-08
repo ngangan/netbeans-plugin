@@ -132,20 +132,6 @@ final public class ElementLocation {
         return element.toString() + " @ " + startPosition + " in " + sourceFile.getPath();
     }
 
-    final private static EnumSet<JFXTokenId> closingTokens = EnumSet.of(JFXTokenId.WS,
-                                                                        JFXTokenId.LPAREN,
-                                                                        JFXTokenId.RPAREN,
-                                                                        JFXTokenId.DOT,
-                                                                        JFXTokenId.COMMA,
-                                                                        JFXTokenId.SEMI,
-                                                                        JFXTokenId.COLON,
-                                                                        JFXTokenId.LBRACE,
-                                                                        JFXTokenId.RBRACE,
-                                                                        JFXTokenId.LBRACKET,
-                                                                        JFXTokenId.RBRACKET,
-                                                                        JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
-                                                                        JFXTokenId.RBRACE_QUOTE_STRING_LITERAL,
-                                                                        JFXTokenId.EQ, JFXTokenId.LT);
     private void setPositions(int pos, CompilationInfo ci) {
         TokenSequence<JFXTokenId> tokens = ci.getTokenHierarchy().tokenSequence();
         tokens.moveStart();
@@ -155,11 +141,13 @@ final public class ElementLocation {
         pos += token.length();
         
         boolean found = false;
-        if (token.id() != JFXTokenId.IDENTIFIER) {
+        String simpleText = element.getSimpleName().toString();
+
+        if (token.id() != JFXTokenId.IDENTIFIER || !simpleText.equals(token.text().toString())) {
             if (tokens.movePrevious()) {
                 token = tokens.token();
                 pos -= token.length();
-                if (token.id() == JFXTokenId.IDENTIFIER) {
+                if (token.id() == JFXTokenId.IDENTIFIER && simpleText.equals(token.text().toString())) {
                     startPosition = pos;
                     endPosition = pos + token.length();
                     found = true;
@@ -172,7 +160,7 @@ final public class ElementLocation {
                 while (tokens.moveNext()) {
                     token = tokens.token();
                     pos += token.length();
-                    if (token.id() == JFXTokenId.IDENTIFIER) {
+                    if (token.id() == JFXTokenId.IDENTIFIER && simpleText.equals(token.text().toString())) {
                         startPosition = pos - token.length();
                         endPosition = pos;
                         break;
