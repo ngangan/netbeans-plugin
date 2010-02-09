@@ -24,8 +24,6 @@ import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.editor.structure.api.DocumentElementEvent;
-import org.netbeans.modules.editor.structure.api.DocumentElementListener;
 import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
 import org.openide.util.Exceptions;
 
@@ -44,6 +42,8 @@ final class DocumentElementWrapper {
         public FXDElementWrapper( final DocumentElement de) {
             m_de = de;
             m_children = m_de.getChildren();
+
+            /* it is not necessary. remove in case will not find cases when it is useful
             m_de.addDocumentElementListener(new DocumentElementListener() {
 
                 public void elementAdded(DocumentElementEvent dee) {
@@ -68,6 +68,7 @@ final class DocumentElementWrapper {
                     //System.out.println(m_de.getName()+ " attributesChanged "+dee.getChangedChild());
                 }
             });
+             */
         }
         
         public void release() {
