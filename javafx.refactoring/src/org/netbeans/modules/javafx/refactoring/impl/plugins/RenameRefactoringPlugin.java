@@ -80,7 +80,6 @@ import org.openide.util.Utilities;
 public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
     private final AtomicBoolean requestCancelled = new AtomicBoolean(false);
 
-    private String fileName;
     private RenameRefactoring refactoring;
 
     private boolean doCheckName = true;
@@ -119,9 +118,6 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        }
-        if (location != null) {
-            fileName = location.getSourceFile().getName();
         }
     }
 
@@ -295,22 +291,6 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                     }
                     break;
                 }
-                // ===========================================================================================================
-                // The following check is, probably, not necessary as it seems impossible to hide a field member in a subclass
-                // ===========================================================================================================
-    //                        case FIELD:
-    //                        case ENUM_CONSTANT: {
-    //                            fireProgressListenerStep();
-    //                            fireProgressListenerStep();
-    //                            Element hiddenField = hides(el, el.getSimpleName().toString(), info);
-    //                            fireProgressListenerStep();
-    //                            fireProgressListenerStep();
-    //                            if (hiddenField != null) {
-    //                                String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_Hides", new Object[] {ElementUtilities.enclosingTypeElement(hiddenField)});
-    //                                problem[0] = createProblem(problem[0], false, msg);
-    //                            }
-    //                            break;
-    //                        }
             }
         } else {
             preCheckProblem = createProblem(preCheckProblem, true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ErroneousSource", info.getFileObject().getPath()));
