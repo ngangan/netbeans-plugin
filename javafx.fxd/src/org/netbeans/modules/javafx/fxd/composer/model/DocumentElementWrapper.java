@@ -24,6 +24,8 @@ import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.io.Reader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.modules.editor.structure.api.DocumentElementEvent;
+import org.netbeans.modules.editor.structure.api.DocumentElementListener;
 import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
 import org.openide.util.Exceptions;
 
@@ -36,14 +38,41 @@ final class DocumentElementWrapper {
 
     private static abstract class FXDElementWrapper implements com.sun.javafx.tools.fxd.FXDElement {
         protected DocumentElement m_de;
+        protected List<DocumentElement> m_children;
         private static FXDParser m_parser = createParser();
 
         public FXDElementWrapper( final DocumentElement de) {
             m_de = de;
+            m_children = m_de.getChildren();
+            m_de.addDocumentElementListener(new DocumentElementListener() {
+
+                public void elementAdded(DocumentElementEvent dee) {
+                    //System.out.println(m_de.getName()+ " elementAdded "+dee.getChangedChild());
+                    m_children = m_de.getChildren();
+                }
+
+                public void elementRemoved(DocumentElementEvent dee) {
+                    //System.out.println(m_de.getName()+ " elementRemoved "+dee.getChangedChild());
+                    m_children = m_de.getChildren();
+                }
+
+                public void childrenReordered(DocumentElementEvent dee) {
+                    //System.out.println(m_de.getName()+ " childrenReordered "+dee.getChangedChild());
+                }
+
+                public void contentChanged(DocumentElementEvent dee) {
+                    //System.out.println(m_de.getName()+ " contentChanged "+dee.getChangedChild());
+                }
+
+                public void attributesChanged(DocumentElementEvent dee) {
+                    //System.out.println(m_de.getName()+ " attributesChanged "+dee.getChangedChild());
+                }
+            });
         }
         
         public void release() {
             m_de = null;
+            m_children = null;
         }
 
         private static FXDParser createParser() {
@@ -113,15 +142,14 @@ final class DocumentElementWrapper {
                     return parseValue(strValue);
                 } else {
                     if ( m_de.getAttributes().isDefined(name)) {
-                        List<DocumentElement> children = m_de.getChildren();
-                        for ( DocumentElement de : children) {
-                            if ( name.equals(de.getName())) {
-                                if ( FXDFileModel.FXD_ATTRIBUTE.equals( de.getType())) {
-                                    assert de.getElementCount() == 1;
-                                    return wrap(de.getElement(0), false);
+                        for ( DocumentElement cde : m_children) {
+                            if ( name.equals(cde.getName())) {
+                                if ( FXDFileModel.FXD_ATTRIBUTE.equals( cde.getType())) {
+                                    assert cde.getElementCount() == 1;
+                                    return wrap(cde.getChildren().get(0), false);
                                 } else {
-                                    assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( de.getType());
-                                    return wrap(de, false);
+                                    assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( cde.getType());
+                                    return wrap(cde, false);
                                 }
                             }
                         }
@@ -268,7 +296,7 @@ final class DocumentElementWrapper {
         }
 
         public Object elementAt(int index) {
-            DocumentElement de = m_de.getElement(index);
+            DocumentElement de = m_children.get(index);
 
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
                 return parseValue(de.getName());
@@ -290,21 +318,21 @@ final class DocumentElementWrapper {
                 private int m_index = advance(0);
 
                 public boolean hasMoreElements() {
-                    return m_index < m_de.getElementCount();
+                    return m_index < m_children.size();
                 }
 
                 public Object nextElement() {
-                    if ( m_index >= m_de.getElementCount()) {
+                    if ( m_index >= m_children.size()) {
                         throw new NoSuchElementException();
                     }
-                    com.sun.javafx.tools.fxd.FXDElement elem = wrap( m_de.getElement(m_index), false);
+                    com.sun.javafx.tools.fxd.FXDElement elem = wrap( m_children.get(m_index), false);
                     m_index = advance(m_index+1);
                     return elem;
                 }
                 
                 private int advance(int index) {
-                    while( index < m_de.getElementCount() &&
-                       FXDFileModel.FXD_ARRAY_ELEM.equals(m_de.getElement(index).getType())) {
+                    while( index < m_children.size() &&
+                       FXDFileModel.FXD_ARRAY_ELEM.equals(m_children.get(index).getType())) {
                        index++;
                     }
                     return index;
