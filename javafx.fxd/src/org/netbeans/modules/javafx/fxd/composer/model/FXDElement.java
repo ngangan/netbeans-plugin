@@ -93,18 +93,11 @@ public final class FXDElement {
     }
     
     public String getName() {
-        DocumentElement de = getDocumentElement();
-        if (de != null){
-            return de.getName();
-        }
-        return null;
+        return getDocumentElement().getName();
     }
     
     public void visitAttributes( FXDFileModel.ElementAttrVisitor visitor) {
-        DocumentElement de = getDocumentElement();
-        if (de != null){
-            FXDFileModel.visitAttributes( de, visitor, true);
-        }
+        FXDFileModel.visitAttributes( getDocumentElement(), visitor, true);
     }
     
     //TODO should be private
@@ -121,11 +114,7 @@ public final class FXDElement {
     }
     
     public int getStartOffset() {
-        DocumentElement de = getDocumentElement();
-        while ( de != null) {
-            return de.getStartOffset();
-        }
-        return -1;
+        return getDocumentElement().getStartOffset();
     }
     
     public FXDElement getVisibleParent() {

@@ -244,7 +244,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     List<DocumentElement> deChildren = de.getChildren();
                     for (DocumentElement deChild : deChildren) {
                         if (FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(deChild.getType())) {
-                            synchArrayOfChildNodes(deb, de);
+                            synchArrayOfChildNodes(deb, deChild);
                         } else if (FXDFileModel.FXD_ATTRIBUTE.equals(deChild.getType())) {
                             if (!deb.hasNodeInAttrValue(deChild.getName())) {
                                 trans.removeDocumentElement(deChild, true);
@@ -258,6 +258,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     List<String> nodeNamesList = deb.getNodesNamesFromAttrValue(de.getName());
                     for (DocumentElement child : de.getChildren()) {
                         if (FXDFileModel.FXD_NODE.equals(child.getType())) {
+                            // TODO: fix the case when one of children with same names was removed.
+                            // e.g. content with several polygons.
                             if (!nodeNamesList.contains(child.getName())) {
                                 trans.removeDocumentElement(child, true);
                             }
