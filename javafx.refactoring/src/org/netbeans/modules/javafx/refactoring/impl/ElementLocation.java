@@ -82,7 +82,11 @@ final public class ElementLocation {
         else {
             if (info.getFileObject().equals(sourceFile)) {
                 ciRef = new WeakReference<CompilationInfo>(info);
-                element = info.getElementUtilities().elementFor(startPosition);
+                if (startPosition > 0) {
+                    element = info.getElementUtilities().elementFor(startPosition);
+                } else {
+                    element = handle != null ? handle.resolve(info) : null;
+                }
                 return element;
             } else {
                 return handle != null ? handle.resolve(info) : null;

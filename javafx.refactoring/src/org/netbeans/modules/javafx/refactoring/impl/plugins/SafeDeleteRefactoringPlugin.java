@@ -51,7 +51,6 @@ import javax.lang.model.element.ElementKind;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -64,7 +63,6 @@ import org.netbeans.modules.refactoring.spi.*;
 import org.netbeans.modules.refactoring.spi.ui.RefactoringUI;
 import org.netbeans.modules.refactoring.spi.ui.UI;
 
-import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.util.*;
 import org.openide.util.lookup.Lookups;
