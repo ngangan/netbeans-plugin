@@ -400,12 +400,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
                     // Prevent potential NPEs (#180191)
                     if (member.asType() == null) ((Symbol)member).complete();
-
-                    addResult(
+                    if (member.asType() instanceof ExecutableType) {
+                        addResult(
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
                             (ExecutableType) member.asType(),
                             query.anchorOffset, isInherited, isDeprecated, false, false));
+                    }
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
                 String tta = textToAdd;
