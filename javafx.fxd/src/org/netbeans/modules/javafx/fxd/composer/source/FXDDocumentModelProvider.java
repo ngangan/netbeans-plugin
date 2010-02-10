@@ -54,13 +54,35 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
          * Is used to check if child nodes should be removed from the model. 
          * The only possible way because ContentHandler doesn't give relations between nodes.
          */
-        private final Map<String, Object> m_childNodes = new HashMap<String, Object>();
+        //private final Map<String, Object> m_childNodes = new HashMap<String, Object>();
+        private final Map<String, NodeData> m_childAttrNodes = new HashMap<String, NodeData>();
+        private final Map<String, List<NodeData>> m_childAttrArrayNodes =
+                new HashMap<String, List<NodeData>>();
         
         private NodeBuilder( String typeName, int startOff) {
             m_typeName = typeName;
             m_startOffset = startOff;
         }
-        
+
+        /**
+         * creates new object with node's name and start offset.
+         * Separate object is used not to cary extra data, like
+         * Maps with links to attributes or children
+         * @return
+         */
+        public NodeData exportNodeData() {
+            return new NodeData() {
+
+                public String getName() {
+                    return m_typeName;
+                }
+
+                public int getStartOffset() {
+                    return m_startOffset;
+                }
+            };
+        }
+
         public Map<String,String> getAttributeMap() {
             return m_attributes;
         }
@@ -116,11 +138,19 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         }
 
         /**
-         * returns map with attributes that contain Node or List of Nodes as value.
+         * returns map with attributes that contain Node as value.
          * @return Map with pairs (name,value).
          */
-        protected Map<String, Object> getChildNodesMap(){
-            return m_childNodes;
+        protected Map<String, NodeData> getChildAttrNodes(){
+            return m_childAttrNodes;
+        }
+
+        /**
+         * returns map with attributes that contain List of Nodes as value.
+         * @return Map with pairs (name,value).
+         */
+        protected Map<String, List<NodeData>> getChildAttrArrayNodes(){
+            return m_childAttrArrayNodes;
         }
 
         /**
@@ -130,30 +160,40 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
          * List of Nodes as value.
          * @param value Node or List of Nodes
          */
-        protected void addNodeToChildrenMap(String name, Object value) {
-            if (!m_childNodes.containsKey(name)) {
-                m_childNodes.put(name, value);
+        protected void addNodeToChildrenMap(String name, NodeData value) {
+            if (!m_childAttrNodes.containsKey(name)) {
+                m_childAttrNodes.put(name, value);
+            }
+        }
+
+        protected void addNodeToChildrenMap(String name, List<NodeData> value) {
+            if (!m_childAttrArrayNodes.containsKey(name)) {
+                m_childAttrArrayNodes.put(name, value);
             }
         }
 
         protected boolean hasNodeInAttrValue(String nodeName) {
-            Object attrNodeName = getChildNodesMap().get(nodeName);
-            // attr is not present in updated node or it's type is changed to array.
-            if ((attrNodeName == null || !(attrNodeName instanceof String))) {
+            NodeData attrNode = getChildAttrNodes().get(nodeName);
+            if ((attrNode == null)) {
                 return false;
             }
             return true;
         }
 
-        protected List<String> getNodesNamesFromAttrValue(String nodeName) {
-            Object nodesList = getChildNodesMap().get(nodeName);
-            if (nodesList != null && nodesList instanceof List) {
-                return (List<String>) nodesList;
+        protected List<NodeData> getNodesNamesFromAttrValue(String nodeName) {
+            List<NodeData> nodesList = getChildAttrArrayNodes().get(nodeName);
+            if (nodesList != null) {
+                return nodesList;
             } else {
-                return new ArrayList<String>();
+                return new ArrayList<NodeData>();
             }
         }
 
+    }
+
+    private static interface NodeData {
+        String getName();
+        int getStartOffset();
     }
     
     public static final String PROP_PARSE_ERROR = "parse-error"; // NOI18N
@@ -187,8 +227,9 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
             FXDParser fxdParser = new FXDParser(docReader, new ContentHandler() {
                 /** is last processed element was node or not (then array) */
                 private boolean m_isLastNode = true;
-                /** last processed element - String (Node name)
-                 * or List<String> ( array attribute with nodes == list of node names) */
+                /** last processed element.
+                 * possible values are: NodeData (if attribute value was Node)
+                 * or List<NodeData> ( if attribute value was array of nodes) */
                 private Object  m_lastElem = null;
 
                 public Object startNode(String typeName, int startOff, boolean isExtension) {
@@ -203,11 +244,12 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                             if ( m_isLastNode) {
                                 //System.err.println(String.format("Adding attribute %s <%d, %d>", name, startOff, endOff));
                                 trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE, NO_ATTRS, startOff, endOff);
+                                deb.addNodeToChildrenMap(name, (NodeData)m_lastElem);
                             } else {
                                 //System.err.println(String.format("Adding array attribute %s <%d, %d>", name, startOff, endOff));
                                 trans.addDocumentElement(name, FXDFileModel.FXD_ATTRIBUTE_ARRAY, NO_ATTRS, startOff, endOff);
+                                deb.addNodeToChildrenMap(name, (List<NodeData>)m_lastElem);
                             }
-                            deb.addNodeToChildrenMap(name, m_lastElem);
                             m_lastElem = null;
                        } catch( Exception e) {
                            throw new FXDException(e);
@@ -236,7 +278,8 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                         throw new FXDException(e);
                     }
                     m_isLastNode = true;
-                    m_lastElem = deb.m_typeName;
+                    // here
+                    m_lastElem = deb.exportNodeData();
                 }
 
                 private void synchRemovedChildNodes(NodeBuilder deb, DocumentElement de)
@@ -255,16 +298,24 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
 
                 private void synchArrayOfChildNodes(NodeBuilder deb, DocumentElement de) 
                         throws DocumentModelTransactionCancelledException {
-                    List<String> nodeNamesList = deb.getNodesNamesFromAttrValue(de.getName());
+                    List<NodeData> nodeList = deb.getNodesNamesFromAttrValue(de.getName());
                     for (DocumentElement child : de.getChildren()) {
                         if (FXDFileModel.FXD_NODE.equals(child.getType())) {
-                            // TODO: fix the case when one of children with same names was removed.
-                            // e.g. content with several polygons.
-                            if (!nodeNamesList.contains(child.getName())) {
+                            if (!isDEInList(nodeList, child)) {
                                 trans.removeDocumentElement(child, true);
                             }
                         }
                     }
+                }
+
+                private boolean isDEInList(List<NodeData> list, DocumentElement de){
+                    for (NodeData nodeData : list){
+                        if (nodeData.getName().equals(de.getName())
+                                && nodeData.getStartOffset() == de.getStartOffset()){
+                            return true;
+                        }
+                    }
+                    return false;
                 }
 
                 public Object startNodeArray(int startOff) {
@@ -280,7 +331,7 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                             throw new FXDException( ex);
                         }
                     } else {
-                        ((List)array).add(m_lastElem);
+                        ((List<NodeData>)array).add((NodeData)m_lastElem);
                         m_lastElem = null;
                     }
                 }
