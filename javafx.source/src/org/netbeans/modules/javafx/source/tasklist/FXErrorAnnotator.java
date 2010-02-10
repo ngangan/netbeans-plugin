@@ -44,8 +44,9 @@ import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,13 +59,11 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Element;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
@@ -75,6 +74,9 @@ import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileStatusEvent;
+import org.openide.filesystems.FileSystem;
+import org.openide.filesystems.FileUtil;
+import org.openide.filesystems.Repository;
 import org.openide.util.Lookup;
 
 import org.openide.util.lookup.ServiceProvider;
@@ -96,6 +98,17 @@ public class FXErrorAnnotator extends AnnotationProvider {
     private static final String ERROR_BADGE_URL = "org/netbeans/modules/javafx/source/resources/icons/error-badge.gif"; // NOI18N
     private static final Image ERROR_BADGE_SINGLE;
     private static final Image ERROR_BADGE_FOLDER;
+
+    public interface ProcessRelatedFilesLambda {
+        void processRelatedFiles(FileObject topRoot, Collection<FileObject> files);
+
+        final public static ProcessRelatedFilesLambda NULL = new ProcessRelatedFilesLambda() {
+
+            public void processRelatedFiles(FileObject topRoot, Collection<FileObject> files) {
+                // do nothing
+            }
+        };
+    }
 
     static {
         URL errorBadgeIconURL = FXErrorAnnotator.class.getClassLoader().getResource(ERROR_BADGE_URL);
@@ -237,34 +250,43 @@ public class FXErrorAnnotator extends AnnotationProvider {
         return Lookup.getDefault().lookup(FXErrorAnnotator.class);
     }
 
+    public void process(final CompilationController cc, final ProcessRelatedFilesLambda lambda) {
+        if (ISDEBUG) {
+            LOGGER.finest("Processing " + cc.getFileObject().getPath()); // NOI18N
+        }
+        boolean statusChanged = doProcess(cc, lambda);
+        if (ISDEBUG) {
+            LOGGER.finest("===== ERROR MAP ====="); // NOI18N
+            for(ErrorCounter ec : errorMap.values()) {
+                LOGGER.finest(ec.toString());
+            }
+            LOGGER.finest("====================="); // NOI18N
+        }
+        if (statusChanged) {
+            if (ISDEBUG) {
+                LOGGER.finest(cc.getFileObject().getPath());
+            }
+            try {
+                fireFileStatusChanged(new FileStatusEvent(cc.getFileObject().getFileSystem(), Collections.singleton(cc.getFileObject()), true, false));
+            } catch (FileStateInvalidException ex) {
+                ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
+            }
+        }
+    }
+
     public void process(final FileObject fo) {
         processor.submit(new Runnable() {
             private void process() {
-                if (ISDEBUG) {
-                    LOGGER.finest("Processing " + fo.getPath()); // NOI18N
-                }
-                filesWithModifiedStatus.clear();
-                doProcess(fo);
-                if (ISDEBUG) {
-                    LOGGER.finest("===== ERROR MAP ====="); // NOI18N
-                    for(ErrorCounter ec : errorMap.values()) {
-                        LOGGER.finest(ec.toString());
-                    }
-                    LOGGER.finest("====================="); // NOI18N
-                }
-                if (!filesWithModifiedStatus.isEmpty()) {
-                    if (ISDEBUG) {
-                        StringBuilder sb = new StringBuilder();
-                        for(FileObject fo : filesWithModifiedStatus) {
-                            sb.append(fo.getName()).append(",");
+                try {
+                    JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+                    jfxs.runWhenScanFinished(new Task<CompilationController>() {
+
+                        public void run(CompilationController cc) throws Exception {
+                            FXErrorAnnotator.this.process(cc, ProcessRelatedFilesLambda.NULL);
                         }
-                        LOGGER.finest(sb.toString());
-                    }
-                    try {
-                        fireFileStatusChanged(new FileStatusEvent(fo.getFileSystem(), filesWithModifiedStatus, true, false));
-                    } catch (FileStateInvalidException ex) {
-                        ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, ex);
-                    }
+                    }, true);
+                } catch (IOException e) {
+
                 }
             }
             public void run() {
@@ -273,56 +295,69 @@ public class FXErrorAnnotator extends AnnotationProvider {
         });
     }
 
-    private void doProcess(FileObject origFo) {
-        List<FileObject> toProcess = new ArrayList<FileObject>();
-        Set<FileObject> processedFiles = new HashSet<FileObject>();
+    private boolean doProcess(CompilationController cc, ProcessRelatedFilesLambda lambda) {
+        final FileObject processing = cc.getFileObject();
 
-        toProcess.add(origFo);
-        
-        while (!toProcess.isEmpty()) {
-            final FileObject processing = toProcess.remove(0);
+        if (ISDEBUG) {
+            LOGGER.finest("Checking " + processing); // NOI18N
+        }
 
-            processedFiles.add(processing);
 
+        final ErrorCounter errorCnt = getErrorCounter(processing);
+
+        final Set<ElementHandle> handles = new HashSet<ElementHandle>();
+
+        // don't attempt to process if the error status is not changing
+        if (!(errorCnt.isError() ^ cc.isErrors())) {
             if (ISDEBUG) {
-                LOGGER.finest("Checking " + processing); // NOI18N
+                LOGGER.finest("Not processing. Old err = " + errorCnt.isError() + ", new err = " + cc.isErrors()); // NOI18N
             }
+            return false;
+        }
+        FileObject top = FileOwnerQuery.getOwner(processing).getProjectDirectory();
+        setErrorFlag(errorCnt, cc.isErrors(), top);
 
-
-            final ErrorCounter errorCnt = getErrorCounter(processing);
+        if (lambda != ProcessRelatedFilesLambda.NULL) {
+            for(Tree t : cc.getCompilationUnit().getTypeDecls()) {
+                handles.add(ElementHandle.create(cc.getTrees().getElement(cc.getTrees().getPath(cc.getCompilationUnit(), t))));
+            }
+            ClassIndex index = cc.getClasspathInfo().getClassIndex();
+            Set<FileObject> dependencies = new HashSet<FileObject>();
+            for(ElementHandle eh : handles) {
+                dependencies.addAll(index.getDependencyClosure(eh));
+            }
 
             try {
-                final Set<ElementHandle> handles = new HashSet<ElementHandle>();
-
-                JavaFXSource.forFileObject(processing).runUserActionTask(new Task<CompilationController>() {
-                    public void run(CompilationController ci) throws Exception {
-                        // don't attempt to process if the error status is not changing
-                        if (!(errorCnt.isError() ^ ci.isErrors())) {
-                            if (ISDEBUG) {
-                                LOGGER.finest("Not processing. Old err = " + errorCnt.isError() + ", new err = " + ci.isErrors()); // NOI18N
-                            }
-                            return;
-                        }
-                        FileObject top = FileOwnerQuery.getOwner(processing).getProjectDirectory();
-                        setErrorFlag(errorCnt, ci.isErrors(), top);
-
-                        for(Tree t : ci.getCompilationUnit().getTypeDecls()) {
-                            handles.add(ElementHandle.create(ci.getTrees().getElement(ci.getTrees().getPath(ci.getCompilationUnit(), t))));
-                        }
-                    }
-                }, false);
-
-                ClassIndex index = ClasspathInfo.create(processing).getClassIndex();
-                for(ElementHandle eh : handles) {
-                    for(final FileObject fo : index.getResources(eh,  EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
-                        if (!processedFiles.contains(fo)) {
-                            toProcess.add(fo);
-                        }
+                for (FileObject dep : dependencies) {
+                    top = mergeParents(top, dep);
+                    if (top == null) {
+                        top = dep.getFileSystem().getRoot();
+                        break;
                     }
                 }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "error compiling javafx source", e); // NOI18N
+                lambda.processRelatedFiles(top, dependencies);
+            } catch (FileStateInvalidException e) {
+                LOGGER.log(Level.WARNING, null, e);
             }
+        }
+        return true;
+    }
+
+    /**
+     * Merges the old parent and a file object's parent
+     * @param parent The old parent
+     * @param fo The file object
+     * @return Returns a common parent for the given 2 file objects or NULL
+     */
+    private FileObject mergeParents(FileObject parent, FileObject fo) {
+        if (!FileUtil.isParentOf(parent, fo)) {
+            FileObject newParent = fo.getParent();
+            while (newParent != null && !FileUtil.isParentOf(newParent, parent)) {
+                newParent = newParent.getParent();
+            }
+            return newParent;
+        } else {
+            return parent;
         }
     }
 
