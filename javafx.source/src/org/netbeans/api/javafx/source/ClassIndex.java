@@ -40,10 +40,12 @@ package org.netbeans.api.javafx.source;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import org.netbeans.api.java.classpath.ClassPath;
 
 import javax.lang.model.element.TypeElement;
@@ -492,6 +494,32 @@ final public class ClassIndex {
         }
 
         return result;
+    }
+
+    public Set<FileObject> getDependencyClosure(final ElementHandle<? extends Element> handle) {
+        final Set<FileObject> closure = new HashSet<FileObject>();
+        final Deque<ElementHandle<? extends Element>> toProcess = new ArrayDeque<ElementHandle<? extends Element>>();
+
+        try {
+            toProcess.push(handle);
+
+            while (!toProcess.isEmpty()) {
+                ElementHandle<? extends Element> processing = toProcess.pop();
+                final String indexingVal = IndexingUtilities.getIndexValue(processing);
+                QuerySupport query = getUsageQuery(EnumSet.allOf(SearchScope.class));
+                for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), indexingVal, Kind.EXACT)) {
+                    if (!closure.contains(ir.getFile())) {
+                        closure.add(ir.getFile());
+                        for(String typeName : ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
+                            toProcess.push(IndexingUtilities.getTypeHandle(typeName));
+                        }
+                    }
+                }
+            }
+        } catch (IOException iOException) {
+            return Collections.EMPTY_SET;
+        }
+        return closure;
     }
 
     private QuerySupport getQuery(Set<SearchScope> scope) throws IOException {

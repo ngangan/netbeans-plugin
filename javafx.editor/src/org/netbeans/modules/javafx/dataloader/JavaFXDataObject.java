@@ -180,25 +180,6 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         protected @Override CloneableEditor createCloneableEditor() {
             return new JavaFXEditor(this);
         }
-       
-        public @Override boolean close(boolean ask) {
-            return super.close(ask);
-        }
-
-        @Override
-        protected boolean canClose() {
-            return super.canClose();
-        }
-        
-        @Override
-        protected void notifyClosed() {
-//
-//            
-//            Bridge.closePreview((JavaFXDocument) getDocument());
-//
-//
-//
-        }
     }
     
     private static final class JavaFXEditor extends CloneableEditor {

@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -61,10 +62,9 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
-import org.netbeans.modules.javafx.refactoring.impl.RenameRefactoringElement;
-import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.RenamePackageScanner;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixReferences;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenamePackage;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -74,8 +74,6 @@ import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.Lookups;
-import org.openide.util.lookup.ProxyLookup;
 
 /**
  * Implemented abilities:
@@ -91,13 +89,15 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     private Map packagePostfix = new HashMap();
     final AbstractRefactoring refactoring;
     final boolean isRenameRefactoring;
-    ArrayList<FileObject> filesToMove = new ArrayList<FileObject>();
-    HashMap<FileObject,ElementHandle> classes;
+    private ArrayList<FileObject> filesToMove = new ArrayList<FileObject>();
+    private HashMap<FileObject,ElementHandle> classes;
     /** list of folders grouped by source roots */
-    List<List<FileObject>> foldersToMove = new ArrayList<List<FileObject>>();
+    private List<List<FileObject>> foldersToMove = new ArrayList<List<FileObject>>();
     /** collection of packages that will change its name */
-    Set<String> packages;
-    Map<FileObject, Set<FileObject>> whoReferences = new HashMap<FileObject, Set<FileObject>>();
+    private Set<String> packages;
+    // colllection of classes being moved as a result of package renaming
+    private Set<String> movedClasses;
+    private Map<FileObject, Set<FileObject>> whoReferences = new HashMap<FileObject, Set<FileObject>>();
 
     volatile private boolean cancelRequest = false;
     
@@ -186,7 +186,6 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                         ));
                     }
                     
-                    //                this.movingToDefaultPackageMap.put(r, Boolean.valueOf(targetF!= null && targetF.equals(classPath.findOwnerRoot(targetF))));
                     pkgName = targetPackageName;
                     
                     if (pkgName == null) {
@@ -194,15 +193,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                     } else if (pkgName.length() > 0) {
                         pkgName = pkgName + '.';
                     }
-                    //targetPrefix = pkgName;
-                    
-                    //                JavaClass[] sourceClasses = (JavaClass[]) sourceClassesMap.get(r);
-                    //                String[] names = new String [sourceClasses.length];
-                    //                for (int x = 0; x < names.length; x++) {
-                    //                    names [x] = sourceClasses [x].getName();
-                    //                }
-                    //
-                    //                FileObject movedFile = JavaMetamodel.getManager().getDataObject(r).getPrimaryFile();
+
                     String fileName = f.getName();
                     if (targetF!=null) {
                         FileObject[] children = targetF.getChildren();
@@ -214,16 +205,6 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                             }
                         } // for
                     }
-                    
-                    //                boolean accessedByOriginalPackage = ((Boolean) accessedByOriginalPackageMap.get(r)).booleanValue();
-                    //                boolean movingToDefaultPackage = ((Boolean) movingToDefaultPackageMap.get(r)).booleanValue();
-                    //                if (p==null && accessedByOriginalPackage && movingToDefaultPackage) {
-                    //                    p= new Problem(false, getString("ERR_MovingClassToDefaultPackage")); // NOI18N
-                    //                }
-                    
-                    //                if (f.getFolder().getPrimaryFile().equals(targetF) && isPackageCorrect(r)) {
-                    //                    return new Problem(true, getString("ERR_CannotMoveIntoSamePackage"));
-                    //                }
                 }
             } catch (IOException ioe) {
                 //do nothing
@@ -292,6 +273,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     
     private void initClasses() {
         classes = new HashMap<FileObject,ElementHandle>();
+        movedClasses = new HashSet<String>();
         for (int i=0;i<filesToMove.size();i++) {
             final int j = i;
             try {
@@ -303,7 +285,11 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                         for (Tree t: trees) {
                             if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
                                 if (((JFXClassDeclaration) t).getSimpleName().toString().equals(filesToMove.get(j).getName())) {
-                                    classes.put(filesToMove.get(j), ElementHandle.create(cc.getTrees().getElement(JavaFXTreePath.getPath(cc.getCompilationUnit(), t))));
+                                    Element e = cc.getTrees().getElement(JavaFXTreePath.getPath(cc.getCompilationUnit(), t));
+                                    
+                                    ElementHandle eh = ElementHandle.create(e);
+                                    classes.put(filesToMove.get(j), eh);
+                                    movedClasses.add(eh.getQualifiedName());
                                     return ;
                                 }
                             }
@@ -344,35 +330,46 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         Problem p = checkProjectDeps(a);
         fireProgressListenerStep(a.size());
 
-        for(final FileObject fo : a) {
-            try {
-                JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                jfxs.runUserActionTask(new Task<CompilationController>() {
+        String targetPkgName = getTargetPackageName(refactoring.getRefactoringSource().lookup(FileObject.class));
+        Map<String, String> renameMap = new HashMap<String, String>();
+        for(String pak : packages) {
+            renameMap.put(pak, targetPkgName);
+        }
 
-                    public void run(CompilationController cc) throws Exception {
-                        for (String pkgName : packages) {
-                            Set<ElementLocation> locations = new HashSet<ElementLocation>();
-                            new RenamePackageScanner(pkgName, RenamePackagePlugin.this, cc).scan(cc.getCompilationUnit(), locations);
-                            for(ElementLocation loc : locations) {
-                                elements.add(refactoring, RenameRefactoringElement.create(loc, getTargetPackageName(refactoring.getRefactoringSource().lookup(FileObject.class)), pkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
-                            }
-                        }
-                    }
-                }, true);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+        for(final FileObject fo : a) {
+            RenamePackage rp = new RenamePackage(fo, renameMap, elements.getSession());
+            FixReferences fr = new FixReferences(fo, renameMap, movedClasses, true, elements.getSession());
+            if (fr.hasChanges()) {
+                elements.add(refactoring, fr);
             }
+            if (rp.hasChanges()) {
+                elements.add(refactoring, rp);
+            }
+
+//            try {
+//                JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+//                jfxs.runUserActionTask(new Task<CompilationController>() {
+//
+//                    public void run(CompilationController cc) throws Exception {
+//                        for (String pkgName : packages) {
+//                            Set<ElementLocation> locations = new HashSet<ElementLocation>();
+//                            new RenamePackageScanner(pkgName, RenamePackagePlugin.this, cc).scan(cc.getCompilationUnit(), locations);
+//                            for(ElementLocation loc : locations) {
+//                                elements.add(refactoring, RenameRefactoringElement.create(loc, getTargetPackageName(refactoring.getRefactoringSource().lookup(FileObject.class)), pkgName, new ProxyLookup(refactoring.getRefactoringSource(), Lookups.singleton(new TransformationContext()))));
+//                            }
+//                        }
+//                    }
+//                }, true);
+//            } catch (IOException ex) {
+//                Exceptions.printStackTrace(ex);
+//            }
 
             
             fireProgressListenerStep();
         }
 
-//        MoveTransformer t;
-//        TransformTask task = new TransformTask(t=new MoveTransformer(this), null);
-//        Problem prob = createAndAddElements(a, task, elements, refactoring);
         fireProgressListenerStop();
         return p;
-//        return prob != null ? prob : chainProblems(p, t.getProblem());
     }
     
     private static Problem chainProblems(Problem p,Problem p1) {

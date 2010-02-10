@@ -42,15 +42,8 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -58,33 +51,21 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.NestingKind;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeMirror;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.VisibilityQuery;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixReferences;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenamePackage;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
-import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
-import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -114,20 +95,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     private ArrayList<FileObject> filesToMove = new ArrayList<FileObject>();
     /** list of folders grouped by source roots */
     private List<List<FileObject>> foldersToMove = new ArrayList<List<FileObject>>();
-
-    private class ImportParts {
-        final String typeName;
-        final String packageName;
-        final JavaFXTreePath treePath;
-        final String fqn;
-
-        public ImportParts(String typeName, String packageName, JavaFXTreePath treePath) {
-            this.typeName = typeName;
-            this.packageName = packageName;
-            this.treePath = treePath;
-            this.fqn = (packageName != null ? packageName + "." : "") + typeName;
-        }
-    }
 
     public MoveRefactoringPlugin(MoveRefactoring move) {
         this.refactoring = move;
@@ -313,406 +280,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             } catch (IOException e) {}
         }
     }
-
-    private class RenamePackage extends BaseRefactoringElementImplementation {
-        private Map<String, String> renameMap;
-
-        public RenamePackage(FileObject srcFO, Map<String, String> renameMap, RefactoringSession session) {
-            super(srcFO, session);
-            this.renameMap = renameMap;
-        }
-
-        @Override
-        protected Set<Transformation> prepareTransformations(final CompilationController cc) {
-            final Set<Transformation> transformations = new HashSet<Transformation>();
-
-            JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
-                @Override
-                public Void visitCompilationUnit(UnitTree node, Void p) {
-                    ExpressionTree packageNameTree = node.getPackageName();
-                    String packageName = packageNameTree != null ? packageNameTree.toString() : ""; // NOI18N
-                    String targetPkg = renameMap.get(packageName);
-                    if (targetPkg != null) {
-                        if (targetPkg.equals(packageName)) return null; // the same package
-
-                        if (targetPkg.length() > 0) { // non-default target package
-                            if (packageName.length() > 0) { // from non-default package
-                                int pos = (int)cc.getTrees().getSourcePositions().getStartPosition(node, node.getPackageName());
-                                transformations.add(new ReplaceTextTransformation(pos, packageName, targetPkg));
-                            } else {
-                                moveFromDefault(targetPkg);
-                            }
-                        } else { // default target package
-                            moveToDefault(packageNameTree);
-                        }
-                    }
-                    return super.visitCompilationUnit(node, p);
-                }
-
-                private void moveToDefault(ExpressionTree packageNameTree) {
-                    // default package
-                    TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                    // set position to the first character of the package name
-                    int startPos = (int) cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), packageNameTree);
-                    ts.move(startPos);
-                    // search the "package" keyword (backwards)
-                    ts.movePrevious();
-                    Token<JFXTokenId> t = ts.token();
-                    while (t.id() != JFXTokenId.PACKAGE && ts.movePrevious()) {
-                        t = ts.token();
-                        startPos -= t.length();
-                    }
-                    if (t.id() == JFXTokenId.PACKAGE && ts.movePrevious()) {
-                        t = ts.token();
-                        while (t.id() == JFXTokenId.WS && ts.movePrevious()) {
-                            startPos -= t.length();
-                            t = ts.token();
-                        }
-                        // set position to the last character of the package name
-                        int endPos = (int) cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), packageNameTree);
-                        ts.move(endPos);
-                        ts.moveNext();
-                        t = ts.token();
-                        while (t.id() != JFXTokenId.SEMI && ts.moveNext()) {
-                            endPos += t.length();
-                            t = ts.token();
-                        }
-                        transformations.add(new RemoveTextTransformation(startPos, endPos - startPos + 1));
-                    }
-                }
-
-                private void moveFromDefault(String targetPkg) {
-                    TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                    // skip comments; possibly license and other headers
-                    int startPos = 0;
-                    ts.moveStart();
-                    ts.moveNext();
-                    Token<JFXTokenId> t = ts.token();
-                    while (t.id() == JFXTokenId.COMMENT && ts.moveNext()) {
-                        startPos += t.length();
-                        t = ts.token();
-                    }
-                    boolean appendCRLF = false;
-                    if (ts.moveNext()) {
-                        t = ts.token();
-                        appendCRLF = !t.text().toString().equals("\n"); // NOI18N
-                    }
-                    transformations.add(new InsertTextTransformation(startPos, "package " + targetPkg + ";" + (appendCRLF ? "\n" : ""))); // NOI18N
-                }
-            };
-            scanner.scan(cc.getCompilationUnit(), null);
-            return transformations;
-        }
-
-        public String getDisplayText() {
-            return "Rename package";
-        }
-
-    }
-
-    private class FixImports extends BaseRefactoringElementImplementation {
-        private class Import {
-            String fqn, typeName, packageName;
-            int start, end, startFQN, endFQN;
-
-            public Import(String packageName, String typeName, int start, int end, int startFQN, int endFQN) {
-                this(packageName + "." + typeName, start, end, startFQN, endFQN);
-                this.packageName = packageName;
-                this.typeName = typeName;
-            }
-
-             public Import(String packageName, String typeName) {
-                 this(packageName, typeName, -1, -1, -1, -1);
-             }
-
-            public Import(String fqn, int start, int end, int startFQN, int endFQN) {
-                this.fqn = fqn;
-                this.start = start;
-                this.end = end;
-                this.startFQN = startFQN;
-                this.endFQN = endFQN;
-            }
-
-            public Import(String fqn) {
-                this(fqn, -1, -1, -1, -1);
-            }
-        }
-
-        private Set<String> movedClasses;
-        private Map<String, String> renameMap;
-
-        public FixImports(FileObject srcFO, Map<String, String> renameMap, Set<String> movedClasses, RefactoringSession session) {
-            super(srcFO, session);
-            this.renameMap = renameMap;
-            this.movedClasses = movedClasses;
-        }
-
-        @Override
-        protected Set<Transformation> prepareTransformations(final CompilationController cc) {
-            final Set<Transformation> transformations = new HashSet<Transformation>();
-            final int[] importLastLine = new int[]{-1};
-            final boolean[] addTail = new boolean[1];
-            final List<Import> imports = new ArrayList<Import>();
-            final List<Import> origImports = new ArrayList<Import>();
-
-            JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
-                private String myPkgName = ""; // NOI18N
-
-                private boolean handlingImport = false;
-                private TypeMirror currentClass;
-
-                @Override
-                public Void visitCompilationUnit(UnitTree node, Void p) {
-                    myPkgName = node.getPackageName() != null ? node.getPackageName().toString() : "";
-
-                    TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-                    int pos = (int)cc.getTrees().getSourcePositions().getEndPosition(node, node.getPackageName());
-                    ts.move(pos);
-                    boolean semiFound = false;
-                    while (ts.moveNext()) {
-                        Token<JFXTokenId> token = ts.token();
-                        pos += token.length();
-                        if (token.id() == JFXTokenId.SEMI) {
-                            semiFound = true;
-                            break;
-                        }
-                    }
-                    if (semiFound) {
-                        while (ts.moveNext()) {
-                            Token<JFXTokenId> token = ts.token();
-                            pos += token.length();
-                            if (token.text().charAt(0) == '\n') {
-                                importLastLine[0] = pos;
-                                break;
-                            }
-                        }
-                    }
-
-                    return super.visitCompilationUnit(node, p);
-                }
-
-                @Override
-                public Void visitImport(ImportTree node, Void p) {
-                    try {
-                        handlingImport = true;
-                        Tree qualidTree = node.getQualifiedIdentifier();
-                        if (qualidTree != null && (qualidTree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || qualidTree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER)) {
-//                            String name = qualidTree.toString();
-                            SourcePositions sp = cc.getTrees().getSourcePositions();
-                            int start = (int)sp.getStartPosition(cc.getCompilationUnit(), node);
-                            int end = getImportLastPos((int)sp.getEndPosition(cc.getCompilationUnit(), node), cc);
-                            int startFQN = (int)sp.getStartPosition(cc.getCompilationUnit(), qualidTree);
-                            int endFQN = (int)sp.getEndPosition(cc.getCompilationUnit(), qualidTree);
-
-                            ImportParts parts = getImportParts((MemberSelectTree)qualidTree);
-                            if (DEBUG) {
-                                LOG.finest("Import: " + parts.packageName + "." + parts.typeName); // NOI18N
-                            }
-
-                            if (movedClasses.contains(parts.fqn)) {
-                                Import imprt = new Import(renameMap.get(parts.packageName) != null ? renameMap.get(parts.packageName) : parts.packageName, parts.typeName, start, end, startFQN, endFQN);
-                                imports.add(imprt);
-                                transformations.add(new ReplaceTextTransformation(startFQN, parts.packageName, imprt.packageName));
-                            } else {
-                                origImports.add(new Import(parts.packageName, parts.typeName, start, end, startFQN, endFQN));
-                            }
-                        }
-                        addTail[0] = true;
-                        importLastLine[0] = getImportLastPos((int)cc.getTrees().getSourcePositions().getEndPosition(cc.getCompilationUnit(), node), cc);
-                        return super.visitImport(node, p);
-                    } finally {
-                        handlingImport = false;
-                    }
-                }
-
-                @Override
-                public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-                    if (importLastLine[0] == -1) {
-                        addTail[0] = false;
-                        importLastLine[0] = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
-                    }
-                    TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-                    // shortcut; don't even try to enter the mangled syntehtic inner classes generated for object literals; they !@#$ everything
-                    if (cc.getElementUtilities().isSynthetic(te)) return null;
-                    
-                    currentClass = te.asType();
-
-                    // check the existing imports and remove the ones not needed
-                    String thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
-                    // remove same-package imports from the newly added ones
-                    for(Iterator<Import> iter = imports.iterator();iter.hasNext();) {
-                        Import imprt = iter.next();
-                        String otherPkg = movedClasses.contains(imprt.fqn) ? renameMap.get(imprt.packageName) : imprt.packageName;
-                        if (thisPkg.equals(otherPkg)) { // import from the same package can be removed
-                            transformations.add(new RemoveTextTransformation(imprt.start, imprt.end - imprt.start));
-                            iter.remove();
-                        }
-                    }
-                    // remove the same-package imports from the original imports
-                    for(Iterator<Import> iter = origImports.iterator();iter.hasNext();) {
-                        Import imprt = iter.next();
-                        if (thisPkg.equals(imprt.packageName)) { // import from the same package can be removed
-                            transformations.add(new RemoveTextTransformation(imprt.start, imprt.end - imprt.start));
-                            iter.remove();
-                        }
-                    }
-                    // end
-                    // check for import renames
-                    for(Import imprt : origImports) {
-                        String otherPkg = movedClasses.contains(imprt.fqn) ? renameMap.get(imprt.packageName) : imprt.packageName;
-                        if (isImported(otherPkg, imprt.typeName, imports)) {
-                            transformations.add(new ReplaceTextTransformation(imprt.startFQN, imprt.packageName, otherPkg));
-                        }
-                    }
-
-                    // check the supertypes and add imports as needed
-                    for(ExpressionTree et : node.getSupertypeList()) {
-                        if (et != null) {
-                            Element e = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), et));
-                            if (e != null && (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)) {
-                                ImportParts ip = getImportParts(et);
-                                thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
-
-                                if (ip.packageName != null) {
-                                    String otherPkg = movedClasses.contains(ip.fqn) ? renameMap.get(ip.packageName) : ip.packageName;
-                                    if (!thisPkg.equals(otherPkg)) {
-                                        if (!ip.fqn.equals(et.toString())) { // not a FQN
-                                            if (!isImported(otherPkg, ip.typeName, movedClasses.contains(ip.fqn) ? imports : origImports)) {
-                                                imports.add(new Import(otherPkg, ip.typeName));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    // end
-                    return super.visitClassDeclaration(node, p);
-                }
-
-                @Override
-                public Void visitMemberSelect(MemberSelectTree node, Void p) {
-                    if (currentClass != null) {
-                        if (!handlingImport) {
-                            ImportParts ip = getImportParts(node);
-                            Element e = cc.getTrees().getElement(getCurrentPath());
-                            String fqn = node.toString();
-                            if (fqn != null && ip.packageName != null && fqn.startsWith(ip.packageName)) {
-                                if (e != null && (e.getKind() == ElementKind.PACKAGE || e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE)) {
-                                    if (movedClasses.contains(ip.fqn)) {
-                                        String oldPkgName = ip.packageName;
-                                        String newPkgName = renameMap.get(oldPkgName);
-                                        int start = (int)cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), node);
-                                        transformations.add(new ReplaceTextTransformation(start, oldPkgName, newPkgName));
-                                        return null;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return super.visitMemberSelect(node, p);
-                }
-
-                @Override
-                public Void visitIdentifier(IdentifierTree node, Void p) {
-                    if (currentClass != null) {
-                        ImportParts parts = getImportParts(node);
-                        if (parts.fqn != null) {
-                            String thisPkg = movedClasses.contains(currentClass.toString()) ? renameMap.get(myPkgName) : myPkgName;
-                            if (parts.packageName != null) {
-                                String otherPkg = movedClasses.contains(parts.fqn) ? renameMap.get(parts.packageName) : parts.packageName;
-
-                                if (myPkgName.equals(parts.packageName) || isImported(parts.packageName, parts.typeName, origImports)) {
-                                    if (!thisPkg.equals(otherPkg) && !isImported(otherPkg, parts.typeName, imports) && !isImported(otherPkg, parts.typeName, origImports)) {
-                                        imports.add(new Import(otherPkg, parts.typeName));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return super.visitIdentifier(node, p);
-                }
-
-
-
-                private ImportParts getImportParts(Tree t) {
-                    JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), t);
-                    if (tp == null) tp = getCurrentPath();
-                    if (t.toString().endsWith(".*")) {
-                        return new ImportParts("*", ((MemberSelectTree)t).getExpression().toString(), tp);
-                    } else {
-                        Element e = null;
-                        while ((e = cc.getTrees().getElement(tp)) == null) {
-                            if (t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
-                                tp = JavafxcTrees.getPath(getCurrentPath(), ((MemberSelectTree)t).getExpression());
-                                t = tp.getLeaf();
-                            } else {
-                                break;
-                            }
-                        }
-                        String[] types = new String[2];
-                        while (e != null && tp != null && e.getKind() != ElementKind.PACKAGE) {
-                            if (e.getKind() == ElementKind.CLASS && ((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL) {
-                                types[0] = ((TypeElement)e).getQualifiedName().toString();
-                            }
-                            e = e.getEnclosingElement();
-                        }
-                        if (e != null) {
-                            types[1] = ((PackageElement)e).getQualifiedName().toString();
-                            types[0] = types[0] != null ? types[0].substring(types[1].length() + 1) : "*";
-                        }
-                        return new ImportParts(types[0], types[1], tp);
-                    }
-                }
-                private boolean isImported(String pkgName, String typeName, Collection<Import> usingImports) {
-                    for(Import imp : usingImports) {
-                        if (imp.fqn.equals(pkgName + "." + typeName) || (imp.typeName.equals("*") && pkgName.equals(imp.packageName))) { // NOI18N
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            };
-            scanner.scan(cc.getCompilationUnit(), null);
-            if (importLastLine[0] > -1) {
-                for(Import imprt : imports) {
-                    if (imprt.start == -1) { // process only newly added imports; they don't have the position info
-                        if (DEBUG) {
-                            LOG.finest("adding import \"" + imprt.fqn); // NOI18N
-                        }
-                        transformations.add(new InsertTextTransformation(importLastLine[0], "import " + imprt.fqn + ";\n")); // NOI18N
-                    }
-                }
-            }
-            return transformations;
-        }
-
-        public String getDisplayText() {
-            return "Fix Imports";
-        }
-
-        private int getImportLastPos(int pos, CompilationController cc) {
-            TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
-            ts.move(pos);
-            OUTER:
-            while (ts.moveNext()) {
-                Token<JFXTokenId> token = ts.token();
-                pos += token.length();
-                if (token.id() == JFXTokenId.SEMI) {
-                    while (ts.moveNext()) {
-                        token = ts.token();
-                        pos += token.length();
-                        if (token.text().charAt(0) == '\n') break OUTER;
-                    }
-                }
-            }
-            return pos;
-        }
-
-    }
     
-    private void renamePackages(final Map<String, String> renameMap, final RefactoringElementsBag elements) {
-        for(FileObject fo : filesToMove) {
+    private void renamePackages(final Map<String, String> renameMap, final Collection<FileObject> files, final RefactoringElementsBag elements) {
+        for(FileObject fo : files) {
             RenamePackage rp = new RenamePackage(fo, renameMap, elements.getSession());
             if (rp.hasChanges()) {
                 elements.add(refactoring, rp);
@@ -720,9 +290,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         }
     }
 
-    private void fixImports(final Map<String, String> renameMap, final Collection<FileObject> files, final Set<String> movedClasses, final RefactoringElementsBag elements) {
+    private void fixReferences(final Map<String, String> renameMap, final Collection<FileObject> files, final Set<String> movedClasses, final RefactoringElementsBag elements) {
         for(final FileObject fo : files) {
-            FixImports elem = new FixImports(fo, renameMap, movedClasses, elements.getSession());
+            FixReferences elem = new FixReferences(fo, renameMap, movedClasses, elements.getSession());
             if (elem.hasChanges()) {
                 elements.add(refactoring, elem);
             }
@@ -749,28 +319,26 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
 
     public Problem prepare(RefactoringElementsBag elements) {
-        fireProgressListenerStart(ProgressEvent.START, 20);
+        fireProgressListenerStart(RenameRefactoring.PREPARE, 8);
 
         Set<String> movedClasses = new HashSet<String>();
         Set<FileObject> related = new HashSet<FileObject>();
         Map<String, String> renameMap = new HashMap<String, String>();
 
         collectMoveData(renameMap, related, movedClasses);
-        fireProgressListenerStep(2);
-        IndexingManager.getDefault().refreshAllIndices((FileObject[])filesToMove.toArray(new FileObject[filesToMove.size()]));
-        fireProgressListenerStep(4);
-        IndexingManager.getDefault().refreshAllIndices((FileObject[])related.toArray(new FileObject[related.size()]));
-        fireProgressListenerStep(5);
+        fireProgressListenerStep();
         Problem p = null;
         p = chainProblems(p, checkProjectDeps(related));
         p = chainProblems(p, collectProblems(filesToMove, movedClasses, renameMap));
+        fireProgressListenerStep();
         p = chainProblems(p, collectProblems(related, movedClasses, renameMap));
-        fireProgressListenerStep(3);
-        fixImports(renameMap, filesToMove, movedClasses, elements);
-        fireProgressListenerStep(1);
-        fixImports(renameMap, related, movedClasses, elements);
-        fireProgressListenerStep(2);
-        renamePackages(renameMap, elements); // this must be the last step otherwise ...
+        fireProgressListenerStep();
+        fireProgressListenerStep();
+        renamePackages(renameMap, filesToMove, elements);
+        fireProgressListenerStep();
+        fixReferences(renameMap, filesToMove, movedClasses, elements);
+        fireProgressListenerStep();
+        fixReferences(renameMap, related, movedClasses, elements);
         fireProgressListenerStop();
         return p;
     }
@@ -795,7 +363,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             // XXX cache it !!!
             return SourceUtils.getPackageName(((MoveRefactoring) refactoring).getTarget().lookup(URL.class));
         }
-    }
+   }
     
     String getTargetPackageName(FileObject fo) {
         if (isRenameRefactoring) {

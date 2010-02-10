@@ -47,7 +47,7 @@ import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 public final class FXZArchive extends FXZFileContainerImpl implements TableModel {
     private final static Charset UTF_8       = FXDFileEncodingQueryImplementation.UTF_8;
     // TODO store to properties. do not hardcode
-    long MAX_FXD_SIZE_FOR_EDITOR             = 500000; // max fxd size to be loaded with enabled selection
+    //long MAX_FXD_SIZE_FOR_EDITOR             = 500000; // max fxd size to be loaded with enabled selection
     private final    FXZDataObject             m_dObj;
     // controls the access to the FXDFileModel object
     private final    Object                    m_lock = new Object();
@@ -490,14 +490,11 @@ public final class FXZArchive extends FXZFileContainerImpl implements TableModel
 
     @Override
     public FXDRootElement getRoot(String entryName, DocumentParser parser) throws IOException, FXDException {
-        long size = getFXDEntriesSize();
-        if (size < MAX_FXD_SIZE_FOR_EDITOR) {
-            FXDFileModel model = getFileModel(entryName);
-            if (model != null) {
-                return model.getRootNode();
-            }
+        FXDFileModel model = getFileModel(entryName);
+        if (model != null) {
+            return model.getRootNode();
         }
-        return super.getRoot(entryName, parser);
+        return null;
     }
 
     /**
