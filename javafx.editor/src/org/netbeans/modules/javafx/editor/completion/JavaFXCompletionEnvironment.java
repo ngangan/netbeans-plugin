@@ -400,12 +400,13 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
                     // Prevent potential NPEs (#180191)
                     if (member.asType() == null) ((Symbol)member).complete();
-
-                    addResult(
+                    if (member.asType() instanceof ExecutableType) {
+                        addResult(
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
                             (ExecutableType) member.asType(),
                             query.anchorOffset, isInherited, isDeprecated, false, false));
+                    }
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
                 String tta = textToAdd;
@@ -512,14 +513,17 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 if (LOGGABLE) log("  for expression: " + fet + "\n"); // NOI18N
                 for (ForExpressionInClauseTree fetic : fet.getInClauses()) {
                     if (LOGGABLE) log("  fetic: " + fetic + "\n"); // NOI18N
-                    String s = fetic.getVariable().getName().toString();
-                    if (LOGGABLE) log("    adding(2) " + s + " with prefix " + prefix); // NOI18N
-                    TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, fetic));
-                    if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
-                        addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, true));
-                    }
-                    if (JavaFXCompletionProvider.startsWith(s, prefix)) {
-                        addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, false));
+                    VariableTree vt = fetic.getVariable();
+                    if (vt != null) {
+                        String s = vt.getName().toString();
+                        if (LOGGABLE) log("    adding(2) " + s + " with prefix " + prefix); // NOI18N
+                        TypeMirror tm = trees.getTypeMirror(new JavaFXTreePath(tp, fetic));
+                        if (smart != null && tm != null && tm.getKind() == smart.getKind()) {
+                            addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, true));
+                        }
+                        if (JavaFXCompletionProvider.startsWith(s, prefix)) {
+                            addResult(JavaFXCompletionItem.createVariableItem(tm, s, query.anchorOffset, false));
+                        }
                     }
                 }
             }

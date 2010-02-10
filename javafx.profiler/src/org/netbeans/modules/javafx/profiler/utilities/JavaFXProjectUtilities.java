@@ -415,7 +415,13 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
             }
         }
     
-        TypeElement mainClass = controller.getElements().getTypeElement(className.replace('$', '.')); // NOI18N
+        TypeElement mainClass = null;
+        try {
+            mainClass = controller.getElements().getTypeElement(className.replace('$', '.')); // NOI18N
+        } catch (ClassCastException e) {
+            // #180225: working around; no idea what is triggering the problem; unable to create a junit test for this problem ...
+            // ignore
+        }
 
         if (mainClass != null) {
             ProfilerLogger.debug("Resolved: " + mainClass); // NOI18N

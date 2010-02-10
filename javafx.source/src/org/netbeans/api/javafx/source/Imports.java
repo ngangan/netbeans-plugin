@@ -56,6 +56,9 @@ import org.openide.util.Exceptions;
 public class Imports {
 
     public static void addImport( final JTextComponent targetComponent, final String im ) {
+        // Can't import from the default package
+        if (im.indexOf('.') < 0) return;
+
         String doc = null;
         try {
             doc = targetComponent.getDocument().getText(0, targetComponent.getDocument().getEndPosition().getOffset());

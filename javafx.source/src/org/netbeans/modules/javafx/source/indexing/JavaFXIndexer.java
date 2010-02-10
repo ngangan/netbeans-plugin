@@ -1,6 +1,40 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 2008-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.source.indexing;
@@ -25,11 +59,13 @@ import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -53,7 +89,8 @@ import org.netbeans.modules.parsing.spi.indexing.EmbeddingIndexerFactory;
 import org.netbeans.modules.parsing.spi.indexing.Indexable;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexDocument;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
-import org.openide.filesystems.FileUtil;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileStateInvalidException;
 
 /**
  *
@@ -66,70 +103,16 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     final public static String NAME = "fx";
     final public static int VERSION = 3;
 
-    public enum IndexKey {
-        PACKAGE_NAME,
-        CLASS_FQN, CLASS_NAME_SIMPLE, CLASS_NAME_INSENSITIVE,
-        FUNCTION_DEF, FUNCTION_INV, FIELD_DEF, FIELD_REF,
-        TYPE_REF, TYPE_IMPL,
-        NOT_INDEXED
-    }
+    private class IndexingVisitor extends JavaFXTreePathScanner<Void, IndexDocument> {
+        private JavaFXParserResult fxresult;
+        private Indexable indexable;
 
-
-    // <editor-fold defaultstate="collapsed" desc="Indexer Factory">
-    public static class Factory extends EmbeddingIndexerFactory {
-
-        @Override
-        public EmbeddingIndexer createIndexer(Indexable indexable, Snapshot snapshot) {
-            return new JavaFXIndexer();
+        public IndexingVisitor(Indexable indexable, JavaFXParserResult fxresult) {
+            this.fxresult = fxresult;
+            this.indexable = indexable;
         }
 
         @Override
-        public void filesDeleted(Iterable<? extends Indexable> itrbl, Context cntxt) {
-            for(Indexable ixbl : itrbl) {
-                try {
-                    IndexingSupport.getInstance(cntxt).removeDocuments(ixbl);
-                } catch (IOException e) {
-                    LOG.log(Level.WARNING, null, e);
-                }
-            }
-        }
-
-        @Override
-        public void filesDirty(Iterable<? extends Indexable> itrbl, Context cntxt) {
-            for(Indexable ixbl : itrbl) {
-                try {
-                    IndexingSupport.getInstance(cntxt).markDirtyDocuments(ixbl);
-                } catch (IOException e) {
-                    LOG.log(Level.WARNING, null, e);
-                }
-            }
-        }
-
-        @Override
-        public int getIndexVersion() {
-            return VERSION;
-        }
-
-        @Override
-        public String getIndexerName() {
-            return NAME;
-        }
-    }// </editor-fold>
-    @Override
-    protected void index(final Indexable indexable, Result result, Context context) {
-        final JavaFXParserResult fxresult = (JavaFXParserResult)result;
-        if (DEBUG) {
-            LOG.log(Level.FINEST,"Indexing {0}", indexable.toString());
-            LOG.log(Level.FINEST, "Tree: {0}", fxresult.getCompilationUnit());
-        }
-
-        IndexingSupport support;
-        try {
-            support = IndexingSupport.getInstance(context);
-            IndexDocument document = support.createDocument(indexable);
-
-            JavaFXTreePathScanner<Void, IndexDocument> visitor = new JavaFXTreePathScanner<Void, IndexDocument>() {
-                @Override
                 public Void visitCompilationUnit(UnitTree node, IndexDocument document) {
                     String indexVal = node.getPackageName() != null ? node.getPackageName().toString() : "<default>"; // NOI18N
                     index(document, IndexKey.PACKAGE_NAME, indexVal);
@@ -340,7 +323,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     return super.visitMethodInvocation(node, document);
                 }
 
-                
+
 
                 @Override
                 public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
@@ -528,10 +511,95 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 }
             };
 
+    public enum IndexKey {
+        PACKAGE_NAME,
+        CLASS_FQN, CLASS_NAME_SIMPLE, CLASS_NAME_INSENSITIVE,
+        FUNCTION_DEF, FUNCTION_INV, FIELD_DEF, FIELD_REF,
+        TYPE_REF, TYPE_IMPL,
+        NOT_INDEXED
+    }
+
+
+    // <editor-fold defaultstate="collapsed" desc="Indexer Factory">
+    public static class Factory extends EmbeddingIndexerFactory {
+
+        @Override
+        public EmbeddingIndexer createIndexer(Indexable indexable, Snapshot snapshot) {
+            return new JavaFXIndexer();
+        }
+
+        @Override
+        public void filesDeleted(Iterable<? extends Indexable> itrbl, Context cntxt) {
+            for(Indexable ixbl : itrbl) {
+                try {
+                    IndexingSupport.getInstance(cntxt).removeDocuments(ixbl);
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, null, e);
+                }
+            }
+        }
+
+        @Override
+        public void filesDirty(Iterable<? extends Indexable> itrbl, Context cntxt) {
+            for(Indexable ixbl : itrbl) {
+                try {
+                    IndexingSupport.getInstance(cntxt).markDirtyDocuments(ixbl);
+                } catch (IOException e) {
+                    LOG.log(Level.WARNING, null, e);
+                }
+            }
+        }
+
+        @Override
+        public int getIndexVersion() {
+            return VERSION;
+        }
+
+        @Override
+        public String getIndexerName() {
+            return NAME;
+        }
+    }// </editor-fold>
+    @Override
+    protected void index(final Indexable indexable, Result result, final Context context) {
+        final JavaFXParserResult fxresult = (JavaFXParserResult)result;
+        if (DEBUG) {
+            LOG.log(Level.FINEST,"Indexing {0}", indexable.toString());
+            LOG.log(Level.FINEST, "Tree: {0}", fxresult.getCompilationUnit());
+        }
+
+        IndexingSupport support;
+        try {
             // if (fxresult.isErrors()) return;
-            visitor.scan(fxresult.getCompilationUnit(), document);
-            support.addDocument(document);
-            FXErrorAnnotator.getInstance().process(FileUtil.toFileObject(new File(indexable.getURL().toURI())));
+            // supplementary indexing used only for error annotations; don't unnecessarily reindex the files
+            if (!context.isSupplementaryFilesIndexing()) {
+                support = IndexingSupport.getInstance(context);
+                IndexDocument document = support.createDocument(indexable);
+                IndexingVisitor visitor = new IndexingVisitor(indexable, fxresult);
+                visitor.scan(fxresult.getCompilationUnit(), document);
+                support.addDocument(document);
+            }
+//            FXErrorAnnotator.getInstance().process(FileUtil.toFileObject(new File(indexable.getURL().toURI())));
+            FXErrorAnnotator.getInstance().process(CompilationController.create(fxresult), 
+                    context.isSupplementaryFilesIndexing() ?
+                        FXErrorAnnotator.ProcessRelatedFilesLambda.NULL :
+                        new FXErrorAnnotator.ProcessRelatedFilesLambda() {
+                            public void processRelatedFiles(FileObject topRoot, Collection<FileObject> files) {
+                                Set<URL> urls = new HashSet<URL>();
+                                try {
+                                    for (FileObject fo : files) {
+                                        try {
+                                            urls.add(fo.getURL());
+                                        } catch (IOException e) {
+                                            LOG.log(Level.WARNING, null, e);
+                                        }
+                                    }
+                                    context.addSupplementaryFiles(topRoot.getURL(), urls);
+                                } catch (IOException e) {
+                                    LOG.log(Level.WARNING, null, e);
+                                }
+                }
+            });
         } catch (Exception e) {
             LOG.log(Level.WARNING, "Error indexing " + indexable.toString(), e);
             return;
