@@ -324,7 +324,7 @@ public class FixReferences extends BaseRefactoringElementImplementation {
                     }
                     String[] types = new String[2];
                     while (e != null && tp != null && e.getKind() != ElementKind.PACKAGE) {
-                        if (e.getKind() == ElementKind.CLASS && ((TypeElement) e).getNestingKind() == NestingKind.TOP_LEVEL) {
+                        if ((e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) && ((TypeElement) e).getNestingKind() == NestingKind.TOP_LEVEL) {
                             types[1] = ((TypeElement) e).getQualifiedName().toString();
                         }
                         e = e.getEnclosingElement();
