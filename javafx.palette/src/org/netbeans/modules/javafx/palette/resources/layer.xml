@@ -371,6 +371,35 @@
                 <attr name="position" intvalue="800"/>
             </file>
         </folder>
+
+        <folder name="Charts">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="770"/>
+            <file name="BarChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BarChart.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="BarChart3D.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BarChart3D.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+             <file name="PieChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PieChart.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="PieChart3D.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PieChart3D.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="LineChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LineChart.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="AreaChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/AreaChart.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="ScatterChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScatterChart.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="BubbleChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BubbleChart.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+        </folder>
         <folder name="Media">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
             <attr name="position" intvalue="800"/>

@@ -41,14 +41,13 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 <!DOCTYPE editor_palette_item PUBLIC "-//NetBeans//Editor Palette Item 1.0//EN" "http://www.netbeans.org/dtds/editor-palette-item-1_0.dtd">
-
 <editor_palette_item version="1.0">
-    <class name="org.netbeans.modules.javafx.palette.items.transition.FadeTransition" />
+    <class name="org.netbeans.modules.javafx.palette.items.charts.BubbleChart" />
 
     <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/action_16.png" />
     <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/action_32.png" />
     <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
-               display-name-key="NAME_javafx-FadeTransition"
-               tooltip-key="HINT_javafx-Fadew
-Transition" />
+               display-name-key="NAME_javafx-BubbleChart"
+               tooltip-key="HINT_javafx-BubbleChart" />
 </editor_palette_item>
+
