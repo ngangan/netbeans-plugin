@@ -76,14 +76,21 @@ public class RenameClass extends BaseRefactoringElementImplementation {
                 int end = start;
                 TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
                 ts.move(start);
+                boolean classFound = false;
 
                 while (ts.moveNext()) {
                     Token<JFXTokenId> t = ts.token();
-                    if (t.id() != JFXTokenId.IDENTIFIER) {
-                        start += t.length();
+                    if (t.id() == JFXTokenId.CLASS) {
+                        classFound = true;
                     } else {
-                        end = start + t.length();
-                        break;
+                        if (classFound) {
+                            if (t.id() != JFXTokenId.IDENTIFIER) {
+                                start += t.length();
+                            } else {
+                                end = start + t.length();
+                                break;
+                            }
+                        }
                     }
                 }
                 return new int[]{start, end};
