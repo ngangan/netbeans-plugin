@@ -290,18 +290,11 @@ is divided into following sections:
         <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}" failonerror="true">
-                <!--<arg value="-Xdebug"/>-->
-                <!--<arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=y"/>-->
-                <arg value="-Dprism.verbose=false"/>
-                <arg value="-Dprism.order=es2,es1"/>
-                <arg value="-Djava.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
-                <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.TVToolkit"/>
-                <arg value="-Djava.security.policy=${{platform.fxhome}}/lib/security/java_permissive.policy"/>
-                <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar"/>
+            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true">
+                <arg value="-profile"/>
+                <arg value="tv"/>
                 <arg value="-classpath"/>
                 <arg value="${{jar.file}}"/>
-                <arg value="com.sun.javafx.runtime.main.Main"/>
                 <arg value="${{main.class}}"/>
                 <arg value="${{run.jvmargs}}"/>
             </exec>
@@ -408,18 +401,13 @@ is divided into following sections:
         <target name="-debug-tv-debuggee" if="tv.execution.trigger">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true">
                 <arg value="-Xdebug"/>
                 <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
-                <arg value="-Dprism.verbose=false"/>
-                <arg value="-Dprism.order=es2,es1"/>
-                <arg value="-Djava.library.path=${{platform.fxhome}}/emulator/tv/bin"/>
-                <arg value="-Djavafx.toolkit=com.sun.javafx.tk.prism.TVToolkit"/>
-                <arg value="-Djava.security.policy=${{platform.fxhome}}/lib/security/java_permissive.policy"/>
-                <arg value="-Xbootclasspath/a:${{platform.fxhome}}/lib/tv/javafxrt-cdc.jar"/>
+                <arg value="-profile"/>
+                <arg value="tv"/>
                 <arg value="-classpath"/>
                 <arg value="${{jar.file}}"/>
-                <arg value="com.sun.javafx.runtime.main.Main"/>
                 <arg value="${{main.class}}"/>
                 <arg value="${{run.jvmargs}}"/>
             </exec>
