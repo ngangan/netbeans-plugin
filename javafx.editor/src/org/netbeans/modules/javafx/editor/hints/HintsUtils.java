@@ -132,7 +132,6 @@ final class HintsUtils {
             return false;
         }
         JavafxClassSymbol classSymbol = ((JavafxClassSymbol) element);
-        classSymbol.getSuperTypes();
         if (!classSymbol.isLocal()) {
             return false;
         }
