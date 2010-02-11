@@ -298,10 +298,6 @@ public final class CodeStyle {
         return preferences.getBoolean(placeElseOnNewLine, getDefaultAsBoolean(placeElseOnNewLine));
     }
 
-    public boolean placeWhileOnNewLine() {
-        return preferences.getBoolean(placeWhileOnNewLine, getDefaultAsBoolean(placeWhileOnNewLine));
-    }
-
     public boolean placeCatchOnNewLine() {
         return preferences.getBoolean(placeCatchOnNewLine, getDefaultAsBoolean(placeCatchOnNewLine));
     }
