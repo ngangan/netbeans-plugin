@@ -258,11 +258,6 @@ public final class CodeStyle {
         return BracesGenerationStyle.valueOf(redundant);
     }
 
-    public BracesGenerationStyle redundantDoWhileBraces() {
-        String redundant = preferences.get(redundantDoWhileBraces, getDefaultAsString(redundantDoWhileBraces));
-        return BracesGenerationStyle.valueOf(redundant);
-    }
-
     public boolean alignMultilineMethodParams() {
         return preferences.getBoolean(alignMultilineMethodParams, getDefaultAsBoolean(alignMultilineMethodParams));
     }

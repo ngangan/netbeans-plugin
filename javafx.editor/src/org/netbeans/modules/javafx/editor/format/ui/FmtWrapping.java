@@ -44,6 +44,8 @@ package org.netbeans.modules.javafx.editor.format.ui;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import org.netbeans.api.java.source.CodeStyle;
+import org.netbeans.modules.javafx.editor.format.CodeStyle.BracePlacement;
+import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
 import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.*;
 import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.CategorySupport.OPTION_ID;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
@@ -93,12 +95,34 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
     public static PreferencesCustomizer.Factory getController() {
         return new CategorySupport.Factory("wrapping", FmtWrapping.class, //NOI18N
                 org.openide.util.NbBundle.getMessage(FmtWrapping.class, "SAMPLE_Wrapping"), //NOI18N
-                new String[] { FmtOptions.rightMargin, "30" }, //NOI18N
-                new String[] { FmtOptions.redundantDoWhileBraces, CodeStyle.BracesGenerationStyle.LEAVE_ALONE.name() },
-                new String[] { FmtOptions.redundantForBraces, CodeStyle.BracesGenerationStyle.LEAVE_ALONE.name() },
-                new String[] { FmtOptions.redundantIfBraces, CodeStyle.BracesGenerationStyle.LEAVE_ALONE.name() },
-                new String[] { FmtOptions.redundantWhileBraces, CodeStyle.BracesGenerationStyle.LEAVE_ALONE.name() }
-        ); // NOI18N
+                new String[]{FmtOptions.rightMargin, "30"}, //NOI18N
+                new String[]{FmtOptions.wrapSequenceInit, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapAssignOps, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapBinaryOps, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapChainedFunctionCalls, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapExtendsImplementsKeyword, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapExtendsImplementsList, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapFor, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapForStatement, WrapStyle.WRAP_ALWAYS.name()},
+                new String[]{FmtOptions.wrapIfExpression, WrapStyle.WRAP_ALWAYS.name()},
+                new String[]{FmtOptions.wrapFunctionCallArgs, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapFunctionParams, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapThrowsList, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapWhileStatement, WrapStyle.WRAP_ALWAYS.name()},
+                new String[]{FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineCallArgs, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineFor, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineImplements, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineMethodParams, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineParenthesized, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineThrows, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.functionDeclBracePlacement, BracePlacement.SAME_LINE.name()},
+                new String[]{FmtOptions.spaceBeforeFunctionDeclLeftBrace, Boolean.TRUE.toString()},
+                new String[]{FmtOptions.redundantForBraces, CodeStyle.BracesGenerationStyle.GENERATE.name()},
+                new String[]{FmtOptions.redundantIfBraces, CodeStyle.BracesGenerationStyle.GENERATE.name()},
+                new String[]{FmtOptions.redundantWhileBraces, CodeStyle.BracesGenerationStyle.GENERATE.name()});
     }
 
     public void focusGained(FocusEvent e) {

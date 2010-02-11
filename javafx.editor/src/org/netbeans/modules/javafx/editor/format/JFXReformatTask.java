@@ -991,7 +991,7 @@ public class JFXReformatTask implements ReformatTask {
                             rollback(index, c, d);
                             semiRead = false;
                         }
-                            if (!isLastInCU) {
+                        if (!isLastInCU) {
                             blankLines(cs.getBlankLinesAfterMethods());
                         }
                         break;
@@ -1368,9 +1368,6 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitBlockExpression(BlockExpressionTree node, Void p) {
-//            if (node.isStatic()) {
-//                accept(JFXTokenId.STATIC);
-//            }
             CodeStyle.BracePlacement bracePlacement;
             boolean spaceBeforeLeftBrace = false;
 
@@ -1389,9 +1386,7 @@ public class JFXReformatTask implements ReformatTask {
                     case INSTANTIATE_NEW:
                     case ON_REPLACE:
                         bracePlacement = cs.getClassDeclBracePlacement();
-//                        if (node.isStatic()) {
-//                            spaceBeforeLeftBrace = cs.spaceBeforeStaticInitLeftBrace();
-//                        }
+                        spaceBeforeLeftBrace = cs.spaceBeforeClassDeclLeftBrace();
                         break;
                     case INIT_DEFINITION:
                         bracePlacement = cs.getMethodDeclBracePlacement();

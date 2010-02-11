@@ -41,6 +41,8 @@
 
 package org.netbeans.modules.javafx.editor.format.ui;
 
+import org.netbeans.modules.javafx.editor.format.CodeStyle.BracePlacement;
+import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
 import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.*;
 import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.CategorySupport.OPTION_ID;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
@@ -82,7 +84,32 @@ public class FmtBlankLines extends javax.swing.JPanel {
     
     public static PreferencesCustomizer.Factory getController() {
         return new CategorySupport.Factory("blank-lines", FmtBlankLines.class, //NOI18N
-                 org.openide.util.NbBundle.getMessage(FmtBlankLines.class, "SAMPLE_BlankLines")); // NOI18N
+                org.openide.util.NbBundle.getMessage(FmtAlignment.class, "SAMPLE_BlankLines"), // NOI18N
+                new String[]{FmtOptions.rightMargin, "30"}, //NOI18N
+                new String[]{FmtOptions.wrapSequenceInit, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapAssignOps, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapBinaryOps, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapChainedFunctionCalls, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapExtendsImplementsKeyword, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapExtendsImplementsList, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapFor, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapForStatement, WrapStyle.WRAP_ALWAYS.name()},
+                new String[]{FmtOptions.wrapIfExpression, WrapStyle.WRAP_ALWAYS.name()},
+                new String[]{FmtOptions.wrapFunctionCallArgs, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapFunctionParams, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapThrowsList, WrapStyle.WRAP_NEVER.name()},
+                new String[]{FmtOptions.wrapWhileStatement, WrapStyle.WRAP_ALWAYS.name()},
+                new String[]{FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineCallArgs, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineFor, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineImplements, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineMethodParams, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineParenthesized, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.alignMultilineThrows, Boolean.FALSE.toString()},
+                new String[]{FmtOptions.functionDeclBracePlacement, BracePlacement.SAME_LINE.name()},
+                new String[]{FmtOptions.spaceBeforeFunctionDeclLeftBrace, Boolean.TRUE.toString()});
     }
     
     /** This method is called from within the constructor to

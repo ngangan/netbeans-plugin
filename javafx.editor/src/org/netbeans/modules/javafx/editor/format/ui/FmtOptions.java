@@ -105,7 +105,6 @@ public class FmtOptions {
     public static final String redundantIfBraces = "redundantIfBraces"; //NOI18N
     public static final String redundantForBraces = "redundantForBraces"; //NOI18N
     public static final String redundantWhileBraces = "redundantWhileBraces"; //NOI18N
-    public static final String redundantDoWhileBraces = "redundantDoWhileBraces"; //NOI18N
     public static final String alignMultilineMethodParams = "alignMultilineMethodParams"; //NOI18N
     public static final String alignMultilineCallArgs = "alignMultilineCallArgs"; //NOI18N
     public static final String alignMultilineAnnotationArgs = "alignMultilineAnnotationArgs"; //NOI18N
@@ -324,7 +323,6 @@ public class FmtOptions {
             { redundantIfBraces, BGS_GENERATE}, //NOI18N
             { redundantForBraces, BGS_GENERATE}, //NOI18N
             { redundantWhileBraces, BGS_GENERATE}, //NOI18N
-            { redundantDoWhileBraces, BGS_GENERATE}, //NOI18N
             { alignMultilineMethodParams, FALSE}, //NOI18N
             { alignMultilineCallArgs, FALSE}, //NOI18N
             { alignMultilineAnnotationArgs, FALSE}, //NOI18N
