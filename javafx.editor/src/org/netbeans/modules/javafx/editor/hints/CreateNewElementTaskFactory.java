@@ -38,7 +38,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
@@ -47,7 +46,10 @@ import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXVar;
+import com.sun.tools.mjavac.code.Kinds;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -80,7 +82,6 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
 
     private final AtomicBoolean cancel = new AtomicBoolean();
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
-    private static final String HINT_IDENT = "createmethod"; //NOI18N
     private static Logger log = Logger.getLogger(CreateNewElementTaskFactory.class.getName());
 
     public CreateNewElementTaskFactory() {
@@ -88,6 +89,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
     }
 
     private enum Kind {
+
         CLASS,
         FUNCTION,
         LOCAL_VARIABLE,
@@ -119,7 +121,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                             && (diagnostic instanceof JCDiagnostic)) {
 
                         String message = diagnostic.getMessage(Locale.ENGLISH);
-                        Kind kinds[] = getKinds(message);
+                        Kind kinds[] = getKinds(message, diagnostic, compilationInfo);
                         for (Kind kind : kinds) {
                             errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic, kind));
                         }
@@ -158,10 +160,14 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         return errorDescription;
     }
 
-    private Kind[] getKinds(String message) {
+    private Kind[] getKinds(String message, Diagnostic diagnostic, CompilationInfo compilationInfo) {
         if (message.contains("symbol  : class")) { //NOI18N
             return new Kind[]{Kind.LOCAL_CLASS};
         } else if (message.contains("symbol  : variable")) { //NOI18N
+
+            if (!isValidLocalVariable(diagnostic, compilationInfo)) {
+                return new Kind[]{Kind.VARIABLE};
+            }
             return new Kind[]{Kind.VARIABLE, Kind.LOCAL_VARIABLE};
         } else if (message.contains("symbol  : function")) { //NOI18N
             return new Kind[]{Kind.FUNCTION}; //NOI18N
@@ -170,20 +176,42 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         throw new IllegalStateException();
     }
 
+    private boolean isValidLocalVariable(final Diagnostic diagnostic, final CompilationInfo compilationInfo) {
+        final boolean[] validVar = new boolean[1];
+        new JavaFXTreePathScanner<Void, Void>() {
+
+            @Override
+            public Void visitIdentifier(IdentifierTree node, Void p) {
+                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+                int startPosition = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
+                if (startPosition == diagnostic.getStartPosition()) {
+                    System.out.println(getCurrentPath().getParentPath().getLeaf().getClass());
+                    System.out.println("---");
+                    validVar[0] = (getCurrentPath().getParentPath().getLeaf() instanceof JFXBlock);
+                    return null;
+                }
+
+                return super.visitIdentifier(node, p);
+            }
+        }.scan(compilationInfo.getCompilationUnit(), null);
+
+        return validVar[0];
+    }
+
     private static String getMessage(Kind kind, String elementName, String classFullName) {
         String message = null;
         if (kind == Kind.FUNCTION) {
-                message = "TITLE_CREATE_ELEMENT_FUNCTION"; //NOI18N
-            } else if (kind == Kind.VARIABLE) {
-                message = "TITLE_CREATE_ELEMENT_VARIABLE"; //NOI18N
-            } else if (kind == Kind.LOCAL_VARIABLE) {
-                message = "TITLE_CREATE_ELEMENT_LOCAL_VARIABLE"; //NOI18N
-            } else if (kind == Kind.LOCAL_CLASS) {
-                message = "TITLE_CREATE_ELEMENT_CLASS"; //NOI18N
-            }
+            message = "TITLE_CREATE_ELEMENT_FUNCTION"; //NOI18N
+        } else if (kind == Kind.VARIABLE) {
+            message = "TITLE_CREATE_ELEMENT_VARIABLE"; //NOI18N
+        } else if (kind == Kind.LOCAL_VARIABLE) {
+            message = "TITLE_CREATE_ELEMENT_LOCAL_VARIABLE"; //NOI18N
+        } else if (kind == Kind.LOCAL_CLASS) {
+            message = "TITLE_CREATE_ELEMENT_CLASS"; //NOI18N
+        }
 
-            return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, elementName, classFullName);
-            //return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString());
+        return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, elementName, classFullName);
+        //return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString());
     }
 
     private class ElementFix implements Fix {
@@ -195,10 +223,10 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
         private final String message;
 
         public ElementFix(Kind kind,
-                          Document document,
-                          JCDiagnostic diagnostic,
-                          CompilationInfo compilationInfo,
-                          String message) {
+                Document document,
+                JCDiagnostic diagnostic,
+                CompilationInfo compilationInfo,
+                String message) {
 
             this.kind = kind;
             this.document = document;
@@ -296,7 +324,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
             } else if (kind == Kind.VARIABLE) {
                 generatedCode = generatelVar(varName.toString());
             }
-            
+
             return generatedCode;
         }
 
@@ -385,14 +413,14 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
             if (position[0] < 0) {
                 return generateLocalVar(varName);
             }
-            
+
             return diagnostic.getStartPosition() < position[0] ? generateLocalVar(varName) : new GeneratedCode(position[0], code.toString());
         }
 
         private GeneratedCode createLocalClass() {
             StringBuffer code = new StringBuffer();
             Object name = diagnostic.getArgs()[1];
-           
+
 
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
@@ -403,7 +431,6 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                     position[0] = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), node);
                     return null;
                 }
-
             }.scan(compilationInfo.getCompilationUnit(), null);
             code.append("\n"); //NOI18N
             code.append("\nclass ").append(name).append(" {\n"); //NOI18N
