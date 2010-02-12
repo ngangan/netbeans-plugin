@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
@@ -20,6 +21,8 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  * @author karol harezlak
  */
 final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
+
+    private static Logger LOGGER = Logger.getLogger(CreateNewElementTaskFactory.class.getName());
 
     private CompilationInfo compilationInfo;
     private Collection<Element> classes;
@@ -47,13 +50,7 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
     @Override
     @SuppressWarnings("element-type-mismatch")
     public Void visitFunctionDefinition(FunctionDefinitionTree node, Void v) {
-        try {
-            node.toString();
-        } catch(NullPointerException ex) {
-            ex.printStackTrace();
-            return super.visitFunctionDefinition(node, v);
-        }
-        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
+//        if (node.toString().contains(" overridefunction ") || node.toString().contains(" override ")) { //NOI18N
             Element element = compilationInfo.getTrees().getElement(getCurrentPath());
             if (element != null) {
                 Element currentClass = element.getEnclosingElement();
@@ -68,7 +65,7 @@ final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
                     overriddenMethods.put(currentClass, methods);
                 }
             }
-        }
+        //}
         return super.visitFunctionDefinition(node, v);
     }
 }
