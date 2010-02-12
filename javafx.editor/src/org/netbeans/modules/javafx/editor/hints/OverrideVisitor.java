@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import org.netbeans.api.javafx.source.CompilationInfo;
 
@@ -21,8 +20,6 @@ import org.netbeans.api.javafx.source.CompilationInfo;
  * @author karol harezlak
  */
 final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
-
-    private static Logger LOGGER = Logger.getLogger(CreateNewElementTaskFactory.class.getName());
 
     private CompilationInfo compilationInfo;
     private Collection<Element> classes;

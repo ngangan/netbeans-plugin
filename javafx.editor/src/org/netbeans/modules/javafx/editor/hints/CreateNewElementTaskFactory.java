@@ -82,7 +82,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
 
     private final AtomicBoolean cancel = new AtomicBoolean();
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
-    private static Logger log = Logger.getLogger(CreateNewElementTaskFactory.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreateNewElementTaskFactory.class.getName());
 
     public CreateNewElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -261,7 +261,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                         }
                         JTextComponent target = HintsUtils.getEditorComponent(document);
                         if (target == null) {
-                            log.severe("No GUI component for editor document " + document); //NOI18N
+                            LOGGER.severe("No GUI component for editor document " + document); //NOI18N
                             return;
                         }
                         Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
@@ -401,7 +401,7 @@ public final class CreateNewElementTaskFactory extends EditorAwareJavaFXSourceTa
                             String space = HintsUtils.calculateSpace(position[0], document);
                             code.append("\n").append(space).append(HintsUtils.TAB).append("var ").append(varName).append(";"); //NOI18N
                         } catch (BadLocationException ex) {
-                            log.severe(ex.getMessage());
+                            LOGGER.severe(ex.getMessage());
                         }
 
                         return null;
