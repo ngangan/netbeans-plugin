@@ -276,7 +276,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         DeclaredType dt = (DeclaredType) type;
         if (LOGGABLE) log("  elementKind == " + dt.asElement().getKind()); // NOI18N
         final ElementKind kind = dt.asElement().getKind();
-        if (kind != ElementKind.CLASS && kind != ElementKind.ENUM) {
+        if (kind != ElementKind.CLASS && kind != ElementKind.ENUM && kind != ElementKind.INTERFACE) {
             return;
         }
 
