@@ -57,7 +57,6 @@ public class FmtAlignment extends javax.swing.JPanel {
     public FmtAlignment() {
         initComponents();
         nlElseCheckBox.putClientProperty(OPTION_ID, placeElseOnNewLine);
-        nlWhileCheckBox.putClientProperty(OPTION_ID, placeWhileOnNewLine);
         nlCatchCheckBox.putClientProperty(OPTION_ID, placeCatchOnNewLine);
         nlFinallyCheckBox.putClientProperty(OPTION_ID, placeFinallyOnNewLine);
         nlModifiersCheckBox.putClientProperty(OPTION_ID, placeNewLineAfterModifiers);
@@ -110,7 +109,6 @@ public class FmtAlignment extends javax.swing.JPanel {
 
         newLinesLabel = new javax.swing.JLabel();
         nlElseCheckBox = new javax.swing.JCheckBox();
-        nlWhileCheckBox = new javax.swing.JCheckBox();
         nlCatchCheckBox = new javax.swing.JCheckBox();
         nlFinallyCheckBox = new javax.swing.JCheckBox();
         nlModifiersCheckBox = new javax.swing.JCheckBox();
@@ -134,11 +132,6 @@ public class FmtAlignment extends javax.swing.JPanel {
         nlElseCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         nlElseCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
         nlElseCheckBox.setOpaque(false);
-
-        org.openide.awt.Mnemonics.setLocalizedText(nlWhileCheckBox, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_nl_While")); // NOI18N
-        nlWhileCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        nlWhileCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        nlWhileCheckBox.setOpaque(false);
 
         org.openide.awt.Mnemonics.setLocalizedText(nlCatchCheckBox, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_nl_Catch")); // NOI18N
         nlCatchCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -196,32 +189,41 @@ public class FmtAlignment extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                    .add(newLinesLabel)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(jSeparator1))
-                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                    .add(multilineAlignmentLabel)
-                    .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                    .add(jSeparator2))
-                .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                    .addContainerGap()
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(nlElseCheckBox)
-                        .add(nlWhileCheckBox)
-                        .add(nlCatchCheckBox)
-                        .add(amFunctionParamsCheckBox)
-                        .add(amBinaryOpCheckBox1)
-                        .add(amAssignCheckBox1)
-                        .add(amParenthesizedCheckBox1))
-                    .add(14, 14, 14)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(amForCheckBox1)
-                        .add(amCallArgsCheckBox)
-                        .add(nlModifiersCheckBox)
-                        .add(nlFinallyCheckBox)
-                        .add(amExtendsCheckBox1))))
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .add(newLinesLabel)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(jSeparator1))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(nlElseCheckBox)
+                                .add(nlCatchCheckBox))
+                            .add(80, 80, 80)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(nlModifiersCheckBox)
+                                .add(nlFinallyCheckBox))
+                            .add(46, 46, 46)))
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .add(multilineAlignmentLabel)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(jSeparator2))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                            .addContainerGap()
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(amFunctionParamsCheckBox)
+                                .add(amBinaryOpCheckBox1)
+                                .add(amAssignCheckBox1)
+                                .add(amParenthesizedCheckBox1))
+                            .add(14, 14, 14)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(amForCheckBox1)
+                                .add(amCallArgsCheckBox)
+                                .add(amExtendsCheckBox1)))))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -239,16 +241,13 @@ public class FmtAlignment extends javax.swing.JPanel {
                     .add(nlFinallyCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(nlWhileCheckBox)
-                    .add(nlModifiersCheckBox))
+                    .add(nlModifiersCheckBox)
+                    .add(nlCatchCheckBox))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(multilineAlignmentLabel)
                     .add(layout.createSequentialGroup()
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(nlCatchCheckBox)
-                        .add(18, 18, 18)
-                        .add(multilineAlignmentLabel))
-                    .add(layout.createSequentialGroup()
-                        .add(44, 44, 44)
+                        .add(5, 5, 5)
                         .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
@@ -264,7 +263,7 @@ public class FmtAlignment extends javax.swing.JPanel {
                     .add(amForCheckBox1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(amParenthesizedCheckBox1)
-                .addContainerGap(53, Short.MAX_VALUE))
+                .addContainerGap(86, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
@@ -285,7 +284,6 @@ public class FmtAlignment extends javax.swing.JPanel {
     private javax.swing.JCheckBox nlElseCheckBox;
     private javax.swing.JCheckBox nlFinallyCheckBox;
     private javax.swing.JCheckBox nlModifiersCheckBox;
-    private javax.swing.JCheckBox nlWhileCheckBox;
     // End of variables declaration//GEN-END:variables
     
 }
