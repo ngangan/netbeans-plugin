@@ -28,5 +28,14 @@
       </unzip>
     </target>
 
-    <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
+    <target name="release" depends="files-init" if="has.release.dir">
+        <mkdir dir="${cluster}"/>
+        <copy todir="${cluster}" overwrite="true">
+            <fileset dir="${release.dir}">
+                <patternset includes="${release.files}"/>
+            </fileset>
+        </copy>        
+    </target>
+
+    <target name="init" depends="init-release-external,harness.init"/>
 </project>

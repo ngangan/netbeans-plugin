@@ -4,6 +4,9 @@
 <!-- If you delete this file and reopen the project it will be recreated. -->
 <project name="javafx" basedir="." default="full-build">
     <description>Builds the module suite javafx.</description>
+
+    <available file="../nbbuild/netbeans/harness" type="dir" property="harness.dir.default" value="${basedir}/../nbbuild/netbeans/harness"/>
+
     <import file="nbproject/build-impl.xml"/>
 
     <property name="nbroot" location="."/>
@@ -106,40 +109,78 @@
         <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
-    <target name="files-init" depends="-release.files">
-        <property name="release.files" value=""/>
+    <target name="files-init" depends="-release.files,-pre-build"/>
+
+    <target name="update-harness" depends="-init-build-properties">
+        <get src="${netbeans.base.url}/moduleclusters" dest="netbeans.html" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <loadfile srcfile="netbeans.html" property="netbeans.harness.url">
+            <filterchain>
+                <tokenfilter>
+                    <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*harness\.zip)&quot;.*" replace="${netbeans.base.url}/moduleclusters/\1" flags="im"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <echo>netbeans.harness.url=${netbeans.binaries.url}</echo>
+
+        <get src="${netbeans.harness.url}" dest="harness.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <fail message="harness zip was not downloaded, update harness failed">
+            <condition>
+                <not>
+                    <available file="harness.zip"/>
+                </not>
+            </condition>
+        </fail>
+
+        <unzip src="harness.zip" dest="${basedir}">
+             <patternset>
+               <exclude name="harness/config/**"/>
+               <exclude name="harness/modules/**"/>
+               <exclude name="harness/etc/**"/>
+               <exclude name="harness/jnlp/**"/>
+               <exclude name="harness/launchers/**"/>
+               <exclude name="harness/update_tracking/**"/>
+               <exclude name="harness/.lastModified"/>
+             </patternset>
+         </unzip>
+         <!--<delete file="harness.zip"/>-->
+    </target>
+
+    <target name="-init-build-properties">
         <property name="build.config" value="promoted"/>
         <property file="build-${build.config}.properties"/>
         <property environment="env"/>
         <condition property="catalog.base.url" value="${env.HUDSON_URL}job/${env.JOB_NAME}/${env.BUILD_NUMBER}/artifact/build/updates">
             <isset property="env.HUDSON_URL"/>
         </condition>
+        <property name="use.timestamp" value="true"/>
+       <property name="offline" value="false"/>
+    </target>
 
+
+    <target name="-pre-build" depends="-init-build-properties">
         <delete dir="build"/>
         <mkdir dir="build"/>
-        <property name="use.timestamp" value="true"/>
-        <property name="offline" value="false"/>
-
         <parallel failonany="true">
-          <sequential>
             <antcall target="get-netbeans"/>
-          </sequential>
-          <sequential>
             <antcall target="get-sdk-win" />
-          </sequential>
-          <sequential>
             <antcall target="get-sdk-mac" />
-          </sequential>
-          <sequential>
             <antcall target="get-sdk-lin" />
-          </sequential>
-          <sequential>
             <antcall target="get-sdk-sol" />
-          </sequential>
         </parallel>
     </target>
 
-    <target name="clean" depends="-init,testuserdir-delete" description="Clean everything.">
+    <target name="-pre-clean">
+        <mkdir dir="${nbplatform.active.dir}/apisupport"/>
+        <mkdir dir="${nbplatform.active.dir}/harness"/>
+        <mkdir dir="${nbplatform.active.dir}/ide"/>
+        <mkdir dir="${nbplatform.active.dir}/java"/>
+        <mkdir dir="${nbplatform.active.dir}/nb"/>
+        <mkdir dir="${nbplatform.active.dir}/platform"/>
+        <mkdir dir="${nbplatform.active.dir}/profiler"/>
+        <mkdir dir="${nbplatform.active.dir}/websvccommon"/>
+    </target>
+
+    <target name="clean" depends="-init,testuserdir-delete,-pre-clean" description="Clean everything.">
         <mkdir dir="build/netbeans"/>
         <subant target="clean" buildpath="${modules.sorted}" inheritrefs="false" inheritall="false"/>
         <delete dir="${dist.dir}"/>
@@ -165,65 +206,38 @@
     </target>
 
     <target name="jar-linux" if="isLin">
+      <property prefix="javafxsdk.lin." file="javafx.sdk.lin/nbproject/project.properties"/>
       <jar destfile="build/clusters/linux.jar" compress="true" level="9">
         <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-lin.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx">
-          <include name="javafx-sdk/bin/*"/>
-          <include name="javafx-sdk/emulator/mobile/bin/*"/>
-          <include name="javafx-sdk/emulator/tv/bin/*"/>
-        </zipfileset>
-        <zipfileset dir="javafx.sdk.lin/release" prefix="javafx">
-          <exclude name="javafx-sdk/bin/*"/>
-          <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
-          <exclude name="javafx-sdk/emulator/tv/bin/*"/>
-        </zipfileset>
+        <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx" includes="${javafxsdk.lin.nbm.executable.files}"/>
+        <zipfileset dir="javafx.sdk.lin/release"                prefix="javafx" excludes="${javafxsdk.lin.nbm.executable.files}"/>
       </jar>
     </target>
 
     <target name="jar-solaris" if="isSol">
+      <property prefix="javafxsdk.sol." file="javafx.sdk.sol/nbproject/project.properties"/>
       <jar destfile="build/clusters/solaris.jar" compress="true" level="9">
         <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-sol.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx">
-          <include name="javafx-sdk/bin/*"/>
-          <include name="javafx-sdk/emulator/mobile/bin/*"/>
-          <include name="javafx-sdk/emulator/tv/bin/*"/>
-        </zipfileset>
-        <zipfileset dir="javafx.sdk.sol/release" prefix="javafx">
-          <exclude name="javafx-sdk/bin/*"/>
-          <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
-          <exclude name="javafx-sdk/emulator/tv/bin/*"/>
-        </zipfileset>
+        <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx" includes="${javafxsdk.sol.nbm.executable.files}"/>
+        <zipfileset dir="javafx.sdk.sol/release"                prefix="javafx" excludes="${javafxsdk.sol.nbm.executable.files}"/>
       </jar>
     </target>
 
     <target name="jar-macosx" if="isMacOSX">
+      <property prefix="javafxsdk.mac." file="javafx.sdk.mac/nbproject/project.properties"/>
       <jar destfile="build/clusters/mac.jar" compress="true" level="9">
         <zipfileset dir="build/netbeans/javafx" prefix="javafx">
           <exclude name="javafx-sdk/**"/>
           <include name="**/*-mac.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx">
-          <include name="javafx-sdk/bin/*"/>
-          <include name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
-          <include name="javafx-sdk/emulator/mobile/bin/*"/>
-          <include name="javafx-sdk/emulator/mobile/runtimes/cldc-hi-javafx/bin/runMidlet"/>
-          <include name="javafx-sdk/emulator/mobile/device-manager.app/Contents/MacOS/JavaApplicationStub"/>
-          <include name="javafx-sdk/emulator/tv/bin/*"/>
-        </zipfileset>
-        <zipfileset dir="javafx.sdk.mac/release" prefix="javafx">
-          <exclude name="javafx-sdk/bin/*"/>
-          <exclude name="javafx-sdk/lib/desktop/jmcServerDaemon"/>
-          <exclude name="javafx-sdk/emulator/mobile/bin/*"/>
-          <exclude name="javafx-sdk/emulator/mobile/runtimes/cldc-hi-javafx/bin/runMidlet"/>
-          <exclude name="javafx-sdk/emulator/mobile/device-manager.app/Contents/MacOS/JavaApplicationStub"/>
-          <exclude name="javafx-sdk/emulator/tv/bin/*"/>
-        </zipfileset>
+        <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx" includes="${javafxsdk.mac.nbm.executable.files}"/>
+        <zipfileset dir="javafx.sdk.mac/release"                prefix="javafx" excludes="${javafxsdk.mac.nbm.executable.files}"/>
       </jar>
     </target>
 
@@ -252,6 +266,7 @@
         <property name="continue.after.failing.tests" value="true"/>
       </subant>
     </target>
+
 
     <target name="runtests-report" depends="runtests"
       description="Run JavaFX tests and generates test report">
