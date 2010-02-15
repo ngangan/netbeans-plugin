@@ -556,18 +556,21 @@ public class FmtOptions {
             catch( NumberFormatException e ) {
                 // Ignore it
             }
+            boolean fail = false;
             try {
                 Class.forName(CodeStyle.class.getName(), true, CodeStyle.class.getClassLoader());
             } catch (ClassNotFoundException cnfe) {
-                // ignore
+                fail = true;
             }
 
-            CodeStyle codeStyle = codeStyleProducer.create(previewPrefs);
-            jep.setIgnoreRepaint(true);
-            jep.setText(JFXReformatTask.reformat(previewText, codeStyle));
-            jep.setIgnoreRepaint(false);
-            jep.scrollRectToVisible(new Rectangle(0,0,10,10) );
-            jep.repaint(100);
+            if (!fail) {
+                CodeStyle codeStyle = codeStyleProducer.create(previewPrefs);
+                jep.setIgnoreRepaint(true);
+                jep.setText(JFXReformatTask.reformat(previewText, codeStyle));
+                jep.setIgnoreRepaint(false);
+                jep.scrollRectToVisible(new Rectangle(0, 0, 10, 10));
+                jep.repaint(100);
+            }
         }
 
         // PreferencesCustomizer implementation --------------------------------
