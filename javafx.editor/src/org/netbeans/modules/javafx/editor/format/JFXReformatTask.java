@@ -2226,13 +2226,14 @@ public class JFXReformatTask implements ReformatTask {
 
             boolean insideVar = ReformatUtils.isTreeInsideVar(getCurrentPath());
             boolean tecoeo = ReformatUtils.containsOneExpressionOnly(trueExpr);
-            boolean fecoeo = ReformatUtils.containsOneExpressionOnly(falseExpr);
+//            boolean fecoeo = ReformatUtils.containsOneExpressionOnly(falseExpr);
 
             // TODO make cs.wrapIfExpression
             final WrapStyle wrapIfStatement = insideVar || tecoeo ? WrapStyle.WRAP_NEVER : cs.wrapIfexpression();
             boolean prevblock = wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
             if (falseExpr != null) {
-                if (!insideVar && !fecoeo && (cs.placeElseOnNewLine() || !prevblock)) {
+                if (!insideVar && (cs.placeElseOnNewLine() || !prevblock)) {
+//                if (!insideVar && !fecoeo && (cs.placeElseOnNewLine() || !prevblock)) {
                     newline();
                 } else {
                     spaces(cs.spaceBeforeElse() ? 1 : 0);
