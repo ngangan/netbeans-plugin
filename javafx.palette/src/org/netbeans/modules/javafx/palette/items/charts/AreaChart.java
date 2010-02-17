@@ -61,6 +61,7 @@ public class AreaChart implements ActiveEditorDrop {
         
         // Import
         Imports.addImport( targetComponent, "javafx.scene.chart.AreaChart" ); // NOI18N
+        Imports.addImport(targetComponent, "javafx.scene.chart.part.NumberAxis"); // NOI18N
         
         return true;
     }
