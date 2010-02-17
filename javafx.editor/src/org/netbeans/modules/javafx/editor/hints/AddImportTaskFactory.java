@@ -80,18 +80,11 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private static final Comparator IMPORT_CMPERATOR = new ImportComperator();
 
     private final AtomicBoolean cancel = new AtomicBoolean();
-    private boolean trackErrors = false;
-    private List<ErrorDescription> descriptions = null;
 
     public AddImportTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
     }
 
-    AddImportTaskFactory(boolean trackErrors) {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
-        this.trackErrors = trackErrors;
-        this.descriptions = new ArrayList<ErrorDescription>();
-    }
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
@@ -226,9 +219,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             private void clear() {
                 optionsCache.clear();
                 errors.clear();
-                if (trackErrors) {
-                    descriptions = errors;
-                }
             }
 
             private Collection<Diagnostic> getValidDiagnostics(Collection<Diagnostic> diagnostics) {
@@ -257,10 +247,6 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                 return false;
             }
         };
-    }
-
-    Collection<ErrorDescription> getDescriptions() {
-        return descriptions;
     }
 
     private class FixImport implements Fix {

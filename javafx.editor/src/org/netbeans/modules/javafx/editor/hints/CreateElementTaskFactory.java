@@ -90,7 +90,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
 
     public CreateElementTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
+        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
     private enum Kind {
