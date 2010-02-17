@@ -58,33 +58,16 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
     public static String PROJECT_NAME = "TestPalette";
 
 
-    static final String CATEGORY_APPLICATIONS = "Applications";
-    static final String CATEGORY_BASIC_SHAPES = "Basic Shapes";
-    static final String CATEGORY_CONTROLS = "Controls";
-    static final String CATEGORY_TRANSFORMATIONS = "Transformations";
-    static final String CATEGORY_COLORS  = "Colors";
-    static final String CATEGORY_GRADIENTS = "Gradients";
-    static final String CATEGORY_EFFECTS = "Effects";
-    static final String CATEGORY_ANIMATION = "Animation";
-    static final String CATEGORY_MEDIA = "Media";
-    static final String CATEGORY_SWING_COMPONENTS = "Swing Components";
-
-
-    
-//    public static String[] CATEGORIES = {
-//        "Applications",
-//        //"Actions",
-//        "Basic Shapes",
-//        //"Paths",
-//        "Transformations",
-//        "Colors",
-//        "Gradients",
-//        "Effects",
-//        //"Animation",
-//        "Media",
-//        "Swing Components",
-//
-//    };
+//    static final String CATEGORY_APPLICATIONS = "Applications";
+//    static final String CATEGORY_BASIC_SHAPES = "Basic Shapes";
+//    static final String CATEGORY_CONTROLS = "Controls";
+//    static final String CATEGORY_TRANSFORMATIONS = "Transformations";
+//    static final String CATEGORY_COLORS  = "Colors";
+//    static final String CATEGORY_GRADIENTS = "Gradients";
+//    static final String CATEGORY_EFFECTS = "Effects";
+//    static final String CATEGORY_ANIMATION = "Animation";
+//    static final String CATEGORY_MEDIA = "Media";
+//    static final String CATEGORY_SWING_COMPONENTS = "Swing Components";
 
 
     public boolean pass = true;
@@ -94,87 +77,7 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
         super(name);
     }
 
-//    public static Test suite() {
-//        return NbModuleSuite.create(JavaFXPaletteTestCase.class, ".*", ".*", TESTS);
-//
-//    }
 
-//    public void testCategories() {
-//        System.out.println("============  Test Palette!  =======");
-//        JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
-//        project.openOutput();
-//        project.build();
-//
-////        for(String category: CATEGORIES){
-////            System.out.println("============  Test Category: \"" +    category + "\"  =============");
-////            testItems(category);
-////            System.out.println("===============================================");
-////        }
-////
-////
-////        System.out.println("Fail components: " + failComponents);
-////        assertTrue("Failed Palette items: " + failComponents, pass);
-//
-//    }
-
-//    static final String[] TESTS = {
-//    }
-    
-//    static final String[] TESTS = {
-//        "testCategories",
-////        "testCategoryApplications",
-////        "testCategoryBasicShapes",
-////        "testCategoryControls",
-////        // "testCategoryPath"
-////        "testCategoryTransformations",
-////        "testCategoryColors",
-////        "testCategoryGradients",
-////        "testCategoryEffects",
-////        "testCategoryAnimation",
-////        "testCategoryMedia",
-////        "testCategorySwingComponents",
-//
-//    };
-//
-//    public void testCategoryApplications() {
-//            testItems(CATEGORY_APPLICATIONS);
-//    }
-//
-//    public void testCategoryBasicShapes() {
-//            testItems(CATEGORY_BASIC_SHAPES);
-//    }
-//
-//    public void testCategoryControls() {
-//            testItems(CATEGORY_CONTROLS);
-//    }
-//
-//    public void testCategoryTransformations() {
-//            testItems(CATEGORY_TRANSFORMATIONS);
-//    }
-//
-//    public void testCategoryColors() {
-//            testItems(CATEGORY_COLORS);
-//    }
-//
-//    public void testCategoryGradients() {
-//            testItems(CATEGORY_GRADIENTS);
-//    }
-//
-//    public void testCategoryEffects() {
-//            testItems(CATEGORY_EFFECTS);
-//    }
-//
-//    public void testCategoryAnimation() {
-//            testItems(CATEGORY_ANIMATION);
-//    }
-//
-//    public void testCategoryMedia() {
-//            testItems(CATEGORY_MEDIA);
-//    }
-//
-//    public void testCategorySwingComponents() {
-//            testItems(CATEGORY_SWING_COMPONENTS);
-//    }
 
     String getProjectName(String name){
         String projectName = PROJECT_NAME + "_" + name;
@@ -217,6 +120,17 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
             Object item = model.getElementAt(i);
             System.out.println("=============   Test Item: " + item + "====================");
             palette.dragNDrop(list, i, editor);
+
+            // Remove a comma from the end of the palette items (Paths, Gradients)
+            String editorText = editor.getText().trim();
+            System.out.println("---- Text to trim ---");
+            System.out.println(editorText);
+            System.out.println("---------------------");
+            if(editorText.endsWith(",")){
+                editor.setText(editorText.substring(0, editorText.length() - 1));
+            }
+
+
             editor.insert("\n" + end, editor.getLineNumber(), 0);
             project.build();
             Util.sleep(2000);
@@ -224,7 +138,9 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
             if(!project.getOutput().isCompiled()){
                 pass = false;
                 failComponents += "[" + category + ":" + item + "]";
+                System.out.println("---  Failed Component ---");
                 System.out.println(editor.getText());
+                System.out.println("-------------------------");
             }
             
         }
