@@ -2622,13 +2622,25 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitSequenceInsert(SequenceInsertTree node, Void p) {
+            JFXSequenceInsert insertNode = (JFXSequenceInsert) node;
+            JFXExpression position = insertNode.getPosition();
+
             accept(JFXTokenId.INSERT);
             space();
             scan(node.getElement(), p);
             space();
-            accept(JFXTokenId.INTO, JFXTokenId.BEFORE, JFXTokenId.AFTER);
-            space();
-            scan(node.getSequence(), p);
+            if (position == null) { // INTO
+                accept(JFXTokenId.INTO);
+                space();
+                scan(node.getSequence(), p);
+            } else { // BEFORE/AFTER
+                accept(insertNode.shouldInsertAfter() ? JFXTokenId.AFTER : JFXTokenId.BEFORE);
+                space();
+                accept(JFXTokenId.IDENTIFIER);
+                accept(JFXTokenId.LBRACKET);
+                scan(position, p);
+                accept(JFXTokenId.RBRACKET);
+            }
             return true;
         }
 
