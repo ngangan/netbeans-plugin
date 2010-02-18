@@ -50,21 +50,25 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.tasklist.FileTaskScanner;
 import org.netbeans.spi.tasklist.Task;
 import org.openide.filesystems.FileObject;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author karol 
  */
-//FIXME This line must be added to the org.netbeans.modules.tasklist.filter.TypesFilter to make this scanner works "enabledProviders.add("org.netbeans.modules.javafx.source.tasklist.JavaFXTaskListProvider"); //NOI18N"
-//TODO This class needs to be rewritten to actually be a provider. It'd be better to use PushTaskScanner then FileTaskScanner
+//FIXME This line must be added to the org.netbeans.modules.tasklist.filter.TypesFilter to make this scanner works on default "enabledProviders.add("org.netbeans.modules.javafx.source.tasklist.JavaFXTaskListProvider"); //NOI18N"
+//TODO It'd be better to use PushTaskScanner then FileTaskScanner
 public final class JavaFXTaskListProvider extends FileTaskScanner {
+
+    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES");//NOI18N
 
     //private Callback callback;
     private WeakHashMap<FileObject, List<Task>> tasksMap;
     private WeakHashMap<FileObject, org.netbeans.api.javafx.source.Task<CompilationController>> runTasksMap;
+    
 
     public JavaFXTaskListProvider() {
-        super("JavaFX Task Provider", "JavaFX Task Provider", null); //NOI18N
+        super(TASK_LIST_NAME, TASK_LIST_NAME, null); //NOI18N
     }
 
     @Override
@@ -90,7 +94,7 @@ public final class JavaFXTaskListProvider extends FileTaskScanner {
             return Collections.EMPTY_LIST;
         }
 
-        return tasksMap.get(fo);
+        return new ArrayList<Task>(tasksMap.get(fo));
     }
 
     public static JavaFXTaskListProvider create() {
@@ -100,6 +104,9 @@ public final class JavaFXTaskListProvider extends FileTaskScanner {
     @Override
     public void attach(Callback callback) {
         //this.callback = callback;
+        if (callback == null) {
+            return;
+        }
         if (tasksMap == null) {
             tasksMap = new WeakHashMap<FileObject, List<Task>>();
         }
