@@ -86,7 +86,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
 
     private final AtomicBoolean cancel = new AtomicBoolean();
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
-    private static final Logger log = Logger.getLogger(CreateElementTaskFactory.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
 
     public CreateElementTaskFactory() {
@@ -156,6 +156,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             final Kind kind) {
 
         if (kind == null || diagnostic.getArgs()[1] == null || diagnostic.getArgs()[5] == null) {
+            LOGGER.severe("Error Description has null kind or Diagnostic's args null"); //NOI18N
             return null;
         }
         String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString(), compilationInfo.getCompilationUnit().getPackageName().toString());
@@ -270,7 +271,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         }
                         JTextComponent target = HintsUtils.getEditorComponent(document);
                         if (target == null) {
-                            log.severe("No GUI component for editor document " + document); //NOI18N
+                            LOGGER.severe("No GUI component for editor document " + document); //NOI18N
                             return;
                         }
                         Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
@@ -410,7 +411,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                             String space = HintsUtils.calculateSpace(position[0], document);
                             code.append("\n").append(space).append(HintsUtils.TAB).append("var ").append(varName).append(";"); //NOI18N
                         } catch (BadLocationException ex) {
-                            log.severe(ex.getMessage());
+                            LOGGER.severe(ex.getMessage());
                         }
 
                         return null;
