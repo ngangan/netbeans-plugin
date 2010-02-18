@@ -155,7 +155,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             final JCDiagnostic diagnostic,
             final Kind kind) {
 
-        if (kind == null) {
+        if (kind == null || diagnostic.getArgs()[1] == null || diagnostic.getArgs()[5] == null) {
             return null;
         }
         String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString(), compilationInfo.getCompilationUnit().getPackageName().toString());
