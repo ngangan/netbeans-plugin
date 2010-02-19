@@ -101,7 +101,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             return;
         }
         try {
-            jfxs.runUserActionTask(new ScannerTask(callback), true);
+            jfxs.runWhenScanFinished(new ScannerTask(callback), true);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -133,6 +133,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                             fileObject.removeFileChangeListener(this);
                         }
                     });
+            callback.setTasks(fileObject, getTasks(compilationController));
         }
 
         private List<Task> getTasks(CompilationController compilationController) {
