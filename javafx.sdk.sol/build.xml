@@ -31,34 +31,15 @@
       </unzip>
     </target>
 
-    <target name="init" depends="basic-init,init-release-external,files-init,build-init"/>
+    <target name="release" depends="files-init" if="has.release.dir">
+        <mkdir dir="${cluster}"/>
+        <copy todir="${cluster}" overwrite="true">
+            <fileset dir="${release.dir}">
+                <patternset includes="${release.files}"/>
+            </fileset>
+        </copy>        
+    </target>
 
-    <target name="main">
-        <mkdir dir="build/main"/>
-        <javac srcdir="instsrc" destdir="build/main"/>
-        <filter token="SDK_DIR" value="javafx-sdk"/>
-        <copy file="main/main.properties" todir="build/main" overwrite="true" filtering="true"/>
-    </target>
-    <target name="nbm" depends="init,netbeans,-nbm-prompt-for-storepass,main" description="Build NBM archive.">
-        <mkdir dir="build"/>
-        <property name="nbm.target.cluster" value=""/> <!-- fallback -->
-        <property name="license.file.override" value="${license.file}"/>
-        <makenbm file="build/${nbm}"
-                 productdir="${cluster}"
-                 module="${module.jar}"
-                 homepage="${nbm.homepage}"
-                 distribution="${nbm.distribution}"
-                 needsrestart="${nbm.needs.restart}"
-                 global="${nbm.is.global}"
-                 targetcluster="${nbm.target.cluster}"
-                 releasedate="${nbm.release.date}"
-                 moduleauthor="${nbm.module.author}">
-            <license file="${license.file.override}"/>
-            <signature keystore="${keystore}" storepass="${storepass}" alias="${nbm_alias}"/>
-            <main dir="build/main"/>
-            <updaterjar>
-                <fileset dir="${netbeans.dest.dir}" includes="platform*/modules/ext/updater.jar"/>
-            </updaterjar>
-        </makenbm>
-    </target>
+    <!--<target name="init" depends="basic-init,init-release-external,files-init,build-init"/>-->
+    <target name="init" depends="init-release-external,harness.init"/>
 </project>

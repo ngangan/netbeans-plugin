@@ -34,7 +34,7 @@
 
         <path id="jfxl.generateTokenIdsCp">
                 <pathelement path="${build.classes.dir}"/>
-                <fileset dir="${netbeans.dest.dir}">
+                <fileset dir="${cluster}/..">
                     <include name="ide*/modules/org-netbeans-modules-lexer.jar"/>
                     <include name="platform*/lib/org-openide-util.jar"/>
                 </fileset>
@@ -53,7 +53,7 @@
 
         <path id="jfxl.grammarVerifierCp">
                 <pathelement path="${build.classes.dir}"/>
-                <fileset dir="${netbeans.dest.dir}">
+                <fileset dir="${cluster}/..">
                     <include name="ide*/modules/org-netbeans-modules-lexer.jar"/>
                     <include name="java*/modules/org-netbeans-modules-java-lexer.jar"/>
                     <include name="platform*/lib/org-openide-util.jar"/>

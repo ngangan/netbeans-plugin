@@ -1,6 +1,7 @@
 ~$
 ^build$
 ^netbeans.*.zip$
+^harness.*.zip$
 ^netbeans.*.html$
 ^installers.*.html$
 ^testdist.*.zip$
