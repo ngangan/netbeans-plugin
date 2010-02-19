@@ -54,10 +54,20 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
     </folder>
+    <!--
     <folder name="TaskList">
         <folder name="Scanners">
             <file name="JavaFXTaskListProvider.instance">
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.tasklist.FileTaskScanner"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.source.tasklist.JavaFXTaskListProvider.create"/>
+            </file>
+        </folder>
+    </folder>
+    -->
+    <folder name="TaskList">
+        <folder name="Scanners">
+            <file name="JavaFXTaskListProvider.instance">
+                <attr name="instanceOf" stringvalue="org.netbeans.spi.tasklist.PushTaskScanner"/>
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.source.tasklist.JavaFXTaskListProvider.create"/>
             </file>
         </folder>
