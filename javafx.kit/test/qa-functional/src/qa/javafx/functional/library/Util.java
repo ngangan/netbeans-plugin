@@ -25,11 +25,12 @@ import javax.swing.text.JTextComponent;
 import javax.swing.tree.TreeModel;
 import org.netbeans.junit.ide.ProjectSupport;
 import org.netbeans.jellytools.MainWindowOperator;
+
 import org.netbeans.jemmy.TimeoutExpiredException;
 import org.netbeans.jemmy.operators.ComponentOperator;
 import org.netbeans.jemmy.operators.JProgressBarOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
-
+import org.netbeans.jemmy.operators.WindowOperator;
 
 import java.io.FileOutputStream;
 import java.net.URL;
@@ -116,6 +117,9 @@ public class Util {
         return null;
     }
 
+    public static WindowOperator getMainWindowOperator() {
+        return MainWindowOperator.getDefault();
+    }
 
     public static void showIDE() {
         showComponents(MainWindowOperator.getDefault().getSource());

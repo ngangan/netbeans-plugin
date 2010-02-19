@@ -40,8 +40,19 @@ package qa.javafx.functional.library.project;
 
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
+import org.netbeans.jemmy.operators.JListOperator;
 import qa.javafx.functional.library.Util;
 import org.netbeans.jellytools.MainWindowOperator;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
+import java.util.LinkedList;
+import java.util.List;
+import javax.swing.ListModel;
+
+import javax.swing.SwingUtilities;
+import qa.javafx.functional.library.operator.ClassNameComponentChooser;
+import org.netbeans.jellytools.modules.editor.CompletionJListOperator;
 
 
 /**
@@ -78,4 +89,57 @@ public class EditorOperator extends org.netbeans.jellytools.EditorOperator {
         //JPopupMenuOperator popup = new JPopupMenuOperator();
         popup.pushMenuNoBlock("Format");
     }
+
+    public List<String> codecompletion(){
+        typeKey(KeyEvent.VK_SPACE, ' ', InputEvent.CTRL_DOWN_MASK );
+
+        Util.sleep(3000);
+
+        final List<String> items = new LinkedList<String>();
+
+        SwingUtilities.invokeLater(
+                new Runnable(){
+
+                    public void run(){
+                        JListOperator list = new JListOperator(Util.getMainWindowOperator(), new ClassNameComponentChooser("CompletionJList"));
+                        //Util.showComponents(list);
+                        ListModel model = list.getModel();
+                        for(int i=0; i< model.getSize(); i++){
+                            items.add(model.getElementAt(i).toString());
+                        }
+//                        CompletionJListOperator completion  = new CompletionJListOperator();
+//
+//                        try{
+//                            items.addAll(completion.getCompletionItems());
+//                        }catch(Exception e){
+//                            e.printStackTrace();
+//                        }
+                        System.out.println("---------------------------");
+                        System.out.println("Items: " + items.size());
+                        for(String item: items ){
+                            System.out.println("Item: " + item);
+                        }
+                    }
+                }
+        );
+
+        return items;
+        //JPopupMenuOperator popup = new JPopupMenuOperator(this);
+
+        //Util.showComponents(popup);
+        
+        //clickForPopup();
+        //Util.sleep(2000);
+        //JPopupMenuOperator popup = new JPopupMenuOperator(textComponent);
+        //JPopupMenuOperator popup = new JPopupMenuOperator(this);
+
+        //JPopupMenuOperator popup = new JPopupMenuOperator( MainWindowOperator.getDefault());
+
+        //JPopupMenuOperator popup = new JPopupMenuOperator();
+        //popup.pushMenuNoBlock("Format");
+    }
+
+
+    
+    
 }
