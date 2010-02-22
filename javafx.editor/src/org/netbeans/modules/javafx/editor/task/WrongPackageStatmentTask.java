@@ -159,14 +159,15 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                             fixes, file, sp, ep)
             ));
         } else {
+// [pnejedly] disabling the error temporarily to allow comfortabe editing of real JavaFX sources under an NBM project type.
             // solving compilation error under J5
             //noinspection RedundantArrayCreation
-            HintsController.setErrors(file, WRONG_PROJECT, Collections.<ErrorDescription>singletonList(
-                    ErrorDescriptionFactory.createErrorDescription(
-                            Severity.ERROR,
-                            MessageFormat.format(BUNDLE.getString(EDITOR_WRONG_PROJECT), new Object[0]),
-                            file, sp, ep)
-            ));
+//            HintsController.setErrors(file, WRONG_PROJECT, Collections.<ErrorDescription>singletonList(
+//                    ErrorDescriptionFactory.createErrorDescription(
+//                            Severity.ERROR,
+//                            MessageFormat.format(BUNDLE.getString(EDITOR_WRONG_PROJECT), new Object[0]),
+//                            file, sp, ep)
+//            ));
         }
     }
 
