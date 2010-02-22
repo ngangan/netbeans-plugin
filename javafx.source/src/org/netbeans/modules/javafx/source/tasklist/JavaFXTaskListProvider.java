@@ -32,7 +32,6 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
 
     private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProviderNotUsed.class, "LABEL_TL_JAVAFX_ISSUES");//NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
-    private WeakSet<FileObject> files = new WeakSet<FileObject>();
     private WeakSet<FileObject> projectDirs = new WeakSet<FileObject>();
 
     private JavaFXTaskListProvider() {
@@ -53,7 +52,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         Iterator<FileObject> iterator = taskScanningScope.iterator();
 
         while (iterator.hasNext()) {
-            final FileObject fileObject = iterator.next();
+            FileObject fileObject = iterator.next();
 
             if (!fileObject.getExt().equals(FX_EXT)) {
                 continue;
@@ -66,37 +65,44 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
 
                     @Override
                     public void fileDataCreated(FileEvent fe) {
-                        FileObject newFileObject = fe.getFile();
-                        if (newFileObject.getExt().equals(FX_EXT)) {
-                            addTask(newFileObject, callback);
+                        if (fe.getFile().getExt().equals(FX_EXT)) {
+                            updateTasks(fe.getFile(), callback);
                         }
-                        files.add(fileObject);
+
                         super.fileDataCreated(fe);
+                    }
+
+                    @Override
+                    public void fileChanged(FileEvent fe) {
+                        if (fe.getFile().getExt().equals(FX_EXT)) {
+                            updateTasks(fe.getFile(), callback);
+                        }
+
+                        super.fileChanged(fe);
                     }
 
                     @Override
                     public void fileDeleted(FileEvent fe) {
                         if (fe.getFile() == projectDir) {
                             fe.getFile().removeRecursiveListener(this);
+                        } else if (fe.getFile().getExt().equals(FX_EXT)) {
+                            callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                         }
+
                         super.fileDeleted(fe);
                     }
                 });
+                
                 projectDirs.add(projectDir);
             }
 
-            if (!files.contains(fileObject)) {
-                addTask(fileObject, callback);
-                files.add(fileObject);
-            }
-
+            updateTasks(fileObject, callback);
         }
 
     }
 
-    private void addTask(FileObject fileObject, Callback callback) {
+    private void updateTasks(final FileObject fileObject, final Callback callback) {
         JavaFXSource jfxs = JavaFXSource.forFileObject(fileObject);
-
         if (jfxs == null) {
             return;
         }
@@ -117,22 +123,6 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
 
         public void run(final CompilationController compilationController) throws Exception {
             final FileObject fileObject = compilationController.getFileObject();
-            fileObject.addFileChangeListener(
-                    new FileChangeAdapter() {
-
-                        @Override
-                        public void fileChanged(FileEvent fe) {
-                            callback.setTasks(fileObject, getTasks(compilationController));
-                            super.fileChanged(fe);
-                        }
-
-                        @Override
-                        public void fileDeleted(FileEvent fe) {
-                            callback.setTasks(fileObject, Collections.EMPTY_LIST);
-                            super.fileDeleted(fe);
-                            fileObject.removeFileChangeListener(this);
-                        }
-                    });
             callback.setTasks(fileObject, getTasks(compilationController));
         }
 
