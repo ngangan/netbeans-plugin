@@ -30,8 +30,9 @@ import org.openide.util.WeakSet;
  */
 public class JavaFXTaskListProvider extends PushTaskScanner {
 
-    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProviderNotUsed.class, "LABEL_TL_JAVAFX_ISSUES");//NOI18N
+    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES");//NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
+    
     private WeakSet<FileObject> projectDirs = new WeakSet<FileObject>();
 
     private JavaFXTaskListProvider() {

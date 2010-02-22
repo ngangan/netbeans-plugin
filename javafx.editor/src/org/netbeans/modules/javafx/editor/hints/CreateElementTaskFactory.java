@@ -121,7 +121,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (isValidError(diagnostic, compilationInfo)
+                    if (isValidError(diagnostic, document)
                             && !cancel.get()
                             && (diagnostic instanceof JCDiagnostic)) {
 
@@ -137,13 +137,8 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         };
     }
 
-    private boolean isValidError(Diagnostic diagnostic, CompilationInfo compilationInfo) {
-        if (diagnostic.getCode().equals(ERROR_CODE)) {
-//            for (Diagnostic d : compilationInfo.getDiagnostics()) {
-//                if (d.getLineNumber() == diagnostic.getLineNumber()) {
-//                    return false;
-//                }
-//            }
+    private boolean isValidError(Diagnostic diagnostic, JavaFXDocument document) {
+        if (diagnostic.getCode().equals(ERROR_CODE) && !document.isPosGuarded((int) diagnostic.getPosition())) {
             return true;
         }
 
@@ -357,7 +352,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
             String space = HintsUtils.calculateSpace(position[0], document);
-            StringBuffer code = new StringBuffer().append("var ").append(varName).append(";\n").append(space); //NOI18N
+            StringBuffer code = new StringBuffer().append("\nvar ").append(varName).append(";\n").append(space); //NOI18N
             if (position[0] < 0) {
                 position[0] = (int) diagnostic.getStartPosition();
             }
@@ -397,7 +392,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         if (firstVar != null) {
                             position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), firstVar);
                             String space = HintsUtils.calculateSpace(position[0], document);
-                            code.append("var ").append(varName).append(";\n").append(space); //NOI18N
+                            code.append("\nvar ").append(varName).append(";\n").append(space); //NOI18N
 
                             return null;
                         }
