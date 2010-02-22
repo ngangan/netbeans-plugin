@@ -98,7 +98,7 @@ public class FmtOptions {
     
     public static final String classDeclBracePlacement = "classDeclBracePlacement"; //NOI18N
     public static final String functionDeclBracePlacement = "functionDeclBracePlacement"; //NOI18N
-    public static final String objectLiteralPlacement = "objectLiteralPlacement"; //NOI18N
+    public static final String objectLiteralBracePlacement = "objectLiteralBracePlacement"; //NOI18N
     public static final String onReplacePlacement = "onReplacePlacement"; //NOI18N
     public static final String otherBracePlacement = "otherBracePlacement"; //NOI18N
     public static final String specialElseIf = "specialElseIf"; //NOI18N
@@ -110,10 +110,8 @@ public class FmtOptions {
     public static final String alignMultilineAnnotationArgs = "alignMultilineAnnotationArgs"; //NOI18N
     public static final String alignMultilineImplements = "alignMultilineImplements"; //NOI18N
     public static final String alignMultilineThrows = "alignMultilineThrows"; //NOI18N
-    public static final String alignMultilineParenthesized = "alignMultilineParenthesized"; //NOI18N
     public static final String alignMultilineBinaryOp = "alignMultilineBinaryOp"; //NOI18N
     public static final String alignMultilineAssignment = "alignMultilineAssignment"; //NOI18N
-    public static final String alignMultilineFor = "alignMultilineFor"; //NOI18N
     public static final String placeElseOnNewLine = "placeElseOnNewLine"; //NOI18N
     public static final String placeCatchOnNewLine = "placeCatchOnNewLine"; //NOI18N
     public static final String placeFinallyOnNewLine = "placeFinallyOnNewLine"; //NOI18N
@@ -315,7 +313,7 @@ public class FmtOptions {
 
             { classDeclBracePlacement, BP_SAME_LINE}, //NOI18N
             { functionDeclBracePlacement, BP_SAME_LINE}, //NOI18N
-            { objectLiteralPlacement, BP_SAME_LINE },
+            { objectLiteralBracePlacement, BP_SAME_LINE },
             { onReplacePlacement, BP_SAME_LINE },
             { otherBracePlacement, BP_SAME_LINE}, //NOI18N
             { specialElseIf, TRUE}, //NOI18N
@@ -327,10 +325,8 @@ public class FmtOptions {
             { alignMultilineAnnotationArgs, FALSE}, //NOI18N
             { alignMultilineImplements, FALSE}, //NOI18N
             { alignMultilineThrows, FALSE}, //NOI18N
-            { alignMultilineParenthesized, FALSE}, //NOI18N
             { alignMultilineBinaryOp, FALSE}, //NOI18N
             { alignMultilineAssignment, FALSE}, //NOI18N
-            { alignMultilineFor, FALSE}, //NOI18N
             { placeElseOnNewLine, FALSE}, //NOI18N 
             { placeCatchOnNewLine, FALSE}, //NOI18N 
             { placeFinallyOnNewLine, FALSE}, //NOI18N 

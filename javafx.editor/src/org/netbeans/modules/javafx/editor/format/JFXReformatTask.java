@@ -1389,20 +1389,20 @@ public class JFXReformatTask implements ReformatTask {
                         spaceBeforeLeftBrace = cs.spaceBeforeClassDeclLeftBrace();
                         break;
                     case INIT_DEFINITION:
-                        bracePlacement = cs.getMethodDeclBracePlacement();
+                        bracePlacement = cs.getFunctionDeclBracePlacement();
                         spaceBeforeLeftBrace = cs.spaceBeforeInitBlockLeftBrace();
                         break;
                     case POSTINIT_DEFINITION:
-                        bracePlacement = cs.getMethodDeclBracePlacement();
+                        bracePlacement = cs.getFunctionDeclBracePlacement();
                         spaceBeforeLeftBrace = cs.spaceBeforePostInitBlockLeftBrace();
                         break;
                     case INSTANTIATE_OBJECT_LITERAL:
-                        bracePlacement = cs.getClassDeclBracePlacement();
+                        bracePlacement = cs.getObjectLiteralBracePlacement();
                         spaceBeforeLeftBrace = cs.spaceBeforeObjectLiteralDeclLeftBrace();
                         break;
                     case FUNCTION_DEFINITION:
                     case FUNCTION_VALUE:
-                        bracePlacement = cs.getMethodDeclBracePlacement();
+                        bracePlacement = cs.getFunctionDeclBracePlacement();
                         spaceBeforeLeftBrace = cs.spaceBeforeMethodDeclLeftBrace();
                         break;
                     case TRY:
@@ -1711,11 +1711,36 @@ public class JFXReformatTask implements ReformatTask {
                     scan(body, p);
                 }
             } else {
-                accept(JFXTokenId.LBRACE);
+                CodeStyle.BracePlacement bracePlacement = cs.getObjectLiteralBracePlacement();
                 int old = indent;
-                indent += indentSize;
-                spaces(cs.spaceWithinBraces() ? 1 : 0, true);
-                
+                int halfIndent = indent;
+                switch (bracePlacement) {
+                    case SAME_LINE:
+//                        spaces(cs.spaceBeforeObjectLiteralDeclLeftBrace() ? 1 : 0);
+                        accept(JFXTokenId.LBRACE);
+                        indent += indentSize;
+                        break;
+                    case NEW_LINE:
+                        newline();
+                        accept(JFXTokenId.LBRACE);
+                        indent += indentSize;
+                        break;
+                    case NEW_LINE_HALF_INDENTED:
+                        indent += (indentSize >> 1);
+                        halfIndent = indent;
+                        newline();
+                        accept(JFXTokenId.LBRACE);
+                        indent = old + indentSize;
+                        break;
+                    case NEW_LINE_INDENTED:
+                        indent += indentSize;
+                        halfIndent = indent;
+                        newline();
+                        accept(JFXTokenId.LBRACE);
+                        break;
+                }
+                indent = halfIndent;
+
                 TreeSet<Tree> members = new TreeSet<Tree>(new TreePosComparator(sp, root));
                 members.addAll(node.getLiteralParts());
                 ClassDeclarationTree body = node.getClassBody();
@@ -1969,6 +1994,8 @@ public class JFXReformatTask implements ReformatTask {
         // TODO sequence
         @Override
         public Boolean visitAssignment(AssignmentTree node, Void p) {
+            int old = indent;
+            indent += continuationIndentSize;
             int alignIndent = cs.alignMultilineAssignment() ? col : -1;
             boolean b = scan(node.getVariable(), p);
             if (b) {
@@ -1985,6 +2012,7 @@ public class JFXReformatTask implements ReformatTask {
             } else {
                 scan(node.getExpression(), p);
             }
+            indent = old;
             return true;
         }
 

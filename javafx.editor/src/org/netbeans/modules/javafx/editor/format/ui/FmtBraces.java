@@ -58,7 +58,7 @@ public class FmtBraces extends javax.swing.JPanel {
         initComponents();
         classDeclCombo.putClientProperty(OPTION_ID, classDeclBracePlacement);
         functionDeclCombo.putClientProperty(OPTION_ID, functionDeclBracePlacement);
-        objectLiteralCombo.putClientProperty(OPTION_ID, objectLiteralPlacement);
+        objectLiteralCombo.putClientProperty(OPTION_ID, objectLiteralBracePlacement);
         onReplaceCombo.putClientProperty(OPTION_ID, onReplacePlacement);
         otherCombo.putClientProperty(OPTION_ID, otherBracePlacement);
         specialElseIfCheckBox.putClientProperty(OPTION_ID, specialElseIf);
@@ -88,10 +88,8 @@ public class FmtBraces extends javax.swing.JPanel {
                 new String[]{FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineCallArgs, Boolean.FALSE.toString()},
-                new String[]{FmtOptions.alignMultilineFor, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineImplements, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineMethodParams, Boolean.FALSE.toString()},
-                new String[]{FmtOptions.alignMultilineParenthesized, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineThrows, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.functionDeclBracePlacement, BracePlacement.SAME_LINE.name()},
                 new String[]{FmtOptions.spaceBeforeFunctionDeclLeftBrace, Boolean.TRUE.toString()});

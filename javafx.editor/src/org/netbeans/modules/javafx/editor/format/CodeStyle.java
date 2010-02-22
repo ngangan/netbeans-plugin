@@ -229,8 +229,13 @@ public final class CodeStyle {
         return BracePlacement.valueOf(placement);
     }
 
-    public BracePlacement getMethodDeclBracePlacement() {
+    public BracePlacement getFunctionDeclBracePlacement() {
         String placement = preferences.get(functionDeclBracePlacement, getDefaultAsString(functionDeclBracePlacement));
+        return BracePlacement.valueOf(placement);
+    }
+
+    public BracePlacement getObjectLiteralBracePlacement() {
+        String placement = preferences.get(objectLiteralBracePlacement, getDefaultAsString(objectLiteralBracePlacement));
         return BracePlacement.valueOf(placement);
     }
 
@@ -278,20 +283,12 @@ public final class CodeStyle {
         return preferences.getBoolean(alignMultilineThrows, getDefaultAsBoolean(alignMultilineThrows));
     }
 
-    public boolean alignMultilineParenthesized() {
-        return preferences.getBoolean(alignMultilineParenthesized, getDefaultAsBoolean(alignMultilineParenthesized));
-    }
-
     public boolean alignMultilineBinaryOp() {
         return preferences.getBoolean(alignMultilineBinaryOp, getDefaultAsBoolean(alignMultilineBinaryOp));
     }
 
     public boolean alignMultilineAssignment() {
         return preferences.getBoolean(alignMultilineAssignment, getDefaultAsBoolean(alignMultilineAssignment));
-    }
-
-    public boolean alignMultilineFor() {
-        return preferences.getBoolean(alignMultilineFor, getDefaultAsBoolean(alignMultilineFor));
     }
 
     public boolean placeElseOnNewLine() {
