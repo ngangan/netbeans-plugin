@@ -41,13 +41,16 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.javafx.tree.JFXBlock;
+import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
+import com.sun.tools.javafx.tree.JFXVarInit;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.util.*;
@@ -88,6 +91,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
+    private static final String JAVAFX_RUN = "public static synthetic function javafx$run$"; //NOI18N
 
     public CreateElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -154,7 +158,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             LOGGER.severe("Error Description has null kind or Diagnostic's args null"); //NOI18N
             return null;
         }
-        String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString(), compilationInfo.getCompilationUnit().getPackageName().toString());
+        String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString(), compilationInfo.getCompilationUnit().getPackageName());
         Fix fix = new ElementFix(kind, document, diagnostic, compilationInfo, message);
         ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, message, Collections.singletonList(fix), compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
@@ -165,11 +169,15 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         if (message.contains("symbol  : class")) { //NOI18N
             return new Kind[]{Kind.LOCAL_CLASS, Kind.CLASS};
         } else if (message.contains("symbol  : variable")) { //NOI18N
+            ArrayList<Kind> array = new ArrayList<Kind>();
 
-            if (!isValidLocalVariable(diagnostic, compilationInfo)) {
-                return new Kind[]{Kind.VARIABLE};
+            if (isValidLocalVariable(diagnostic, compilationInfo)) {
+                array.add(Kind.LOCAL_VARIABLE);
             }
-            return new Kind[]{Kind.VARIABLE, Kind.LOCAL_VARIABLE};
+            array.add(Kind.VARIABLE);
+
+            return array.toArray(new Kind[array.size()]);
+            
         } else if (message.contains("symbol  : function")) { //NOI18N
             return new Kind[]{Kind.FUNCTION}; //NOI18N
         }
@@ -197,7 +205,9 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         return validVar[0];
     }
 
-    private static String getMessage(Kind kind, String elementName, String classFullName, String packageName) {
+    
+
+    private static String getMessage(Kind kind, String elementName, String classFullName, ExpressionTree packageName) {
         String message = null;
         if (kind == Kind.FUNCTION) {
             message = "LABEL_FUNCTION"; //NOI18N
@@ -209,7 +219,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             message = "LABEL_LOCAL_CLASS"; //NOI18N
         } else if (kind == Kind.CLASS) {
             message = "LABEL_CLASS"; //NOI18N
-            return NbBundle.getMessage(CreateElementTaskFactory.class, message, elementName, packageName);
+            return NbBundle.getMessage(CreateElementTaskFactory.class, message, elementName, packageName != null ? packageName.toString() : ""); //NOI18N
         }
 
         return NbBundle.getMessage(CreateElementTaskFactory.class, message, elementName, classFullName);
@@ -327,7 +337,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             if (kind == Kind.LOCAL_VARIABLE) {
                 generatedCode = generateLocalVar(varName.toString());
             } else if (kind == Kind.VARIABLE) {
-                generatedCode = generatelVar(varName.toString());
+                generatedCode = generateVar(varName.toString());
             }
 
             return generatedCode;
@@ -352,7 +362,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
             String space = HintsUtils.calculateSpace(position[0], document);
-            StringBuffer code = new StringBuffer().append("\nvar ").append(varName).append(";\n").append(space); //NOI18N
+            StringBuffer code = new StringBuffer().append("\n").append(space).append("var ").append(varName).append(";\n").append(space); //NOI18N
             if (position[0] < 0) {
                 position[0] = (int) diagnostic.getStartPosition();
             }
@@ -360,7 +370,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             return new GeneratedCode(position[0], code.toString());
         }
 
-        private GeneratedCode generatelVar(final String varName) {
+        private GeneratedCode generateVar(final String varName) {
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
             final StringBuffer code = new StringBuffer();
@@ -396,15 +406,38 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
 
                             return null;
                         }
+
                         try {
                             //TODO Line below returns 0 in same cases which means start of the node and end of the node is the same which is not true.
                             //int length = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), currentClass) - start;
                             //TODO Workaround for this problem
+
+                            for (Tree tree : currentClass.getClassMembers()) {
+                                if (tree instanceof JFXFunctionDefinition && tree.toString().contains(JAVAFX_RUN)) {
+                                    //position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(),((JFXFunctionDefinition) tree).getBodyExpression());
+                                    List<ExpressionTree> statements = ((JFXFunctionDefinition) tree).getBodyExpression().getStatements();
+                                    if (!statements.isEmpty()) {
+                                        ExpressionTree treeForPosition = statements.iterator().next();
+                                        //FIXME Bug in compiler - getStartPostion and getEndPosition return same value!
+                                        code.append("\n").append("var ").append(varName).append(";\n"); //NOI18N
+                                        if (treeForPosition instanceof JFXVarInit) {
+                                            position[0] = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), treeForPosition);
+                                        } else {
+                                            code.append("\n"); //NOI18N
+                                            position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), treeForPosition);
+                                        }
+
+                                    }
+
+                                    return null;
+                                }
+                            }
+
                             String sourceCode = document.getText(start, document.getLength() - start);
                             int index = sourceCode.indexOf("{"); //NOI18N
                             position[0] = start + index + 1;
                             String space = HintsUtils.calculateSpace(position[0], document);
-                            code.append("\n").append(space).append(HintsUtils.TAB).append("var ").append(varName).append(";"); //NOI18N
+                            code.append("\n").append(space).append(HintsUtils.TAB).append("var ").append(varName).append(";\n"); //NOI18N
                         } catch (BadLocationException ex) {
                             LOGGER.severe(ex.getMessage());
                         }
