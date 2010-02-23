@@ -1176,6 +1176,11 @@ public class JFXReformatTask implements ReformatTask {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                 accept(JFXTokenId.EQ);
 
+                // XXX
+//                if (initTree instanceof InstantiateTree) {
+//                    indent = old;
+//                }
+
                 final JavafxBindStatus bindStatus = node.getBindStatus();
                 if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
                     spaces(cs.spaceAroundAssignOps() ? 1 : 0);
@@ -1694,7 +1699,7 @@ public class JFXReformatTask implements ReformatTask {
             }
 
             scan(node.getIdentifier(), p);
-            spaces(!isNewKeyWordUsed || cs.spaceBeforeMethodCallParen() ? 1 : 0);
+//            spaces(!isNewKeyWordUsed || cs.spaceBeforeMethodCallParen() ? 1 : 0);
 
             if (isNewKeyWordUsed) {
                 accept(JFXTokenId.LPAREN);
@@ -1716,7 +1721,7 @@ public class JFXReformatTask implements ReformatTask {
                 int halfIndent = indent;
                 switch (bracePlacement) {
                     case SAME_LINE:
-//                        spaces(cs.spaceBeforeObjectLiteralDeclLeftBrace() ? 1 : 0);
+                        spaces(cs.spaceBeforeObjectLiteralDeclLeftBrace() ? 1 : 0);
                         accept(JFXTokenId.LBRACE);
                         indent += indentSize;
                         break;
@@ -1739,7 +1744,6 @@ public class JFXReformatTask implements ReformatTask {
                         accept(JFXTokenId.LBRACE);
                         break;
                 }
-                indent = halfIndent;
 
                 TreeSet<Tree> members = new TreeSet<Tree>(new TreePosComparator(sp, root));
                 members.addAll(node.getLiteralParts());
@@ -1755,9 +1759,10 @@ public class JFXReformatTask implements ReformatTask {
                     spaces(cs.spaceWithinMethodCallParens() ? 1 : 0, true);
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
                 }
-                indent = old;
+                indent = halfIndent;
                 spaces(cs.spaceWithinBraces() && !members.isEmpty() ? 1 : 0, true);
                 accept(JFXTokenId.RBRACE);
+                indent = old;
             }
             
             return true;
