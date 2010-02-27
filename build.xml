@@ -2,7 +2,7 @@
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="javafx" basedir="." default="full-build">
+<project name="javafx" basedir="." default="default-build">
     <description>Builds the module suite javafx.</description>
 
     <available file="../nbbuild/netbeans/harness" type="dir" property="harness.dir.default" value="${basedir}/../nbbuild/netbeans/harness"/>
@@ -247,7 +247,16 @@
       </jar>
     </target>
 
-    <target name="zip-clusters" depends="nbms">
+    <target name="-init-zip-clusters" depends="-is-local-netbeans,-init-build-properties">
+        <condition property="do.zip.clusters">
+           <or>
+              <isset property="env.HUDSON_URL"/>
+              <isset property="local-netbeans-is-available"/>
+           </or>
+        </condition>
+    </target>
+
+    <target name="-zip-clusters" depends="-init-zip-clusters" if="do.zip.clusters">
       <mkdir dir="build/clusters"/>
       <jar destfile="build/clusters/common.jar" compress="true" level="9">
         <zipfileset dir="build/netbeans/javafx" prefix="javafx">
@@ -290,7 +299,9 @@
       <echo message="Unit Test Results: ${nbroot}/build/test/results/index.html"/>
     </target>
 
-    <target name="full-build" depends="clean,nbms,zip-clusters,l10n-kit"/>
+    <target name="default-build" depends="clean,build,-zip-clusters"/>
+
+    <target name="full-build" depends="clean,nbms,-zip-clusters,l10n-kit"/>
 
     <target name="build-installers" depends="full-build">
       <ant dir="installer"/>
