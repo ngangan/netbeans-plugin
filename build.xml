@@ -120,7 +120,7 @@
                 </tokenfilter>
             </filterchain>
         </loadfile>
-        <echo>netbeans.harness.url=${netbeans.binaries.url}</echo>
+        <echo>netbeans.harness.url=${netbeans.harness.url}</echo>
 
         <get src="${netbeans.harness.url}" dest="harness.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
         <fail message="harness zip was not downloaded, update harness failed">
@@ -133,13 +133,11 @@
 
         <unzip src="harness.zip" dest="${basedir}">
              <patternset>
-               <exclude name="harness/config/**"/>
-               <exclude name="harness/modules/**"/>
-               <exclude name="harness/etc/**"/>
-               <exclude name="harness/jnlp/**"/>
-               <exclude name="harness/launchers/**"/>
-               <exclude name="harness/update_tracking/**"/>
-               <exclude name="harness/.lastModified"/>
+               <include name="harness/*.xml"/>
+               <include name="harness/*.jar"/>
+               <include name="harness/antlib/**"/>
+               <include name="harness/testcoverage/**"/>
+               <include name="harness/README"/>
              </patternset>
          </unzip>
          <!--<delete file="harness.zip"/>-->
