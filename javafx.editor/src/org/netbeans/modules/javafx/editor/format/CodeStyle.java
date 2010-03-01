@@ -239,6 +239,11 @@ public final class CodeStyle {
         return BracePlacement.valueOf(placement);
     }
 
+    public BracePlacement getOnReplacePlacement() {
+        String placement = preferences.get(onReplacePlacement, getDefaultAsString(onReplacePlacement));
+        return BracePlacement.valueOf(placement);
+    }
+
     public BracePlacement getOtherBracePlacement() {
         String placement = preferences.get(otherBracePlacement, getDefaultAsString(otherBracePlacement));
         return BracePlacement.valueOf(placement);
@@ -521,6 +526,10 @@ public final class CodeStyle {
 
     public boolean spaceBeforeObjectLiteralDeclLeftBrace() {
         return preferences.getBoolean(spaceBeforeObjectLiteralDeclLeftBrace, getDefaultAsBoolean(spaceBeforeObjectLiteralDeclLeftBrace));
+    }
+
+    public boolean spaceBeforeOnReplaceDeclLeftBrace() {
+        return preferences.getBoolean(spaceBeforeOnReplaceDeclLeftBrace, getDefaultAsBoolean(spaceBeforeOnReplaceDeclLeftBrace));
     }
 
     public boolean spaceBeforeIfLeftBrace() {

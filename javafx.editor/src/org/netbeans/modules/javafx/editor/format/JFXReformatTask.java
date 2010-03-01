@@ -1176,11 +1176,6 @@ public class JFXReformatTask implements ReformatTask {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                 accept(JFXTokenId.EQ);
 
-                // XXX
-//                if (initTree instanceof InstantiateTree) {
-//                    indent = old;
-//                }
-
                 final JavafxBindStatus bindStatus = node.getBindStatus();
                 if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
                     spaces(cs.spaceAroundAssignOps() ? 1 : 0);
@@ -1201,7 +1196,6 @@ public class JFXReformatTask implements ReformatTask {
 
             OnReplaceTree onReplaceTree = node.getOnReplaceTree();
             if (onReplaceTree != null) {
-                // TODO introduce cs.wrapOnReplace and invoke wrapTree
                 spaces(1, true);
                 scan(onReplaceTree, p);
             }
@@ -1389,9 +1383,12 @@ public class JFXReformatTask implements ReformatTask {
                 switch (parentTree.getJavaFXKind()) {
                     case CLASS_DECLARATION:
                     case INSTANTIATE_NEW:
-                    case ON_REPLACE:
                         bracePlacement = cs.getClassDeclBracePlacement();
                         spaceBeforeLeftBrace = cs.spaceBeforeClassDeclLeftBrace();
+                        break;
+                    case ON_REPLACE:
+                        bracePlacement = cs.getOnReplacePlacement();
+                        spaceBeforeLeftBrace = cs.spaceBeforeOnReplaceDeclLeftBrace();
                         break;
                     case INIT_DEFINITION:
                         bracePlacement = cs.getFunctionDeclBracePlacement();
@@ -2469,13 +2466,9 @@ public class JFXReformatTask implements ReformatTask {
                 index = tokens.index();
                 c = col;
                 d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (accept(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
-                    space();
-                } else {
+                if (accept(JFXTokenId.IDENTIFIER) != JFXTokenId.IDENTIFIER) {
                     rollback(index, c, d);
                 }
-            } else {
-                space();
             }
             scan(node.getBody(), p);
             return true;

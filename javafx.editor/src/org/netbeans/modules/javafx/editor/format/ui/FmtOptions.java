@@ -166,6 +166,7 @@ public class FmtOptions {
     public static final String spaceBeforeClassDeclLeftBrace = "spaceBeforeClassDeclLeftBrace"; //NOI18N
     public static final String spaceBeforeFunctionDeclLeftBrace = "spaceBeforeFunctionDeclLeftBrace"; //NOI18N
     public static final String spaceBeforeObjectLiteralDeclLeftBrace = "spaceBeforeObjectLiteralDeclLeftBrace"; //NOI18N
+    public static final String spaceBeforeOnReplaceDeclLeftBrace = "spaceBeforeOnReplaceDeclLeftBrace"; //NOI18N
     public static final String spaceBeforeIfLeftBrace = "spaceBeforeIfLeftBrace"; //NOI18N
     public static final String spaceBeforeElseLeftBrace = "spaceBeforeElseLeftBrace"; //NOI18N
     public static final String spaceBeforeWhileLeftBrace = "spaceBeforeWhileLeftBrace"; //NOI18N
@@ -378,6 +379,7 @@ public class FmtOptions {
             { spaceBeforeClassDeclLeftBrace, TRUE}, //NOI18N
             { spaceBeforeFunctionDeclLeftBrace, TRUE}, //NOI18N
             { spaceBeforeObjectLiteralDeclLeftBrace, TRUE}, //NOI18N
+            { spaceBeforeOnReplaceDeclLeftBrace, TRUE}, //NOI18N
             { spaceBeforeIfLeftBrace, TRUE}, //NOI18N
             { spaceBeforeElseLeftBrace, TRUE}, //NOI18N
             { spaceBeforeWhileLeftBrace, TRUE}, //NOI18N
