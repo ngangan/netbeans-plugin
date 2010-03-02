@@ -76,6 +76,34 @@
         <echo>netbeans.testdist.url resolved to ${netbeans.testdist.url}</echo>
     </target>
 
+    <target name="-check-ergonomics">
+        <condition property="no.ergonomics">
+            <or>
+                <istrue value="${local-netbeans-is-available}"/>
+                <isfalse value="${with.ergonomics}"/>
+            </or>
+        </condition>
+    </target>
+    
+    <target name="-calculate-ergonomics-url" unless="ergonomics.binaries.url">
+        <get src="${netbeans.base.url}/moduleclusters" dest="moduleclusters.html" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <loadfile srcfile="moduleclusters.html" property="ergonomics.binaries.url">
+            <filterchain>
+                <tokenfilter>
+                    <containsregex pattern=".*href=&quot;(netbeans-[a-z0-9-.]*ergonomics\.zip)&quot;.*" replace="${netbeans.base.url}/moduleclusters/\1" flags="im"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <echo>ergonomics.binaries.url resolved to ${ergonomics.binaries.url}</echo>
+    </target>
+
+    <target name="-get-ergonomics-url" unless="no.ergonomics" depends="-calculate-ergonomics-url"/>
+    
+    <target name="get-ergonomics" unless="no.ergonomics" depends="-check-ergonomics,-get-ergonomics-url">
+        <get src="${ergonomics.binaries.url}" dest="ergonomics.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <unzip src="ergonomics.zip" dest="build/netbeans"/>
+    </target>
+    
     <target name="get-netbeans" unless="local-netbeans-is-available" depends="-calculate-netbeans-url">
         <parallel failonany="true">
             <sequential>
@@ -87,6 +115,7 @@
                 <unzip src="testdist.zip" dest="build/testdist"/>
             </sequential>
         </parallel>
+        <antcall target="get-ergonomics"/>
     </target>
 
     <target name="get-sdk-win" if="isWin">
@@ -298,11 +327,54 @@
     </target>
 
     <target name="default-build" depends="clean,build,-zip-clusters"/>
-
+    
     <target name="full-build" depends="clean,nbms,-zip-clusters,l10n-kit"/>
 
     <target name="build-installers" depends="full-build">
       <ant dir="installer"/>
     </target>
+
+    <target name="-enable-ergonomics">
+        <property name="with.ergonomics" value="true"/>
+    </target>
+
+    <target name="build-ergonomics" depends="-taskdefs">
+        <property name="cluster" value="build/netbeans/javafx"/>
+        <property name="ergonomics.cluster" value="build/netbeans/ergonomics"/>
+        <property name="harness.dir" value="build/netbeans/harness"/>
+
+        <mkdir dir="tmp/ergonomics"/>
+        <property name="ergonomicsdir" location="tmp/ergonomics"/>
+        <property name="build.dir" location="${ergonomicsdir}/build"/>
+        
+        <property name="anttasks.jar" location="${harness.dir}/tasks.jar"/>
+        <property name="ergonomics.jar" location="${ergonomics.cluster}/modules/org-netbeans-modules-ide-ergonomics.jar"/>
+        
+        <copy file="${ergonomics.jar}" tofile="tmp/ergonomics.jar"/>
+        <taskdef classname="org.netbeans.modules.ide.ergonomics.ant.ExtractLayer" classpath="tmp/ergonomics.jar" name="extractlayer"/>
+
+        <delete dir="${build.dir}"/>
+        
+        <unzip dest="${build.dir}" src="tmp/ergonomics.jar">
+            <mapper type="flatten"/>
+            <patternset>
+                <include name="**/common-ergonomics.xml"/>
+            </patternset>
+        </unzip>
+        <echo message="# repacked ${line.separator}" file="${build.dir}/empty"/>
+        <property name="cluster.properties" location="${build.dir}/empty"/>
+
+        
+        <ant antfile="${build.dir}/common-ergonomics.xml" target="-disable-one-cluster">
+            <property name="xmldir" value="${ergonomics.cluster}/config/Modules/"/>
+            <property name="cluster.to.process" value="${cluster}"/>
+        </ant>
+        <ant antfile="${build.dir}/common-ergonomics.xml" target="-proxy-one-cluster"/>
+
+        <jar basedir="${ergonomicsdir}/build/classes" jarfile="${ergonomics.jar}" update="true" keepcompression="true"/>
+        <delete dir="tmp"/>
+    </target>
+    
+    <target name="ergonomics-build" depends="-enable-ergonomics,clean,build,build-ergonomics,-zip-clusters"/>
 
 </project>
