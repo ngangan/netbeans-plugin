@@ -124,9 +124,8 @@ public final class FXDComposerController {
     }
 
     public Node getNode(final String id) {
-        Node node = getScene().lookup(id);
-        //System.out.println("Lookup for " + id + " -> " + node);
-        return node;
+        Scene scene = getScene();
+        return scene != null ? scene.lookup(id) : null;
     }
         
     protected boolean hasPreviewTC() {
