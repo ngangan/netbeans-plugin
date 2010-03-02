@@ -61,21 +61,12 @@ public class FXDCompletionDocumentation implements CompletionDocumentation{
     public String getText() {
         sb = new StringBuilder("Information about " + m_item.getDisplayText());
 
-        String descr = getSchemaElementDescription();
-        if (descr != null){
+        String descr = m_item.getDescription();
+        if (descr != null) {
             sb.append("<p>");
             sb.append(descr);
         }
         return sb.toString();
-    }
-
-    private String getSchemaElementDescription(){
-        if(m_item.getSchemaElement() != null ){
-            if ( m_item.getSchemaElement().description != null ){
-                return m_item.getSchemaElement().description;
-            }
-        }
-        return null;
     }
 
     public URL getURL() {

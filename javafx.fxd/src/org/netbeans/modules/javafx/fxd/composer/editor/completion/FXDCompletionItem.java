@@ -153,13 +153,16 @@ public class FXDCompletionItem implements CompletionItem {
     }
 
     public CompletionTask createDocumentationTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
+        if (getDescription() != null) {
+            return new AsyncCompletionTask(new AsyncCompletionQuery() {
 
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                completionResultSet.setDocumentation(new FXDCompletionDocumentation(FXDCompletionItem.this));
-                completionResultSet.finish();
-            }
-        });
+                protected void query(CompletionResultSet completionResultSet, Document document, int i) {
+                    completionResultSet.setDocumentation(new FXDCompletionDocumentation(FXDCompletionItem.this));
+                    completionResultSet.finish();
+                }
+            });
+        }
+        return null;
     }
 
     public CompletionTask createToolTipTask() {
@@ -203,6 +206,13 @@ public class FXDCompletionItem implements CompletionItem {
 
     protected AbstractSchemaElement getSchemaElement() {
         return m_element;
+    }
+
+    protected String getDescription() {
+        if (getSchemaElement() != null && getSchemaElement().description != null) {
+                return getSchemaElement().description;
+        }
+        return null;
     }
 
     protected ImageIcon getIcon() {
