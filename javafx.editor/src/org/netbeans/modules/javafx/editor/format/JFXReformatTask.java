@@ -58,6 +58,7 @@ import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
 import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
+import org.netbeans.spi.lexer.MutableTextInput;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -189,103 +190,42 @@ public class JFXReformatTask implements ReformatTask {
             return;
         }
 
-        for (Diff diff : Pretty.reformat(controller, path, cs, startOffset, endOffset, templateEdit)) {
-            int start = diff.getStartOffset();
-            int end = diff.getEndOffset();
-            String text = diff.getText();
-            if (startOffset > end) {
-                continue;
-            }
-            if (endOffset < start) {
-                continue;
-            }
-            if (endOffset == start && (text == null || !text.trim().equals(RCBRACE))) {
-                continue;
-            }
+        // #180620
+        MutableTextInput<? extends Document> mti = (MutableTextInput<? extends Document>) doc.getProperty(MutableTextInput.class);
+        if (mti != null) {
+            mti.tokenHierarchyControl().setActive(false);
+        }
+        try {
+            for (Diff diff : Pretty.reformat(controller, path, cs, startOffset, endOffset, templateEdit)) {
+                int start = diff.getStartOffset();
+                int end = diff.getEndOffset();
+                String text = diff.getText();
+                if (startOffset > end) {
+                    continue;
+                }
+                if (endOffset < start) {
+                    continue;
+                }
+                if (endOffset == start && (text == null || !text.trim().equals(RCBRACE))) {
+                    continue;
+                }
 
-            if (startOffset >= start) {
-                if (text != null && text.length() > 0) {
-                    TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-                    if (ts == null) {
-                        continue;
-                    }
-                    if (ts.move(startOffset) == 0) {
-                        if (!ts.movePrevious() && !ts.moveNext()) {
+                if (startOffset >= start) {
+                    if (text != null && text.length() > 0) {
+                        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+                        if (ts == null) {
                             continue;
                         }
-                    } else {
-                        if (!ts.moveNext() && !ts.movePrevious()) {
-                            continue;
-                        }
-                    }
-                    if (ts.token().id() == JFXTokenId.WS) {
-                        // JavaFX diffenerce
-                        int tsOffset = ts.offset();
-                        StringBuilder t1 = new StringBuilder();
-                        do {
-                            t1.append(ts.token().text().toString());
-                        } while (ts.moveNext() && ts.token().id() == JFXTokenId.WS);
-
-                        String t = t1.toString();
-//                        String t = ts.token().text().toString();
-                        t = t.substring(0, startOffset - tsOffset);
-                        if (templateEdit) {
-                            int idx = t.lastIndexOf(NEWLINE);
-                            if (idx >= 0) {
-                                t = t.substring(idx + 1);
-                                idx = text.lastIndexOf(NEWLINE);
-                                if (idx >= 0) {
-                                    text = text.substring(idx + 1);
-                                }
-                                if (text.trim().length() > 0) {
-                                    text = null;
-                                } else if (text.length() > t.length()) {
-                                    text = text.substring(t.length());
-                                } else {
-                                    text = null;
-                                }
-                            } else {
-                                text = null;
+                        if (ts.move(startOffset) == 0) {
+                            if (!ts.movePrevious() && !ts.moveNext()) {
+                                continue;
                             }
                         } else {
-                            int idx1 = 0;
-                            int idx2 = 0;
-                            int lastIdx1 = 0;
-                            int lastIdx2 = 0;
-                            while ((idx1 = t.indexOf(NEWLINE, lastIdx1)) >= 0 && (idx2 = text.indexOf(NEWLINE, lastIdx2)) >= 0) {
-                                lastIdx1 = idx1 + 1;
-                                lastIdx2 = idx2 + 1;
-                            }
-                            if ((idx2 = text.lastIndexOf(NEWLINE)) >= 0 && idx2 >= lastIdx2) {
-                                if (lastIdx1 == 0) {
-                                    t = null;
-                                } else {
-                                    text = text.substring(idx2 + 1);
-                                    t = t.substring(lastIdx1);
-                                }
-                            } else if ((idx1 = t.lastIndexOf(NEWLINE)) >= 0 && idx1 >= lastIdx1) {
-                                t = t.substring(idx1 + 1);
-                                text = text.substring(lastIdx2);
-                            } else {
-                                t = t.substring(lastIdx1);
-                                text = text.substring(lastIdx2);
-                            }
-                            if (text != null && t != null) {
-                                text = text.length() > t.length() ? text.substring(t.length()) : null;
+                            if (!ts.moveNext() && !ts.movePrevious()) {
+                                continue;
                             }
                         }
-                    } else if (templateEdit) {
-                        text = null;
-                    }
-                }
-                start = startOffset;
-            }
-            if (endOffset < end) {
-                if (text != null && text.length() > 0 && !templateEdit) {
-                    TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-                    if (ts != null) {
-                        ts.move(endOffset);
-                        if (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
+                        if (ts.token().id() == JFXTokenId.WS) {
                             // JavaFX diffenerce
                             int tsOffset = ts.offset();
                             StringBuilder t1 = new StringBuilder();
@@ -294,26 +234,98 @@ public class JFXReformatTask implements ReformatTask {
                             } while (ts.moveNext() && ts.token().id() == JFXTokenId.WS);
 
                             String t = t1.toString();
-//                            String t = ts.token().text().toString();
-                            t = t.substring(endOffset - tsOffset);
-                            int idx1, idx2;
-                            while ((idx1 = t.lastIndexOf(NEWLINE)) >= 0 && (idx2 = text.lastIndexOf(NEWLINE)) >= 0) {
-                                t = t.substring(0, idx1);
-                                text = text.substring(0, idx2);
+//                        String t = ts.token().text().toString();
+                            t = t.substring(0, startOffset - tsOffset);
+                            if (templateEdit) {
+                                int idx = t.lastIndexOf(NEWLINE);
+                                if (idx >= 0) {
+                                    t = t.substring(idx + 1);
+                                    idx = text.lastIndexOf(NEWLINE);
+                                    if (idx >= 0) {
+                                        text = text.substring(idx + 1);
+                                    }
+                                    if (text.trim().length() > 0) {
+                                        text = null;
+                                    } else if (text.length() > t.length()) {
+                                        text = text.substring(t.length());
+                                    } else {
+                                        text = null;
+                                    }
+                                } else {
+                                    text = null;
+                                }
+                            } else {
+                                int idx1 = 0;
+                                int idx2 = 0;
+                                int lastIdx1 = 0;
+                                int lastIdx2 = 0;
+                                while ((idx1 = t.indexOf(NEWLINE, lastIdx1)) >= 0 && (idx2 = text.indexOf(NEWLINE, lastIdx2)) >= 0) {
+                                    lastIdx1 = idx1 + 1;
+                                    lastIdx2 = idx2 + 1;
+                                }
+                                if ((idx2 = text.lastIndexOf(NEWLINE)) >= 0 && idx2 >= lastIdx2) {
+                                    if (lastIdx1 == 0) {
+                                        t = null;
+                                    } else {
+                                        text = text.substring(idx2 + 1);
+                                        t = t.substring(lastIdx1);
+                                    }
+                                } else if ((idx1 = t.lastIndexOf(NEWLINE)) >= 0 && idx1 >= lastIdx1) {
+                                    t = t.substring(idx1 + 1);
+                                    text = text.substring(lastIdx2);
+                                } else {
+                                    t = t.substring(lastIdx1);
+                                    text = text.substring(lastIdx2);
+                                }
+                                if (text != null && t != null) {
+                                    text = text.length() > t.length() ? text.substring(t.length()) : null;
+                                }
                             }
-                            text = text.length() > t.length() ? text.substring(0, text.length() - t.length()) : null;
+                        } else if (templateEdit) {
+                            text = null;
                         }
                     }
+                    start = startOffset;
                 }
-                end = endOffset;
+                if (endOffset < end) {
+                    if (text != null && text.length() > 0 && !templateEdit) {
+                        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+                        if (ts != null) {
+                            ts.move(endOffset);
+                            if (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
+                                // JavaFX diffenerce
+                                int tsOffset = ts.offset();
+                                StringBuilder t1 = new StringBuilder();
+                                do {
+                                    t1.append(ts.token().text().toString());
+                                } while (ts.moveNext() && ts.token().id() == JFXTokenId.WS);
+
+                                String t = t1.toString();
+//                            String t = ts.token().text().toString();
+                                t = t.substring(endOffset - tsOffset);
+                                int idx1, idx2;
+                                while ((idx1 = t.lastIndexOf(NEWLINE)) >= 0 && (idx2 = text.lastIndexOf(NEWLINE)) >= 0) {
+                                    t = t.substring(0, idx1);
+                                    text = text.substring(0, idx2);
+                                }
+                                text = text.length() > t.length() ? text.substring(0, text.length() - t.length()) : null;
+                            }
+                        }
+                    }
+                    end = endOffset;
+                }
+                start = controller.getSnapshot().getOriginalOffset(start);
+                end = controller.getSnapshot().getOriginalOffset(end);
+                start += shift;
+                end += shift;
+                doc.remove(start, end - start);
+                if (text != null && text.length() > 0) {
+                    doc.insertString(start, text, null);
+                }
             }
-            start = controller.getSnapshot().getOriginalOffset(start);
-            end = controller.getSnapshot().getOriginalOffset(end);
-            start += shift;
-            end += shift;
-            doc.remove(start, end - start);
-            if (text != null && text.length() > 0) {
-                doc.insertString(start, text, null);
+        } finally {
+            if (mti != null) {
+                mti.tokenHierarchyControl().setActive(true);
             }
         }
         shift = region.getEndOffset() - originalEndOffset;
