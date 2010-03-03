@@ -83,6 +83,8 @@ public class FXDCompletionItem implements CompletionItem {
             = "0";//NOI18N
     protected static final String PRIMITIVE_TYPE_DEF_VALUE_BOOLEAN
             = "true";//NOI18N
+    protected static final String OBJECT_DEF_VALUE_NULL
+            = "null";//NOI18N
 
     private String m_displayText;
     private String m_text;
@@ -170,7 +172,7 @@ public class FXDCompletionItem implements CompletionItem {
 
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\"");
+                toolTip.setTipText("Press Enter to insert \"" + getText() + "\""); //NOI18N
                 completionResultSet.setToolTip(toolTip);
                 completionResultSet.finish();
             }
@@ -266,10 +268,14 @@ public class FXDCompletionItem implements CompletionItem {
         assert prop.defaultValue != null;
         if (prop.isArray){
             String str = prop.defaultValue.toString();
-            if (str.equals("]")){
-                str = "[]";
+            if (str.equals("]")){                                               //NOI18N
+                str = "[]";                                                     //NOI18N
             }
             return str;
+        } else if (prop.defaultValue.equals("$null$")){                         //NOI18N
+            return OBJECT_DEF_VALUE_NULL;
+        } else if (prop.defaultValue.equals("")){                               //NOI18N
+            return PRIMITIVE_TYPE_DEF_VALUE_STRING;
         } else {
             return prop.defaultValue.toString();
         }
