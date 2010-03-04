@@ -1,415 +1,448 @@
 /*
- *  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- *  Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
- * 
- *  The contents of this file are subject to the terms of either the GNU
- *  General Public License Version 2 only ("GPL") or the Common
- *  Development and Distribution License("CDDL") (collectively, the
- *  "License"). You may not use this file except in compliance with the
- *  License. You can obtain a copy of the License at
- *  http://www.netbeans.org/cddl-gplv2.html
- *  or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
- *  specific language governing permissions and limitations under the
- *  License.  When distributing the software, include this License Header
- *  Notice in each file and include the License file at
- *  nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
- *  particular file as subject to the "Classpath" exception as provided
- *  by Sun in the GPL Version 2 section of the License file that
- *  accompanied this code. If applicable, add the following below the
- *  License Header, with the fields enclosed by brackets [] replaced by
- *  your own identifying information:
- *  "Portions Copyrighted [year] [name of copyright owner]"
- * 
- *  Contributor(s):
- * 
- *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import org.netbeans.modules.javafx.refactoring.impl.scanners.BaseRefactoringScanner;
-import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFilesElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
+import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.Problem;
-import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
+import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
+import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
+import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
  *
- * @author Jaroslav Bachorik
+ * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
-    private final AtomicBoolean requestCancelled = new AtomicBoolean(false);
-
+public class RenameRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
     private RenameRefactoring refactoring;
 
-    private boolean doCheckName = true;
+    public RenameRefactoringPlugin(RenameRefactoring refactoring) {
+        this.refactoring = refactoring;
+        FileObject srcFo = getRefactoringFO();
 
-    private Collection<ExecutableElement> overriddenByMethods = null; // methods that override the method to be renamed
-    private Collection<ExecutableElement> overridesMethods = null; // methods that are overridden by the method to be renamed
-
-    private ElementLocation location = null;
-
-    public RenameRefactoringPlugin(RenameRefactoring rename) {
-        this.refactoring = rename;
-        ElementLocation loc = rename.getRefactoringSource().lookup(ElementLocation.class);
-        if (loc!=null) {
-            this.location = loc;
-        } else {
-            try {
-                getSource().runUserActionTask(new Task<CompilationController>() {
-                    public void cancel() {
-                    }
-
-                    public void run(CompilationController co) throws Exception {
-                        UnitTree cut = co.getCompilationUnit();
-                        for (Tree t: cut.getTypeDecls()) {
-                            JavaFXTreePath path = JavaFXTreePath.getPath(cut, t);
-                            Element e = co.getTrees().getElement(path);
-                            if (e!=null && e.getSimpleName().toString().equals(co.getFileObject().getName())) {
-                                location = ElementLocation.forPath(path, co);
-                                refactoring.getContext().add(co);
-                                break;
-                            }
-                        }
-                    }
-                }, false);
-            } catch (IllegalArgumentException ex) {
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                ex.printStackTrace();
+        // make sure the file image on disk is up-to-date
+        try {
+            DataObject dobj = DataObject.find(srcFo);
+            SaveCookie sc = dobj.getCookie(SaveCookie.class);
+            if (sc != null) {
+                sc.save();
             }
+        } catch (IOException iOException) {
         }
-    }
-
-    @Override
-    protected JavaFXSource prepareSource() {
-        return JavaFXSource.forFileObject(location.getSourceFile());
     }
 
     public void cancelRequest() {
-        requestCancelled.set(true);
+        //
     }
 
-    public Problem checkParameters(final CompilationInfo info) {
-        final String newElementName = refactoring.getNewName();
+    public Problem checkParameters() {
+        fireProgressListenerStart(RenameRefactoring.PARAMETERS_CHECK, 4);
+        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final Problem p[] = new Problem[1];
+        FileObject fo = getRefactoringFO();
 
-        final AtomicReference<Problem> problem = new AtomicReference<Problem>();
+        String msg = null;
+        if (edef != null) {
+            if (edef.isOverriding()) {
+                p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_Overrides"))); // NOI18N
+            }
 
-        switch(location.getElement(info).getKind()) {
-            case CLASS: {
-                TypeElement te = (TypeElement) info.getElementUtilities().elementFor(location.getStartPosition());
-                switch(te.getNestingKind()) {
-                    case MEMBER: {
-                        final TypeElement parent = (TypeElement)te.getEnclosingElement();
-                        JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
-                            @Override
-                            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-                                TypeElement current = (TypeElement)info.getTrees().getElement(getCurrentPath());
-                                if (current.getEnclosingElement().equals(parent)) {
-                                    if (current.getSimpleName().toString().equals(newElementName)) {
-                                        problem.set(new Problem(true, "Can not rename to " + current.getQualifiedName() + " - it already exists."));
-                                    }
-                                }
-                                return super.visitClassDeclaration(node, p);
-                            }
-                        };
-                        scanner.scan(info.getCompilationUnit(), null);
+            fireProgressListenerStep();
+
+            if (edef.getKind().isClass()) {
+                if (!edef.getNestingKind().isNested()) {
+                    ClasspathInfo cpInfo = refactoring.getContext().lookup(ClasspathInfo.class);
+                    ClassIndex ci = cpInfo.getClassIndex();
+                    Set<FileObject> typeDefFOs = ci.getResources(edef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_DEFS), EnumSet.allOf(ClassIndex.SearchScope.class));
+                    FileObject typeDefFO = typeDefFOs.iterator().next();
+
+                    String oldFqn = edef.createHandle().getQualifiedName();
+                    int pkgDelimitIndex = oldFqn.lastIndexOf(edef.getName());
+                    String pkgname = oldFqn.substring(0, pkgDelimitIndex > 0 ? pkgDelimitIndex - 1 : 0);
+                    String newFqn = pkgname + "." + refactoring.getNewName();
+
+                    if (!ci.getDeclaredTypes(newFqn, ClassIndex.NameKind.EXACT, EnumSet.allOf(ClassIndex.SearchScope.class)).isEmpty()) {
+                        msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ClassClash", new Object[] {refactoring.getNewName(), pkgname});
                     }
-                }
-                break;
-            }
-        }
-
-        return problem.get();
-    }
-
-    public Problem fastCheckParameters(CompilationInfo info) {
-        Problem fastCheckProblem = null;
-        Element element = info.getElementUtilities().elementFor(location.getStartPosition());
-        JavaFXTreePath treePath = info.getTrees().getPath(element);
-
-        ElementKind kind = element.getKind();
-
-        String newName = refactoring.getNewName();
-        String oldName = element.getSimpleName().toString();
-
-        if (oldName.equals(newName)) {
-            boolean nameNotChanged = true;
-            if (kind.isClass()) {
-                if (!((TypeElement) element).getNestingKind().isNested()) {
-                    nameNotChanged = info.getFileObject().getName().contentEquals(((TypeElement) element).getSimpleName());
-                }
-            }
-            if (nameNotChanged) {
-                fastCheckProblem = createProblem(fastCheckProblem, true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_NameNotChanged"));
-                return fastCheckProblem;
-            }
-
-        }
-
-        if (!Utilities.isJavaIdentifier(newName)) {
-            String msg = kind == ElementKind.PACKAGE?
-                NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidPackage", new Object[]{newName}) :
-                NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidIdentifier", new Object[]{newName}); //NOI18N
-
-            fastCheckProblem = createProblem(fastCheckProblem, true, msg);
-            return fastCheckProblem;
-        }
-
-        if (kind.isClass() && !((TypeElement) element).getNestingKind().isNested()) {
-            if (doCheckName) {
-                Set<FileObject> typeDefFOs = getClassIndex().getResources(ElementHandle.create(element), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
-                FileObject typeDefFO = typeDefFOs.iterator().next();
-
-                String oldFqn = ElementHandle.create(element).getQualifiedName();
-                int pkgDelimitIndex = oldFqn.lastIndexOf(oldName);
-                String pkgname = oldFqn.substring(0, pkgDelimitIndex > 0 ? pkgDelimitIndex - 1 : 0);
-                String newFqn = pkgname + "." + newName;
-
-                if (!getClassIndex().getDeclaredTypes(newFqn, ClassIndex.NameKind.EXACT, EnumSet.allOf(SearchScope.class)).isEmpty()) {
-                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ClassClash", new Object[] {newName, pkgname});
-                    fastCheckProblem = createProblem(fastCheckProblem, true, msg);
-                    return fastCheckProblem;
-                }
-                FileObject parentFolder = typeDefFO.getParent();
-                Enumeration enumeration = parentFolder.getFolders(false);
-                while (enumeration.hasMoreElements()) {
-                    FileObject subfolder = (FileObject) enumeration.nextElement();
-                    if (subfolder.getName().equals(newName)) {
-                        String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ClassPackageClash", new Object[] {newName, pkgname});
-                        fastCheckProblem = createProblem(fastCheckProblem, true, msg);
-                        return fastCheckProblem;
-                    }
-                }
-            }
-            FileObject primFile = location.getSourceFile();
-            FileObject folder = primFile.getParent();
-            FileObject existing = folder.getFileObject(newName, primFile.getExt());
-            if (existing != null && primFile != existing) {
-                // primFile != existing is check for case insensitive filesystems; #136434
-                String msg = NbBundle.getMessage(RenameRefactoringPlugin.class,
-                        "ERR_ClassClash", newName, folder.getPath());
-                fastCheckProblem = createProblem(fastCheckProblem, true, msg);
-            }
-        } else if (kind == ElementKind.LOCAL_VARIABLE || kind == ElementKind.PARAMETER) {
-            String msg = variableClashes(newName,treePath, info);
-            if (msg != null) {
-                fastCheckProblem = createProblem(fastCheckProblem, true, msg);
-                return fastCheckProblem;
-            }
-        } else {
-            String msg = clashes(element, newName, info);
-            if (msg != null) {
-                fastCheckProblem = createProblem(fastCheckProblem, true, msg);
-                return fastCheckProblem;
-            }
-        }
-        return fastCheckProblem;
-    }
-
-    public Problem preCheck(CompilationInfo info) {
-        Problem preCheckProblem = null;
-        fireProgressListenerStart(RenameRefactoring.PRE_CHECK, 4);
-        Element el = info.getElementUtilities().elementFor(location.getStartPosition());
-        preCheckProblem = isSourceElement(el, info);
-        if (preCheckProblem != null) return preCheckProblem;
-        if (el != null) {
-            switch (el.getKind()) {
-                case METHOD: {
-                    fireProgressListenerStep();
-                    fireProgressListenerStep();
-                    overriddenByMethods = SourceUtils.getOverridingMethods((ExecutableElement)el, info);
-    //                            fireProgressListenerStep();
-                    if (el.getModifiers().contains(Modifier.NATIVE)) {
-                        preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", el));
-                    }
-                    if (!overriddenByMethods.isEmpty()) {
-                        String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_IsOverridden",
-                                new Object[] {ElementUtilities.enclosingTypeElement(el).getSimpleName().toString()});
-                        preCheckProblem = createProblem(preCheckProblem, false, msg);
-                    }
-                    for (ExecutableElement e : overriddenByMethods) {
-                        if (e.getModifiers().contains(Modifier.NATIVE)) {
-                            preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", e));
+                    FileObject parentFolder = typeDefFO.getParent();
+                    Enumeration enumeration = parentFolder.getFolders(false);
+                    while (enumeration.hasMoreElements()) {
+                        FileObject subfolder = (FileObject) enumeration.nextElement();
+                        if (subfolder.getName().equals(refactoring.getNewName())) {
+                            msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ClassPackageClash", new Object[] {refactoring.getNewName(), pkgname});
                         }
                     }
-                    overridesMethods = SourceUtils.getOverridenMethods((ExecutableElement)el, info);
-                    fireProgressListenerStep();
-                    if (!overridesMethods.isEmpty()) {
-                        boolean fatal = false;
-                        for (ExecutableElement method : overridesMethods) {
-                            if (method.getModifiers().contains(Modifier.NATIVE)) {
-                                preCheckProblem = createProblem(preCheckProblem, false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method));
-                            }
-                            if (SourceUtils.isFromLibrary(method, info.getClasspathInfo())) {
-                                fatal = true;
+                }
+            }
+            fireProgressListenerStep();
+        }
+        FileObject primFile = fo;
+        FileObject folder = primFile.getParent();
+        FileObject existing = folder.getFileObject(refactoring.getNewName(), primFile.getExt());
+        if (existing != null && primFile != existing) {
+            // primFile != existing is check for case insensitive filesystems; #136434
+            msg = NbBundle.getMessage(RenameRefactoringPlugin.class,
+                    "ERR_ClassClash", refactoring.getNewName(), folder.getPath());
+        }
+        fireProgressListenerStep();
+        if (edef != null) {
+            if (msg == null) {
+                if (edef.getKind() == ElementKind.LOCAL_VARIABLE || edef.getKind() == ElementKind.PARAMETER) {
+                    msg = variableClashes();
+                } else {
+                    msg = clashes();
+                }
+            }
+        }
+        fireProgressListenerStep();
+        if (msg != null) {
+            p[0] = chainProblems(p[0], new Problem(true, msg));
+        }
+        
+        fireProgressListenerStop();
+        
+        return p[0];
+    }
+
+    public Problem fastCheckParameters() {
+        ClassModel cm = getClassModel();
+
+        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        if (edef == null) return null;
+        
+        Problem p = null;
+        if (edef.getName().equals(refactoring.getNewName())) {
+            p = chainProblems(p, new Problem(true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_NameNotChanged"))); // NOI18N
+        }
+
+        if (!Utilities.isJavaIdentifier(refactoring.getNewName())) {
+            String msg = edef.getKind() == ElementKind.PACKAGE?
+                NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidPackage", new Object[]{refactoring.getNewName()}) :
+                NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InvalidIdentifier", new Object[]{refactoring.getNewName()}); //NOI18N
+
+            p = chainProblems(p, new Problem(true, msg));
+        }
+
+        for(ElementDef ed : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE))) {
+            if (ed.getName().equals(refactoring.getNewName())) {
+                p = chainProblems(p, new Problem(true, "Can not rename to " + refactoring.getNewName() + " - it already exists."));
+            }
+        }
+
+        return p;
+    }
+
+    public Problem preCheck() {
+        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        if (edef == null) return null;
+        
+        final Problem p[] = new Problem[1];
+        FileObject fo = getRefactoringFO();
+
+        fireProgressListenerStart(RenameRefactoring.PRE_CHECK, 4);
+        
+        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        try {
+            jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                public void run(CompilationController cc) throws Exception {
+                    Element el = cc.getElementUtilities().elementFor(edef.getStartPos());
+                    p[0] = chainProblems(p[0], isSourceElement(el, cc));
+                    if (el != null) {
+                        switch (el.getKind()) {
+                            case METHOD: {
+                                fireProgressListenerStep();
+                                fireProgressListenerStep();
+                                Collection<ExecutableElement> overriddenByMethods = SourceUtils.getOverridingMethods((ExecutableElement)el, cc);
+                                fireProgressListenerStep();
+                                if (el.getModifiers().contains(Modifier.NATIVE)) {
+                                    p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", el)));
+                                }
+                                if (!overriddenByMethods.isEmpty()) {
+                                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_IsOverridden",
+                                            new Object[] {ElementUtilities.enclosingTypeElement(el).getSimpleName().toString()});
+                                    p[0] = chainProblems(p[0], new Problem(false, msg));
+                                }
+                                for (ExecutableElement e : overriddenByMethods) {
+                                    if (e.getModifiers().contains(Modifier.NATIVE)) {
+                                        p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", e)));
+                                    }
+                                }
+                                Collection<ExecutableElement> overridesMethods = SourceUtils.getOverridenMethods((ExecutableElement)el, cc);
+                                fireProgressListenerStep();
+                                if (!overridesMethods.isEmpty()) {
+                                    boolean fatal = false;
+                                    for (ExecutableElement method : overridesMethods) {
+                                        if (method.getModifiers().contains(Modifier.NATIVE)) {
+                                            p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method)));
+                                        }
+                                        Element parentClz = method.getEnclosingElement();
+                                        while (parentClz != null && parentClz.getKind() != ElementKind.CLASS && parentClz.getKind() != ElementKind.INTERFACE) {
+                                            parentClz = parentClz.getEnclosingElement();
+                                        }
+                                        if (parentClz == null || SourceUtils.isFromLibrary(parentClz, cc)) {
+                                            fatal = true;
+                                            break;
+                                        }
+                                    }
+                                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fatal?"ERR_Overrides_Fatal":"ERR_Overrides");
+                                    p[0] = chainProblems(p[0], new Problem(fatal, msg));
+                                    fireProgressListenerStep();
+                                }
                                 break;
                             }
                         }
-                        String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fatal?"ERR_Overrides_Fatal":"ERR_Overrides");
-                        preCheckProblem = createProblem(preCheckProblem, fatal, msg);
+                    } else {
+                        p[0] = chainProblems(p[0], new Problem(true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ErroneousSource", cc.getFileObject().getPath())));
                     }
-                    break;
                 }
-            }
-        } else {
-            preCheckProblem = createProblem(preCheckProblem, true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ErroneousSource", info.getFileObject().getPath()));
+            }, true);
+        } catch (IOException iOException) {
         }
+        
         fireProgressListenerStop();
-        return preCheckProblem;
+        return p[0];
     }
 
-    private class RenameOccurences extends BaseRefactoringElementImplementation {
+    public Problem prepare(RefactoringElementsBag bag) {
+        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        if (edef == null) return null; // fail earl
 
-        public RenameOccurences(FileObject srcFO, RefactoringSession session) {
-            super(srcFO, session);
+        final FileObject fo = getRefactoringFO();
+        ClassIndex ci = refactoring.getContext().lookup(ClassIndex.class);
+        ClasspathInfo cpInfo = refactoring.getContext().lookup(ClasspathInfo.class);
+        if (cpInfo == null) {
+            cpInfo = ClasspathInfo.create(fo);
+            refactoring.getContext().add(cpInfo);
         }
 
-        @Override
-        protected Set<Transformation> prepareTransformations(CompilationController cc) {
-            final Set<ElementLocation> references = new HashSet<ElementLocation>();
-            final Set<Transformation> transforms = new HashSet<Transformation>();
+        final Set<FileObject> files = new HashSet<FileObject>();
+        files.add(fo);
 
-            JavaFXTreePathScanner<Void, Set<ElementLocation>> scanner = new BaseRefactoringScanner(location, cc);
-            scanner.scan(cc.getCompilationUnit(), references);
+        if (edef.isIndexable()) {
+            ElementHandle eh = edef.createHandle();
+            Element e = edef.getElement();
+            TypeElement te = (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) ? (TypeElement)e : ElementUtilities.enclosingTypeElement(e);
 
-            for(ElementLocation el : references) {
-                transforms.add(new ReplaceTextTransformation(el.getStartPosition(), el.getSimpleName(), refactoring.getNewName()));
+            files.addAll(ci.getResources(
+                    eh,
+                    EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.TYPE_DEFS, ClassIndex.SearchKind.METHOD_REFERENCES, ClassIndex.SearchKind.FIELD_REFERENCES),
+                    EnumSet.allOf(ClassIndex.SearchScope.class)));
+
+            files.addAll(ci.getResources(
+                    ElementHandle.create(te),
+                    EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
+                    EnumSet.allOf(ClassIndex.SearchScope.class)));
+        }
+        for(FileObject file : files) {
+            BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(file, bag.getSession()) {
+
+                @Override
+                protected Set<Transformation> prepareTransformations(FileObject fo) {
+                    ClassModel localCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+
+                    Set<Transformation> transformations = new HashSet<Transformation>();
+                    Set<Usage> usages = new HashSet<Usage>();
+                    usages.addAll(localCm.getUsages(edef));
+                    if (edef.getKind() == ElementKind.METHOD) {
+                        for(Usage usg : localCm.getUsages()) {
+                            if (usg.getDef().getKind() == edef.getKind()) {
+                                if (usg.getDef().overrides(edef) || edef.overrides(usg.getDef())) {
+                                    usages.add(usg);
+                                }
+                            }
+                        }
+                    }
+                    for(Usage usg : usages) {
+                        transformations.add(new ReplaceTextTransformation(usg.getStartPos(), usg.getDef().getName(), refactoring.getNewName()));
+                    }
+                    return transformations;
+                }
+
+                protected String getRefactoringText() {
+                    return "Rename Occurences";
+                }
+            };
+            bag.add(refactoring, updateRefs);
+
+            if (file.equals(fo)) {
+                bag.addFileChange(refactoring, new ReindexFilesElement(file, files));
             }
-
-            return transforms;
         }
-
-        public String getDisplayText() {
-            return "Rename Occurences";
-        }
-
+        return null;
     }
 
-    public Problem prepare(final RefactoringElementsBag bag) {
-        JavaFXSource jfxs = JavaFXSource.forFileObject(location.getSourceFile());
-        try {
-            final Set<FileObject> refFos = new HashSet<FileObject>();
-            refFos.add(location.getSourceFile());
+    private static Problem chainProblems(Problem p,Problem p1) {
+        Problem problem;
+        if (p==null) return p1;
+        if (p1==null) return p;
+        problem=p;
+        while(problem.getNext()!=null) {
+            problem=problem.getNext();
+        }
+        problem.setNext(p1);
+        return p;
+    }
 
-            final ElementHandle[] handle = new ElementHandle[1];
+    private String variableClashes() {
+        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final FileObject srcFo = getRefactoringFO();
+
+        JavaFXSource jfxs = JavaFXSource.forFileObject(srcFo);
+        final String[] msg = new String[1];
+
+        try {
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
-                public void run(final CompilationController cc) throws Exception {
-                    final ClassIndex ci = cc.getClasspathInfo().getClassIndex();
-                    Element el = cc.getElementUtilities().elementFor(location.getStartPosition());
-                    handle[0] = ElementHandle.create(el);
-                    switch(el.getKind()) {
-                        case CLASS:
-                        case INTERFACE: {
-                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
-                            if (((TypeElement)el).getNestingKind() == NestingKind.TOP_LEVEL) {
-                                new JavaFXTreePathScanner<Void, Void>() {
+                public void run(CompilationController cc) throws Exception {
+                    if (edef != null) {
+                        Element var = cc.getElementUtilities().elementFor(edef.getStartPos());
 
-                                    @Override
-                                    public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-                                        TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-                                        if (te.getNestingKind() == NestingKind.MEMBER) {
-                                            refFos.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(SearchKind.TYPE_REFERENCES, SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class)));
+                        JavaFXTreePath tp = cc.getPath(var);
+
+                        LocalVarScanner lookup = new LocalVarScanner(cc, refactoring.getNewName());
+                        JavaFXTreePath scopeBlok = tp;
+                        EnumSet set = EnumSet.of(Tree.JavaFXKind.BLOCK_EXPRESSION, Tree.JavaFXKind.FOR_EXPRESSION_FOR, Tree.JavaFXKind.FUNCTION_DEFINITION, Tree.JavaFXKind.CLASS_DECLARATION);
+                        while (scopeBlok != null && scopeBlok.getLeaf() != null && !set.contains(scopeBlok.getLeaf().getJavaFXKind())) {
+                            scopeBlok = scopeBlok.getParentPath();
+                        }
+                        if (scopeBlok != null) {
+                            lookup.scan(scopeBlok, var);
+
+                            if (lookup.hasRefernces()) {
+                                msg[0] = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[]{refactoring.getNewName()}); // NOI18N
+                                return;
+                            }
+
+                            Scope scope = null;
+                            if (tp != null) {
+                                scope = cc.getTrees().getScope(tp);
+                                if (scope != null) {
+                                    for (Element el : scope.getLocalElements()) {
+                                        if (el.getSimpleName().toString().equals(refactoring.getNewName())) {
+                                            msg[0] = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[]{refactoring.getNewName()}); // NOI18N
+                                            return;
                                         }
-                                        return super.visitClassDeclaration(node, p);
                                     }
-
-                                }.scan(cc.getCompilationUnit(), null);
+                                }
                             }
-                            break;
-                        }
-                        case FIELD: {
-                            ElementHandle typeHandle = ElementHandle.create(el.getEnclosingElement());
-                            if (typeHandle != null) {
-                                refFos.addAll(ci.getResources(typeHandle, EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)));
-                            }
-                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.FIELD_REFERENCES), EnumSet.allOf(SearchScope.class)));
-                            break;
-                        }
-                        case METHOD: {
-                            ElementHandle typeHandle = ElementHandle.create(el.getEnclosingElement());
-                            if (typeHandle != null) {
-                                refFos.addAll(ci.getResources(typeHandle, EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)));
-                            }
-                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.METHOD_REFERENCES), EnumSet.allOf(SearchScope.class)));
-                            break;
-                        }
-                        case PACKAGE: {
-                            refFos.addAll(ci.getResources(handle[0], EnumSet.of(SearchKind.PACKAGES), EnumSet.allOf(SearchScope.class)));
-                            break;
                         }
                     }
                 }
             }, true);
+        } catch (IOException e) {
+        }
+        
+        return msg[0];
+    }
 
-            for(FileObject fo : refFos) {
-                RenameOccurences rename = new RenameOccurences(fo, bag.getSession());
-                if (rename.hasChanges()) {
-                    bag.add(refactoring, rename);
+    private String clashes() {
+        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+
+        Element feature = edef.getElement();
+
+        Element dc = feature.getEnclosingElement();
+        ElementKind kind = edef.getKind();
+        final String newName = refactoring.getNewName();
+        
+        if (kind.isClass() || kind.isInterface()) {
+            for (Element current:ElementFilter.typesIn(dc.getEnclosedElements())) {
+                if (current.getSimpleName().toString().equals(newName)) {
+                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InnerClassClash",new Object[] {newName,dc.getSimpleName()}); // NOI18N
                 }
             }
-        } catch (IOException e) {
-            return new Problem(true, e.getLocalizedMessage());
+        } else if (kind==ElementKind.METHOD) {
+            if (ElementUtilities.alreadyDefinedIn((CharSequence) newName, (ExecutableElement) feature, (TypeElement) dc)) {
+                return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_MethodClash", new Object[] {newName,dc.getSimpleName()}); // NOI18N
+            }
+        } else if (kind.isField()) {
+            for (Element current:ElementFilter.fieldsIn(dc.getEnclosedElements())) {
+                if (current.getSimpleName().toString().equals(newName)) {
+                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_FieldClash", new Object[] {newName,dc.getSimpleName()}); // NOi18N
+                }
+            }
         }
         return null;
     }
 
     private static final Problem isSourceElement(TypeElement el, CompilationInfo info) {
         Problem preCheckProblem = null;
-        if (SourceUtils.isFromLibrary(el, info.getClasspathInfo())) { //NOI18N
+        if (SourceUtils.isFromLibrary(el, info)) { //NOI18N
             preCheckProblem = new Problem(true, NbBundle.getMessage(
-                    RenameRefactoringPlugin.class, "ERR_CannotRefactorLibraryClass",
+                    RenameRefactoringPlugin.class, "ERR_CannotRefactorLibraryClass", // NOI18N
                     el
                     ));
             return preCheckProblem;
         }
-        FileObject file = SourceUtils.getFile(el,info.getClasspathInfo());
+        FileObject file = SourceUtils.getFile(el,info);
         // RetoucheUtils.isFromLibrary already checked file for null
         if (!SourceUtils.isFileInOpenProject(file)) {
             preCheckProblem =new Problem(true, NbBundle.getMessage(
                     RenameRefactoringPlugin.class,
-                    "ERR_ProjectNotOpened",
+                    "ERR_ProjectNotOpened", // NOI18N
                     FileUtil.getFileDisplayName(file)));
             return preCheckProblem;
         }
@@ -424,56 +457,19 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         return e != null ? isSourceElement((TypeElement)e, info) : null;
     }
 
-    private String clashes(Element feature, String newName, CompilationInfo info) {
-        ElementUtilities utils = info.getElementUtilities();
-        Element dc = feature.getEnclosingElement();
-        ElementKind kind = feature.getKind();
-        if (kind.isClass() || kind.isInterface()) {
-            for (Element current:ElementFilter.typesIn(dc.getEnclosedElements())) {
-                if (current.getSimpleName().toString().equals(newName)) {
-                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_InnerClassClash",new Object[] {newName, dc.getSimpleName()});
-                }
-            }
-        } else if (kind==ElementKind.METHOD) {
-            if (utils.alreadyDefinedIn((CharSequence) newName, (ExecutableElement) feature, (TypeElement) dc)) {
-                return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_MethodClash", new Object[] {newName, dc.getSimpleName()});
-            }
-        } else if (kind.isField()) {
-            for (Element current:ElementFilter.fieldsIn(dc.getEnclosedElements())) {
-                if (current.getSimpleName().toString().equals(newName)) {
-                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_FieldClash", new Object[] {newName, dc.getSimpleName()});
-                }
-            }
+    private ClassModel getClassModel() {
+        FileObject fo = getRefactoringFO();
+        if (fo != null) {
+            return ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
         }
         return null;
     }
 
-    private String variableClashes(String newName, JavaFXTreePath tp, CompilationInfo info) {
-        LocalVarScanner lookup = new LocalVarScanner(info, newName);
-        JavaFXTreePath scopeBlok = tp;
-        EnumSet set = EnumSet.of(Tree.JavaFXKind.BLOCK_EXPRESSION, Tree.JavaFXKind.FOR_EXPRESSION_FOR, Tree.JavaFXKind.FUNCTION_DEFINITION);
-        while (scopeBlok != null && scopeBlok.getLeaf() != null && !set.contains(scopeBlok.getLeaf().getJavaFXKind())) {
-            scopeBlok = scopeBlok.getParentPath();
+    private FileObject getRefactoringFO() {
+        FileObject fo = refactoring.getRefactoringSource().lookup(FileObject.class);
+        if (fo == null) {
+            fo = refactoring.getContext().lookup(FileObject.class);
         }
-        if (scopeBlok != null) {
-            Element var = info.getTrees().getElement(tp);
-            lookup.scan(scopeBlok, var);
-
-            if (lookup.hasRefernces())
-                return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
-
-            Scope scope = null;
-            if (tp != null) {
-                scope = info.getTrees().getScope(tp);
-                if (scope != null) {
-                    for (Element el:scope.getLocalElements()) {
-                        if (el.getSimpleName().toString().equals(newName)) {
-                            return NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_LocVariableClash", new Object[] {newName});
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+        return fo;
     }
 }

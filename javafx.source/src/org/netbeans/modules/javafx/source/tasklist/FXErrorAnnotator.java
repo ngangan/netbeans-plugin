@@ -66,6 +66,7 @@ import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.modules.masterfs.providers.AnnotationProvider;
@@ -279,12 +280,14 @@ public class FXErrorAnnotator extends AnnotationProvider {
             private void process() {
                 try {
                     JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                    jfxs.runWhenScanFinished(new Task<CompilationController>() {
+                    if (jfxs != null) {
+                        jfxs.runWhenScanFinished(new Task<CompilationController>() {
 
-                        public void run(CompilationController cc) throws Exception {
-                            FXErrorAnnotator.this.process(cc, ProcessRelatedFilesLambda.NULL);
-                        }
-                    }, true);
+                            public void run(CompilationController cc) throws Exception {
+                                FXErrorAnnotator.this.process(cc, ProcessRelatedFilesLambda.NULL);
+                            }
+                        }, true);
+                    }
                 } catch (IOException e) {
 
                 }
@@ -329,6 +332,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
             try {
                 for (FileObject dep : dependencies) {
+                    if (dep == null) continue; // no idea why ...
                     top = mergeParents(top, dep);
                     if (top == null) {
                         top = dep.getFileSystem().getRoot();

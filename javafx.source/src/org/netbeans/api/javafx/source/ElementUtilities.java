@@ -74,6 +74,7 @@ import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -105,7 +106,7 @@ public final class ElementUtilities {
 //        this.delegate = ElementsService.instance(ctx);
     }
 
-    public boolean alreadyDefinedIn(CharSequence name, ExecutableElement method, TypeElement enclClass) {
+    static public boolean alreadyDefinedIn(CharSequence name, ExecutableElement method, TypeElement enclClass) {
         ElementHandle origHandle = ElementHandle.create(method);
         String sigs[] = origHandle.getSignatures();
         origHandle = new ElementHandle(origHandle.getKind(), new String[]{sigs[0], name.toString(), sigs[2]});
@@ -144,6 +145,29 @@ public final class ElementUtilities {
 	}
 	
 	return (TypeElement)element.getEnclosingElement(); // Wrong
+    }
+
+    /**
+     * Returns the type element within which this member or constructor
+     * is declared. Does not accept pakages
+     * If this is the declaration of a top-level type (a non-nested class
+     * or interface), returns null.
+     *
+     * @return the type declaration within which this member or constructor
+     * is declared, or null if there is none
+     * @throws IllegalArgumentException if the provided element is a package element
+     */
+    public static PackageElement enclosingPackageElement( Element element ) throws IllegalArgumentException {
+
+	if( element.getKind() == ElementKind.PACKAGE ) {
+            return null;
+        }
+
+	while( !(element.getEnclosingElement().getKind() == ElementKind.PACKAGE) ) {
+	    element = element.getEnclosingElement();
+	}
+
+	return (PackageElement)element.getEnclosingElement(); // Wrong
     }
 
     /**
@@ -260,7 +284,7 @@ public final class ElementUtilities {
                     long end = positions.getEndPosition(parserResultImpl.getCompilationUnit(), tree);
 
                     if (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals(""))) {
-                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && start != -1 && start != end && start <= pos && end >=pos) {
+                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && tree.getJavaFXKind() != Tree.JavaFXKind.FUNCTION_VALUE && start != -1 && start != end && start <= pos && end >=pos) {
                             // check for javafx$run$ magic
                             if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
                                 long span = end - start + 1;
@@ -274,8 +298,10 @@ public final class ElementUtilities {
                                             e[0] = getPackageElement(tree.toString());
                                             lastValidSpan = span;
                                         } else if (tree.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
-                                            e[0] = ((JFXOverrideClassVar)tree).sym;
-                                            lastValidSpan = span;
+                                            if (tree instanceof JFXOverrideClassVar) {
+                                                e[0] = ((JFXOverrideClassVar)tree).sym;
+                                                lastValidSpan = span;
+                                            }
                                         }
                                     }
                                 }

@@ -46,7 +46,6 @@ import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.SourceTestBase;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.*;
 
 /**
  *

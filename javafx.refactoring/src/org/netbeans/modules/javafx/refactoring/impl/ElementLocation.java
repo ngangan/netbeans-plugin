@@ -38,6 +38,7 @@ import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -74,6 +75,19 @@ final public class ElementLocation {
         this.handle = ElementHandle.create(element);
         this.simpleName = element.getSimpleName().toString();
         setPositions(position, ci);
+    }
+
+    private ElementDef elDef;
+
+    public ElementDef getElementDef() {
+        return elDef;
+    }
+
+    public ElementLocation(ElementDef elDef, FileObject fo) {
+        this.elDef = elDef;
+        this.sourceFile = fo;
+        this.startPosition = elDef.getStartPos();
+        this.endPosition = elDef.getEndPos();
     }
 
     public Element getElement(CompilationInfo info) {
