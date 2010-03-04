@@ -72,14 +72,8 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         methodCallArgsCombo.addFocusListener(this);
         chainedMethodCallsCombo.putClientProperty(OPTION_ID, wrapChainedFunctionCalls);
         chainedMethodCallsCombo.addFocusListener(this);
-        throwsKeywordCombo.putClientProperty(OPTION_ID, wrapThrowsKeyword);
-        throwsKeywordCombo.addFocusListener(this);
-        throwsListCombo.putClientProperty(OPTION_ID, wrapThrowsList);
-        throwsListCombo.addFocusListener(this);
         sequenceInitCombo.putClientProperty(OPTION_ID, wrapSequenceInit);
         sequenceInitCombo.addFocusListener(this);
-        forCombo.putClientProperty(OPTION_ID, wrapFor);
-        forCombo.addFocusListener(this);
         forStatementCombo.putClientProperty(OPTION_ID, wrapForStatement );
         forStatementCombo.addFocusListener(this);
         ifStatementCombo.putClientProperty(OPTION_ID, wrapIfExpression);
@@ -102,13 +96,10 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
                 new String[]{FmtOptions.wrapChainedFunctionCalls, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapExtendsImplementsKeyword, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapExtendsImplementsList, WrapStyle.WRAP_NEVER.name()},
-                new String[]{FmtOptions.wrapFor, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapForStatement, WrapStyle.WRAP_ALWAYS.name()},
                 new String[]{FmtOptions.wrapIfExpression, WrapStyle.WRAP_ALWAYS.name()},
                 new String[]{FmtOptions.wrapFunctionCallArgs, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapFunctionParams, WrapStyle.WRAP_NEVER.name()},
-                new String[]{FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_NEVER.name()},
-                new String[]{FmtOptions.wrapThrowsList, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapWhileStatement, WrapStyle.WRAP_ALWAYS.name()},
                 new String[]{FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString()},
@@ -151,14 +142,8 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         methodCallArgsCombo = new javax.swing.JComboBox();
         chainedMethodCallsLabel = new javax.swing.JLabel();
         chainedMethodCallsCombo = new javax.swing.JComboBox();
-        throwsKeywordLabel = new javax.swing.JLabel();
-        throwsKeywordCombo = new javax.swing.JComboBox();
-        throwsListLabel = new javax.swing.JLabel();
-        throwsListCombo = new javax.swing.JComboBox();
         arrayInitLabel = new javax.swing.JLabel();
         sequenceInitCombo = new javax.swing.JComboBox();
-        forLabel = new javax.swing.JLabel();
-        forCombo = new javax.swing.JComboBox();
         forStatementLabel = new javax.swing.JLabel();
         forStatementCombo = new javax.swing.JComboBox();
         ifStatementLabel = new javax.swing.JLabel();
@@ -253,34 +238,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
         panel1.add(chainedMethodCallsCombo, gridBagConstraints);
 
-        throwsKeywordLabel.setLabelFor(throwsKeywordCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(throwsKeywordLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_throwsKeyword")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(throwsKeywordLabel, gridBagConstraints);
-
-        throwsKeywordCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(throwsKeywordCombo, gridBagConstraints);
-
-        throwsListLabel.setLabelFor(throwsListCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(throwsListLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_throwsList")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(throwsListLabel, gridBagConstraints);
-
-        throwsListCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(throwsListCombo, gridBagConstraints);
-
         arrayInitLabel.setLabelFor(sequenceInitCombo);
         org.openide.awt.Mnemonics.setLocalizedText(arrayInitLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_arrayInit")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -294,20 +251,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
         panel1.add(sequenceInitCombo, gridBagConstraints);
-
-        forLabel.setLabelFor(forCombo);
-        org.openide.awt.Mnemonics.setLocalizedText(forLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_for")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 4, 0);
-        panel1.add(forLabel, gridBagConstraints);
-
-        forCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 4, 8);
-        panel1.add(forCombo, gridBagConstraints);
 
         forStatementLabel.setLabelFor(forStatementCombo);
         org.openide.awt.Mnemonics.setLocalizedText(forStatementLabel, org.openide.util.NbBundle.getMessage(FmtWrapping.class, "LBL_wrp_forStatement")); // NOI18N
@@ -405,8 +348,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
     private javax.swing.JComboBox extendsImplementsListCombo;
     private javax.swing.JLabel extendsImplementsListLabel;
     private javax.swing.JLabel extendsImplemetsKeywordLabel;
-    private javax.swing.JComboBox forCombo;
-    private javax.swing.JLabel forLabel;
     private javax.swing.JComboBox forStatementCombo;
     private javax.swing.JLabel forStatementLabel;
     private javax.swing.JComboBox ifStatementCombo;
@@ -419,10 +360,6 @@ public class FmtWrapping extends javax.swing.JPanel implements FocusListener {
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JComboBox sequenceInitCombo;
     private javax.swing.JPanel spacerPanel1;
-    private javax.swing.JComboBox throwsKeywordCombo;
-    private javax.swing.JLabel throwsKeywordLabel;
-    private javax.swing.JComboBox throwsListCombo;
-    private javax.swing.JLabel throwsListLabel;
     private javax.swing.JComboBox whileStatementComboBox;
     private javax.swing.JLabel whileStatementLabel;
     // End of variables declaration//GEN-END:variables

@@ -112,6 +112,7 @@ public class FmtOptions {
     public static final String alignMultilineThrows = "alignMultilineThrows"; //NOI18N
     public static final String alignMultilineBinaryOp = "alignMultilineBinaryOp"; //NOI18N
     public static final String alignMultilineAssignment = "alignMultilineAssignment"; //NOI18N
+    public static final String alignSequenceInit = "alignSequenceInit"; //NOI18N
     public static final String placeElseOnNewLine = "placeElseOnNewLine"; //NOI18N
     public static final String placeCatchOnNewLine = "placeCatchOnNewLine"; //NOI18N
     public static final String placeFinallyOnNewLine = "placeFinallyOnNewLine"; //NOI18N
@@ -120,12 +121,9 @@ public class FmtOptions {
     public static final String wrapExtendsImplementsKeyword = "wrapExtendsImplementsKeyword"; //NOI18N
     public static final String wrapExtendsImplementsList = "wrapExtendsImplementsList"; //NOI18N
     public static final String wrapFunctionParams = "wrapFunctionParams"; //NOI18N
-    public static final String wrapThrowsKeyword = "wrapThrowsKeyword"; //NOI18N
-    public static final String wrapThrowsList = "wrapThrowsList"; //NOI18N
     public static final String wrapFunctionCallArgs = "wrapFunctionCallArgs"; //NOI18N
     public static final String wrapChainedFunctionCalls = "wrapChainedFunctionCalls"; //NOI18N
     public static final String wrapSequenceInit = "wrapSequenceInit"; //NOI18N
-    public static final String wrapFor = "wrapFor"; //NOI18N
     public static final String wrapForStatement = "wrapForStatement"; //NOI18N
     public static final String wrapIfExpression = "wrapIfExpression"; //NOI18N
     public static final String wrapWhileStatement = "wrapWhileStatement"; //NOI18N
@@ -146,7 +144,6 @@ public class FmtOptions {
     public static final String blankLinesBeforeNonClassExpression = "blankLinesBeforeNonClassExpression"; //NOI18N
     public static final String blankLinesAfterNonClassExpression = "blankLinesAfterNonClassExpression"; //NOI18N
     
-    public static final String spaceBeforeWhile = "spaceBeforeWhile"; //NOI18N
     public static final String spaceBeforeElse = "spaceBeforeElse"; //NOI18N
     public static final String spaceBeforeCatch = "spaceBeforeCatch"; //NOI18N
     public static final String spaceBeforeFinally = "spaceBeforeFinally"; //NOI18N
@@ -161,7 +158,7 @@ public class FmtOptions {
     public static final String spaceBeforeAnnotationParen = "spaceBeforeAnnotationParen"; //NOI18N
     public static final String spaceAroundUnaryOps = "spaceAroundUnaryOps"; //NOI18N
     public static final String spaceAroundBinaryOps = "spaceAroundBinaryOps"; //NOI18N
-    public static final String spaceAroundIfElseOps = "spaceAroundIfElseOps"; //NOI18N
+    public static final String spaceAroundRangeOps = "spaceAroundRangeOps"; //NOI18N
     public static final String spaceAroundAssignOps = "spaceAroundAssignOps"; //NOI18N
     public static final String spaceBeforeClassDeclLeftBrace = "spaceBeforeClassDeclLeftBrace"; //NOI18N
     public static final String spaceBeforeFunctionDeclLeftBrace = "spaceBeforeFunctionDeclLeftBrace"; //NOI18N
@@ -328,6 +325,7 @@ public class FmtOptions {
             { alignMultilineThrows, FALSE}, //NOI18N
             { alignMultilineBinaryOp, FALSE}, //NOI18N
             { alignMultilineAssignment, FALSE}, //NOI18N
+            { alignSequenceInit, FALSE}, //NOI18N
             { placeElseOnNewLine, FALSE}, //NOI18N 
             { placeCatchOnNewLine, FALSE}, //NOI18N 
             { placeFinallyOnNewLine, FALSE}, //NOI18N 
@@ -336,12 +334,9 @@ public class FmtOptions {
             { wrapExtendsImplementsKeyword, WRAP_NEVER}, //NOI18N
             { wrapExtendsImplementsList, WRAP_NEVER}, //NOI18N
             { wrapFunctionParams, WRAP_NEVER}, //NOI18N
-            { wrapThrowsKeyword, WRAP_NEVER}, //NOI18N
-            { wrapThrowsList, WRAP_NEVER}, //NOI18N
             { wrapFunctionCallArgs, WRAP_NEVER}, //NOI18N
             { wrapChainedFunctionCalls, WRAP_NEVER}, //NOI18N
             { wrapSequenceInit, WRAP_NEVER}, //NOI18N
-            { wrapFor, WRAP_NEVER}, //NOI18N
             { wrapForStatement, WRAP_ALWAYS}, //NOI18N
             { wrapIfExpression, WRAP_ALWAYS}, //NOI18N
             { wrapWhileStatement, WRAP_ALWAYS}, //NOI18N
@@ -362,7 +357,6 @@ public class FmtOptions {
             { blankLinesBeforeNonClassExpression, "1" }, //NOI18N
             { blankLinesAfterNonClassExpression, "0" }, //NOI18N
 
-            { spaceBeforeWhile, TRUE}, //NOI18N // XXX
             { spaceBeforeElse, TRUE}, //NOI18N // XXX
             { spaceBeforeCatch, TRUE}, //NOI18N // XXX
             { spaceBeforeFinally, TRUE}, //NOI18N // XXX
@@ -374,7 +368,7 @@ public class FmtOptions {
             { spaceBeforeCatchParen, TRUE}, //NOI18N
             { spaceAroundUnaryOps, FALSE}, //NOI18N
             { spaceAroundBinaryOps, TRUE}, //NOI18N
-            { spaceAroundIfElseOps, TRUE}, //NOI18N
+            { spaceAroundRangeOps, FALSE}, //NOI18N
             { spaceAroundAssignOps, TRUE}, //NOI18N
             { spaceBeforeClassDeclLeftBrace, TRUE}, //NOI18N
             { spaceBeforeFunctionDeclLeftBrace, TRUE}, //NOI18N

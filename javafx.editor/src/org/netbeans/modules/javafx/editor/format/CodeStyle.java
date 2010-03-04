@@ -296,6 +296,10 @@ public final class CodeStyle {
         return preferences.getBoolean(alignMultilineAssignment, getDefaultAsBoolean(alignMultilineAssignment));
     }
 
+    public boolean alignSequenceInit() {
+        return preferences.getBoolean(alignSequenceInit, getDefaultAsBoolean(alignSequenceInit));
+    }
+
     public boolean placeElseOnNewLine() {
         return preferences.getBoolean(placeElseOnNewLine, getDefaultAsBoolean(placeElseOnNewLine));
     }
@@ -329,16 +333,6 @@ public final class CodeStyle {
         return WrapStyle.valueOf(wrap);
     }
 
-    public WrapStyle wrapThrowsKeyword() {
-        String wrap = preferences.get(wrapThrowsKeyword, getDefaultAsString(wrapThrowsKeyword));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapThrowsList() {
-        String wrap = preferences.get(wrapThrowsList, getDefaultAsString(wrapThrowsList));
-        return WrapStyle.valueOf(wrap);
-    }
-
     public WrapStyle wrapMethodCallArgs() {
         String wrap = preferences.get(wrapFunctionCallArgs, getDefaultAsString(wrapFunctionCallArgs));
         return WrapStyle.valueOf(wrap);
@@ -351,11 +345,6 @@ public final class CodeStyle {
 
     public WrapStyle wrapSequenceInit() {
         String wrap = preferences.get(wrapSequenceInit, getDefaultAsString(wrapSequenceInit));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapFor() {
-        String wrap = preferences.get(wrapFor, getDefaultAsString(wrapFor));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -440,10 +429,6 @@ public final class CodeStyle {
 
     // Spaces ------------------------------------------------------------------
     
-    public boolean spaceBeforeWhile() {
-        return preferences.getBoolean(spaceBeforeWhile, getDefaultAsBoolean(spaceBeforeWhile));
-    }
-
     public boolean spaceBeforeElse() {
         return preferences.getBoolean(spaceBeforeElse, getDefaultAsBoolean(spaceBeforeElse));
     }
@@ -500,8 +485,8 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceAroundBinaryOps, getDefaultAsBoolean(spaceAroundBinaryOps));
     }
 
-    public boolean spaceAroundTernaryOps() {
-        return preferences.getBoolean(spaceAroundIfElseOps, getDefaultAsBoolean(spaceAroundIfElseOps));
+    public boolean spaceAroundRangeOps() {
+        return preferences.getBoolean(spaceAroundRangeOps, getDefaultAsBoolean(spaceAroundRangeOps));
     }
 
     public boolean spaceAroundAssignOps() {
