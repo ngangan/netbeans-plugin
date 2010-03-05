@@ -2617,7 +2617,6 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO check cs.getOtherBracePlacement()
         @Override
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
             List<ExpressionTree> itemList = node.getItemList();
@@ -2626,23 +2625,24 @@ public class JFXReformatTask implements ReformatTask {
             indent += indentSize;
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             if (itemList != null) {
-                boolean first = true;
-                for (Iterator<ExpressionTree> it = itemList.iterator(); it.hasNext();) {
-                    ExpressionTree expressionTree = it.next();
-                    if (!first) {
-                        spaces(cs.spaceAfterComma() ? 1 : 0, true);
-                    }
-                    scan(expressionTree, p);
-
-                    int index = tokens.index();
-                    int c = col;
-                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (accept(JFXTokenId.COMMA) != JFXTokenId.COMMA) {
-                        rollback(index, c, d);
-                    }
-
-                    first = false;
-                }
+                wrapList(cs.wrapSequenceInit(), cs.alignSequenceInit(), false, itemList);
+//                boolean first = true;
+//                for (Iterator<ExpressionTree> it = itemList.iterator(); it.hasNext();) {
+//                    ExpressionTree expressionTree = it.next();
+//                    if (!first) {
+//                        spaces(cs.spaceAfterComma() ? 1 : 0, true);
+//                    }
+//                    scan(expressionTree, p);
+//
+//                    int index = tokens.index();
+//                    int c = col;
+//                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+//                    if (accept(JFXTokenId.COMMA) != JFXTokenId.COMMA) {
+//                        rollback(index, c, d);
+//                    }
+//
+//                    first = false;
+//                }
             }
             indent = old;
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);

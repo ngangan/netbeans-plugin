@@ -220,7 +220,6 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
         
         Item[] categories = new Item[] {
             new Item("BeforeKeywords",                          // NOI18N
-                new Item(spaceBeforeWhile),
                 new Item(spaceBeforeElse),
                 new Item(spaceBeforeCatch),
                 new Item(spaceBeforeFinally) ),
@@ -236,7 +235,7 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
             new Item("AroundOperators",                         // NOI18N
                 new Item(spaceAroundUnaryOps),
                 new Item(spaceAroundBinaryOps),
-                new Item(spaceAroundIfElseOps),
+                new Item(spaceAroundRangeOps),
                 new Item(spaceAroundAssignOps) ),
             
             new Item("BeforeLeftBraces",                        // NOI18N
@@ -355,13 +354,10 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
                     new String[]{FmtOptions.wrapChainedFunctionCalls, WrapStyle.WRAP_NEVER.name()},
                     new String[]{FmtOptions.wrapExtendsImplementsKeyword, WrapStyle.WRAP_NEVER.name()},
                     new String[]{FmtOptions.wrapExtendsImplementsList, WrapStyle.WRAP_NEVER.name()},
-                    new String[]{FmtOptions.wrapFor, WrapStyle.WRAP_NEVER.name()},
                     new String[]{FmtOptions.wrapForStatement, WrapStyle.WRAP_ALWAYS.name()},
                     new String[]{FmtOptions.wrapIfExpression, WrapStyle.WRAP_ALWAYS.name()},
                     new String[]{FmtOptions.wrapFunctionCallArgs, WrapStyle.WRAP_NEVER.name()},
                     new String[]{FmtOptions.wrapFunctionParams, WrapStyle.WRAP_NEVER.name()},
-                    new String[]{FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_NEVER.name()},
-                    new String[]{FmtOptions.wrapThrowsList, WrapStyle.WRAP_NEVER.name()},
                     new String[]{FmtOptions.wrapWhileStatement, WrapStyle.WRAP_ALWAYS.name()},
                     new String[]{FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString()},
                     new String[]{FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString()},

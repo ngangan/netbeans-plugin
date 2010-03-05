@@ -62,9 +62,10 @@ public class FmtAlignment extends javax.swing.JPanel {
         nlModifiersCheckBox.putClientProperty(OPTION_ID, placeNewLineAfterModifiers);
         amFunctionParamsCheckBox.putClientProperty(OPTION_ID, alignMultilineMethodParams);
         amCallArgsCheckBox.putClientProperty(OPTION_ID, alignMultilineCallArgs);
-        amAssignCheckBox1.putClientProperty(OPTION_ID, alignMultilineAssignment);
-        amBinaryOpCheckBox1.putClientProperty(OPTION_ID, alignMultilineBinaryOp);
-        amExtendsCheckBox1.putClientProperty(OPTION_ID, alignMultilineImplements);
+        amAssignCheckBox.putClientProperty(OPTION_ID, alignMultilineAssignment);
+        amBinaryOpCheckBox.putClientProperty(OPTION_ID, alignMultilineBinaryOp);
+        amExtendsCheckBox.putClientProperty(OPTION_ID, alignMultilineImplements);
+        amSequenceInitCheckBox.putClientProperty(OPTION_ID, alignSequenceInit);
     }
     
     public static PreferencesCustomizer.Factory getController() {
@@ -77,13 +78,10 @@ public class FmtAlignment extends javax.swing.JPanel {
                 new String[]{FmtOptions.wrapChainedFunctionCalls, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapExtendsImplementsKeyword, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapExtendsImplementsList, WrapStyle.WRAP_NEVER.name()},
-                new String[]{FmtOptions.wrapFor, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapForStatement, WrapStyle.WRAP_ALWAYS.name()},
                 new String[]{FmtOptions.wrapIfExpression, WrapStyle.WRAP_ALWAYS.name()},
                 new String[]{FmtOptions.wrapFunctionCallArgs, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapFunctionParams, WrapStyle.WRAP_NEVER.name()},
-                new String[]{FmtOptions.wrapThrowsKeyword, WrapStyle.WRAP_NEVER.name()},
-                new String[]{FmtOptions.wrapThrowsList, WrapStyle.WRAP_NEVER.name()},
                 new String[]{FmtOptions.wrapWhileStatement, WrapStyle.WRAP_ALWAYS.name()},
                 new String[]{FmtOptions.alignMultilineAssignment, Boolean.FALSE.toString()},
                 new String[]{FmtOptions.alignMultilineBinaryOp, Boolean.FALSE.toString()},
@@ -111,11 +109,12 @@ public class FmtAlignment extends javax.swing.JPanel {
         multilineAlignmentLabel = new javax.swing.JLabel();
         amFunctionParamsCheckBox = new javax.swing.JCheckBox();
         amCallArgsCheckBox = new javax.swing.JCheckBox();
-        amExtendsCheckBox1 = new javax.swing.JCheckBox();
-        amBinaryOpCheckBox1 = new javax.swing.JCheckBox();
-        amAssignCheckBox1 = new javax.swing.JCheckBox();
+        amExtendsCheckBox = new javax.swing.JCheckBox();
+        amBinaryOpCheckBox = new javax.swing.JCheckBox();
+        amAssignCheckBox = new javax.swing.JCheckBox();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
+        amSequenceInitCheckBox = new javax.swing.JCheckBox();
 
         setName(org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_Alignment")); // NOI18N
         setOpaque(false);
@@ -154,20 +153,25 @@ public class FmtAlignment extends javax.swing.JPanel {
         amCallArgsCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
         amCallArgsCheckBox.setOpaque(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(amExtendsCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_an_Implements")); // NOI18N
-        amExtendsCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        amExtendsCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        amExtendsCheckBox1.setOpaque(false);
+        org.openide.awt.Mnemonics.setLocalizedText(amExtendsCheckBox, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_an_Implements")); // NOI18N
+        amExtendsCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        amExtendsCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        amExtendsCheckBox.setOpaque(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(amBinaryOpCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_BinaryOp")); // NOI18N
-        amBinaryOpCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        amBinaryOpCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        amBinaryOpCheckBox1.setOpaque(false);
+        org.openide.awt.Mnemonics.setLocalizedText(amBinaryOpCheckBox, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_BinaryOp")); // NOI18N
+        amBinaryOpCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        amBinaryOpCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        amBinaryOpCheckBox.setOpaque(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(amAssignCheckBox1, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_Assign")); // NOI18N
-        amAssignCheckBox1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        amAssignCheckBox1.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        amAssignCheckBox1.setOpaque(false);
+        org.openide.awt.Mnemonics.setLocalizedText(amAssignCheckBox, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "LBL_am_Assign")); // NOI18N
+        amAssignCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        amAssignCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        amAssignCheckBox.setOpaque(false);
+
+        org.openide.awt.Mnemonics.setLocalizedText(amSequenceInitCheckBox, org.openide.util.NbBundle.getMessage(FmtAlignment.class, "FmtAlignment.amSequenceInitCheckBox.text")); // NOI18N
+        amSequenceInitCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        amSequenceInitCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        amSequenceInitCheckBox.setOpaque(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -199,12 +203,13 @@ public class FmtAlignment extends javax.swing.JPanel {
                             .addContainerGap()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(amFunctionParamsCheckBox)
-                                .addComponent(amBinaryOpCheckBox1)
-                                .addComponent(amAssignCheckBox1))
+                                .addComponent(amBinaryOpCheckBox)
+                                .addComponent(amAssignCheckBox))
                             .addGap(14, 14, 14)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(amSequenceInitCheckBox)
                                 .addComponent(amCallArgsCheckBox)
-                                .addComponent(amExtendsCheckBox1)))))
+                                .addComponent(amExtendsCheckBox)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -237,21 +242,24 @@ public class FmtAlignment extends javax.swing.JPanel {
                     .addComponent(amCallArgsCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(amExtendsCheckBox1)
-                    .addComponent(amBinaryOpCheckBox1))
+                    .addComponent(amExtendsCheckBox)
+                    .addComponent(amBinaryOpCheckBox))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(amAssignCheckBox1)
-                .addContainerGap(107, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(amAssignCheckBox)
+                    .addComponent(amSequenceInitCheckBox))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox amAssignCheckBox1;
-    private javax.swing.JCheckBox amBinaryOpCheckBox1;
+    private javax.swing.JCheckBox amAssignCheckBox;
+    private javax.swing.JCheckBox amBinaryOpCheckBox;
     private javax.swing.JCheckBox amCallArgsCheckBox;
-    private javax.swing.JCheckBox amExtendsCheckBox1;
+    private javax.swing.JCheckBox amExtendsCheckBox;
     private javax.swing.JCheckBox amFunctionParamsCheckBox;
+    private javax.swing.JCheckBox amSequenceInitCheckBox;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel multilineAlignmentLabel;
