@@ -142,7 +142,7 @@ public abstract class AbstractCompletionProvider {
         fillCompletionWithSchemaElements(resultSet, attrs, caretOffset, nameStart);
     }
 
-// TODO add check for parent node to suggest only valid ids.
+    // TODO add check for parent node to suggest only valid ids.
     protected void fillCompletionByNameStart(final CompletionResultSet resultSet,
             DocumentElement el, final int caretOffset) {
         final String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
@@ -370,9 +370,7 @@ public abstract class AbstractCompletionProvider {
     }
 
     private String getSchemaIdByName(String elementName) {
-        final String id = FXDSchemaHelper.getFXDSchemaId(elementName);
-        LOG.warning(">>>> element name = " + elementName + " id = " + id);
-        return id;
+        return FXDSchemaHelper.getFXDSchemaId(elementName);
     }
 
 

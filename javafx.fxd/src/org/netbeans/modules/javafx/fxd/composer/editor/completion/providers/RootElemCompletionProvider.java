@@ -58,6 +58,5 @@ public class RootElemCompletionProvider extends AbstractCompletionProvider {
         // default item is now 'FXD', that is not obviously described in schema,
         //  but is equal to schema root node.
         // Not sure it is final schema implementation => do not spend time for now.
-        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
     }
 }

@@ -50,8 +50,7 @@ import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**
- *
- * @author avk
+ * @author Andrey Korostelev
  */
 public class AttributeArrayCompletionProvider extends AbstractCompletionProvider {
 
@@ -59,11 +58,9 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
-        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
 
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
-        LOG.warning("ATTR_ARR PREV = " + prev + ", NEXT = " + next);
 
         if (prev == null && next == FXDTokenId.IDENTIFIER_ATTR) {
             // move ts to next non-white token. DO NOT REMOVE
