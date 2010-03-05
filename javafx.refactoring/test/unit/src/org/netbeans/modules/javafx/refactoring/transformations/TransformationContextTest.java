@@ -26,12 +26,11 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.transformers;
+package org.netbeans.modules.javafx.refactoring.transformations;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.netbeans.modules.javafx.refactoring.transformations.TransformationContext;
 import static org.junit.Assert.*;
 
 /**

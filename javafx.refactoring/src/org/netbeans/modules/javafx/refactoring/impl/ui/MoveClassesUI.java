@@ -47,6 +47,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -86,7 +87,7 @@ import org.openide.util.lookup.Lookups;
 public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
     
     private List<FileObject> resources;
-    private Set<FileObject> javaObjects;
+    private Collection<? extends FileObject> javaObjects;
     private MovePanel panel;
     private MoveRefactoring refactoring;
     private String targetPkgName = "";
@@ -98,14 +99,15 @@ public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
         return NbBundle.getMessage(MoveClassUI.class, key);
     }
     
-    public MoveClassesUI(Set<FileObject> javaObjects) {
-        this(javaObjects, null, null);
+    public MoveClassesUI(MoveRefactoring refactoring) {
+        this(refactoring, null, null);
     }
 
-    public MoveClassesUI(Set<FileObject> javaObjects, FileObject targetFolder, PasteType paste) {
+    public MoveClassesUI(MoveRefactoring refactoring, FileObject targetFolder, PasteType paste) {
+        this.refactoring = refactoring;
         this.disable = targetFolder != null;
         this.targetFolder = targetFolder;
-        this.javaObjects=javaObjects;
+        this.javaObjects=refactoring.getRefactoringSource().lookupAll(FileObject.class);
         this.pasteType = paste;
         if (!disable) {
             resources = new ArrayList(javaObjects);

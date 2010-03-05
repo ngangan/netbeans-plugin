@@ -47,6 +47,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +61,7 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
@@ -86,7 +88,7 @@ import org.openide.util.lookup.Lookups;
 public class CopyClassesUI implements RefactoringUI, RefactoringUIBypass {
     
     private List<FileObject> resources;
-    private Set<FileObject> javaObjects;
+    private Collection<? extends FileObject> javaObjects;
     private CopyPanel panel;
     private MultipleCopyRefactoring refactoring;
     private String targetPkgName = "";
@@ -98,14 +100,15 @@ public class CopyClassesUI implements RefactoringUI, RefactoringUIBypass {
         return NbBundle.getMessage(MoveClassUI.class, key);
     }
     
-    public CopyClassesUI(Set<FileObject> javaObjects) {
-        this(javaObjects, null, null);
+    public CopyClassesUI(MultipleCopyRefactoring refactoring) {
+        this(refactoring, null, null);
     }
 
-    public CopyClassesUI(Set<FileObject> javaObjects, FileObject targetFolder, PasteType paste) {
+    public CopyClassesUI(MultipleCopyRefactoring refactoring, FileObject targetFolder, PasteType paste) {
+        this.refactoring = refactoring;
         this.disable = targetFolder != null;
         this.targetFolder = targetFolder;
-        this.javaObjects=javaObjects;
+        this.javaObjects=refactoring.getRefactoringSource().lookupAll(FileObject.class);
         this.pasteType = paste;
         if (!disable) {
             resources = new ArrayList(javaObjects);

@@ -103,6 +103,11 @@ final public class TransformationContext {
         int changeDiff = newLen - oldLen;
         if (changeDiff == 0) return;
 
+        if (changeDiff > 0) {
+            offset = offset + oldLen - 1;
+        } else {
+            offset = offset + newLen - 1;
+        }
         changes.add(new Change(offset, changeDiff));
         synchronized(sortedLock) {
             isSorted = false;

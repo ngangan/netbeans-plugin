@@ -33,8 +33,10 @@ import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
+import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.tools.mjavac.code.Symbol;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -92,6 +94,7 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.modules.javafx.project.JavaFXProjectConstants;
 import org.netbeans.api.javafx.source.ClasspathInfoProvider;
+import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
@@ -265,8 +268,8 @@ final public class SourceUtils {
         //return ClassPath.getClassPath(fo, ClassPath.SOURCE)!=null;
     }
 
-     public static boolean isFromLibrary(Element element, ClasspathInfo info) {
-        FileObject file = getFile(element, info);
+     public static boolean isFromLibrary(Element element, CompilationInfo cc) {
+        FileObject file = getFile(element, cc);
         if (file==null) {
             //no source for given element. Element is from library
             return true;
@@ -356,15 +359,39 @@ final public class SourceUtils {
         return org.netbeans.api.java.source.ClasspathInfo.create(cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT), cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE), cpInfo.getClassPath(ClasspathInfo.PathKind.SOURCE));
     }
 
-    public static FileObject getFile(Element element, ClasspathInfo cpInfo) {
-        return getFile(ElementHandle.create(element), cpInfo);
+    public static FileObject getFile(final Element element, final CompilationInfo cc) {
+        final FileObject[] rslt = new FileObject[]{getFile(ElementHandle.create(element), cc.getClasspathInfo())};
+        if (rslt[0] == null) {
+            rslt[0] = new JavaFXTreePathScanner<FileObject, Void>() {
+
+                @Override
+                public FileObject scan(Tree tree, Void p) {
+                    if (tree == null) return null;
+                    
+                    JavaFXTreePath tp = cc.getTrees().getPath(cc.getCompilationUnit(), tree);
+                    if (tp != null) {
+                        Element e = cc.getTrees().getElement(tp);
+
+                        if (e != null && e.equals(element)) {
+                            rslt[0] = cc.getFileObject();
+                            return null;
+                        }
+                    }
+                    return super.scan(tree, p);
+                }
+
+            }.scan(cc.getCompilationUnit(), null);
+        }
+        return rslt[0];
     }
 
-    public static FileObject getFile(ElementHandle handle, ClasspathInfo cpInfo) {
-        ClassIndex ci = cpInfo.getClassIndex();
+    public static FileObject getFile(ElementHandle handle, final ClasspathInfo info) {
+        ClassIndex ci = info.getClassIndex();
 
         Set<FileObject> files = ci.getResources(handle, EnumSet.of(ClassIndex.SearchKind.TYPE_DEFS), EnumSet.of(ClassIndex.SearchScope.SOURCE));
-        if (!files.isEmpty()) return files.iterator().next();
+        if (!files.isEmpty()) {
+            return files.iterator().next();
+        }
 
         return null;
     }

@@ -74,9 +74,9 @@ public class CopyClassUI implements RefactoringUI, RefactoringUIBypass {
     private FileObject targetFolder;
     private PasteType paste;
     
-    public CopyClassUI(FileObject resource, FileObject target, PasteType paste) {
-        refactoring = new SingleCopyRefactoring(Lookups.singleton(resource));
-        this.resource = resource;
+    public CopyClassUI(SingleCopyRefactoring refactoring, FileObject target, PasteType paste) {
+        this.refactoring = refactoring;
+        this.resource = refactoring.getRefactoringSource().lookup(FileObject.class);
         this.targetFolder = target;
         this.paste=paste;
     }

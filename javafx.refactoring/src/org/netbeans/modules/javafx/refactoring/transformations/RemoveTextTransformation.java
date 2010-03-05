@@ -10,25 +10,22 @@ package org.netbeans.modules.javafx.refactoring.transformations;
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
 final public class RemoveTextTransformation extends Transformation {
-    final private int pos, len;
+    final private int len;
     private String oldText;
 
     public RemoveTextTransformation(int pos, int len) {
-        this.pos = pos;
+        super(pos);
         this.len = len;
     }
 
     @Override
     public void perform(Transformer t) {
-        oldText = removeText(pos, len, t);
+        oldText = removeText(getPosition(), len, t);
     }
 
     @Override
-    public void revert(Transformer t) {
-        if (oldText != null) {
-            insertText(pos, oldText, t);
-            oldText = null;
-        }
+    protected int priority() {
+        return 3;
     }
 
     @Override
@@ -40,7 +37,7 @@ final public class RemoveTextTransformation extends Transformation {
             return false;
         }
         final RemoveTextTransformation other = (RemoveTextTransformation) obj;
-        if (this.pos != other.pos) {
+        if (this.getPosition() != other.getPosition()) {
             return false;
         }
         if (this.len != other.len) {
@@ -55,7 +52,7 @@ final public class RemoveTextTransformation extends Transformation {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 59 * hash + this.pos;
+        hash = 59 * hash + this.getPosition();
         hash = 59 * hash + this.len;
         hash = 59 * hash + (this.oldText != null ? this.oldText.hashCode() : 0);
         return hash;

@@ -41,23 +41,17 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
-import javax.lang.model.element.Element;
-import java.io.IOException;
 import java.util.*;
 import javax.lang.model.element.ElementKind;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.spi.*;
 import org.netbeans.modules.refactoring.spi.ui.RefactoringUI;
@@ -77,19 +71,17 @@ import org.openide.util.lookup.Lookups;
  * Copied over from the java implementation
  */
 public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
-    private final ElementLocation location;
     private SafeDeleteRefactoring refactoring;
     private WhereUsedQuery[] whereUsedQueries;
     
     private static final String JAVAFX_EXTENSION = "fx"; // NOI18N
-    
+
     /**
      * Creates the a new instance of the Safe Delete refactoring
      * plugin.
      * @param refactoring The refactoring to be used by this plugin
      */
     public SafeDeleteRefactoringPlugin(SafeDeleteRefactoring refactoring) {
-        this.location = refactoring.getRefactoringSource().lookup(ElementLocation.class);
         this.refactoring = refactoring;
     }
 
@@ -115,7 +107,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         return null;
     }
 
-    private ArrayList<ElementLocation> grips = new ArrayList<ElementLocation>();
+    private ArrayList<ElementDef> grips = new ArrayList<ElementDef>();
     /**
      * Invokes the checkParameters of each of the underlying
      * WhereUsed refactorings and returns a Problem (if any)
@@ -127,39 +119,19 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         //But there's no other go I guess.
         grips.clear();
         for (final FileObject f: lookupJavaFXFileObjects()) {
-            JavaFXSource source = JavaFXSource.forFileObject(f);
-            if (source == null) {
-                continue;
-            }
-            try {
-                source.runUserActionTask(new Task<CompilationController>() {
-                    public void cancel() {
+            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(f);
 
-                    }
-                    public void run(CompilationController co) throws Exception {
-                        UnitTree cut = co.getCompilationUnit();
-                        for (Tree t: cut.getTypeDecls()) {
-                            ElementLocation handle = ElementLocation.forPath(JavaFXTreePath.getPath(cut, t), co);
-                            if (!containsHandle(handle, co))
-                                grips.add(handle);
-                        }
-                    }
-                }, true);
-            } catch (IllegalArgumentException ex) {
-                ex.printStackTrace();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            grips.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
         }
 
-        grips.addAll(refactoring.getRefactoringSource().lookupAll(ElementLocation.class));
+        grips.addAll(refactoring.getRefactoringSource().lookupAll(ElementDef.class));
 
         whereUsedQueries = new WhereUsedQuery[grips.size()];
         for(int i = 0;i <  whereUsedQueries.length; ++i) {
             whereUsedQueries[i] = createQuery(grips.get(i));
 
             whereUsedQueries[i].putValue(WhereUsedQuery.SEARCH_IN_COMMENTS, refactoring.isCheckInComments());
-            if(ElementKind.METHOD == grips.get(i).getElement().getKind()){
+            if(ElementKind.METHOD == grips.get(i).getKind()){
                 whereUsedQueries[i].putValue(WhereUsedQueryConstants.FIND_OVERRIDING_METHODS,true);
                 whereUsedQueries[i].putValue(WhereUsedQueryConstants.FIND_SUBCLASSES, true);
                 whereUsedQueries[i].putValue(WhereUsedQueryConstants.FIND_DIRECT_SUBCLASSES, true);
@@ -198,7 +170,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
 
         fireProgressListenerStart(AbstractRefactoring.PARAMETERS_CHECK, whereUsedQueries.length + 1);
         for(int i = 0;i < whereUsedQueries.length; ++i) {
-            Object refactoredObject = whereUsedQueries[i].getRefactoringSource().lookup(Object.class);
+            Object refactoredObject = whereUsedQueries[i].getRefactoringSource().lookup(FileObject.class);
             refactoredObjects.add(refactoredObject);
 
             whereUsedQueries[i].prepare(inner);
@@ -206,9 +178,21 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         }
         Problem problemFromWhereUsed = null;
         for (RefactoringElement refacElem : inner.getRefactoringElements()) {
-            ElementLocation eloc = refacElem.getLookup().lookup(ElementLocation.class);
-            if (!(refactoredObjects.contains(eloc) || refactoredObjects.contains(eloc.getSourceFile()) || refactoredObjects.contains(eloc.getSourceFile().getParent()))) {
-                problemFromWhereUsed = new Problem(false, NbBundle.getMessage(SafeDeleteRefactoringPlugin.class, "ERR_ReferencesFound"), ProblemDetailsFactory.createProblemDetails(new ProblemDetailsImplemen(new WhereUsedQueryUI(eloc!=null?eloc:null, eloc.getCompilationInfo()), inner)));
+            Usage usg = refacElem.getLookup().lookup(Usage.class);
+            ElementDef edef = usg.getDef();
+
+            FileObject fo = usg.getFile();
+
+            if (!(refactoredObjects.contains(edef) || refactoredObjects.contains(fo) || refactoredObjects.contains(fo.getParent()))) {
+                problemFromWhereUsed = new Problem(false,
+                                                   NbBundle.getMessage(SafeDeleteRefactoringPlugin.class, "ERR_ReferencesFound"),
+                                                   ProblemDetailsFactory.createProblemDetails(
+                                                        new ProblemDetailsImplemen(
+                                                            new WhereUsedQueryUI(edef, ClassModelFactory.forRefactoring(refactoring), fo),
+                                                            inner
+                                                        )
+                                                   )
+                );
                 break;
             }
         }
@@ -271,22 +255,23 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         }
     }
 
-    private boolean containsHandle(ElementLocation handle, CompilationInfo info) {
-        Element wanted = handle.getElement(info);
-        for (ElementLocation current : refactoring.getRefactoringSource().lookupAll(ElementLocation.class)) {
-            if (wanted == current.getElement(info)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    private boolean containsHandle(ElementLocation handle, CompilationInfo info) {
+//        Element wanted = handle.getElement(info);
+//        for (ElementLocation current : refactoring.getRefactoringSource().lookupAll(ElementLocation.class)) {
+//            if (wanted == current.getElement(info)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
-    private WhereUsedQuery createQuery(ElementLocation loc) {
-        WhereUsedQuery q = new WhereUsedQuery(Lookups.singleton(loc));
+    private WhereUsedQuery createQuery(ElementDef def) {
+        WhereUsedQuery q = new WhereUsedQuery(Lookups.fixed(def, refactoring.getRefactoringSource().lookup(FileObject.class)));
         for (Object o:refactoring.getContext().lookupAll(Object.class)) {
             q.getContext().add(o);
         }
         q.getContext().add(refactoring);
+        q.getContext().add(ClassModelFactory.forRefactoring(refactoring));
         q.getContext().add(this);
         return q;
     }

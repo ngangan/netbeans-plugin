@@ -53,6 +53,9 @@ import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -78,58 +81,35 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     private DataEditorSupport des;
     private GuardedDocument doc;
 
-    private final ElementLocation location;
+    private final Usage usage;
     private final Lookup context;
 
-    private WhereUsedElement(ElementLocation location) throws IOException {
-        this(location, Lookup.EMPTY);
+    private WhereUsedElement(Usage usage) throws IOException {
+        this(usage, Lookup.EMPTY);
     }
 
-    private WhereUsedElement(ElementLocation location, Lookup context) throws IOException {
-        this.location = location;
-        this.context = new ProxyLookup(context, Lookups.singleton(location));
+    private WhereUsedElement(Usage usage, Lookup context) throws IOException {
+        this.usage = usage;
+        this.context = new ProxyLookup(context, Lookups.singleton(usage));
+        init();
+    }
+
+    private WhereUsedElement(ElementDef def, FileObject file) throws IOException {
+        this.usage = null;
+        this.context = Lookup.EMPTY;
         init();
     }
 
     private void init() throws IOException {
-        DataObject dobj = DataObject.find(location.getSourceFile());
+        DataObject dobj = DataObject.find(usage.getFile());
         des = (DataEditorSupport)dobj.getCookie(EditorCookie.class);
         doc = (GuardedDocument)des.getDocument();
         if (doc == null) {
             doc = (GuardedDocument)des.openDocument();
         }
 
-        startPosition = location.getStartPosition();
-        endPosition = location.getEndPosition();
-//        JavaFXSource jfxs = JavaFXSource.forFileObject(location.getSourceFile());
-//        jfxs.runUserActionTask(new Task<CompilationController>() {
-//
-//            public void run(CompilationController cc) throws Exception {
-//                JavaFXTreePath path = location.getPath(cc);
-//                if (path != null) {
-//                    TokenSequence<JFXTokenId> tokens = cc.getTreeUtilities().tokensFor(path.getLeaf());
-//                    tokens.moveStart();
-//                    int firstPos = -1, lastPos = -1;
-//                    while (tokens.moveNext()) {
-//                        Token<JFXTokenId> token = tokens.token();
-//                        int pos = token.offset(cc.getTokenHierarchy());
-//                        if (firstPos == -1) {
-//                            firstPos = pos;
-//                        }
-//                        lastPos = pos + token.length();
-//                        if (location.getElement(cc).getSimpleName().contentEquals(token.text().toString())) {
-//                            startPosition = pos;
-//                            endPosition = startPosition + token.length();
-//                            break;
-//                        }
-//                    }
-//                    if (startPosition == -1) {
-//                        startPosition = firstPos;
-//                        endPosition = lastPos;
-//                    }
-//                }
-//            }
-//        }, true);
+        startPosition = usage.getStartPos();
+        endPosition = usage.getEndPos();
         try {
             doc.readLock();
             if (startPosition != -1) {
@@ -149,7 +129,7 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
                 displayText = SourceUtils.getHtml(doc.getText(sta, en - sta + 1), startPosition - sta);
                 bounds = new PositionBounds(des.createPositionRef(startPosition, Bias.Forward), des.createPositionRef(endPosition, Bias.Forward));
             } else {
-                throw new IOException("*** Can not resolve: " + location); // NOI18N
+                throw new IOException("*** Can not resolve: " + usage); // NOI18N
             }
         } catch (BadLocationException e) {
             IOException ioe = new IOException(e.getLocalizedMessage());
@@ -180,21 +160,21 @@ public class WhereUsedElement extends SimpleRefactoringElementImplementation {
     }
 
     public FileObject getParentFile() {
-        return location.getSourceFile();
+        return usage.getFile();
     }
 
-    public static WhereUsedElement create(ElementLocation location, Lookup context) {
+    public static WhereUsedElement create(Usage usg, Lookup context) {
         try {
-            return new WhereUsedElement(location, context);
+            return new WhereUsedElement(usg, context);
         } catch (IOException e) {
 
         }
         return null;
     }
 
-    public static WhereUsedElement create(ElementLocation location) {
+    public static WhereUsedElement create(Usage usg) {
         try {
-            return new WhereUsedElement(location);
+            return new WhereUsedElement(usg);
         } catch (IOException e) {
 
         }

@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,24 +41,7 @@ abstract public class Transformer {
 
     final private List<Transformation> transformations;
 
-    private int applyMark = -1, revertMark = -1;
-
-    final private ProgressListener pl = new ProgressListener() {
-
-        public void start(ProgressEvent pe) {
-            applyMark = -1;
-            revertMark = -1;
-        }
-
-        public void step(ProgressEvent pe) {
-            // ignore
-        }
-
-        public void stop(ProgressEvent pe) {
-            applyMark = -1;
-            revertMark = -1;
-        }
-    };
+    private int applyMark = -1;
 
     protected Transformer(CharSequence content) {
         builder = new StringBuilder(content);
@@ -89,7 +74,6 @@ abstract public class Transformer {
                     DataEditorSupport des = (DataEditorSupport) dobj.getCookie(EditorCookie.class);
                     t = forDocument((BaseDocument) des.openDocument());
                     map.put(fo, t);
-                    session.addProgressListener(t.pl);
                 } catch (DataObjectNotFoundException dataObjectNotFoundException) {
                     LOGGER.log(Level.WARNING, null, dataObjectNotFoundException);
                 } catch (IOException e) {
@@ -101,16 +85,19 @@ abstract public class Transformer {
     }
 
     final synchronized void insertText(int pos, String text) {
-        int realPos = context.getRealOffset(pos);
-        builder.insert(realPos, text);
+        int startPos = context.getRealOffset(pos);
+
+        builder.insert(startPos, text);
         context.replaceText(pos, 0, text.length());
     }
 
     final synchronized String removeText(int pos, int len) {
-        int realPos = context.getRealOffset(pos);
-        String removed = builder.subSequence(realPos, realPos + len).toString();
-        builder.delete(realPos, realPos + len);
-        context.replaceText(pos, len, 0);
+        int startPos = context.getRealOffset(pos);
+        int endPos = context.getRealOffset(pos + len);
+
+        String removed = builder.subSequence(startPos, endPos).toString();
+        builder.delete(startPos, endPos);
+        context.replaceText(pos, endPos - startPos + 1, 0);
         return removed;
     }
 
@@ -142,6 +129,7 @@ abstract public class Transformer {
         try {
             int transformationCounter = 0;
 
+            Collections.sort(transformations, Transformation.COMPARATOR);
             for(Transformation t : transformations) {
                 if (transformationCounter > applyMark) {
                     t.perform(this);
@@ -155,35 +143,12 @@ abstract public class Transformer {
         }
     }
 
-    synchronized private String revertTransforms() {
-        try {
-            int transformationCounter = 0;
-
-            for(int i=transformations.size() - 1;i>=0;i--) {
-                Transformation t = transformations.get(i);
-                if (transformationCounter > revertMark) {
-                    t.revert(this);
-                    revertMark = transformationCounter;
-                }
-                transformationCounter++;
-            }
-            return builder.toString();
-        } finally {
-            
-        }
-    }
-
     final synchronized public String preview() {
         return applyTransforms();
     }
 
     final synchronized public void transform() {
         String transformed = applyTransforms();
-        saveTransformed(transformed);
-    }
-
-    final synchronized public void revert() {
-        String transformed = revertTransforms();
         saveTransformed(transformed);
     }
 
