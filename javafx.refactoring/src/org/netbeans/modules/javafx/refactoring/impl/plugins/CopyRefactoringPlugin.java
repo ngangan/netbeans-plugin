@@ -101,18 +101,18 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         String newPkgName = getTargetPackageName();
         String oldPkgName = getSourcePackageName();
 
-        final Set<String> movedClasses = new HashSet<String>();
-        final Map<String, String> renameMap = new HashMap<String, String>();
-        renameMap.put(oldPkgName, newPkgName);
+//        final Set<String> movedClasses = new HashSet<String>();
+//        final Map<String, String> renameMap = new HashMap<String, String>();
+//        renameMap.put(oldPkgName, newPkgName);
 
         Problem problem = null;
         Collection<? extends FileObject> affectedFiles = refactoring.getRefactoringSource().lookupAll(FileObject.class);
-        for(FileObject fo : affectedFiles) {
-            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
-            for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
-                movedClasses.add(edef.createHandle().getQualifiedName());
-            }
-        }
+//        for(FileObject fo : affectedFiles) {
+//            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+//            for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
+//                movedClasses.add(edef.createHandle().getQualifiedName());
+//            }
+//        }
         for(FileObject fo : affectedFiles) {
             problem = checkForProblem(fo, problem);
         }
@@ -121,7 +121,14 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
 
     public Problem fastCheckParameters() {
-        return null;
+        Problem p = null;
+        for(FileObject fo : refactoring.getRefactoringSource().lookupAll(FileObject.class)) {
+            FileObject target = getTargetFO(fo);
+            if (target != null) {
+                p = chainProblems(p, new Problem(true, NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_FileAlreadyExists", target.getName(), getTargetPackageName()))); // NOI18N
+            }
+        }
+        return p;
     }
 
     public Problem preCheck() {
@@ -162,7 +169,9 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                         return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
                     }
                 };
-                reb.add(refactoring, ref);
+                if (ref.hasChanges()) {
+                        reb.add(refactoring, ref);
+                    }
             } else {
                 if (cm.getPackageDef() == PackageDef.DEFAULT) {
                     BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
@@ -181,7 +190,9 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                             return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
                         }
                     };
-                    reb.add(refactoring, ref);
+                    if (ref.hasChanges()) {
+                        reb.add(refactoring, ref);
+                    }
                 } else {
                     BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
                         @Override
@@ -202,45 +213,51 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                             return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
                         }
                     };
-                    reb.add(refactoring, ref);
+                    if (ref.hasChanges()) {
+                        reb.add(refactoring, ref);
+                    }
                 }
             }
-            BaseRefactoringElementImplementation fixImports = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
+            if (!getSourcePackageName().equals(getTargetPackageName())) {
+                BaseRefactoringElementImplementation fixImports = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
 
-                @Override
-                protected Set<Transformation> prepareTransformations(FileObject fo) {
-                    Set<Transformation> transformations = new HashSet<Transformation>();
-                    ClassModel refCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
-                    ImportSet is = refCm.getImportSet();
-                    for(ElementDef mDef : movingDefs) {
-                        String fqn = mDef.createHandle().getQualifiedName();
-                        is.addRename(fqn, fqn.replace(cm.getPackageDef().getName(), newPkgName));
+                    @Override
+                    protected Set<Transformation> prepareTransformations(FileObject fo) {
+                        Set<Transformation> transformations = new HashSet<Transformation>();
+                        ClassModel refCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+                        ImportSet is = refCm.getImportSet();
+                        for(ElementDef mDef : movingDefs) {
+                            String fqn = mDef.createHandle().getQualifiedName();
+                            is.addRename(fqn, fqn.replace(cm.getPackageDef().getName(), newPkgName));
+                        }
+                        fixImports(movingDefs, is, refCm, true, transformations);
+                        return transformations;
                     }
-                    fixImports(movingDefs, is, refCm, true, transformations);
-                    return transformations;
-                }
 
-                protected String getRefactoringText() {
-                    return "Fix Imports";
-                }
+                    protected String getRefactoringText() {
+                        return "Fix Imports";
+                    }
 
-                @Override
-                protected FileObject getTargetFO() {
-                    return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
-                }
+                    @Override
+                    protected FileObject getTargetFO() {
+                        return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
+                    }
 
-                private void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
-                    for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
-                        if (isMoving ^ movingDefs.contains(missing.getT1())) {
-                            transformations.add(new InsertTextTransformation(cm.getImportPos(), missing.getT2().toString() + ";\n")); // NOI18N
+                    private void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
+                        for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
+                            if (isMoving ^ movingDefs.contains(missing.getT1())) {
+                                transformations.add(new InsertTextTransformation(cm.getImportPos(), missing.getT2().toString() + ";\n")); // NOI18N
+                            }
+                        }
+                        for(ImportEntry ie : is.getUnused()) {
+                            transformations.add(new RemoveTextTransformation(ie.getStartPos(), ie.getEndPos() - ie.getStartPos()));
                         }
                     }
-                    for(ImportEntry ie : is.getUnused()) {
-                        transformations.add(new RemoveTextTransformation(ie.getStartPos(), ie.getEndPos() - ie.getStartPos()));
-                    }
+                };
+                if (fixImports.hasChanges()) {
+                    reb.add(refactoring, fixImports);
                 }
-            };
-            reb.add(refactoring, fixImports);
+            }
 
             if (refactoring instanceof SingleCopyRefactoring) {
                 final String newClsName = ((SingleCopyRefactoring)refactoring).getNewName();
@@ -267,7 +284,9 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                         return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
                     }
                 };
-                reb.add(refactoring, renameClass);
+                if (renameClass.hasChanges()) {
+                    reb.add(refactoring, renameClass);
+                }
             }
         }
         return null;
@@ -304,6 +323,9 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
 
     private Problem checkForProblem(FileObject fobj, final Problem p) {
+        // don't check if the package is not changing
+        if (getSourcePackageName().equals(getTargetPackageName())) return null;
+        
         // use the scanner to check for problems; might be rewritten to ClassModel usage later
         // can't use MoveProblemCollector as the preconditions are a bit different :(
         final Problem[] problem = new Problem[]{p};
@@ -466,5 +488,18 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         public PositionBounds getPosition() {
             return null;
         }
+    }
+
+    private static Problem chainProblems(Problem p,Problem p1) {
+        Problem problem;
+
+        if (p==null) return p1;
+        if (p1==null) return p;
+        problem=p;
+        while(problem.getNext()!=null) {
+            problem=problem.getNext();
+        }
+        problem.setNext(p1);
+        return p;
     }
 }

@@ -100,7 +100,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         for(FileObject file : relevantFiles) {
             ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(file);
             final PackageDef pd = cm.getPackageDef();
-            reb.add(refactoring, new BaseRefactoringElementImplementation(file, reb.getSession()) {
+            BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
 
                 @Override
                 protected Set<Transformation> prepareTransformations(FileObject fo) {
@@ -114,7 +114,10 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                 protected String getRefactoringText() {
                     return "Rename Package";
                 }
-            });
+            };
+            if (ref.hasChanges()) {
+                reb.add(refactoring, ref);
+            }
             fireProgressListenerStep();
             ClasspathInfo cpInfo = ClasspathInfo.create(file);
             ClassIndex index = cpInfo.getClassIndex();
@@ -137,7 +140,9 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                             return "Rename Occurences";
                         }
                     };
-                    reb.add(refactoring, bre);
+                    if (bre.hasChanges()) {
+                        reb.add(refactoring, bre);
+                    }
                 }
             }
             fireProgressListenerStep();

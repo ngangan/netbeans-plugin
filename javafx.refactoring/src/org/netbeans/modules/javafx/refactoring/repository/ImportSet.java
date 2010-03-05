@@ -137,23 +137,35 @@ public class ImportSet {
             ElementKind usgKind = usg.getDef().getKind();
             if (usgKind.isClass() || usgKind.isInterface()) {
                 String typeFQN = usg.getDef().createHandle().getQualifiedName();
+                String typeOrigFQN = typeFQN;
                 if (renames.containsKey(typeFQN)) {
                     typeFQN = renames.get(typeFQN);
                 }
                 String typeSimple = usg.getDef().getName();
 
-                int pkgLen = typeFQN.length() - typeSimple.length();
+                int pkgLen = typeOrigFQN.length() - typeSimple.length();
+
+                String fqnOrigPkg = pkgLen > 0 ? typeOrigFQN.substring(0, pkgLen -1) : "";
+                pkgLen = typeFQN.length() - typeSimple.length();
+
                 if (pkgLen > 0) {
-                    String fqnPkg = typeFQN.substring(0, pkgLen - 1);
+                    String fqnPkg = pkgLen > 0 ? typeFQN.substring(0, pkgLen - 1) : "";
+                    TypeImportEntry tie = new TypeImportEntry(fqnPkg, typeFQN);
+                    TypeImportEntry tieOrig = new TypeImportEntry(fqnOrigPkg, typeOrigFQN);
+
                     if (fqnPkg.startsWith("java.lang") || fqnPkg.startsWith("javafx.lang")) continue; // NOI18N
 
                     if (renames.containsKey(fqnPkg)) {
                         fqnPkg = renames.get(fqnPkg);
                     }
-                    TypeImportEntry tie = new TypeImportEntry(fqnPkg, typeFQN);
                     for(ImportEntry decl : cm.getImports()) {
-                        if (decl.contains(tie)) continue OUTER;
+                        if (renames.containsKey(decl.getPackageName()) || renames.containsKey(decl.getTypeName())) {
+                            if (decl.contains(tieOrig)) continue OUTER;
+                        } else {
+                            if (decl.contains(tie)) continue OUTER;
+                        }
                     }
+
                     missing.add(new Touple<ElementDef, ImportEntry>(usg.getDef(), tie));
                 }
             }
@@ -172,24 +184,61 @@ public class ImportSet {
                 case INTERFACE:
                 case ENUM: {
                     String typeFQN = usg.getDef().createHandle().getQualifiedName();
+                    String typeOrigFQN = typeFQN;
+
                     if (renames.containsKey(typeFQN)) {
                         typeFQN = renames.get(typeFQN);
                     }
                     String typeSimple = usg.getDef().getName();
 
-                    int pkgLen = typeFQN.length() - typeSimple.length();
+                    int pkgLen = typeOrigFQN.length() - typeSimple.length();
+
                     if (pkgLen > 0) {
-                        String fqnPkg = typeFQN.substring(0, pkgLen - 1);
-                        if (renames.containsKey(fqnPkg)) {
-                            fqnPkg = renames.get(fqnPkg);
-                        }
+                        String fqnOrigPkg = pkgLen > 0 ? typeOrigFQN.substring(0, pkgLen -1) : "";
+                        pkgLen = typeFQN.length() - typeSimple.length();
+
+                        String fqnPkg = pkgLen > 0 ? typeFQN.substring(0, pkgLen - 1) : "";
+
                         TypeImportEntry tie = new TypeImportEntry(fqnPkg, typeFQN);
+                        TypeImportEntry tieOrig = new TypeImportEntry(fqnOrigPkg, typeOrigFQN);
+
                         for(Iterator<ImportEntry> iter=unused.iterator();iter.hasNext();) {
                             ImportEntry decl = iter.next();
-                            if (!pkgName.equals(fqnPkg) && decl.contains(tie)) iter.remove();
+                            if (!pkgName.equals(fqnPkg)){
+                                if (renames.containsKey(decl.getPackageName()) || renames.containsKey(decl.getTypeName())) {
+                                    if (decl.contains(tieOrig)) {
+                                        iter.remove();
+                                    }
+                                } else {
+                                    if (decl.contains(tie)) {
+                                        iter.remove();
+                                    }
+                                }
+                            }
                         }
                     }
                     break;
+                }
+                case METHOD:
+                case FIELD: {
+                    String typeFQN = usg.getDef().createHandle().getSignatures()[0];
+                    TypeImportEntry tie = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1);
+                    if (renames.containsKey(typeFQN)) {
+                        typeFQN = renames.get(typeFQN);
+                    }
+                    TypeImportEntry tieRenamed = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1);
+                    for(Iterator<ImportEntry> iter=unused.iterator();iter.hasNext();) {
+                        ImportEntry decl = iter.next();
+                        if (renames.containsKey(decl.getTypeName())) {
+                            if (decl.contains(tie)) {
+                                iter.remove();
+                            }
+                        } else {
+                            if (decl.contains(tieRenamed)) {
+                                iter.remove();
+                            }
+                        }
+                    }
                 }
             }
             if (unused.isEmpty()) break; // no need to do more checks; all imports are used

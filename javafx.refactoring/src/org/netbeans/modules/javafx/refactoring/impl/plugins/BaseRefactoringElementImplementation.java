@@ -134,7 +134,7 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
         }
     }
 
-    private boolean hasChanges() {
+    public boolean hasChanges() {
         return getTransformations().size() > 0;
     }
 

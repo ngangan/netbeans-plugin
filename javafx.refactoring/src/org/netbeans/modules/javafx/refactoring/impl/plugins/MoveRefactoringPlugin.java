@@ -206,9 +206,10 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             }
             fireProgressListenerStep();
 
+            BaseRefactoringElementImplementation ref = null;
             if (!(newPkgName == null && cm.getPackageDef().getName() == null) && !cm.getPackageDef().getName().equals(newPkgName)) {
                 if (newPkgName == null || newPkgName.length() == 0) {
-                    reb.add(refactoring, new BaseRefactoringElementImplementation(file, reb.getSession()) {
+                    ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Transformation t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
@@ -218,10 +219,10 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         protected String getRefactoringText() {
                             return "Remove Package Definition";
                         }
-                    });
+                    };
                 } else {
                     if (cm.getPackageDef() == PackageDef.DEFAULT) {
-                        reb.add(refactoring, new BaseRefactoringElementImplementation(file, reb.getSession()) {
+                        ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
                             @Override
                             protected Set<Transformation> prepareTransformations(FileObject fo) {
                                 Transformation t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n"); // NOI18N
@@ -231,9 +232,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             protected String getRefactoringText() {
                                 return "Add Package Definition";
                             }
-                        });
+                        };
                     } else {
-                        reb.add(refactoring, new BaseRefactoringElementImplementation(file, reb.getSession()) {
+                        ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
                             @Override
                             protected Set<Transformation> prepareTransformations(FileObject fo) {
                                 Transformation t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), cm.getPackageDef().getName(), getNewPackageName());
@@ -243,10 +244,16 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             protected String getRefactoringText() {
                                 return "Rename Package";
                             }
-                        });
+                        };
                     }
                 }
+
             }
+
+            if (ref != null && ref.hasChanges()) {
+                reb.add(refactoring, ref);
+            }
+
             fireProgressListenerStep();
 
             BaseRefactoringElementImplementation fixImports = new BaseRefactoringElementImplementation(file, reb.getSession()) {
@@ -265,15 +272,20 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     return "Fix Imports";
                 }
             };
-            reb.add(refactoring, fixImports);
+            if (fixImports.hasChanges()) {
+                reb.add(refactoring, fixImports);
+            }
 
-            reb.addFileChange(refactoring, new ReindexFilesElement(file, related));
+            if ((ref != null && ref.hasChanges()) || fixImports.hasChanges()) {
+                reb.addFileChange(refactoring, new ReindexFilesElement(file, related));
+            }
 
             fireProgressListenerStep();
 
             int batchSize = related.size() / 10; // the 10 allocated steps
             int cntr = 0;
             for(FileObject refFo : related) {
+                if (refFo.equals(file)) continue;
                 BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(refFo, reb.getSession()) {
 
                     @Override
@@ -281,6 +293,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         Set<Transformation> transformations = new HashSet<Transformation>();
                         ClassModel refCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
                         for(Usage usg : refCm.getUsages(cm.getPackageDef())) {
+                            if (usg.getStartPos() == refCm.getPackageDef().getStartFQN()) continue; // don't process the package name
                             // a small hack
                             ElementDef typeDef = refCm.getDefForPos(usg.getEndPos() + 2); // move 1 character past the "." delimiter
                             if (typeDef != null && movingDefs.contains(typeDef)) {
@@ -294,7 +307,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         return "Update References";
                     }
                 };
-                reb.add(refactoring, updateRefs);
+                if (updateRefs.hasChanges()) {
+                    reb.add(refactoring, updateRefs);
+                }
                 if (!files.contains(refFo)) {
                     fixImports = new BaseRefactoringElementImplementation(refFo, reb.getSession()) {
 
@@ -315,7 +330,9 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             return "Fix Imports";
                         }
                     };
-                    reb.add(refactoring, fixImports);
+                    if (fixImports.hasChanges()) {
+                        reb.add(refactoring, fixImports);
+                    }
                 }
                 if (++cntr == batchSize) {
                     fireProgressListenerStep();

@@ -28,8 +28,6 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import java.awt.datatransfer.Transferable;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -39,10 +37,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
-import javax.lang.model.element.TypeElement;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.text.Document;
@@ -52,11 +48,6 @@ import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.NodeToElementTask;
 import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.TextComponentTask;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
@@ -631,13 +622,14 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     }
 
     static boolean nodeHandle(Lookup lookup) {
-        Node n = lookup.lookup(Node.class);
-        if (n != null) {
-            if (n.getLookup().lookup(ElementHandle.class) != null) {
-                return true;
-            }
-        }
         return false;
+//        Node n = lookup.lookup(Node.class);
+//        if (n != null) {
+//            if (n.getLookup().lookup(ElementHandle.class) != null) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     private static boolean isRefactorableFolder(DataObject dataObject) {
@@ -655,76 +647,76 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 && !SourceUtils.isClasspathRoot(fileObject);
     }
 
-    public static abstract class TreePathHandleTask implements Runnable, Task<CompilationController> {
-
-        private Collection<ElementLocation> locations = new ArrayList<ElementLocation>();
-        private ElementLocation current;
-        boolean renameFile;
-
-        public TreePathHandleTask(Collection<? extends Node> nodes) {
-            this(nodes, false);
-        }
-
-        public TreePathHandleTask(Collection<? extends Node> nodes, boolean useFirstHandle) {
-            for (Node n : nodes) {
-                ElementLocation temp = n.getLookup().lookup(ElementLocation.class);
-                if (temp != null) {
-                    locations.add(temp);
-                    if (useFirstHandle) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        public void cancel() {
-        }
-
-        public void run(CompilationController info) throws Exception {
-            Element el = info.getElementUtilities().elementFor(current.getStartPosition());
-            if (el != null && el instanceof TypeElement && !((TypeElement) el).getNestingKind().isNested()) {
-                if (info.getFileObject().getName().equals(el.getSimpleName().toString())) {
-                    renameFile = true;
-                }
-            }
-            locationResolved(current, null, info);
-        }
-
-        public void run() {
-            for (ElementLocation location : locations) {
-                FileObject f = location.getSourceFile();
-                current = location;
-                JavaFXSource source = JavaFXSource.forFileObject(f);
-                assert source != null;
-                try {
-                    source.runUserActionTask(this, true);
-                } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            TopComponent activetc = TopComponent.getRegistry().getActivated();
-
-            RefactoringUI ui = createRefactoringUI(locations, null);
-            if (ui != null) {
-                UI.openRefactoringUI(ui, activetc);
-            } else {
-                JOptionPane.showMessageDialog(null, NbBundle.getMessage(RefactoringActionsProvider.class, "ERR_CannotRenameKeyword"));
-            }
-        }
-
-        /**
-         * This is the place where subclasses may collect info about handles.
-         * @param handle handle
-         * @param javac context of running transaction
-         */
-        protected void locationResolved(ElementLocation location, ClassModelFactory factory, CompilationInfo javac) {
-        }
-
-        protected abstract RefactoringUI createRefactoringUI(Collection<ElementLocation> locations, ClassModelFactory factory);
-    }
+//    public static abstract class TreePathHandleTask implements Runnable, Task<CompilationController> {
+//
+//        private Collection<ElementLocation> locations = new ArrayList<ElementLocation>();
+//        private ElementLocation current;
+//        boolean renameFile;
+//
+//        public TreePathHandleTask(Collection<? extends Node> nodes) {
+//            this(nodes, false);
+//        }
+//
+//        public TreePathHandleTask(Collection<? extends Node> nodes, boolean useFirstHandle) {
+//            for (Node n : nodes) {
+//                ElementLocation temp = n.getLookup().lookup(ElementLocation.class);
+//                if (temp != null) {
+//                    locations.add(temp);
+//                    if (useFirstHandle) {
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//
+//        public void cancel() {
+//        }
+//
+//        public void run(CompilationController info) throws Exception {
+//            Element el = info.getElementUtilities().elementFor(current.getStartPosition());
+//            if (el != null && el instanceof TypeElement && !((TypeElement) el).getNestingKind().isNested()) {
+//                if (info.getFileObject().getName().equals(el.getSimpleName().toString())) {
+//                    renameFile = true;
+//                }
+//            }
+//            locationResolved(current, null, info);
+//        }
+//
+//        public void run() {
+//            for (ElementLocation location : locations) {
+//                FileObject f = location.getSourceFile();
+//                current = location;
+//                JavaFXSource source = JavaFXSource.forFileObject(f);
+//                assert source != null;
+//                try {
+//                    source.runUserActionTask(this, true);
+//                } catch (IllegalArgumentException ex) {
+//                    ex.printStackTrace();
+//                } catch (IOException ex) {
+//                    ex.printStackTrace();
+//                }
+//            }
+//
+//            TopComponent activetc = TopComponent.getRegistry().getActivated();
+//
+//            RefactoringUI ui = createRefactoringUI(locations, null);
+//            if (ui != null) {
+//                UI.openRefactoringUI(ui, activetc);
+//            } else {
+//                JOptionPane.showMessageDialog(null, NbBundle.getMessage(RefactoringActionsProvider.class, "ERR_CannotRenameKeyword"));
+//            }
+//        }
+//
+//        /**
+//         * This is the place where subclasses may collect info about handles.
+//         * @param handle handle
+//         * @param javac context of running transaction
+//         */
+//        protected void locationResolved(ElementLocation location, ClassModelFactory factory, CompilationInfo javac) {
+//        }
+//
+//        protected abstract RefactoringUI createRefactoringUI(Collection<ElementLocation> locations, ClassModelFactory factory);
+//    }
 
     public static abstract class TextComponentTask implements Runnable {
 
@@ -859,16 +851,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             } else {
                 JOptionPane.showMessageDialog(null, NbBundle.getMessage(RefactoringActionsProvider.class, "ERR_NoTypeDecls"));
             }
-        }
-
-        /**
-         * Notifies subclasses about the translation.
-         * This is the place where subclasses may collect info about handles.
-         * @param node node that is translated
-         * @param locations handles translated from the node
-         * @param javac context of running translation
-         */
-        protected void nodeTranslated(Node node, Collection<ElementLocation> locations, FileObject fo, ClassModelFactory factory) {
         }
 
         protected abstract RefactoringUI createRefactoringUI(FileObject[] selectedElement, NonRecursiveFolder[] pkgs);

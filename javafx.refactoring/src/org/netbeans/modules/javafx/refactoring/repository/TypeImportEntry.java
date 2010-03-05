@@ -92,9 +92,6 @@ public class TypeImportEntry extends ImportEntry {
         if (this.isStatic != other.isStatic) {
             return false;
         }
-        if ((this.packageName == null) ? (other.packageName != null) : !this.packageName.equals(other.packageName)) {
-            return false;
-        }
         if ((this.typeName == null) ? (other.typeName != null) : !this.typeName.equals(other.typeName)) {
             return false;
         }
@@ -105,7 +102,6 @@ public class TypeImportEntry extends ImportEntry {
     protected int computeHash() {
         int hash = 3;
         hash = 73 * hash + (this.isStatic ? 1 : 0);
-        hash = 73 * hash + (this.packageName != null ? this.packageName.hashCode() : 0);
         hash = 73 * hash + (this.typeName != null ? this.typeName.hashCode() : 0);
         return hash;
     }

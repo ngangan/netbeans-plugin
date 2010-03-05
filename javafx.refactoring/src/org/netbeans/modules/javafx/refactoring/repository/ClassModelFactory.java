@@ -229,7 +229,7 @@ final public class ClassModelFactory {
         public Void visitIdentifier(IdentifierTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitIdentifier(node, p);
 
-            if (node != null && !inImport) {
+            if (node != null) {
                 int startPos = (int)positions.getStartPosition(cc.getCompilationUnit(), node);
                 int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
                 // workaround for bug in javafxc reporting incorrect end position for an overridden variable
@@ -299,7 +299,7 @@ final public class ClassModelFactory {
 
         @Override
         public Void visitMemberSelect(MemberSelectTree node, ClassModel p) {
-            if (isSynthetic(node) || inImport) return super.visitMemberSelect(node, p);
+            if (isSynthetic(node)) return super.visitMemberSelect(node, p);
 
             Element e = cc.getTrees().getElement(getCurrentPath());
             if (e != null) {

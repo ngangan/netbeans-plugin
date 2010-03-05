@@ -326,7 +326,9 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                     return "Rename Occurences";
                 }
             };
-            bag.add(refactoring, updateRefs);
+            if (updateRefs.hasChanges()) {
+                bag.add(refactoring, updateRefs);
+            }
 
             if (file.equals(fo)) {
                 bag.addFileChange(refactoring, new ReindexFilesElement(file, files));
