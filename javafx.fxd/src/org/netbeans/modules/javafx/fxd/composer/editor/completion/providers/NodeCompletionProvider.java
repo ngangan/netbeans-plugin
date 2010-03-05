@@ -155,7 +155,6 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
 
     private void processAttrId(final CompletionResultSet resultSet,
             DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
-        // move ts to next non-white token. DO NOT REMOVE
         String nameStart;
         try {
             // move ts to prev token.

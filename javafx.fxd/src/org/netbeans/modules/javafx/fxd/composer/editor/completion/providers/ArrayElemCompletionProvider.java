@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
+import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
@@ -50,25 +51,52 @@ import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**
  *
- * @author avk
+ * @author Andrey Korostelev
  */
 public class ArrayElemCompletionProvider extends AbstractCompletionProvider {
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
-        resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
+        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
         //resultSet.addItem(new FXDCompletionItem("NODE PREV = " + prev + ", NEXT = " + next, caretOffset));
-        if (prev == null || prev == FXDTokenId.COMMA){
-            TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
+        if (prev == null && next == FXDTokenId.IDENTIFIER){
             if (caretOffset <= ts.offset() ) {
-                processAttrValue(resultSet, el, caretOffset);
-            } else if (next == FXDTokenId.IDENTIFIER){
-                // TODO complete identifier
+                // right before an id
+                processAttrValue(resultSet, el.getParentElement(), caretOffset);
+            } else {
+                // inside id
+                processArrElemId(resultSet, el, caretOffset);
             }
-            // do not complete numbers, strings etc.
+        } else if (prev == FXDTokenId.IDENTIFIER) {
+            // move ts to previous non-white token
+            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+            if (ts.offset() + prevT.length() == caretOffset) {
+                // at the end of id
+                processArrElemId(resultSet, el, caretOffset);
+            }
+            // after id. nothing to suggest?
         }
 
     }
+
+    private void processArrElemId(final CompletionResultSet resultSet,
+            DocumentElement el, int caretOffset) {
+        String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
+
+        // get array attr containgng this elem
+        DocumentElement parent = el.getParentElement();
+        if (parent == null) {
+            return;
+        }
+        // get it's parent node
+        parent = parent.getParentElement();
+        if (parent == null) {
+            return;
+        }
+        // get parent properties with nameStart pattern
+        fillItemsWithNodeAttrs(resultSet, parent, caretOffset, nameStart);
+    }
+
 }

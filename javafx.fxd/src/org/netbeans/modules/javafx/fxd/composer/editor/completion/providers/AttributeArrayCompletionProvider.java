@@ -70,7 +70,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
             TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
             if (ts.offset() < caretOffset) {
                 // inside identifier
-                processAttrId(resultSet, el, caretOffset);
+                processArrElemId(resultSet, el, caretOffset);
             } else {
                 // before identifier
                 processParentDocElement(resultSet, el, caretOffset, ts);
@@ -80,7 +80,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
             Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before :
-                processAttrId(resultSet, el, caretOffset);
+                processArrElemId(resultSet, el, caretOffset);
             } else {
                 // between id and :
                 // nothing to suggest?
@@ -98,7 +98,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
         }
     }
 
-    private void processAttrId(final CompletionResultSet resultSet,
+    private void processArrElemId(final CompletionResultSet resultSet,
             DocumentElement el, int caretOffset) {
         String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
         DocumentElement parent = el.getParentElement();

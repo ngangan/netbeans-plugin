@@ -86,10 +86,10 @@ public abstract class AbstractCompletionProvider {
         } else if (FXDFileModel.DOCUMENT_ROOT_ELEMENT_TYPE.equals(type)) {
             provider = new RootElemCompletionProvider();
         } else if (FXDFileModel.FXD_ATTRIBUTE.equals(type)) {
-            // is not used
+            // is not used?
             provider = new AttributeCompletionProvider();
         } else if (FXDFileModel.FXD_ARRAY_ELEM.equals(type)) {
-            // is not used
+            // is used in the following cursor position(marked as '|'): 'content[ |xxx ]'
             provider = new ArrayElemCompletionProvider();
         }
 
