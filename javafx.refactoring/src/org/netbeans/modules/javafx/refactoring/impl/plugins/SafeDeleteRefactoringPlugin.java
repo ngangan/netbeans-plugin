@@ -45,6 +45,7 @@ import java.util.*;
 import javax.lang.model.element.ElementKind;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
@@ -119,7 +120,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         //But there's no other go I guess.
         grips.clear();
         for (final FileObject f: lookupJavaFXFileObjects()) {
-            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(f);
+            ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(f);
 
             grips.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
         }
@@ -188,7 +189,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
                                                    NbBundle.getMessage(SafeDeleteRefactoringPlugin.class, "ERR_ReferencesFound"),
                                                    ProblemDetailsFactory.createProblemDetails(
                                                         new ProblemDetailsImplemen(
-                                                            new WhereUsedQueryUI(edef, ClassModelFactory.forRefactoring(refactoring), fo),
+                                                            new WhereUsedQueryUI(edef, RefactoringSupport.classModelFactory(refactoring), fo),
                                                             inner
                                                         )
                                                    )
@@ -271,7 +272,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
             q.getContext().add(o);
         }
         q.getContext().add(refactoring);
-        q.getContext().add(ClassModelFactory.forRefactoring(refactoring));
+        q.getContext().add(RefactoringSupport.classModelFactory(refactoring));
         q.getContext().add(this);
         return q;
     }

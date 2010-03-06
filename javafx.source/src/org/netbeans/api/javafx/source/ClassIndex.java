@@ -438,7 +438,7 @@ final public class ClassIndex {
             result.add(fo);
         }
 
-        final String typeDef = (handle.getKind().isClass()) ? handle.getQualifiedName() : "";
+        final String typeDef = (handle.getKind().isClass() || handle.getKind().isInterface()) ? handle.getQualifiedName() : "";
 
 //        final String typeRefRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
         final String indexingVal = IndexingUtilities.getIndexValue(handle);

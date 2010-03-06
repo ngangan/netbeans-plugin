@@ -48,6 +48,7 @@ import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.NodeToElementTask;
 import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.TextComponentTask;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
@@ -119,7 +120,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = ClassModelFactory.forRefactoring(query).classModelFor(srcFo);
+                    ClassModel cm = RefactoringSupport.classModelFactory(query).classModelFor(srcFo);
                     ElementDef edef = cm.getDefForPos(startOffset);
                     if (edef == null) {
                         return null;
@@ -134,7 +135,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             task = new NodeToElementTask(lkp.lookupAll(Node.class)) {
 
                 protected RefactoringUI createRefactoringUI(FileObject srcFo) {
-                    ClassModel cm = ClassModelFactory.forRefactoring(query).classModelFor(srcFo);
+                    ClassModel cm = RefactoringSupport.classModelFactory(query).classModelFor(srcFo);
                     ElementDef edef = null;
                     for (ElementDef typeDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.ENUM, ElementKind.INTERFACE))) {
                         if (edef == null) {
@@ -183,7 +184,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(final FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = ClassModelFactory.forRefactoring(ref).classModelFor(srcFo);
+                    ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
 
                     ElementDef edef = cm.getDefForPos(startOffset);
                     if (edef == null) {
@@ -257,7 +258,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                     if (files[0] != null || pkgs[0] != null) {
                         if (files[0] != null) {
-                            ClassModel cm = ClassModelFactory.forRefactoring(ref).classModelFor(files[0]);
+                            ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(files[0]);
                             ElementDef typeDef = null;
                             for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                                 if (edef.getName().equals(files[0].getName())) {
@@ -362,7 +363,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = ClassModelFactory.forRefactoring(ref).classModelFor(srcFo);
+                    ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
 
                     ElementDef edef = cm.getDefForPos(startOffset);
 
@@ -533,7 +534,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = ClassModelFactory.forRefactoring(ref).classModelFor(srcFo);
+                    ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
 
                     ElementDef edef = cm.getDefForPos(startOffset);
                     if (edef == null) {

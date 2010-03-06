@@ -41,10 +41,6 @@
 
 package org.netbeans.modules.javafx.refactoring.repository;
 
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

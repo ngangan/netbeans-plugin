@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -16,26 +17,26 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.GlobalDef;
 import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
-import org.netbeans.modules.refactoring.spi.RefactoringElementImplementation;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
-import org.netbeans.modules.refactoring.spi.Transaction;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -45,11 +46,8 @@ import org.openide.filesystems.FileObject;
 public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
     private WhereUsedQuery refactoring;
 
-    final private ClassModelFactory factory;
-
     public WhereUsedQueryPlugin(WhereUsedQuery refactoring) {
         this.refactoring = refactoring;
-        factory = this.refactoring.getContext().lookup(ClassModelFactory.class);
     }
 
     public void cancelRequest() {
@@ -69,26 +67,9 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final ElementDef edef = getElementDef();
 
-        FileObject srcFo = refactoring.getRefactoringSource().lookup(FileObject.class);
-        if (srcFo == null) {
-            srcFo = refactoring.getContext().lookup(FileObject.class);
-        }
-
-        ClassModel cm = factory.classModelFor(srcFo);
-
-//        if (isFindUsages()) {
-//            for(Usage usg : cm.getUsages(edef)) {
-//                // include only usages; no declarations
-//                if (usg.getStartPos() != usg.getDef().getStartFQN()) {
-//                    reb.add(refactoring, WhereUsedElement.create(usg));
-//                }
-//            }
-//        }
-
-        ClasspathInfo cpInfo = ClasspathInfo.create(srcFo);
-        final ClassIndex ci = cpInfo.getClassIndex();
+        final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
 
         switch(edef.getKind()) {
             case METHOD: {
@@ -99,7 +80,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
             case PARAMETER:
             case LOCAL_VARIABLE:
             case ENUM_CONSTANT: {
-                collectFieldUsages(edef, cm, reb, ci);
+                collectFieldUsages(edef, reb, ci);
                 break;
             }
             case CLASS:
@@ -134,7 +115,9 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                     EnumSet.of(ClassIndex.SearchKind.METHOD_REFERENCES),
                     EnumSet.allOf(ClassIndex.SearchScope.class))
                 ) {
-                    ClassModel cm = factory.classModelFor(fo);
+                    if (!SourceUtils.isJavaFXFile(fo)) continue;
+                    
+                    ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                     for(Usage usg : cm.getUsages(checking)) {
                         // include only references; no declarations
                         if (usg.getStartPos() != usg.getDef().getStartFQN()) {
@@ -151,7 +134,8 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                     EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
                     EnumSet.allOf(ClassIndex.SearchScope.class))
                 ) {
-                    ClassModel cm = factory.classModelFor(fo);
+                    if (!SourceUtils.isJavaFXFile(fo)) continue;
+                    ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                     for(ElementDef refdef : cm.getElementDefs(EnumSet.of(edef.getKind()))) {
                         if (refdef.overrides(edef)) {
                             reb.add(refactoring, WhereUsedElement.create(cm.getDefaultUsage(refdef)));
@@ -162,8 +146,10 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
         }
     }
 
-    private void collectFieldUsages(final ElementDef edef, ClassModel cm, RefactoringElementsBag reb, final ClassIndex ci) {
+    private void collectFieldUsages(final ElementDef edef, RefactoringElementsBag reb, final ClassIndex ci) {
         if (!edef.isIndexable()) {
+            // local references
+            ClassModel cm = getClassModel();
             for(Usage usg : cm.getUsages(edef)) {
                 if (usg.getStartPos() != usg.getDef().getStartFQN()) {
                     reb.add(refactoring, WhereUsedElement.create(usg));
@@ -180,7 +166,8 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
         references.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
 
         for(FileObject ref : references) {
-            ClassModel refcm = factory.classModelFor(ref);
+            if (!SourceUtils.isJavaFXFile(ref)) continue;
+            ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
 
             if (isFindUsages()) {
                 for(Usage usg : refcm.getUsages(edef)) {
@@ -220,7 +207,9 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
             if (checked.contains(checking)) continue;
 
             for(FileObject ref : files) {
-                ClassModel refcm = factory.classModelFor(ref);
+                if (!SourceUtils.isJavaFXFile(ref)) continue;
+                
+                ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
 
                 Usage.Kind kind = Usage.Kind.REFERENCE;
                 if (isFindSubclasses() || isFindDirectSubclassesOnly()) {
@@ -265,5 +254,72 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
 
     private boolean isSearchInComments() {
         return refactoring.getBooleanValue(WhereUsedQuery.SEARCH_IN_COMMENTS);
+    }
+
+    private ClassModel getClassModel() {
+        FileObject fo = getRefactoringFO();
+        if (fo != null) {
+            return RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
+        }
+        return null;
+    }
+
+    private FileObject refFo = null;
+    synchronized private FileObject getRefactoringFO() {
+        if (refFo == null) {
+            refFo = refactoring.getRefactoringSource().lookup(FileObject.class);
+            if (refFo == null) {
+                refFo = refactoring.getContext().lookup(FileObject.class);
+            }
+            if (refFo == null) {
+                TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
+                if (tph != null) {
+                    refFo = tph.getFileObject();
+                    refactoring.getContext().add(refFo);
+                }
+            }
+        }
+        return refFo;
+    }
+
+    private ElementDef refdef = null;
+    synchronized private ElementDef getElementDef() {
+        if (refdef == null) {
+            refdef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+            if (refdef == null) {
+                final TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
+                if (tph != null) {
+                    JavaSource js = JavaSource.forFileObject(tph.getFileObject());
+                    try {
+                        js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
+
+                            public void run(org.netbeans.api.java.source.CompilationController cc) throws Exception {
+
+                                Method m = tph.getClass().getMethod("resolveElement", org.netbeans.api.java.source.CompilationInfo.class); // NOI18N
+                                Object e = m.invoke(tph, cc);
+
+                                Class eClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+                                Class nClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Name"); // NOI18N
+
+                                m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", eClass); // NOI18N
+                                Method nMethod = eClass.getMethod("getSimpleName"); // NOI18N
+                                try {
+                                    org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, e);
+                                    ElementHandle eh = ElementHandle.fromJava(jeh);
+                                    if (eh != null) {
+                                        String simpleName = nMethod.invoke(e).toString();
+                                        refdef = new GlobalDef(simpleName, eh.getKind(), -1, -1, -1, -1, RefactoringSupport.getRefId(eh), null);
+                                    }
+                                } catch (Throwable ex) {
+                                    // basically ignore
+                                }
+                            }
+                        }, false);
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        }
+        return refdef;
     }
 }

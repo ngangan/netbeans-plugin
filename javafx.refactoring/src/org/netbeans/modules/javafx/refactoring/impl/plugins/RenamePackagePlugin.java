@@ -13,10 +13,9 @@ import javax.lang.model.element.ElementKind;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
 import org.netbeans.modules.javafx.refactoring.repository.Usage;
@@ -98,7 +97,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         
         fireProgressListenerStart(RenameRefactoring.PREPARE, relevantFiles.size() * 3);
         for(FileObject file : relevantFiles) {
-            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(file);
+            ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
             final PackageDef pd = cm.getPackageDef();
             BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
 
@@ -119,8 +118,8 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                 reb.add(refactoring, ref);
             }
             fireProgressListenerStep();
-            ClasspathInfo cpInfo = ClasspathInfo.create(file);
-            ClassIndex index = cpInfo.getClassIndex();
+
+            final ClassIndex index = RefactoringSupport.classIndex(refactoring);
             fireProgressListenerStep();
             for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE))) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
@@ -129,7 +128,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Set<Transformation> transformations = new HashSet<Transformation>();
-                            ClassModel rcm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+                            ClassModel rcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                             for(Usage usg : rcm.getUsages(pd)) {
                                 transformations.add(new ReplaceTextTransformation(usg.getStartPos(), sourcePkgName, targetPkgName));
                             }

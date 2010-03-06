@@ -29,6 +29,7 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
+import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.CopyRefactoringPlugin;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
@@ -66,8 +67,10 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
         NonRecursiveFolder folder = look.lookup(NonRecursiveFolder.class);
         ElementDef elDef = look.lookup(ElementDef.class);
 
+        TreePathHandle javaHandle = look.lookup(TreePathHandle.class);
+
         if (refactoring instanceof WhereUsedQuery) {
-            if (elDef == null ) return null;
+            if (elDef == null && javaHandle == null) return null;
             return new WhereUsedQueryPlugin((WhereUsedQuery)refactoring);
         }
 
@@ -84,6 +87,9 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
             } else if (folder!=null && SourceUtils.isOnSourceClasspath(folder.getFolder())) {
                 //rename package
                 return new RenamePackagePlugin((RenameRefactoring)refactoring);
+            }
+            if (javaHandle != null) {
+                return new RenameRefactoringPlugin((RenameRefactoring)refactoring);
             }
         }
 

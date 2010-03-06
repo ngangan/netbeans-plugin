@@ -52,6 +52,7 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
@@ -142,12 +143,12 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         
         final Set<ElementDef> movingDefs = new HashSet<ElementDef>();
         for(FileObject fobj : affectedFiles) {
-            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fobj);
+            ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fobj);
             movingDefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
         }
 
         for(FileObject fobj : affectedFiles) {
-            final ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fobj);
+            final ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fobj);
             // Refactoring API doesn't handle copy of multiple files
             if (refactoring instanceof MultipleCopyRefactoring) {
                 reb.add(refactoring, new CopyFile(fobj, reb.getSession()));
@@ -224,7 +225,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     @Override
                     protected Set<Transformation> prepareTransformations(FileObject fo) {
                         Set<Transformation> transformations = new HashSet<Transformation>();
-                        ClassModel refCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+                        ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                         ImportSet is = refCm.getImportSet();
                         for(ElementDef mDef : movingDefs) {
                             String fqn = mDef.createHandle().getQualifiedName();

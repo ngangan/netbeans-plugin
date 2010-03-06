@@ -20,16 +20,15 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFilesElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.ImportEntry;
 import org.netbeans.modules.javafx.refactoring.repository.ImportSet;
@@ -71,14 +70,14 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         Collection<? extends FileObject> files = refactoring.getRefactoringSource().lookupAll(FileObject.class);
         Set<FileObject> related = new HashSet<FileObject>();
 
-        final ClassIndex ci = refactoring.getContext().lookup(ClassIndex.class);
+        final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
 
         fireProgressListenerStart(MoveRefactoring.INIT, files.size());
 
         final Problem p[] = new Problem[1];
 
         for (FileObject f: files) {
-            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(f);
+            ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(f);
             for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                 related.addAll(ci.getResources(edef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
                 movingClasses.add(edef.createHandle().getQualifiedName());
@@ -184,25 +183,21 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         Collection<? extends FileObject> files = refactoring.getRefactoringSource().lookupAll(FileObject.class);
 
         fireProgressListenerStart(MoveRefactoring.PREPARE, 14);
-        final ClassIndex[] ci = new ClassIndex[1];
         final Set<ElementDef> movingDefs = new HashSet<ElementDef>();
         for(FileObject file : files) {
-            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(file);
+            ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
             movingDefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
         }
         fireProgressListenerStep();
+        final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
         for(FileObject file : files) {
-            if (ci[0] == null) {
-                ci[0] = ClasspathInfo.create(file).getClassIndex();
-            }
-
-            final ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(file);
+            final ClassModel cm =RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
 
             final String newPkgName = getNewPackageName();
 
             Set<FileObject> related = new HashSet<FileObject>();
             for(ElementDef refDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
-                related.addAll(ci[0].getResources(refDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
+                related.addAll(ci.getResources(refDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
             }
             fireProgressListenerStep();
 
@@ -291,7 +286,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     @Override
                     protected Set<Transformation> prepareTransformations(FileObject fo) {
                         Set<Transformation> transformations = new HashSet<Transformation>();
-                        ClassModel refCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+                        ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                         for(Usage usg : refCm.getUsages(cm.getPackageDef())) {
                             if (usg.getStartPos() == refCm.getPackageDef().getStartFQN()) continue; // don't process the package name
                             // a small hack
@@ -316,7 +311,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Set<Transformation> transformations = new HashSet<Transformation>();
-                            ClassModel refCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+                            ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                             ImportSet is = refCm.getImportSet();
                             for(ElementDef mDef : movingDefs) {
                                 String fqn = mDef.createHandle().getQualifiedName();

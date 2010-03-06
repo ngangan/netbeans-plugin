@@ -31,7 +31,10 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.source.util.TreePath;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
@@ -43,6 +46,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -51,12 +56,14 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFilesElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.GlobalDef;
 import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
@@ -81,16 +88,19 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
 
     public RenameRefactoringPlugin(RenameRefactoring refactoring) {
         this.refactoring = refactoring;
-        FileObject srcFo = getRefactoringFO();
+        TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
+        if (tph == null) {
+            FileObject srcFo = getRefactoringFO();
 
-        // make sure the file image on disk is up-to-date
-        try {
-            DataObject dobj = DataObject.find(srcFo);
-            SaveCookie sc = dobj.getCookie(SaveCookie.class);
-            if (sc != null) {
-                sc.save();
+            // make sure the file image on disk is up-to-date
+            try {
+                DataObject dobj = DataObject.find(srcFo);
+                SaveCookie sc = dobj.getCookie(SaveCookie.class);
+                if (sc != null) {
+                    sc.save();
+                }
+            } catch (IOException iOException) {
             }
-        } catch (IOException iOException) {
         }
     }
 
@@ -99,14 +109,16 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     public Problem checkParameters() {
-        fireProgressListenerStart(RenameRefactoring.PARAMETERS_CHECK, 4);
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
-        final Problem p[] = new Problem[1];
         FileObject fo = getRefactoringFO();
+        if (!SourceUtils.isJavaFXFile(fo)) return null;
+        
+        fireProgressListenerStart(RenameRefactoring.PARAMETERS_CHECK, 4);
+        final ElementDef edef = getElementDef();
+        final Problem p[] = new Problem[1];
 
         String msg = null;
         if (edef != null) {
-            if (edef.isOverriding()) {
+            if (edef.getKind() == ElementKind.METHOD && edef.isOverriding()) {
                 p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_Overrides"))); // NOI18N
             }
 
@@ -168,9 +180,12 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     public Problem fastCheckParameters() {
+        FileObject fo = getRefactoringFO();
+        if (!SourceUtils.isJavaFXFile(fo)) return null;
+        
         ClassModel cm = getClassModel();
 
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final ElementDef edef = getElementDef();
         if (edef == null) return null;
         
         Problem p = null;
@@ -196,11 +211,13 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     public Problem preCheck() {
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        FileObject fo = getRefactoringFO();
+        if (!SourceUtils.isJavaFXFile(fo)) return null;
+        
+        final ElementDef edef = getElementDef();
         if (edef == null) return null;
         
         final Problem p[] = new Problem[1];
-        FileObject fo = getRefactoringFO();
 
         fireProgressListenerStart(RenameRefactoring.PRE_CHECK, 4);
         
@@ -268,41 +285,48 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     public Problem prepare(RefactoringElementsBag bag) {
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final ElementDef edef = getElementDef();
         if (edef == null) return null; // fail earl
 
         final FileObject fo = getRefactoringFO();
-        ClassIndex ci = refactoring.getContext().lookup(ClassIndex.class);
-        ClasspathInfo cpInfo = refactoring.getContext().lookup(ClasspathInfo.class);
-        if (cpInfo == null) {
-            cpInfo = ClasspathInfo.create(fo);
-            refactoring.getContext().add(cpInfo);
-        }
+        ClassIndex ci = RefactoringSupport.classIndex(refactoring);
 
         final Set<FileObject> files = new HashSet<FileObject>();
-        files.add(fo);
+        if (SourceUtils.isJavaFXFile(fo)) {
+            files.add(fo);
+        }
 
         if (edef.isIndexable()) {
-            ElementHandle eh = edef.createHandle();
-            Element e = edef.getElement();
-            TypeElement te = (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) ? (TypeElement)e : ElementUtilities.enclosingTypeElement(e);
+            Set<ElementDef> edefs = new HashSet<ElementDef>();
+            edefs.add(edef);
+            if (edef.getKind() == ElementKind.METHOD) {
+                edefs.addAll(edef.getOverridden());
+            }
+            for(ElementDef ed : edefs) {
+                ElementHandle eh = ed.createHandle();
+                files.addAll(ci.getResources(
+                        eh,
+                        EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.TYPE_DEFS, ClassIndex.SearchKind.METHOD_REFERENCES, ClassIndex.SearchKind.FIELD_REFERENCES),
+                        EnumSet.allOf(ClassIndex.SearchScope.class)));
 
-            files.addAll(ci.getResources(
-                    eh,
-                    EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.TYPE_DEFS, ClassIndex.SearchKind.METHOD_REFERENCES, ClassIndex.SearchKind.FIELD_REFERENCES),
-                    EnumSet.allOf(ClassIndex.SearchScope.class)));
-
-            files.addAll(ci.getResources(
-                    ElementHandle.create(te),
-                    EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
-                    EnumSet.allOf(ClassIndex.SearchScope.class)));
+                if (!(eh.getKind().isClass() || eh.getKind().isInterface())) {
+                    eh = new ElementHandle(ElementKind.CLASS, new String[]{eh.getSignatures()[0]});
+                }
+                if (eh != null && (eh.getKind().isInterface() || eh.getKind().isClass())) {
+                    files.addAll(ci.getResources(
+                            eh,
+                            EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
+                            EnumSet.allOf(ClassIndex.SearchScope.class)));
+                }
+            }
         }
         for(FileObject file : files) {
+            if (!SourceUtils.isJavaFXFile(file)) continue;
             BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(file, bag.getSession()) {
 
                 @Override
                 protected Set<Transformation> prepareTransformations(FileObject fo) {
-                    ClassModel localCm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+                    ClassModel localCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
 
                     Set<Transformation> transformations = new HashSet<Transformation>();
                     Set<Usage> usages = new HashSet<Usage>();
@@ -350,7 +374,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     private String variableClashes() {
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final ElementDef edef = getElementDef();
         final FileObject srcFo = getRefactoringFO();
 
         JavaFXSource jfxs = JavaFXSource.forFileObject(srcFo);
@@ -402,7 +426,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     private String clashes() {
-        final ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+        final ElementDef edef = getElementDef();
 
         Element feature = edef.getElement();
 
@@ -462,16 +486,67 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     private ClassModel getClassModel() {
         FileObject fo = getRefactoringFO();
         if (fo != null) {
-            return ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
+            return RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
         }
         return null;
     }
 
-    private FileObject getRefactoringFO() {
-        FileObject fo = refactoring.getRefactoringSource().lookup(FileObject.class);
-        if (fo == null) {
-            fo = refactoring.getContext().lookup(FileObject.class);
+    private FileObject refFo = null;
+    synchronized private FileObject getRefactoringFO() {
+        if (refFo == null) {
+            refFo = refactoring.getRefactoringSource().lookup(FileObject.class);
+            if (refFo == null) {
+                refFo = refactoring.getContext().lookup(FileObject.class);
+            }
+            if (refFo == null) {
+                TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
+                if (tph != null) {
+                    refFo = tph.getFileObject();
+                    refactoring.getContext().add(refFo);
+                }
+            }
         }
-        return fo;
+        return refFo;
+    }
+
+    private ElementDef refdef = null;
+    synchronized private ElementDef getElementDef() {
+        if (refdef == null) {
+            refdef = refactoring.getRefactoringSource().lookup(ElementDef.class);
+            if (refdef == null) {
+                final TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
+                if (tph != null) {
+                    JavaSource js = JavaSource.forFileObject(tph.getFileObject());
+                    try {
+                        js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
+
+                            public void run(org.netbeans.api.java.source.CompilationController cc) throws Exception {
+
+                                Method m = tph.getClass().getMethod("resolveElement", org.netbeans.api.java.source.CompilationInfo.class); // NOI18N
+                                Object e = m.invoke(tph, cc);
+
+                                Class eClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+                                Class nClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Name"); // NOI18N
+
+                                m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", eClass); // NOI18N
+                                Method nMethod = eClass.getMethod("getSimpleName"); // NOI18N
+                                try {
+                                    org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, e);
+                                    ElementHandle eh = ElementHandle.fromJava(jeh);
+                                    if (eh != null) {
+                                        String simpleName = nMethod.invoke(e).toString();
+                                        refdef = new GlobalDef(simpleName, eh.getKind(), -1, -1, -1, -1, RefactoringSupport.getRefId(eh), null);
+                                    }
+                                } catch (Throwable ex) {
+                                    // basically ignore
+                                }
+                            }
+                        }, false);
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        }
+        return refdef;
     }
 }

@@ -86,7 +86,7 @@ import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.refactoring.api.AbstractRefactoring;
+import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -149,7 +149,7 @@ final public class ClassModelFactory {
             Element e = ((JFXClassDeclaration)node).sym;
             if (((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL || (!cc.getElementUtilities().isSynthetic(e) && ((JFXClassDeclaration)node).mods.getGenType() != SynthType.SYNTHETIC)) {
                 superTypes.addAll(node.getSupertypeList());
-                ElementDef def = getClassDef(node, (TypeElement)e, p);
+                ElementDef def = getClassDef((TypeElement)e, p);
                 if (def != null) {
                     p.addDef(def);
                     if (!def.isSynthetic()) {
@@ -161,13 +161,13 @@ final public class ClassModelFactory {
                         if (se != null) {
                             Tree t = cc.getTree(se);
                             if (t != null) {
-                                def.addOverridenDef(getClassDef((ClassDeclarationTree)t, (TypeElement)se, p));
+                                def.addOverridenDef(getClassDef((TypeElement)se, p));
                             }
                         } else {
                             // extending a java type
                             ElementHandle eh = ElementHandle.create(e);
                             if (eh != null) {
-                                def.addOverridenDef(new GlobalDef(e.getSimpleName().toString(), e.getKind(), ((TypeElement)e).getNestingKind(), -1, -1, -1, -1, getRefId(eh), p));
+                                def.addOverridenDef(new GlobalDef(e.getSimpleName().toString(), e.getKind(), ((TypeElement)e).getNestingKind(), -1, -1, -1, -1, RefactoringSupport.getRefId(eh), p));
                             }
                         }
                     }
@@ -238,14 +238,14 @@ final public class ClassModelFactory {
                 endPos = endPos > expectedEndPos ? endPos : expectedEndPos;
                 // *** tada ***
 
-                Element e = cc.getTrees().getElement(getCurrentPath());
+                Element e = getElement((JFXTree)node);
                 if (e != null) {
                     Tree t = cc.getTree(e);
                     if (t != null) {
                         switch (e.getKind()) {
                             case CLASS:
                             case INTERFACE: {
-                                p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, getClassDef((ClassDeclarationTree)t, (TypeElement)e, p)));
+                                p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, getClassDef((TypeElement)e, p)));
                                 break;
                             }
                             case FIELD:
@@ -253,12 +253,12 @@ final public class ClassModelFactory {
                             case LOCAL_VARIABLE:
                             case METHOD: {
                                 if (t.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
-                                    ElementDef def= getVarDef(((VariableTree)t), e, p);
+                                    ElementDef def= getVarDef(e, p);
                                     if (def != null) {
                                         p.addUsage(new Usage(startPos, endPos, def));
                                     }
                                 } else if (t.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
-                                    ElementDef def = getMethodDef(((FunctionDefinitionTree)t), p);
+                                    ElementDef def = getMethodDef((ExecutableElement)e, p);
                                     if (def != null) {
                                         p.addUsage(new Usage(startPos, endPos, def));
                                     }
@@ -270,7 +270,7 @@ final public class ClassModelFactory {
                         // probably referencing a java type
                         ElementHandle eh = ElementHandle.create(e);
                         if (eh != null) {
-                            p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, new GlobalDef(e.getSimpleName().toString(), e.getKind(), startPos, endPos, startPos, endPos, getRefId(eh), p)));
+                            p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, new GlobalDef(e.getSimpleName().toString(), e.getKind(), startPos, endPos, startPos, endPos, RefactoringSupport.getRefId(eh), p)));
                         }
                     }
                 }
@@ -287,11 +287,11 @@ final public class ClassModelFactory {
             int startFQN = findIdentifier(node, null, cc);
             int endFQN = startFQN + name.length();
 
-            Element e = ((JFXObjectLiteralPart)node).sym;
+            Element e = getElement((JFXTree)node);
             if (e != null) {
                 Tree t = cc.getTree(e);
                 if (t != null) {
-                    p.addUsage(new Usage(startFQN, endFQN, getVarDef(((VariableTree)t), e, p)));
+                    p.addUsage(new Usage(startFQN, endFQN, getVarDef(e, p)));
                 }
             }
             return super.visitObjectLiteralPart(node, p);
@@ -301,33 +301,24 @@ final public class ClassModelFactory {
         public Void visitMemberSelect(MemberSelectTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitMemberSelect(node, p);
 
-            Element e = cc.getTrees().getElement(getCurrentPath());
+            Element e = getElement((JFXTree)node);
             if (e != null) {
                 ElementDef def = ElementDef.NULL;
                 switch (e.getKind()) {
                     case METHOD:
                     case CONSTRUCTOR: {
-                        Tree t = cc.getTree(e);
-                        if (t != null) {
-                            def = getMethodDef((FunctionDefinitionTree)t, p);
-                        }
+                        def = getMethodDef((ExecutableElement)e, p);
                         break;
                     }
                     case FIELD:
                     case PARAMETER:
                     case LOCAL_VARIABLE: {
-                        Tree t = cc.getTree(e);
-                        if (t != null) {
-                            def = getVarDef(((VariableTree)t), e, p);
-                        }
+                        def = getVarDef(e, p);
                         break;
                     }
                     case CLASS:
                     case INTERFACE: {
-                        Tree t = cc.getTree(e);
-                        if (t != null) {
-                            def = getClassDef(((ClassDeclarationTree)t), (TypeElement)e, p);
-                        }
+                        def = getClassDef((TypeElement)e, p);
                         break;
                     }
                     case PACKAGE: {
@@ -347,7 +338,8 @@ final public class ClassModelFactory {
         public Void visitVariable(VariableTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitVariable(node, p);
 
-            ElementDef def = getVarDef(node, cc.getTrees().getElement(getCurrentPath()), p);
+            Element e = getElement((JFXTree)node);
+            ElementDef def = getVarDef(e, p);
             if (def != null) {
                 p.addDef(def);
                 p.addUsage(new Usage(def.getStartFQN(), def.getEndFQN(), def));
@@ -357,10 +349,10 @@ final public class ClassModelFactory {
 
         @Override
         public Void visitOnReplace(OnReplaceTree node, ClassModel p) {
-            ElementDef firstIndexDef = node.getFirstIndex() != null ? getVarDef(node.getFirstIndex(), cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getFirstIndex())), p) : null;
-            ElementDef lastIndexDef = node.getLastIndex() != null ? getVarDef(node.getLastIndex(), cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getLastIndex())), p) : null;
-            ElementDef oldValueDef = node.getOldValue() != null ? getVarDef(node.getOldValue(), cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getOldValue())), p) : null;
-            ElementDef newValuesDef = node.getNewElements() != null ? getVarDef(node.getNewElements(), cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getNewElements())), p) : null;
+            ElementDef firstIndexDef = node.getFirstIndex() != null ? getVarDef(getElement((JFXTree)node.getFirstIndex()), p) : null;
+            ElementDef lastIndexDef = node.getLastIndex() != null ? getVarDef(getElement((JFXTree)node.getLastIndex()), p) : null;
+            ElementDef oldValueDef = node.getOldValue() != null ? getVarDef(getElement((JFXTree)node.getOldValue()), p) : null;
+            ElementDef newValuesDef = node.getNewElements() != null ? getVarDef(getElement((JFXTree)node.getNewElements()), p) : null;
 
             if (firstIndexDef != null) {
                 p.addDef(firstIndexDef);
@@ -388,8 +380,9 @@ final public class ClassModelFactory {
         @Override
         public Void visitFunctionDefinition(FunctionDefinitionTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitFunctionDefinition(node, p);
-            
-            ElementDef def  = getMethodDef(node, p);
+
+            ExecutableElement ee = (ExecutableElement)cc.getTrees().getElement(getCurrentPath());
+            ElementDef def  = getMethodDef(ee, p);
             if (def != null && !def.getName().equals("javafx$run$")) {
                 p.addDef(def);
                 p.addUsage(new Usage(def.getStartFQN(), def.getEndFQN(), def));
@@ -397,16 +390,12 @@ final public class ClassModelFactory {
             return super.visitFunctionDefinition(node, p);
         }
 
-        private void processFunctionDef(JFXFunctionDefinition t, ElementDef def, ClassModel p) {
-            ExecutableElement e = t.sym;
-            for(ExecutableElement overriden : JavaFXSourceUtils.getOverridenMethods(e, cc)) {
-                Tree t1 = cc.getTree(overriden);
-                if (t1 != null && t1.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
-                    GlobalDef otherDef = (GlobalDef)getMethodDef((JFXFunctionDefinition)t1, p);
-                    if (otherDef != null) {
-                        ((GlobalDef)def).addOverridenDef(otherDef);
-                        processFunctionDef((JFXFunctionDefinition)t1, otherDef, p);
-                    }
+        private void processFunctionDef(ExecutableElement ee, ElementDef def, ClassModel p) {
+            for(ExecutableElement overriden : JavaFXSourceUtils.getOverridenMethods(ee, cc)) {
+                GlobalDef otherDef = (GlobalDef)getMethodDef(overriden, p);
+                if (otherDef != null) {
+                    ((GlobalDef)def).addOverridenDef(otherDef);
+                    processFunctionDef(overriden, otherDef, p);
                 }
             }
         }
@@ -419,80 +408,85 @@ final public class ClassModelFactory {
 
         final private Map<Object, ElementDef> defCache = new WeakHashMap<Object, ElementDef>();
 
-        private ElementDef getVarDef(VariableTree node, Element e, ClassModel p) {
-            if (node == null || node.getName() == null) return null;
+        private Element getElement(JFXTree t) {
+            Element e = JavafxTreeInfo.symbolFor(t);
+            if (e == null) {
+                // #JFXC-3789 workaround
+                if (t instanceof JFXOverrideClassVar) {
+                    e = ((JFXOverrideClassVar)t).sym;
+                } else if (t instanceof JFXVar) {
+                    // #JFXC-3917 workaround
+                    e = ((JFXVar)t).getSymbol();
+                }
+            }
+            return e;
+        }
+
+        private ElementDef getVarDef(Element e, ClassModel p) {
+            VariableTree node = (VariableTree)cc.getTree(e);
+
+            boolean missingTree = (node == null || node.getName() == null);
             ElementDef edef = defCache.get(node);
             if (edef == null) {
-                String name = node.getName().toString();
-                int startPos = (int)positions.getStartPosition(cc.getCompilationUnit(), node);
-                int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
-                int startFQN = findIdentifier(node, null, cc);
-                int endFQN = startFQN + name.length();
+                String name = e.getSimpleName().toString();
+                int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
+                int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
+                int startFQN = missingTree ? -1 : findIdentifier(node, null, cc);
+                int endFQN = missingTree ? -1 : startFQN + name.length();
                 // workaround for bug in javafxc reporting incorrect end position for an overridden variable
                 // not reporting it when it can be workaround ... what's the point, anyway?
                 endPos = endPos < endFQN ? endFQN : endPos;
 
-                if (e == null) {
-                    // #JFXC-3789 workaround
-                    if (node instanceof JFXOverrideClassVar) {
-                        e = ((JFXOverrideClassVar)node).sym;
-                    } else if (node instanceof JFXVar) {
-                        // #JFXC-3917 workaround
-                        e = ((JFXVar)node).getSymbol();
-                    }
-                }
+                
 
                 if (e != null) {
                     if (e.getKind() != ElementKind.FIELD) {
                         edef = new LocalDef(localCounter++, name, e.getKind(), startPos, endPos, startFQN, endFQN, p);
                     } else {
-                        edef = new GlobalDef(name, e.getKind(), startPos, endPos, startFQN, endFQN, getRefId(ElementHandle.create(e)), p);
+                        edef = new GlobalDef(name, e.getKind(), startPos, endPos, startFQN, endFQN, RefactoringSupport.getRefId(ElementHandle.create(e)), p);
                     }
                 }
             }
             return edef;
         }
 
-        private ElementDef getMethodDef(FunctionDefinitionTree node, ClassModel p) {
-            if (node == null || ((JFXFunctionDefinition)node).getName() == null) return null;
+        private ElementDef getMethodDef(ExecutableElement e, ClassModel p) {
+            Tree node = (JFXFunctionDefinition)cc.getTree(e);
+            
+            boolean missingTree = (node == null || ((JFXFunctionDefinition)node).getName() == null);
 
-            ElementDef edef = defCache.get(node);
+            ElementDef edef = missingTree ? null : defCache.get(node);
             if (edef == null) {
-                String name = ((JFXFunctionDefinition)node).getName().toString();
-                int startPos = (int)positions.getStartPosition(cc.getCompilationUnit(), node);
-                int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
-                int startFQN = findIdentifier(node, JFXTokenId.FUNCTION, cc);
-                int endFQN = startFQN + name.length();
-                JavaFXTreePath tp = cc.getTrees().getPath(cc.getCompilationUnit(), node);
-                Element e = null;
-                if (tp != null) {
-                    e = cc.getTrees().getElement(tp);
-                } else {
-                    e = ((JFXFunctionDefinition)node).sym;
-                }
+                String name = e.getSimpleName().toString();
+                int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
+                int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
+                int startFQN = missingTree ? -1 : findIdentifier(node, JFXTokenId.FUNCTION, cc);
+                int endFQN = missingTree ? -1 : startFQN + name.length();
                 if (e != null) {
-                    edef = new GlobalDef(name, e.getKind(), startPos, endPos, startFQN, endFQN, getRefId(ElementHandle.create(e)), p);
+                    edef = new GlobalDef(name, e.getKind(), startPos, endPos, startFQN, endFQN, RefactoringSupport.getRefId(ElementHandle.create(e)), p);
                 }
             }
             if (edef != null && !edef.getName().equals("javafx$run$")) {
-                processFunctionDef((JFXFunctionDefinition)node, edef, p);
+                processFunctionDef(e, edef, p);
             }
             return edef;
         }
 
-        private ElementDef getClassDef(ClassDeclarationTree node, TypeElement te, ClassModel p) {
-            if (te == null || node == null) return null;
+        private ElementDef getClassDef(TypeElement te, ClassModel p) {
+            ClassDeclarationTree node = (ClassDeclarationTree)cc.getTree(te);
+
+            boolean missingTree = (te == null || node == null);
             
-            ElementDef edef = defCache.get(node);
+            ElementDef edef = missingTree ? null : defCache.get(node);
             if (edef == null) {
-                boolean isSynth = ((JFXClassDeclaration)node).mods.getGenType() == SynthType.SYNTHETIC;
+                boolean isSynth = missingTree ? cc.getElementUtilities().isSynthetic(te) : ((JFXClassDeclaration)node).mods.getGenType() == SynthType.SYNTHETIC;
 
-                int startPos = (int)positions.getStartPosition(cc.getCompilationUnit(), node);
-                int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
+                int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
+                int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
 
-                int startFQN = findIdentifier(node, JFXTokenId.CLASS, cc);
-                String name = node.getSimpleName().toString();
-                edef = new GlobalDef(name, te.getKind(), te.getNestingKind(), startPos, endPos, startFQN, startFQN + name.length(), getRefId(ElementHandle.create(((JFXClassDeclaration)node).sym)), isSynth, p);
+                int startFQN = missingTree ? -1 : findIdentifier(node, JFXTokenId.CLASS, cc);
+                String name = te.getSimpleName().toString();
+                edef = new GlobalDef(name, te.getKind(), te.getNestingKind(), startPos, endPos, startFQN, startFQN + name.length(), RefactoringSupport.getRefId(ElementHandle.create(te)), isSynth, p);
             }
             return edef;
         }
@@ -522,7 +516,7 @@ final public class ClassModelFactory {
 
     final private Map<FileObject, ClassModel> classModelCache = new HashMap<FileObject, ClassModel>();
 
-    private ClassModelFactory() {}
+    public ClassModelFactory() {}
 
 //    public static ClassModelFactory getInstance(RefactoringSession session) {
 //        synchronized(factories) {
@@ -534,15 +528,6 @@ final public class ClassModelFactory {
 //            return cmf;
 //        }
 //    }
-
-    public static synchronized ClassModelFactory forRefactoring(AbstractRefactoring ref) {
-        ClassModelFactory f = ref.getContext().lookup(ClassModelFactory.class);
-        if (f == null) {
-            f = new ClassModelFactory();
-            ref.getContext().add(f);
-        }
-        return f;
-    }
 
     public ClassModel classModelFor(FileObject fo) {
         synchronized(classModelCache) {
@@ -571,25 +556,5 @@ final public class ClassModelFactory {
 
         // fail
         return null;
-    }
-
-    private static String getRefId(ElementHandle<? extends Element> eeh) {
-        switch (eeh.getKind()) {
-            case PACKAGE:
-            case CLASS:
-            case INTERFACE:
-            case ENUM: {
-                return eeh.getSignatures()[0];
-            }
-            case FIELD:
-            case LOCAL_VARIABLE:
-            case PARAMETER:
-            case METHOD: {
-                return eeh.getSignatures()[0] + "#" + eeh.getSignatures()[1] + "#" + eeh.getSignatures()[2];
-            }
-            default: {
-                return eeh.toString();
-            }
-        }
     }
 }
