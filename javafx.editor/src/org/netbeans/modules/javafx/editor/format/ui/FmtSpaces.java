@@ -74,7 +74,6 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
     private DefaultTreeCellRenderer dr = new DefaultTreeCellRenderer();    
     private JCheckBox renderer = new JCheckBox();
     
-    /** Creates new form FmtSpaces */
     private FmtSpaces() {
         initComponents();
         model = createModel();
@@ -264,16 +263,13 @@ public class FmtSpaces extends JPanel implements TreeCellRenderer, MouseListener
                 new Item(spaceWithinBraces),
                 new Item(spaceWithinSequenceInitBrackets)),
                     
-                
              new Item("Other",                                  // NOI18N
                 new Item(spaceBeforeComma),
                 new Item(spaceAfterComma),
                 new Item(spaceBeforeSemi),
                 new Item(spaceAfterSemi),
                 new Item(spaceBeforeColon),
-                new Item(spaceAfterColon),
-                new Item(spaceAfterTypeCast) )
-                
+                new Item(spaceAfterColon) )
         };
          
         
