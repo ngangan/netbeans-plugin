@@ -68,32 +68,34 @@ abstract public class ElementDef implements Referencable {
     private Set<ElementDef> overridden = new HashSet<ElementDef>();
     private ClassModel enclosing;
     private boolean synthetic;
+    private String pkgName;
 
-    public ElementDef(String name, ElementKind kind, int startPos, int endPos, int startFQN, int endFQN, boolean synth, ClassModel parent) {
-        this(name, kind, NestingKind.MEMBER, startPos, endPos, startFQN, endFQN, synth, parent);
+    public ElementDef(String name, ElementKind kind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, boolean synth, ClassModel parent) {
+        this(name, kind, NestingKind.MEMBER, enclosingPkg, startPos, endPos, startFQN, endFQN, synth, parent);
     }
 
-    public ElementDef(String name, ElementKind kind, NestingKind nestingKind, int startPos, int endPos, int startFQN, int endFQN, boolean synth, ClassModel parent) {
+    public ElementDef(String name, ElementKind kind, NestingKind nestingKind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, boolean synth, ClassModel parent) {
         this.startPos = startPos;
         this.endPos = endPos;
         this.startFQN = startFQN;
         this.endFQN = endFQN;
         this.name = name;
+        this.pkgName = enclosingPkg;
         this.kind = kind;
         this.enclosing = parent;
         this.synthetic = synth;
         this.nestingKind = nestingKind;
     }
 
-    public ElementDef(String name, ElementKind kind, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
-        this(name, kind, NestingKind.MEMBER, startPos, endPos, startFQN, endFQN, parent);
+    public ElementDef(String name, ElementKind kind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
+        this(name, kind, NestingKind.MEMBER, enclosingPkg, startPos, endPos, startFQN, endFQN, parent);
     }
 
-    public ElementDef(String name, ElementKind kind, NestingKind nestingKind, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
-        this(name, kind, nestingKind, startPos, endPos, startFQN, endFQN, false, parent);
+    public ElementDef(String name, ElementKind kind, NestingKind nestingKind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
+        this(name, kind, nestingKind, enclosingPkg, startPos, endPos, startFQN, endFQN, false, parent);
     }
 
-    final public static ElementDef NULL = new ElementDef("", ElementKind.OTHER, NestingKind.ANONYMOUS, -1, -1, -1, -1, null){
+    final public static ElementDef NULL = new ElementDef("", ElementKind.OTHER, NestingKind.ANONYMOUS, "",  -1, -1, -1, -1, null){
         final private ElementHandle NULL_HANDLE = new ElementHandle(ElementKind.OTHER, new String[]{""});
         public String getRefId() {
             return "<null>"; // NOI18N
@@ -125,6 +127,10 @@ abstract public class ElementDef implements Referencable {
 
     final public String getName() {
         return name;
+    }
+
+    final public String getPackageName() {
+        return pkgName;
     }
 
     final public int getStartFQN() {

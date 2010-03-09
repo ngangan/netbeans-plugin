@@ -46,7 +46,6 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.MemberSelectTree;
 import com.sun.javafx.api.tree.ObjectLiteralPartTree;
@@ -56,19 +55,21 @@ import com.sun.javafx.api.tree.SyntheticTree.SynthType;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
 import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXClassDeclaration;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
 import com.sun.tools.javafx.tree.JFXOverrideClassVar;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import com.sun.tools.mjavac.tree.JCTree;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -78,14 +79,22 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
+import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ui.OpenProjects;
+import org.netbeans.modules.javafx.project.JavaFXProject;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.openide.filesystems.FileObject;
 
@@ -167,7 +176,17 @@ final public class ClassModelFactory {
                             // extending a java type
                             ElementHandle eh = ElementHandle.create(e);
                             if (eh != null) {
-                                def.addOverridenDef(new GlobalDef(e.getSimpleName().toString(), e.getKind(), ((TypeElement)e).getNestingKind(), -1, -1, -1, -1, RefactoringSupport.getRefId(eh), p));
+                                PackageElement pe = ElementUtilities.enclosingPackageElement(e);
+                                def.addOverridenDef(
+                                    new GlobalDef(
+                                        e.getSimpleName().toString(),
+                                        e.getKind(),
+                                        ((TypeElement)e).getNestingKind(),
+                                        pe != null ? pe.getQualifiedName().toString() : "",
+                                        -1, -1, -1, -1,
+                                        RefactoringSupport.getRefId(eh), p
+                                    )
+                                );
                             }
                         }
                     }
@@ -269,8 +288,23 @@ final public class ClassModelFactory {
                     } else {
                         // probably referencing a java type
                         ElementHandle eh = ElementHandle.create(e);
+                        PackageElement pe = ElementUtilities.enclosingPackageElement(e);
+
                         if (eh != null) {
-                            p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, new GlobalDef(e.getSimpleName().toString(), e.getKind(), startPos, endPos, startPos, endPos, RefactoringSupport.getRefId(eh), p)));
+                            p.addUsage(
+                                new Usage(
+                                    startPos,
+                                    endPos,
+                                    superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE,
+                                    new GlobalDef(
+                                        e.getSimpleName().toString(),
+                                        e.getKind(),
+                                        pe != null ? pe.getQualifiedName().toString() : "",
+                                        startPos, endPos, startPos, endPos,
+                                        RefactoringSupport.getRefId(eh), p
+                                    )
+                                )
+                            );
                         }
                     }
                 }
@@ -440,10 +474,25 @@ final public class ClassModelFactory {
                 
 
                 if (e != null) {
+                    PackageElement pe = ElementUtilities.enclosingPackageElement(e);
                     if (e.getKind() != ElementKind.FIELD) {
-                        edef = new LocalDef(localCounter++, name, e.getKind(), startPos, endPos, startFQN, endFQN, p);
+                        edef = new LocalDef(
+                            localCounter++,
+                            name,
+                            e.getKind(),
+                            pe != null ? pe.getQualifiedName().toString() : "",
+                            startPos, endPos, startFQN, endFQN,
+                            p
+                        );
                     } else {
-                        edef = new GlobalDef(name, e.getKind(), startPos, endPos, startFQN, endFQN, RefactoringSupport.getRefId(ElementHandle.create(e)), p);
+                        edef = new GlobalDef(
+                            name,
+                            e.getKind(),
+                            pe != null ? pe.getQualifiedName().toString() : "",
+                            startPos, endPos, startFQN, endFQN,
+                            RefactoringSupport.getRefId(ElementHandle.create(e)),
+                            p
+                        );
                     }
                 }
             }
@@ -463,7 +512,15 @@ final public class ClassModelFactory {
                 int startFQN = missingTree ? -1 : findIdentifier(node, JFXTokenId.FUNCTION, cc);
                 int endFQN = missingTree ? -1 : startFQN + name.length();
                 if (e != null) {
-                    edef = new GlobalDef(name, e.getKind(), startPos, endPos, startFQN, endFQN, RefactoringSupport.getRefId(ElementHandle.create(e)), p);
+                    PackageElement pe = ElementUtilities.enclosingPackageElement(e);
+                    edef = new GlobalDef(
+                        name,
+                        e.getKind(),
+                        pe != null ? pe.getQualifiedName().toString() : "",
+                        startPos, endPos, startFQN, endFQN,
+                        RefactoringSupport.getRefId(ElementHandle.create(e)),
+                        p
+                    );
                 }
             }
             if (edef != null && !edef.getName().equals("javafx$run$")) {
@@ -486,7 +543,17 @@ final public class ClassModelFactory {
 
                 int startFQN = missingTree ? -1 : findIdentifier(node, JFXTokenId.CLASS, cc);
                 String name = te.getSimpleName().toString();
-                edef = new GlobalDef(name, te.getKind(), te.getNestingKind(), startPos, endPos, startFQN, startFQN + name.length(), RefactoringSupport.getRefId(ElementHandle.create(te)), isSynth, p);
+                PackageElement pe = ElementUtilities.enclosingPackageElement(te);
+                edef = new GlobalDef(
+                    name,
+                    te.getKind(),
+                    te.getNestingKind(),
+                    pe != null ? pe.getQualifiedName().toString() : "",
+                    startPos, endPos, startFQN, startFQN + name.length(),
+                    RefactoringSupport.getRefId(ElementHandle.create(te)),
+                    isSynth,
+                    p
+                );
             }
             return edef;
         }
@@ -538,6 +605,26 @@ final public class ClassModelFactory {
             }
             return m;
         }
+    }
+
+    private static final ClassPath EMPTY_CLASSPATH = org.netbeans.spi.java.classpath.support.ClassPathSupport.createClassPath( new FileObject[0] );
+    public ClassModel classModelFor(String className) {
+        List<FileObject> roots = new ArrayList<FileObject>();
+        for(Project p : OpenProjects.getDefault().getOpenProjects()) {
+            if (!(p instanceof JavaFXProject)) continue;
+            ClassPath pcp = ((JavaFXProject)p).getClassPathProvider().getProjectSourcesClassPath(ClassPath.SOURCE);
+            if (pcp != null) {
+                roots.addAll(Arrays.asList(pcp.getRoots()));
+            }
+        }
+        ClassPath combinedCP = org.netbeans.spi.java.classpath.support.ClassPathSupport.createClassPath(roots.toArray(new FileObject[roots.size()]));
+        ClasspathInfo ci = ClasspathInfo.create(EMPTY_CLASSPATH, EMPTY_CLASSPATH, combinedCP);
+
+        Set<FileObject> found = ci.getClassIndex().getResources(new ElementHandle(ElementKind.CLASS, new String[]{className}), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+        if (found != null) {
+            return classModelFor(found.iterator().next());
+        }
+        return null;
     }
 
     private static ClassModel createClassModel(FileObject fo) {

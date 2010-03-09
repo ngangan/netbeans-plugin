@@ -48,8 +48,8 @@ import javax.lang.model.element.ElementKind;
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
 public class ClassDef extends GlobalDef {
-    public ClassDef(String name,  String fqn, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
-        super(name, ElementKind.CLASS, startPos, endPos, startFQN, endFQN, fqn, parent);
+    public ClassDef(String name,  String fqn, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
+        super(name, ElementKind.CLASS, enclosingPkg, startPos, endPos, startFQN, endFQN, fqn, parent);
     }
 
     @Override

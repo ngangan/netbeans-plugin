@@ -114,7 +114,7 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
 
     private boolean checkMove(Lookup refactoringSource) {
         for (FileObject f:refactoringSource.lookupAll(FileObject.class)) {
-            if (SourceUtils.isJavaFXFile(f)) {
+            if (SourceUtils.isJavaFXFile(f) || f.getExt().toLowerCase().equals("java")) {
                 return true;
             }
             if (f.isFolder()) {
