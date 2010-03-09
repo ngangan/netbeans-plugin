@@ -267,7 +267,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
 //    }
 
     private WhereUsedQuery createQuery(ElementDef def) {
-        WhereUsedQuery q = new WhereUsedQuery(Lookups.fixed(def, refactoring.getRefactoringSource().lookup(FileObject.class)));
+        WhereUsedQuery q = new WhereUsedQuery(Lookups.fixed(def, getRefFO()));
         for (Object o:refactoring.getContext().lookupAll(Object.class)) {
             q.getContext().add(o);
         }
@@ -289,6 +289,20 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
 //        }
 //        return false;
 //    }
+
+    private FileObject getRefFO() {
+        FileObject refFo = refactoring.getRefactoringSource().lookup(FileObject.class);
+        if (refFo == null) {
+            NonRecursiveFolder nrf = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class);
+            if (nrf != null) {
+                refFo = nrf.getFolder();
+            }
+        }
+        if (refFo == null) {
+            refFo = refactoring.getContext().lookup(FileObject.class);
+        }
+        return refFo;
+    }
 
     private class ProblemDetailsImplemen implements ProblemDetailsImplementation {
 

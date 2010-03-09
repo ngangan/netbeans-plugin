@@ -93,7 +93,7 @@ abstract public class Transformer {
 
     final synchronized String removeText(int pos, int len) {
         int startPos = context.getRealOffset(pos);
-        int endPos = context.getRealOffset(pos + len);
+        int endPos = context.getRealOffset(pos + len - 1);
 
         String removed = builder.subSequence(startPos, endPos).toString();
         builder.delete(startPos, endPos);

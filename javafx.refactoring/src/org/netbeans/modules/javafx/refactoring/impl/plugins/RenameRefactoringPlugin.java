@@ -31,10 +31,7 @@ package org.netbeans.modules.javafx.refactoring.impl.plugins;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Scope;
 import com.sun.javafx.api.tree.Tree;
-import com.sun.source.util.TreePath;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Enumeration;
@@ -46,7 +43,6 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -61,9 +57,7 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFilesElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.GlobalDef;
 import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
@@ -510,41 +504,13 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     private ElementDef refdef = null;
+    
     synchronized private ElementDef getElementDef() {
         if (refdef == null) {
             refdef = refactoring.getRefactoringSource().lookup(ElementDef.class);
             if (refdef == null) {
                 final TreePathHandle tph = refactoring.getRefactoringSource().lookup(TreePathHandle.class);
-                if (tph != null) {
-                    JavaSource js = JavaSource.forFileObject(tph.getFileObject());
-                    try {
-                        js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
-
-                            public void run(org.netbeans.api.java.source.CompilationController cc) throws Exception {
-
-                                Method m = tph.getClass().getMethod("resolveElement", org.netbeans.api.java.source.CompilationInfo.class); // NOI18N
-                                Object e = m.invoke(tph, cc);
-
-                                Class eClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
-                                Class nClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Name"); // NOI18N
-
-                                m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", eClass); // NOI18N
-                                Method nMethod = eClass.getMethod("getSimpleName"); // NOI18N
-                                try {
-                                    org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, e);
-                                    ElementHandle eh = ElementHandle.fromJava(jeh);
-                                    if (eh != null) {
-                                        String simpleName = nMethod.invoke(e).toString();
-                                        refdef = new GlobalDef(simpleName, eh.getKind(), -1, -1, -1, -1, RefactoringSupport.getRefId(eh), null);
-                                    }
-                                } catch (Throwable ex) {
-                                    // basically ignore
-                                }
-                            }
-                        }, false);
-                    } catch (IOException e) {
-                    }
-                }
+                refdef = RefactoringSupport.fromJava(tph);
             }
         }
         return refdef;

@@ -56,22 +56,22 @@ public class GlobalDef extends ElementDef {
     private String refId;
     private boolean indexable = true;
 
-    public GlobalDef(String name, ElementKind kind, NestingKind nestingKind, int startPos, int endPos, int startFQN, int endFQN, String refId, boolean synth, ClassModel parent) {
-        super(name, kind, nestingKind, startPos, endPos, startFQN, endFQN, synth, parent);
+    public GlobalDef(String name, ElementKind kind, NestingKind nestingKind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, String refId, boolean synth, ClassModel parent) {
+        super(name, kind, nestingKind, enclosingPkg, startPos, endPos, startFQN, endFQN, synth, parent);
         this.refId = refId;
     }
 
-    public GlobalDef(String name, ElementKind kind, int startPos, int endPos, int startFQN, int endFQN, String refId, boolean synth, ClassModel parent) {
-        super(name, kind, startPos, endPos, startFQN, endFQN, synth, parent);
+    public GlobalDef(String name, ElementKind kind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, String refId, boolean synth, ClassModel parent) {
+        super(name, kind, enclosingPkg, startPos, endPos, startFQN, endFQN, synth, parent);
         this.refId = refId;
     }
 
-    public GlobalDef(String name, ElementKind kind, NestingKind nestingKind, int startPos, int endPos, int startFQN, int endFQN, String refId, ClassModel parent) {
-        this(name, kind, nestingKind, startPos, endPos, startFQN, endFQN, refId, false, parent);
+    public GlobalDef(String name, ElementKind kind, NestingKind nestingKind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, String refId, ClassModel parent) {
+        this(name, kind, nestingKind, enclosingPkg, startPos, endPos, startFQN, endFQN, refId, false, parent);
     }
     
-    public GlobalDef(String name, ElementKind kind, int startPos, int endPos, int startFQN, int endFQN, String refId, ClassModel parent) {
-        this(name, kind, startPos, endPos, startFQN, endFQN, refId, false, parent);
+    public GlobalDef(String name, ElementKind kind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, String refId, ClassModel parent) {
+        this(name, kind, enclosingPkg, startPos, endPos, startFQN, endFQN, refId, false, parent);
     }
 
     public String getRefId() {

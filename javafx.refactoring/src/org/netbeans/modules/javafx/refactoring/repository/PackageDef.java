@@ -55,7 +55,7 @@ public class PackageDef extends GlobalDef {
     }
 
     public PackageDef(String name, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
-        super(name, ElementKind.PACKAGE, startPos, endPos, startFQN, endFQN, name, parent);
+        super(name, ElementKind.PACKAGE, name, startPos, endPos, startFQN, endFQN, name, parent);
     }
 
     @Override

@@ -57,8 +57,8 @@ import org.netbeans.api.javafx.source.ElementHandle;
 public class LocalDef extends ElementDef {
     private int localId;
 
-    public LocalDef(int localId, String name, ElementKind kind, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
-        super(name, kind, startPos, endPos, startFQN, endFQN, parent);
+    public LocalDef(int localId, String name, ElementKind kind, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
+        super(name, kind, enclosingPkg, startPos, endPos, startFQN, endFQN, parent);
         this.localId = localId;
     }
 
