@@ -316,7 +316,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                 targetURL = ((MultipleCopyRefactoring) refactoring).getTarget().lookup(URL.class);
             }
             FileObject targetFolder = FileUtil.toFileObject(new File(targetURL.toURI()));
-            FileObject targetFile = targetFolder.getFileObject(targetName);
+            FileObject targetFile = targetFolder != null ? targetFolder.getFileObject(targetName) : null;
             return targetFile;
         } catch (URISyntaxException uRISyntaxException) {
         }
