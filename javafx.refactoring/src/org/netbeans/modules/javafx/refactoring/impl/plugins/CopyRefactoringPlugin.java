@@ -231,6 +231,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                             String fqn = mDef.createHandle().getQualifiedName();
                             is.addRename(fqn, fqn.replace(cm.getPackageDef().getName(), newPkgName));
                         }
+                        is.setPkgName(newPkgName);
                         fixImports(movingDefs, is, refCm, true, transformations);
                         return transformations;
                     }
@@ -245,13 +246,20 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     }
 
                     private void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
-                        for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
-                            if (isMoving ^ movingDefs.contains(missing.getT1())) {
-                                transformations.add(new InsertTextTransformation(cm.getImportPos(), missing.getT2().toString() + ";\n")); // NOI18N
-                            }
-                        }
+                        int lastRemovePos = -1;
                         for(ImportEntry ie : is.getUnused()) {
                             transformations.add(new RemoveTextTransformation(ie.getStartPos(), ie.getEndPos() - ie.getStartPos()));
+                            if (ie.getStartPos() > lastRemovePos) {
+                                lastRemovePos = ie.getStartPos();
+                            }
+                        }
+
+                        int insertionPos = lastRemovePos > cm.getImportPos() ? lastRemovePos : cm.getImportPos();
+
+                        for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
+                            if (isMoving ^ movingDefs.contains(missing.getT1())) {
+                                transformations.add(new InsertTextTransformation(insertionPos, missing.getT2().toString() + ";\n")); // NOI18N
+                            }
                         }
                     }
                 };
@@ -268,7 +276,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     protected Set<Transformation> prepareTransformations(FileObject fo) {
                         Set<Transformation> t = new HashSet<Transformation>();
                         for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
-                            if (!edef.isSynthetic() && edef.getName().equals(fo.getName())) {
+                            if (!edef.getName().contentEquals(newClsName) && !edef.isSynthetic() && edef.getName().equals(fo.getName())) {
                                 t.add(new ReplaceTextTransformation(edef.getStartFQN(), edef.getName(), newClsName));
                                 break;
                             }
