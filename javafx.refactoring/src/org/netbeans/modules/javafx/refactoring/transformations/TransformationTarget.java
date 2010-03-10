@@ -38,42 +38,14 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.refactoring.transformations;
 
 /**
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class StringTransformer extends Transformer {
-    final private static class StringModificator implements TransformationTarget  {
-        private StringBuilder sb;
-
-        public StringModificator(StringBuilder buffer) {
-            this.sb = buffer;
-        }
-
-        public void insertText(int pos, String text) {
-            sb.insert(pos, text);
-        }
-
-        public String removeText(int pos, int len) {
-            String removed = sb.substring(pos, pos + len);
-            sb.delete(pos, pos + len);
-            return removed;
-        }
-
-        public void replaceText(int pos, String oldText, String newText) {
-            sb.replace(pos, pos + oldText.length(), newText);
-        }
-    }
-
-    protected StringTransformer(StringBuilder buffer) {
-        super(buffer.toString(), new StringModificator(buffer));
-    }
-
-    @Override
-    protected void runTransformation(Runnable task) {
-        task.run();
-    }
+public interface TransformationTarget {
+    void insertText(int pos, String text);
+    String removeText(int pos, int len);
+    void replaceText(int pos, String oldText, String newText);
 }

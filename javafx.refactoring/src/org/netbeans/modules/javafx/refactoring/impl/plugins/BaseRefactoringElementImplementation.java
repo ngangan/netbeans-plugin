@@ -41,8 +41,9 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -125,8 +126,7 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
                 backupHandle = shouldBackup ? BackupFacility.getDefault().backup(targetFO) : null;
                 final Transformer t = Transformer.forFileObject(targetFO, session);
                 if (t != null) {
-                    t.addTransformations(getTransformations());
-                    t.transform();
+                    t.transform(getTransformations());
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, null, e);
@@ -140,10 +140,15 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
 
     @Override
     protected String getNewFileContent() {
-        final Transformer t = Transformer.forFileObject(srcFO, session, false);
-        if (t != null) {
-            t.addTransformations(getTransformations());
-            return t.preview();
+        try {
+            StringBuilder content = new StringBuilder(srcFO.asText());
+
+            final Transformer t = Transformer.forText(content);
+            if (t != null) {
+                t.transform(getTransformations());
+                return content.toString();
+            }
+        } catch (IOException e) {
         }
         return "";
     }
@@ -167,12 +172,12 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
         }
     }
 
-    private Set<Transformation> getTransformations() {
+    private List<Transformation> getTransformations() {
         synchronized(transformations) {
             if (transformations.isEmpty()) {
                 transformations.addAll(prepareTransformations(srcFO));
             }
-            return Collections.unmodifiableSet(transformations);
+            return new ArrayList<Transformation>(transformations);
         }
     }
 
