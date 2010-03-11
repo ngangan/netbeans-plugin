@@ -120,6 +120,7 @@ public class FXDCompletionItem implements CompletionItem {
         //Completion.get().hideAll();
     }
 
+    // TODO: replace text before.
     protected void substituteText(JTextComponent c, final int offset, 
             int len, final String text) {
         final BaseDocument doc = (BaseDocument) c.getDocument();
@@ -231,7 +232,11 @@ public class FXDCompletionItem implements CompletionItem {
 
     private static String createDisplayText(AbstractSchemaElement element) {
         if (element instanceof Property) {
-            return element.id;
+            Property prop = (Property) element;
+            if (prop.isStatic && prop.parent != null) {
+                return createDisplayText(prop.parent) + '.' + prop.id;
+            }
+            return prop.id;
         } else if (element instanceof Function) {
             return element.id;
         } else if (element instanceof Enumeration) {
@@ -247,11 +252,13 @@ public class FXDCompletionItem implements CompletionItem {
     private static String createText(AbstractSchemaElement element) {
         if (element instanceof Property) {
             Property prop = (Property) element;
-            String text = prop.id;
-            if (prop.defaultValue != null){
-                text += " : " + defaultValueToString(prop); // NOI18N
+            if (prop.isStatic && prop.parent != null) {
+                return createText(prop.parent) + '.' + prop.id;
             }
-            return text;
+            if (prop.defaultValue != null) {
+                return prop.id + " : " + defaultValueToString(prop); // NOI18N
+            }
+            return prop.id;
         } else if (element instanceof Function) {
             return element.id;
         } else if (element instanceof Enumeration) {
