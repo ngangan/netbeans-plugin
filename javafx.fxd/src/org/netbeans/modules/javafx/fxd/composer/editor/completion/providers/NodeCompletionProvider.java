@@ -41,11 +41,17 @@
 
 package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
+import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
+import com.sun.javafx.tools.fxd.schema.model.Element;
+import com.sun.javafx.tools.fxd.schema.model.Enumeration;
+import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
+import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
+import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionQuery;
 import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
@@ -94,8 +100,26 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
 
     private void processNodeId(final CompletionResultSet resultSet,
             DocumentElement el, int caretOffset) {
-        fillCompletionByNameStart(resultSet, el, caretOffset);
-        // TODO filter to show only relevant for e.g. node's parent?
+        // TODO: use the following when it is NOT in attribute value
+        fillNodeIdItems(resultSet, el, caretOffset);
+    }
+
+    private void fillNodeIdItems(final CompletionResultSet resultSet,
+            DocumentElement el, final int caretOffset) {
+        final String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
+        final int startOffset = el.getStartOffset();
+        FXDCompletionQuery.getFXDSchema().visit(new SchemaVisitor() {
+
+            public void visitSchemaElement(AbstractSchemaElement ae) {
+                // collect schema elements with matching ids || element and enum names
+                if (ae instanceof Element) {
+                    if (idStartsWith(ae.id, nameStart)) {
+                        resultSet.addItem(new FXDCompletionItem(ae, startOffset));
+                    }
+                }
+            }
+
+        });
     }
 
     private void processNodeBody(final CompletionResultSet resultSet,
@@ -128,13 +152,13 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             }
         } else if (prev == FXDTokenId.COLON){
             // attr value completion
-            processAttrValue(resultSet, el, caretOffset);
+            processAttrValue(resultSet, el, caretOffset, ts);
         } else if (next == FXDTokenId.COMMA || next == FXDTokenId.RBRACE){
             if (prev == FXDTokenId.IDENTIFIER){
                 TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
                 FXDTokenId prevPrev = getPrevNonWhiteID(el, ts.offset(), ts);
                 if (prevPrev == FXDTokenId.COLON){
-                    // TODO: started attr value completion (identifier)
+                    processAttrValue(resultSet, el, caretOffset, ts);
                 } else {
                     // at the end of id before , or }
                     processAttrId(resultSet, el, caretOffset, ts);

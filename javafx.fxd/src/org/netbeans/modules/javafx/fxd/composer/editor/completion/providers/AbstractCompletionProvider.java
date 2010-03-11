@@ -51,7 +51,9 @@ import com.sun.javafx.tools.fxd.schema.model.Type;
 import com.sun.javafx.tools.fxd.schema.model.Value;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
@@ -142,31 +144,27 @@ public abstract class AbstractCompletionProvider {
         fillCompletionWithSchemaElements(resultSet, attrs, caretOffset, nameStart);
     }
 
-    // TODO add check for parent node to suggest only valid ids.
-    protected void fillCompletionByNameStart(final CompletionResultSet resultSet,
-            DocumentElement el, final int caretOffset) {
-        final String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
-        final int startOffset = el.getStartOffset();
-        //LOG.warning("---- FIND COMPLETION FOR : "+nameStart);
-        FXDCompletionQuery.getFXDSchema().visit(new SchemaVisitor() {
-
-            public void visitSchemaElement(AbstractSchemaElement ae) {
-                // collect schema elements with matching ids || element and enum names
-                if (ae.id.startsWith(nameStart) || nameStartsWith(ae.id, nameStart)) {
-                    resultSet.addItem(new FXDCompletionItem(ae, startOffset));
-                }
-            }
-
-            private boolean nameStartsWith(String id, String nameStart) {
-                int idx = id.lastIndexOf('-');
-                if (idx > -1) {
-                    return id.substring(idx).startsWith(nameStart);
-                }
-                return false;
-            }
-        });
+    protected static boolean idStartsWith(String id, String nameStart) {
+        if (id.startsWith(nameStart)) {
+            return true;
+        }
+        int idx = id.lastIndexOf('-');
+        if (idx > -1) {
+            return id.substring(idx + 1).startsWith(nameStart);
+        }
+        return false;
     }
 
+    protected static boolean idEqualsTo(String id, String nameStart) {
+        if (id.equalsIgnoreCase(nameStart)) {
+            return true;
+        }
+        int idx = id.lastIndexOf('-');
+        if (idx > -1) {
+            return id.substring(idx + 1).equalsIgnoreCase(nameStart);
+        }
+        return false;
+    }
 
     /**
      * finds schema element that describes gived Document Element.
@@ -220,30 +218,81 @@ public abstract class AbstractCompletionProvider {
      * @param excludeIDs
      */
     protected void collectElementAttrs(List<Property> attrs,
-            AbstractSchemaElement ae, List<String> excludeIDs) {
+            AbstractSchemaElement ae, final List<String> excludeIDs) {
+        doCollectFilteredElementAttrs(attrs, ae, new ElementsFilter() {
+
+            public boolean accept(AbstractSchemaElement prop) {
+                return excludeIDs == null || !excludeIDs.contains(prop.id);
+            }
+        });
+    }
+
+    /**
+     * fills provided list with all static Properties of AbstractSchemaElement.
+     * including it's direct and inherited attributes.
+     * @param attrs
+     * @param ae
+     */
+    protected void collectElementStaticAttrs(List<Property> attrs,
+            AbstractSchemaElement ae) {
+        doCollectFilteredElementAttrs(attrs, ae, new ElementsFilter() {
+
+            public boolean accept(AbstractSchemaElement prop) {
+                return ((Property)prop).isStatic;
+            }
+        });
+    }
+
+    /**
+     * fills provided list with all static Properties of AbstractSchemaElement.
+     * including it's direct and inherited attributes.
+     * tests if attribute name starts with specified string
+     * @param attrs
+     * @param ae
+     * @param nameStart
+     */
+    protected void collectElementStaticAttrs(List<Property> attrs,
+            AbstractSchemaElement ae, final String nameStart) {
+        if (nameStart == null){
+            collectElementStaticAttrs(attrs, ae);
+            return;
+        }
+        doCollectFilteredElementAttrs(attrs, ae, new ElementsFilter() {
+
+            public boolean accept(AbstractSchemaElement prop) {
+                return ((Property)prop).isStatic && idStartsWith(prop.id, nameStart);
+            }
+        });
+    }
+
+    private void doCollectFilteredElementAttrs(List<Property> attrs,
+            AbstractSchemaElement ae, ElementsFilter filter) {
         if (ae instanceof Element) {
             Element elem = (Element) ae;
             Property[] props = elem.properties;
             for (Property prop : props) {
-                if (excludeIDs != null && excludeIDs.contains(prop.id)){
-                    continue;
+                if (filter == null || filter.accept(prop)){
+                    attrs.add(prop);
                 }
-                attrs.add(prop);
             }
             if (elem.extendsElement != null) {
-                collectElementAttrs(attrs, elem.extendsElement, excludeIDs);
+                doCollectFilteredElementAttrs(attrs, elem.extendsElement, filter);
             }
 
         }
     }
 
-    protected void collectElementAttrs(List<Property> attrs,
-            AbstractSchemaElement[] aes, List<String> excludeIDs) {
+    private void doCollectFilteredElementAttrs(List<Property> attrs,
+            AbstractSchemaElement[] aes, ElementsFilter filter) {
         for (AbstractSchemaElement ae : aes) {
-            collectElementAttrs(attrs, ae, excludeIDs);
+            doCollectFilteredElementAttrs(attrs, ae, filter);
         }
     }
-    
+
+    private static interface ElementsFilter {
+        boolean accept(AbstractSchemaElement prop);
+    }
+
     /**
      * Finds Property of given AbstractSchemaElement by given property id.
      * Looks for element's direct and inherited attributes.
@@ -283,7 +332,7 @@ public abstract class AbstractCompletionProvider {
 
     protected void fillCompletionWithSchemaElements(CompletionResultSet resultSet,
             List<? extends AbstractSchemaElement> aes, int caretOffset) {
-        fillCompletionWithSchemaElements(resultSet, null, caretOffset, null);
+        fillCompletionWithSchemaElements(resultSet, aes, caretOffset, null);
     }
     protected void fillCompletionWithSchemaElements(CompletionResultSet resultSet,
             List<? extends AbstractSchemaElement> aes, int caretOffset, String nameStart) {
@@ -300,36 +349,180 @@ public abstract class AbstractCompletionProvider {
         }
     }
 
-    protected void processAttrValue(final CompletionResultSet resultSet,
-            DocumentElement el, int caretOffset){
+    protected void processAttrArrayValue(final CompletionResultSet resultSet,
+            DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts){
+        try {
+            doProcessAttrArrayValue(resultSet, el, caretOffset, ts);
+        } catch (BadLocationException ex) {
+            LOG.log(Level.INFO, null, ex);
+        }
+    }
+    
+    protected void doProcessAttrArrayValue(final CompletionResultSet resultSet,
+            DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts)
+            throws BadLocationException{
 
         AbstractSchemaElement parentEl = getParentSchemaElementsForDE(el);
         if (parentEl == null){
             return;
         }
         Property prop = findElementPropertyByName(parentEl, el.getName());
-        fillItemsForProperty(resultSet, prop, caretOffset);
+        String valueStart = getAttrValueStartByPosition(el, caretOffset, ts);
+        
+        List<AbstractSchemaElement> elements = new ArrayList<AbstractSchemaElement>();
+        
+        collectPropertyValues(elements, prop, valueStart);
+
+        fillCompletionWithSchemaElements(resultSet, elements, caretOffset);
+
     }
 
-    private void fillItemsForProperty(CompletionResultSet resultSet,
-            Property prop, int caretOffset) {
+    protected void processAttrValue(final CompletionResultSet resultSet,
+            DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
+        try {
+            doProcessAttrValue(resultSet, el, caretOffset, ts);
+        } catch (BadLocationException ex) {
+            LOG.log(Level.INFO, null, ex);
+        }
+    }
+    protected void doProcessAttrValue(final CompletionResultSet resultSet,
+            DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts)
+            throws BadLocationException{
+        String idName = getAttrNameByPosition(el, caretOffset, ts);
+        if (idName == null){
+            return;
+        }
+        // get property by name
+        AbstractSchemaElement parentEl = getSchemaElementsForDE(el);
+        if (parentEl == null){
+            return;
+        }
+        Property prop = findElementPropertyByName(parentEl, idName);
+        if (prop == null){
+            return;
+        }
+        if (prop.isArray){
+            //can't happen here
+            return; 
+        }
+        String valueStart = getAttrValueStartByPosition(el, caretOffset, ts);
+        if (valueStart == null){
+            return;
+        }
+        List<AbstractSchemaElement> elements = new ArrayList<AbstractSchemaElement>();
+        collectPropertyValues(elements, prop, valueStart);
+        fillCompletionWithSchemaElements(resultSet, elements, caretOffset);
+    }
+
+    private String getAttrNameByPosition(DocumentElement el, int caretOffset,
+            TokenSequence<FXDTokenId> ts) throws BadLocationException {
+        Token<FXDTokenId> prev = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+        if (prev != null && prev.id() == FXDTokenId.IDENTIFIER) {
+            // if right after identifier, go one step back to colon
+            prev = TokenUtils.getNextNonWhiteBwd(ts);
+        }
+        if (prev == null || prev.id() != FXDTokenId.COLON) {
+            return null;
+        }
+        Token<FXDTokenId> idToken = TokenUtils.getNextNonWhiteBwd(ts);
+        if (idToken == null || idToken.id() != FXDTokenId.IDENTIFIER_ATTR) {
+            return null;
+        }
+        return el.getDocument().getText(ts.offset(), idToken.length());
+    }
+
+    private String getAttrValueStartByPosition(DocumentElement el, int caretOffset,
+            TokenSequence<FXDTokenId> ts) throws BadLocationException {
+
+        // move ts to prev token.
+        FXDTokenId id = getPrevNonWhiteID(el, caretOffset, ts);
+        if (id != FXDTokenId.IDENTIFIER) {
+            //then move ts to next token
+            id = getNextNonWhiteID(el, caretOffset, ts);
+            if (id != FXDTokenId.IDENTIFIER) {
+                return null;
+            }
+        }
+        return el.getDocument().getText(ts.offset(), caretOffset - ts.offset());
+    }
+
+    private void collectPropertyValues(List<AbstractSchemaElement> schElements,
+            Property prop, String nameStart) {
         Type propType = prop.type;
         if (propType instanceof Element) {
-            Element elem = (Element) propType;
-            List<Element> successors = new ArrayList<Element>();
-            collectSuccessors(successors, elem);
-            for (Element e : successors) {
-                resultSet.addItem(new FXDCompletionItem(e, caretOffset));
-            }
+            doCollectValuesAsElement(schElements, (Element) propType, nameStart);
+            // todo: process function with parameters
         } else if (propType instanceof Enumeration) {
-            Enumeration enumn = (Enumeration) propType;
-            Value[] values = enumn.values;
-            for (Value value : values) {
-                resultSet.addItem(new FXDCompletionItem(value, caretOffset));
-            }
+            doCollectValuesAsEmuneration(schElements, (Enumeration) propType, nameStart);
         } else if (propType instanceof PrimitiveType) {
             //PrimitiveType primType = (PrimitiveType)propType;
             //resultSet.addItem(new FXDCompletionItem(primType, caretOffset));
+        }
+    }
+
+    private void doCollectValuesAsEmuneration(List<AbstractSchemaElement> schElements,
+            Enumeration enumn, String nameStart) {
+        // todo: completion may have errors. typed text is not taken into account
+        Value[] values = enumn.values;
+        for (Value value : values) {
+            schElements.add(value);
+        }
+    }
+
+    private void doCollectValuesAsElement(List<AbstractSchemaElement> schElements,
+            Element elem, String typedText) {
+
+        ElementNameFilter filter = new ElementNameFilter(typedText);
+
+        List<Property> attrs = new ArrayList<Property>();
+        List<Element> successors = new ArrayList<Element>();
+        collectSuccessors(successors, elem);
+        for (Element e : successors) {
+            if (!filter.accept(elem)) {
+                continue;
+            }
+            schElements.add(e);
+            // add static attributes
+            attrs.clear();
+            collectElementStaticAttrs(attrs, e, filter.getTypedPropertyText());
+            schElements.addAll(attrs);
+        }
+    }
+
+    private static class ElementNameFilter {
+
+        boolean nameFull;
+        String typedName;
+        String typedProperty;
+
+        ElementNameFilter(String typedText) {
+            int dot = typedText == null ? -1 : typedText.indexOf('.');
+            nameFull = dot != -1;
+            typedName = dot == -1 ? typedText : typedText.substring(0, dot);
+            typedProperty = dot == -1 ? null : typedText.substring(dot + 1);
+        }
+
+        boolean accept(Element element) {
+            if (typedName != null) {
+                if (nameFull) {
+                    if (!idEqualsTo(element.id, typedName)) {
+                        return false;
+                    }
+                } else {
+                    if (!idStartsWith(element.id, typedName)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        String getTypedPropertyText() {
+            return typedProperty;
+        }
+
+        String getTypedNameText() {
+            return typedName;
         }
     }
 

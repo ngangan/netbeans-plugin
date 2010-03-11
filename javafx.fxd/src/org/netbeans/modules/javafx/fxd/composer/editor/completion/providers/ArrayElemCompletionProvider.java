@@ -61,7 +61,7 @@ public class ArrayElemCompletionProvider extends AbstractCompletionProvider {
         if (prev == null && next == FXDTokenId.IDENTIFIER){
             if (caretOffset <= ts.offset() ) {
                 // right before an id
-                processAttrValue(resultSet, el.getParentElement(), caretOffset);
+                processAttrArrayValue(resultSet, el.getParentElement(), caretOffset, ts);
             } else {
                 // inside id
                 processArrElemId(resultSet, el, caretOffset);

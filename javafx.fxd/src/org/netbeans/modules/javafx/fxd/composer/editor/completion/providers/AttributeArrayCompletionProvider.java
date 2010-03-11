@@ -91,7 +91,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
         } else if (next != FXDTokenId.UNKNOWN) {
             // between { and }, but not before error
             //suggest possible attribute_array values
-            processAttrValue(resultSet, el, caretOffset);
+            processAttrArrayValue(resultSet, el, caretOffset, ts);
         }
     }
 
