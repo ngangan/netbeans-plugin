@@ -25,7 +25,9 @@ final public class IndexingUtilities {
     public static String getIndexValue(ElementHandle<? extends Element> eeh) {
         switch (eeh.getKind()) {
             case PACKAGE:
-            case CLASS: {
+            case CLASS:
+            case INTERFACE:
+            case ENUM: {
                 return eeh.getSignatures()[0].replace("$", ".");
             }
             case FIELD:

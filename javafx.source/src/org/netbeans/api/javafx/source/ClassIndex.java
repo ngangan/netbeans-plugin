@@ -343,7 +343,7 @@ final public class ClassIndex {
         assert handle.getSignatures()[0] != null;
         assert searchKind != null;
 
-        if (handle.getKind() != ElementKind.CLASS) {
+        if (!handle.getKind().isClass()  && !handle.getKind().isInterface()) {
             return Collections.EMPTY_SET;
         }
 

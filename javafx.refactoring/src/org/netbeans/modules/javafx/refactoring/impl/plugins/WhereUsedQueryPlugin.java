@@ -213,7 +213,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                     reb.add(refactoring, WhereUsedElement.create(usg));
                 }
                 if (isFindSubclasses()) {
-                    for(ElementDef typeRef : refcm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE))) {
+                    for(ElementDef typeRef : refcm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                         if (typeRef.overrides(checking)) {
                             workset.put(typeRef, ci.getResources(
                                 typeRef.createHandle(),

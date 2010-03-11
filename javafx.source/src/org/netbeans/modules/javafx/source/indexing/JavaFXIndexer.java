@@ -354,7 +354,7 @@ public class JavaFXIndexer extends CustomIndexer {
                 }
                 return super.visitTypeClass(node, document);
             }
-            if (el.getKind() == ElementKind.CLASS || el.getKind() == ElementKind.INTERFACE) {
+            if (el.getKind().isClass() || el.getKind().isInterface()) {
                 ElementHandle eh = ElementHandle.create(el);
                 if (eh == null) {
                     if (DEBUG) {
@@ -391,7 +391,7 @@ public class JavaFXIndexer extends CustomIndexer {
                     }
                     return super.visitMemberSelect(node, document);
                 }
-                if (ts.getKind() != ElementKind.CLASS) {
+                if (!ts.getKind().isClass() && !ts.getKind().isInterface()) {
                     return super.visitMemberSelect(node, document);
                 }
                 /**
@@ -495,10 +495,11 @@ public class JavaFXIndexer extends CustomIndexer {
                         if (DEBUG) {
                             LOG.log(Level.FINEST, "Indexing field reference {0} as {1}\n", new String[]{node.toString(), indexVal});
                         }
-                        index(document, IndexKey.FIELD_REF, indexVal);
+                        index(document, IndexKey.TYPE_REF, indexVal);
                     } else {
                         LOG.log(Level.FINE, "Can not determine indexing value for: {0}", node);
                     }
+                    break;
                 }
             }
             return super.visitIdentifier(node, document);
@@ -513,7 +514,7 @@ public class JavaFXIndexer extends CustomIndexer {
                 }
                 return super.visitInstantiate(node, document);
             }
-            if (el.getKind() == ElementKind.CLASS) {
+            if (el.getKind().isClass() || el.getKind().isInterface()) {
                 ElementHandle eh = ElementHandle.create(el);
                 if (eh == null) {
                     if (DEBUG) {
@@ -623,21 +624,6 @@ public class JavaFXIndexer extends CustomIndexer {
                     files.add(fo);
                 } catch (URISyntaxException e) {
                 }
-            }
-        } else {
-            FileObject root = cntxt.getRoot();
-            Collection<FileObject> fxFiles = new HashSet<FileObject>();
-            collectFxFiles(root, fxFiles);
-            if (!fxFiles.isEmpty()) {
-                if (DEBUG) {
-                    LOG.log(Level.FINEST, "Indexing {1} files under source root {0}", new Object[]{root, fxFiles.size()});
-                }
-                ClasspathInfo cpInfo = cpInfoCache.get(root);
-                if (cpInfo == null) {
-                    cpInfo = ClasspathInfo.create(root);
-                    cpInfoCache.put(root, cpInfo);
-                }
-                map.put(cpInfo, fxFiles);
             }
         }
         

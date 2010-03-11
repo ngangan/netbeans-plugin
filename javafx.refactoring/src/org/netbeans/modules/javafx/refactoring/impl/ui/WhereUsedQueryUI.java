@@ -112,7 +112,9 @@ public class WhereUsedQueryUI implements RefactoringUI {
                 setForMethod();
                 return query.checkParameters();    
             }
-            case CLASS: {
+            case CLASS:
+            case INTERFACE:
+            case ENUM: {
                 setForClass();
                 return query.checkParameters();
             }
@@ -147,7 +149,9 @@ public class WhereUsedQueryUI implements RefactoringUI {
                 setForMethod();
                 return query.fastCheckParameters();
             }
-            case CLASS: {
+            case CLASS:
+            case INTERFACE:
+            case ENUM: {
                 setForClass();
                 return query.fastCheckParameters();
             }
@@ -182,7 +186,9 @@ public class WhereUsedQueryUI implements RefactoringUI {
                     description += " " + getString("DSC_WhereUsedOf", panel.getMethodDeclaringClass() + '.' + name); //NOI18N
                     return description;
                 }
-                case CLASS: {
+                case CLASS:
+                case INTERFACE:
+                case ENUM: {
                     if (!panel.isClassFindUsages())
                     if (!panel.isClassSubTypesDirectOnly()) {
                     return getString("DSC_WhereUsedFindAllSubTypes", name);
