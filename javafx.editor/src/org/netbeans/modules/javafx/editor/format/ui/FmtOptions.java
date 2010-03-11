@@ -391,7 +391,7 @@ public class FmtOptions {
             {spaceBeforeComma, FALSE},
             {spaceAfterComma, TRUE},
             {spaceBeforeSemi, FALSE},
-            {spaceAfterSemi, TRUE},
+            {spaceAfterSemi, FALSE},
             {spaceBeforeColon, FALSE},
             {spaceAfterColon, TRUE},
 

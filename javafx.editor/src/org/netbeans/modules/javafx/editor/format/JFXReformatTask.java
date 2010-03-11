@@ -3865,9 +3865,13 @@ public class JFXReformatTask implements ReformatTask {
             boolean accepted = accept(JFXTokenId.SEMI) == JFXTokenId.SEMI;
             rollback(index, c, d);
             if (accepted) {
-                spaces(cs.spaceBeforeSemi() ? 1 : 0);
+                if (cs.spaceBeforeSemi()) {
+                    space();
+                }
                 accept(JFXTokenId.SEMI);
-                spaces(cs.spaceAfterSemi() ? 1 : 0);
+                if (cs.spaceAfterSemi()) {
+                    space();
+                }
             }
             return accepted;
         }
@@ -3879,9 +3883,13 @@ public class JFXReformatTask implements ReformatTask {
             boolean accepted = accept(JFXTokenId.COLON) == JFXTokenId.COLON;
             rollback(index, c, d);
             if (accepted) {
-                spaces(cs.spaceBeforeColon() ? 1 : 0);
+                if (cs.spaceBeforeColon()) {
+                    space();
+                }
                 accept(JFXTokenId.COLON);
-                spaces(cs.spaceAfterColon() ? 1 : 0);
+                if (cs.spaceAfterColon()) {
+                    space();
+                }
             }
             return accepted;
         }
