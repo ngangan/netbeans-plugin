@@ -1,14 +1,47 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
  */
 
 package org.netbeans.modules.javafx.refactoring.transformations;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +49,6 @@ import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.editor.BaseDocument;
-import org.netbeans.modules.refactoring.api.ProgressEvent;
-import org.netbeans.modules.refactoring.api.ProgressListener;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -32,50 +63,23 @@ import org.openide.text.DataEditorSupport;
 abstract public class Transformer {
     final private static Logger LOGGER = Logger.getLogger(Transformer.class.getName());
     
-    private StringBuilder builder;
     private TransformationContext context = new TransformationContext();
     
     final private static Map<RefactoringSession, Map<FileObject, Transformer>> foTransformers = new WeakHashMap<RefactoringSession, Map<FileObject, Transformer>>();
 
-    final private List<Transformation> transformations;
+    private String backup;
+    private TransformationTarget writer;
 
-    private int applyMark = -1, revertMark = -1;
-
-    final private ProgressListener pl = new ProgressListener() {
-
-        public void start(ProgressEvent pe) {
-            applyMark = -1;
-            revertMark = -1;
-        }
-
-        public void step(ProgressEvent pe) {
-            // ignore
-        }
-
-        public void stop(ProgressEvent pe) {
-            applyMark = -1;
-            revertMark = -1;
-        }
-    };
-
-    protected Transformer(CharSequence content) {
-        builder = new StringBuilder(content);
-        transformations = new ArrayList<Transformation>();
+    protected Transformer(final String content, final TransformationTarget writer) {
+        backup = content;
+        this.writer = writer;
     }
 
-    public static Transformer forText(String text) {
+    public static Transformer forText(StringBuilder text) {
         return new StringTransformer(text);
     }
 
-    public static Transformer forDocument(BaseDocument doc) {
-        return new DocumentTransformer(doc);
-    }
-
     public static Transformer forFileObject(FileObject fo, RefactoringSession session) {
-        return forFileObject(fo, session, true);
-    }
-
-    public static Transformer forFileObject(FileObject fo, RefactoringSession session, boolean shared) {
         synchronized(foTransformers) {
             Map<FileObject, Transformer> map = foTransformers.get(session);
             if (map == null) {
@@ -87,106 +91,54 @@ abstract public class Transformer {
                 try {
                     DataObject dobj = DataObject.find(fo);
                     DataEditorSupport des = (DataEditorSupport) dobj.getCookie(EditorCookie.class);
-                    t = forDocument((BaseDocument) des.openDocument());
+                    t = new DocumentTransformer((BaseDocument) des.openDocument());
                     map.put(fo, t);
-                    session.addProgressListener(t.pl);
                 } catch (DataObjectNotFoundException dataObjectNotFoundException) {
                     LOGGER.log(Level.WARNING, null, dataObjectNotFoundException);
                 } catch (IOException e) {
                     LOGGER.log(Level.WARNING, null, e);
                 }
             }
-            return shared ? t : t.newClone();
+            return t;
         }
     }
 
     final synchronized void insertText(int pos, String text) {
-        int realPos = context.getRealOffset(pos);
-        builder.insert(realPos, text);
+        int startPos = context.getRealOffset(pos);
+
+        writer.insertText(startPos, text);
         context.replaceText(pos, 0, text.length());
     }
 
     final synchronized String removeText(int pos, int len) {
-        int realPos = context.getRealOffset(pos);
-        String removed = builder.subSequence(realPos, realPos + len).toString();
-        builder.delete(realPos, realPos + len);
-        context.replaceText(pos, len, 0);
+        int startPos = context.getRealOffset(pos);
+        int endPos = context.getRealOffset(pos + len - 1);
+
+        String removed = writer.removeText(startPos, endPos - startPos + 1);
+        context.replaceText(pos, endPos - startPos + 1, 0);
         return removed;
     }
 
     final synchronized void replaceText(int pos, String oldText, String newText) {
         int realPos = context.getRealOffset(pos);
-        builder.replace(realPos, realPos + oldText.length(), newText);
+        writer.replaceText(realPos, oldText, newText);
         context.replaceText(pos, oldText.length(), newText.length());
     }
 
-    final public void addTransformation(Transformation t) {
-        if (!transformations.contains(t)) transformations.add(t);
-    }
-
-    final public void removeTransformation(Transformation t) {
-        transformations.remove(t);
-    }
-
-    final public void addTransformations(Collection<Transformation> ts) {
-        for(Transformation t : ts) {
-            addTransformation(t);
-        }
-    }
-
-    final public void addTransformations(Transformation ... ts) {
-        addTransformations(Arrays.asList(ts));
-    }
-
-    synchronized private String applyTransforms() {
-        try {
-            int transformationCounter = 0;
-
-            for(Transformation t : transformations) {
-                if (transformationCounter > applyMark) {
-                    t.perform(this);
-                    applyMark = transformationCounter;
+    final synchronized public void transform(final List<Transformation> transformations) {
+        runTransformation(new Runnable() {
+            public void run() {
+                Collections.sort(transformations, Transformation.COMPARATOR);
+                for(Transformation t : transformations) {
+                    t.perform(Transformer.this);
                 }
-                transformationCounter++;
             }
-            return builder.toString();
-        } finally {
-
-        }
+        });
     }
 
-    synchronized private String revertTransforms() {
-        try {
-            int transformationCounter = 0;
-
-            for(int i=transformations.size() - 1;i>=0;i--) {
-                Transformation t = transformations.get(i);
-                if (transformationCounter > revertMark) {
-                    t.revert(this);
-                    revertMark = transformationCounter;
-                }
-                transformationCounter++;
-            }
-            return builder.toString();
-        } finally {
-            
-        }
+    final protected String getOriginalContent() {
+        return backup;
     }
 
-    final synchronized public String preview() {
-        return applyTransforms();
-    }
-
-    final synchronized public void transform() {
-        String transformed = applyTransforms();
-        saveTransformed(transformed);
-    }
-
-    final synchronized public void revert() {
-        String transformed = revertTransforms();
-        saveTransformed(transformed);
-    }
-
-    abstract protected void saveTransformed(String transformed);
-    abstract protected Transformer newClone();
+    abstract protected void runTransformation(Runnable task);
 }

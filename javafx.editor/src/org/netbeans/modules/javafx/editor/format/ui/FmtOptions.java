@@ -168,13 +168,9 @@ public class FmtOptions {
     public static final String spaceBeforeElseLeftBrace = "spaceBeforeElseLeftBrace"; //NOI18N
     public static final String spaceBeforeWhileLeftBrace = "spaceBeforeWhileLeftBrace"; //NOI18N
     public static final String spaceBeforeForLeftBrace = "spaceBeforeForLeftBrace"; //NOI18N
-    public static final String spaceBeforeDoLeftBrace = "spaceBeforeDoLeftBrace"; //NOI18N
-    public static final String spaceBeforeSwitchLeftBrace = "spaceBeforeSwitchLeftBrace"; //NOI18N
     public static final String spaceBeforeTryLeftBrace = "spaceBeforeTryLeftBrace"; //NOI18N
     public static final String spaceBeforeCatchLeftBrace = "spaceBeforeCatchLeftBrace"; //NOI18N
     public static final String spaceBeforeFinallyLeftBrace = "spaceBeforeFinallyLeftBrace"; //NOI18N
-    public static final String spaceBeforeSynchronizedLeftBrace = "spaceBeforeSynchronizedLeftBrace"; //NOI18N
-    public static final String spaceBeforeStaticInitLeftBrace = "spaceBeforeStaticInitLeftBrace"; //NOI18N
     public static final String spaceBeforeSequenceInitLeftBrace = "spaceBeforeSequenceInitLeftBrace"; //NOI18N
     public static final String spaceBeforeInitBlockLeftBrace = "spaceBeforeClassInitBlockLeftBrace"; //NOI18N
     public static final String spaceBeforePostInitBlockLeftBrace = "spaceBeforePostInitBlockLeftBrace"; //NOI18N
@@ -193,7 +189,6 @@ public class FmtOptions {
     public static final String spaceAfterSemi = "spaceAfterSemi"; //NOI18N
     public static final String spaceBeforeColon = "spaceBeforeColon"; //NOI18N
     public static final String spaceAfterColon = "spaceAfterColon"; //NOI18N
-    public static final String spaceAfterTypeCast = "spaceAfterTypeCast"; //NOI18N
     
     public static final String useSingleClassImport = "useSingleClassImport"; //NOI18N
     public static final String useFQNs = "useFQNs"; //NOI18N
@@ -284,133 +279,131 @@ public class FmtOptions {
     
     private static void createDefaults() {
         String defaultValues[][] = {
-            { expandTabToSpaces, TRUE}, //NOI18N
-            { tabSize, "4"}, //NOI18N
-            { spacesPerTab, "4"}, //NOI18N
-            { indentSize, "4"}, //NOI18N
-            { continuationIndentSize, "8"}, //NOI18N
-            { indentTopLevelClassMembers, TRUE}, //NOI18N
-            { rightMargin, "80"}, //NOI18N
-            { addLeadingStarInComment, TRUE}, //NOI18N
+            {expandTabToSpaces, TRUE},
+            {tabSize, "4"}, //NOI18N
+            {spacesPerTab, "4"}, //NOI18N
+            {indentSize, "4"}, //NOI18N
+            {continuationIndentSize, "8"}, //NOI18N
+            {indentTopLevelClassMembers, TRUE},
+            {rightMargin, "80"}, //NOI18N
+            {addLeadingStarInComment, TRUE},
 
-            { preferLongerNames, TRUE}, //NOI18N
-            { fieldNamePrefix, ""}, //NOI18N // XXX null
-            { fieldNameSuffix, ""}, //NOI18N // XXX null
-            { staticFieldNamePrefix, ""}, //NOI18N // XXX null
-            { staticFieldNameSuffix, ""}, //NOI18N // XXX null
-            { parameterNamePrefix, ""}, //NOI18N // XXX null
-            { parameterNameSuffix, ""}, //NOI18N // XXX null
-            { localVarNamePrefix, ""}, //NOI18N // XXX null
-            { localVarNameSuffix, ""}, //NOI18N // XXX null
-            { qualifyFieldAccess, FALSE}, //NOI18N // XXX
-            { useIsForBooleanGetters, TRUE}, //NOI18N
-            { addOverrideAnnotation, TRUE}, //NOI18N
-            { makeLocalVarsFinal, FALSE}, //NOI18N
-            { makeParametersFinal, FALSE}, //NOI18N
-            { classMembersOrder, ""}, //NOI18N // XXX
+            {preferLongerNames, TRUE},
+            {fieldNamePrefix, ""}, //NOI18N
+            {fieldNameSuffix, ""}, //NOI18N
+            {staticFieldNamePrefix, ""}, //NOI18N
+            {staticFieldNameSuffix, ""}, //NOI18N
+            {parameterNamePrefix, ""}, //NOI18N
+            {parameterNameSuffix, ""}, //NOI18N
+            {localVarNamePrefix, ""}, //NOI18N
+            {localVarNameSuffix, ""}, //NOI18N
+            {qualifyFieldAccess, FALSE},
+            {useIsForBooleanGetters, TRUE},
+            {addOverrideAnnotation, TRUE},
+            {makeLocalVarsFinal, FALSE},
+            {makeParametersFinal, FALSE},
+            {classMembersOrder, ""}, //NOI18N
 
-            { classDeclBracePlacement, BP_SAME_LINE}, //NOI18N
-            { functionDeclBracePlacement, BP_SAME_LINE}, //NOI18N
-            { objectLiteralBracePlacement, BP_SAME_LINE },
-            { onReplacePlacement, BP_SAME_LINE },
-            { otherBracePlacement, BP_SAME_LINE}, //NOI18N
-            { specialElseIf, TRUE}, //NOI18N
-            { redundantIfBraces, BGS_GENERATE}, //NOI18N
-            { redundantForBraces, BGS_GENERATE}, //NOI18N
-            { redundantWhileBraces, BGS_GENERATE}, //NOI18N
-            { alignMultilineMethodParams, FALSE}, //NOI18N
-            { alignMultilineCallArgs, FALSE}, //NOI18N
-            { alignMultilineAnnotationArgs, FALSE}, //NOI18N
-            { alignMultilineImplements, FALSE}, //NOI18N
-            { alignMultilineThrows, FALSE}, //NOI18N
-            { alignMultilineBinaryOp, FALSE}, //NOI18N
-            { alignMultilineAssignment, FALSE}, //NOI18N
-            { alignSequenceInit, FALSE}, //NOI18N
-            { placeElseOnNewLine, FALSE}, //NOI18N 
-            { placeCatchOnNewLine, FALSE}, //NOI18N 
-            { placeFinallyOnNewLine, FALSE}, //NOI18N 
-            { placeNewLineAfterModifiers, FALSE}, //NOI18N
+            {classDeclBracePlacement, BP_SAME_LINE},
+            {functionDeclBracePlacement, BP_SAME_LINE},
+            {objectLiteralBracePlacement, BP_SAME_LINE},
+            {onReplacePlacement, BP_SAME_LINE},
+            {otherBracePlacement, BP_SAME_LINE},
+            {specialElseIf, TRUE},
+            {redundantIfBraces, BGS_GENERATE},
+            {redundantForBraces, BGS_GENERATE},
+            {redundantWhileBraces, BGS_GENERATE},
+            {alignMultilineMethodParams, FALSE},
+            {alignMultilineCallArgs, FALSE},
+            {alignMultilineAnnotationArgs, FALSE},
+            {alignMultilineImplements, FALSE},
+            {alignMultilineThrows, FALSE},
+            {alignMultilineBinaryOp, FALSE},
+            {alignMultilineAssignment, FALSE},
+            {alignSequenceInit, FALSE},
+            {placeElseOnNewLine, FALSE},
+            {placeCatchOnNewLine, FALSE},
+            {placeFinallyOnNewLine, FALSE},
+            {placeNewLineAfterModifiers, FALSE},
 
-            { wrapExtendsImplementsKeyword, WRAP_NEVER}, //NOI18N
-            { wrapExtendsImplementsList, WRAP_NEVER}, //NOI18N
-            { wrapFunctionParams, WRAP_NEVER}, //NOI18N
-            { wrapFunctionCallArgs, WRAP_NEVER}, //NOI18N
-            { wrapChainedFunctionCalls, WRAP_NEVER}, //NOI18N
-            { wrapSequenceInit, WRAP_NEVER}, //NOI18N
-            { wrapForStatement, WRAP_ALWAYS}, //NOI18N
-            { wrapIfExpression, WRAP_ALWAYS}, //NOI18N
-            { wrapWhileStatement, WRAP_ALWAYS}, //NOI18N
-            { wrapBinaryOps, WRAP_NEVER}, //NOI18N
-            { wrapAssignOps, WRAP_NEVER}, //NOI18N
+            {wrapExtendsImplementsKeyword, WRAP_NEVER},
+            {wrapExtendsImplementsList, WRAP_NEVER},
+            {wrapFunctionParams, WRAP_NEVER},
+            {wrapFunctionCallArgs, WRAP_NEVER},
+            {wrapChainedFunctionCalls, WRAP_NEVER},
+            {wrapSequenceInit, WRAP_NEVER},
+            {wrapForStatement, WRAP_ALWAYS},
+            {wrapIfExpression, WRAP_ALWAYS},
+            {wrapWhileStatement, WRAP_ALWAYS},
+            {wrapBinaryOps, WRAP_NEVER},
+            {wrapAssignOps, WRAP_NEVER},
 
-            { blankLinesBeforePackage, "0"}, //NOI18N
-            { blankLinesAfterPackage, "1"}, //NOI18N
-            { blankLinesBeforeImports, "0"}, //NOI18N
-            { blankLinesAfterImports, "1"}, //NOI18N
-            { blankLinesBeforeClass, "1"}, //NOI18N 
-            { blankLinesAfterClass, "0"}, //NOI18N
-            { blankLinesAfterClassHeader, "1"}, //NOI18N 
-            { blankLinesBeforeFields, "0"}, //NOI18N 
-            { blankLinesAfterFields, "0"}, //NOI18N
-            { blankLinesBeforeMethods, "1"}, //NOI18N
-            { blankLinesAfterMethods, "1"}, //NOI18N
-            { blankLinesBeforeNonClassExpression, "1" }, //NOI18N
-            { blankLinesAfterNonClassExpression, "0" }, //NOI18N
+            {blankLinesBeforePackage, "0"}, //NOI18N
+            {blankLinesAfterPackage, "1"}, //NOI18N
+            {blankLinesBeforeImports, "0"}, //NOI18N
+            {blankLinesAfterImports, "1"}, //NOI18N
+            {blankLinesBeforeClass, "1"}, //NOI18N 
+            {blankLinesAfterClass, "0"}, //NOI18N
+            {blankLinesAfterClassHeader, "1"}, //NOI18N 
+            {blankLinesBeforeFields, "0"}, //NOI18N 
+            {blankLinesAfterFields, "0"}, //NOI18N
+            {blankLinesBeforeMethods, "1"}, //NOI18N
+            {blankLinesAfterMethods, "1"}, //NOI18N
+            {blankLinesBeforeNonClassExpression, "1"}, //NOI18N
+            {blankLinesAfterNonClassExpression, "0"}, //NOI18N
 
-            { spaceBeforeElse, TRUE}, //NOI18N // XXX
-            { spaceBeforeCatch, TRUE}, //NOI18N // XXX
-            { spaceBeforeFinally, TRUE}, //NOI18N // XXX
-            { spaceBeforeFunctionDeclParen, FALSE}, //NOI18N
-            { spaceBeforeFunctionCallParen, FALSE}, //NOI18N
-            { spaceBeforeIfParen, TRUE}, //NOI18N
-            { spaceBeforeForParen, TRUE}, //NOI18N
-            { spaceBeforeWhileParen, TRUE}, //NOI18N
-            { spaceBeforeCatchParen, TRUE}, //NOI18N
-            { spaceAroundUnaryOps, FALSE}, //NOI18N
-            { spaceAroundBinaryOps, TRUE}, //NOI18N
-            { spaceAroundRangeOps, FALSE}, //NOI18N
-            { spaceAroundAssignOps, TRUE}, //NOI18N
-            { spaceBeforeClassDeclLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeFunctionDeclLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeObjectLiteralDeclLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeOnReplaceDeclLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeIfLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeElseLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeWhileLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeForLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeTryLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeCatchLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeFinallyLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeStaticInitLeftBrace, TRUE}, //NOI18N
-            { spaceBeforeSequenceInitLeftBrace, FALSE}, //NOI18N
-            { spaceBeforeInitBlockLeftBrace, TRUE}, //NOI18N
-            { spaceBeforePostInitBlockLeftBrace, TRUE}, //NOI18N
-            { spaceWithinParens, FALSE}, //NOI18N
-            { spaceWithinFunctionDeclParens, FALSE}, //NOI18N
-            { spaceWithinFunctionCallParens, FALSE}, //NOI18N
-            { spaceWithinIfParens, FALSE}, //NOI18N
-            { spaceWithinForParens, FALSE}, //NOI18N
-            { spaceWithinWhileParens, FALSE}, //NOI18N
-            { spaceWithinCatchParens, FALSE}, //NOI18N
-            { spaceWithinBraces, TRUE}, //NOI18N
-            { spaceWithinSequenceInitBrackets, FALSE}, //NOI18N
-            { spaceBeforeComma, FALSE}, //NOI18N
-            { spaceAfterComma, TRUE}, //NOI18N
-            { spaceBeforeSemi, FALSE}, //NOI18N
-            { spaceAfterSemi, TRUE}, //NOI18N
-            { spaceBeforeColon, TRUE}, //NOI18N
-            { spaceAfterColon, TRUE}, //NOI18N
-            { spaceAfterTypeCast, TRUE}, //NOI18N
+            {spaceBeforeElse, TRUE},
+            {spaceBeforeCatch, TRUE},
+            {spaceBeforeFinally, TRUE},
+            {spaceBeforeFunctionDeclParen, FALSE},
+            {spaceBeforeFunctionCallParen, FALSE},
+            {spaceBeforeIfParen, TRUE},
+            {spaceBeforeForParen, TRUE},
+            {spaceBeforeWhileParen, TRUE},
+            {spaceBeforeCatchParen, TRUE},
+            {spaceAroundUnaryOps, FALSE},
+            {spaceAroundBinaryOps, TRUE},
+            {spaceAroundRangeOps, FALSE},
+            {spaceAroundAssignOps, TRUE},
+            {spaceBeforeClassDeclLeftBrace, TRUE},
+            {spaceBeforeFunctionDeclLeftBrace, TRUE},
+            {spaceBeforeObjectLiteralDeclLeftBrace, TRUE},
+            {spaceBeforeOnReplaceDeclLeftBrace, TRUE},
+            {spaceBeforeIfLeftBrace, TRUE},
+            {spaceBeforeElseLeftBrace, TRUE},
+            {spaceBeforeWhileLeftBrace, TRUE},
+            {spaceBeforeForLeftBrace, TRUE},
+            {spaceBeforeTryLeftBrace, TRUE},
+            {spaceBeforeCatchLeftBrace, TRUE},
+            {spaceBeforeFinallyLeftBrace, TRUE},
+            {spaceBeforeSequenceInitLeftBrace, FALSE},
+            {spaceBeforeInitBlockLeftBrace, TRUE},
+            {spaceBeforePostInitBlockLeftBrace, TRUE},
+            {spaceWithinParens, FALSE},
+            {spaceWithinFunctionDeclParens, FALSE},
+            {spaceWithinFunctionCallParens, FALSE},
+            {spaceWithinIfParens, FALSE},
+            {spaceWithinForParens, FALSE},
+            {spaceWithinWhileParens, FALSE},
+            {spaceWithinCatchParens, FALSE},
+            {spaceWithinBraces, TRUE},
+            {spaceWithinSequenceInitBrackets, FALSE},
+            {spaceBeforeComma, FALSE},
+            {spaceAfterComma, TRUE},
+            {spaceBeforeSemi, FALSE},
+            {spaceAfterSemi, FALSE},
+            {spaceBeforeColon, FALSE},
+            {spaceAfterColon, TRUE},
 
-            { useSingleClassImport, TRUE}, //NOI18N
-            { useFQNs, FALSE}, //NOI18N
-            { countForUsingStarImport, "5"}, //NOI18N
-            { packagesForStarImport, ""}, //NOI18N // XXX
-            { importsOrder, ""}, //NOI18N // XXX
+            {useSingleClassImport, TRUE},
+            {useFQNs, FALSE},
+            {countForUsingStarImport, "5"}, //NOI18N
+            {packagesForStarImport, ""}, //NOI18N
+            {importsOrder, ""}, //NOI18N
         };
-        
-        defaults = new HashMap<String,String>();
-        
+
+        defaults = new HashMap<String, String>();
+
         for (java.lang.String[] strings : defaultValues) {
             defaults.put(strings[0], strings[1]);
         }

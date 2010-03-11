@@ -71,10 +71,11 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.javafx.refactoring.RefactoringModule;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 import org.openide.awt.Mnemonics;
+import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
 /**
@@ -85,14 +86,16 @@ import org.openide.util.NbBundle;
 public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     private static final int MAX_NAME = 50;
     
-    private final transient ElementLocation location;
+    private final transient ElementDef edef;
+    private final transient FileObject sourceFo;
     private final transient ChangeListener parent;
     
     /** Creates new form WhereUsedPanel */
-    public WhereUsedPanel(String name, ElementLocation l, ChangeListener parent) {
+    public WhereUsedPanel(String name, ElementDef edef, FileObject sourceFo, ChangeListener parent) {
         setName(NbBundle.getMessage(WhereUsedPanel.class,"LBL_WhereUsed")); // NOI18N
-        this.location = l;
+        this.edef = edef;
         this.parent = parent;
+        this.sourceFo = sourceFo;
         initComponents();
     }
 
@@ -106,27 +109,35 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
     
     public void initialize() {
         if (initialized) return;
-        JavaFXSource source = JavaFXSource.forFileObject(location.getSourceFile());
-        Project p = FileOwnerQuery.getOwner(location.getSourceFile());
+        
         final JLabel currentProject;
         final JLabel allProjects;
-        if (p!=null) {
-            ProjectInformation pi = ProjectUtils.getInformation(FileOwnerQuery.getOwner(location.getSourceFile()));
+        Project project = FileOwnerQuery.getOwner(sourceFo);
+        if (project!=null) {
+            ProjectInformation pi = ProjectUtils.getInformation(project);
             currentProject = new JLabel(pi.getDisplayName(), pi.getIcon(), SwingConstants.LEFT);
             allProjects = new JLabel(NbBundle.getMessage(WhereUsedPanel.class,"LBL_AllProjects"), pi.getIcon(), SwingConstants.LEFT);
         } else {
             currentProject = null;
             allProjects = null;
         }
+
+        JavaFXSource source = JavaFXSource.forFileObject(sourceFo);
+
         Task<CompilationController> task =new Task<CompilationController>() {
             public void run(CompilationController info) throws Exception {
                 String m_isBaseClassText = null;
                 final String labelText;
                 Set<Modifier> modif = new HashSet<Modifier>();
 
-                final Element element = info.getElementUtilities().elementFor(location.getStartPosition());
-                if (element.getKind() == ElementKind.METHOD) {
-                    ExecutableElement method = (ExecutableElement) element;
+                final Element[] element = new Element[1];
+                element[0] = edef.createHandle().resolve(info);
+                if (element[0] == null) {
+                    element[0] = info.getElementUtilities().elementFor(edef.getStartFQN());
+                }
+
+                if (edef.getKind() == ElementKind.METHOD) {
+                    ExecutableElement method = (ExecutableElement) element[0];
                     modif = method.getModifiers();
                     labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_MethodUsages", getHeader(method, info), getSimpleName(method.getEnclosingElement())); // NOI18N
 
@@ -146,16 +157,16 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
 //                        Element el1 = tph.resolveElement(info);
 //                        System.out.println("bum");
                     }
-                } else if (element.getKind().isClass() || element.getKind().isInterface()) {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ClassUsages", element.getSimpleName()); // NOI18N
-                } else if (element.getKind() == ElementKind.CONSTRUCTOR) {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ConstructorUsages", getHeader(element,info), getSimpleName(element.getEnclosingElement())); // NOI18N
-                } else if (element.getKind().isField()) {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_FieldUsages", element.getSimpleName(), getSimpleName(element.getEnclosingElement())); // NOI18N
-                } else if (element.getKind() == ElementKind.PACKAGE) {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_PackageUsages", element.getSimpleName()); // NOI18N
+                } else if (edef.getKind().isClass() || edef.getKind().isInterface()) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ClassUsages", edef.getName()); // NOI18N
+                } else if (edef.getKind() == ElementKind.CONSTRUCTOR) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ConstructorUsages", getHeader(element[0],info), getSimpleName(element[0].getEnclosingElement())); // NOI18N
+                } else if (edef.getKind().isField()) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_FieldUsages", edef.getName(), getSimpleName(element[0].getEnclosingElement())); // NOI18N
+                } else if (edef.getKind() == ElementKind.PACKAGE) {
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_PackageUsages", edef.getName()); // NOI18N
                 } else {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_VariableUsages", element.getSimpleName()); // NOI18N
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_VariableUsages", edef.getName()); // NOI18N
                 }
 
                 final Set<Modifier> modifiers = modif;
@@ -166,11 +177,11 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
                         remove(classesPanel);
                         remove(methodsPanel);
                         label.setText(labelText);
-                        if (element instanceof ExecutableElement) {
+                        if (element[0] instanceof ExecutableElement) {
                             add(methodsPanel, BorderLayout.CENTER);
                             methodsPanel.setVisible(true);
                             m_usages.setVisible(!modifiers.contains(Modifier.STATIC));
-                            m_overriders.setVisible(! (element.getEnclosingElement().getModifiers().contains(Modifier.FINAL) || modifiers.contains(Modifier.FINAL) || modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.PRIVATE)));
+                            m_overriders.setVisible(! (element[0].getEnclosingElement().getModifiers().contains(Modifier.FINAL) || modifiers.contains(Modifier.FINAL) || modifiers.contains(Modifier.STATIC) || modifiers.contains(Modifier.PRIVATE)));
                             if (methodDeclaringSuperClass != null ) {
                                 m_isBaseClass.setVisible(true);
                                 m_isBaseClass.setSelected(true);
@@ -179,7 +190,7 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
                                 m_isBaseClass.setVisible(false);
                                 m_isBaseClass.setSelected(false);
                             }
-                        } else if ((element.getKind() == ElementKind.CLASS) || (element.getKind() == ElementKind.INTERFACE)) {
+                        } else if (edef.getKind().isClass()) {
                             add(classesPanel, BorderLayout.CENTER);
                             classesPanel.setVisible(true);
                         } else {

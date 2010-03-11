@@ -438,7 +438,7 @@ final public class ClassIndex {
             result.add(fo);
         }
 
-        final String typeDef = (handle.getKind() == ElementKind.CLASS || handle.getKind() == ElementKind.INTERFACE) ? handle.getQualifiedName() : "";
+        final String typeDef = (handle.getKind().isClass() || handle.getKind().isInterface()) ? handle.getQualifiedName() : "";
 
 //        final String typeRefRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
         final String indexingVal = IndexingUtilities.getIndexValue(handle);
@@ -458,6 +458,7 @@ final public class ClassIndex {
                         for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
                             result.add(ir.getFile());
                         }
+                        break;
                     }
                     case METHOD_REFERENCES: {
                         for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
@@ -508,6 +509,33 @@ final public class ClassIndex {
                 final String indexingVal = IndexingUtilities.getIndexValue(processing);
                 QuerySupport query = getUsageQuery(EnumSet.allOf(SearchScope.class));
                 for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), indexingVal, Kind.EXACT)) {
+                    if (ir.getFile() == null) continue;
+                    if (!closure.contains(ir.getFile())) {
+                        closure.add(ir.getFile());
+                        for(String typeName : ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
+                            toProcess.push(IndexingUtilities.getTypeHandle(typeName));
+                        }
+                    }
+                }
+            }
+        } catch (IOException iOException) {
+            return Collections.EMPTY_SET;
+        }
+        return closure;
+    }
+
+    public Set<FileObject> getInheritanceClosure(final ElementHandle<? extends Element> handle) {
+        final Set<FileObject> closure = new HashSet<FileObject>();
+        final Deque<ElementHandle<? extends Element>> toProcess = new ArrayDeque<ElementHandle<? extends Element>>();
+
+        try {
+            toProcess.push(handle);
+
+            while (!toProcess.isEmpty()) {
+                ElementHandle<? extends Element> processing = toProcess.pop();
+                final String indexingVal = IndexingUtilities.getIndexValue(processing);
+                QuerySupport query = getUsageQuery(EnumSet.allOf(SearchScope.class));
+                for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
                     if (!closure.contains(ir.getFile())) {
                         closure.add(ir.getFile());
                         for(String typeName : ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {

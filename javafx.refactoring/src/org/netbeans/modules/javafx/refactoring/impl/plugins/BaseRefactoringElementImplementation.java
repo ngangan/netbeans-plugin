@@ -41,24 +41,22 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import javax.swing.text.Position.Bias;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformer;
-import org.netbeans.modules.refactoring.api.ProgressEvent;
-import org.netbeans.modules.refactoring.api.ProgressListener;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
+import org.netbeans.modules.refactoring.spi.BackupFacility;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
-import org.openide.filesystems.FileChangeAdapter;
-import org.openide.filesystems.FileChangeListener;
-import org.openide.filesystems.FileEvent;
+import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
+import org.openide.loaders.DataObject;
+import org.openide.text.DataEditorSupport;
 import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.Lookups;
@@ -72,50 +70,31 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
 
     private FileObject srcFO;
     private RefactoringSession session;
+    private PositionBounds pb;
+    final private boolean shouldBackup;
 
     final private Set<Transformation> transformations = new HashSet<Transformation>();
 
-    final private FileChangeListener fcl = new FileChangeAdapter() {
-
-        @Override
-        public void fileChanged(FileEvent fe) {
-            JavaFXSource jfxs = JavaFXSource.forFileObject(fe.getFile());
-            try {
-                jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                    public void run(CompilationController cc) throws Exception {
-                        synchronized(transformations) {
-                            transformations.clear();
-                            transformations.addAll(prepareTransformations(cc));
-                        }
-                    }
-                }, true);
-            } catch (IOException iOException) {
-                LOGGER.log(Level.WARNING, null, iOException);
-            }
-        }
-    };
-
-    final private ProgressListener pl = new ProgressListener() {
-
-        public void start(ProgressEvent pe) {
-            srcFO.removeFileChangeListener(fcl);
-        }
-
-        public void step(ProgressEvent pe) {
-            //
-        }
-
-        public void stop(ProgressEvent pe) {
-            //
-        }
-    };
-
     public BaseRefactoringElementImplementation(FileObject srcFO, RefactoringSession session) {
+        this(srcFO, session, true);
+    }
+    
+    public BaseRefactoringElementImplementation(FileObject srcFO, RefactoringSession session, boolean shouldBackup) {
         this.srcFO = srcFO;
         this.session = session;
-        srcFO.addFileChangeListener(fcl);
-        session.addProgressListener(pl);
+        this.shouldBackup = shouldBackup;
+        if (srcFO != null) {
+            try {
+                DataObject dobj = DataObject.find(srcFO);
+                DataEditorSupport des = (DataEditorSupport) dobj.getCookie(EditorCookie.class);
+                pb = new PositionBounds(des.createPositionRef(0, Bias.Forward), des.createPositionRef(des.openDocument().getLength(), Bias.Forward));
+                getTransformations();
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+                pb = null;
+            }
+        }
+
     }
 
     public Lookup getLookup() {
@@ -127,38 +106,49 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
     }
 
     public PositionBounds getPosition() {
-        return null;
+        return pb;
     }
 
     public String getText() {
         return getDisplayText();
     }
 
+    public String getDisplayText() {
+        return getRefactoringText();
+    }
+
+    private BackupFacility.Handle backupHandle = null;
+
     final public void performChange() {
         FileObject targetFO = getTargetFO();
         if (targetFO != null) {
             try {
+                backupHandle = shouldBackup ? BackupFacility.getDefault().backup(targetFO) : null;
                 final Transformer t = Transformer.forFileObject(targetFO, session);
                 if (t != null) {
-                    t.addTransformations(getTransformations());
-                    t.transform();
+                    t.transform(getTransformations());
                 }
-            } finally {
-                srcFO.removeFileChangeListener(fcl);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, null, e);
             }
         }
     }
 
-    final public boolean hasChanges() {
+    public boolean hasChanges() {
         return getTransformations().size() > 0;
     }
 
     @Override
     protected String getNewFileContent() {
-        final Transformer t = Transformer.forFileObject(srcFO, session, false);
-        if (t != null) {
-            t.addTransformations(getTransformations());
-            return t.preview();
+        try {
+            StringBuilder content = new StringBuilder(srcFO.asText());
+
+            final Transformer t = Transformer.forText(content);
+            if (t != null) {
+                t.transform(getTransformations());
+                return content.toString();
+            }
+        } catch (IOException e) {
         }
         return "";
     }
@@ -173,34 +163,24 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
 
     @Override
     final public void undoChange() {
-        FileObject targetFO = getTargetFO();
-        if (targetFO != null) {
-            final Transformer t = Transformer.forFileObject(targetFO, session);
-            if (t != null) {
-//                t.addTransformations(getTransformations());
-                t.revert();
+        try {
+            if (backupHandle != null) {
+                backupHandle.restore();
             }
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
         }
     }
 
-    private Set<Transformation> getTransformations() {
+    private List<Transformation> getTransformations() {
         synchronized(transformations) {
             if (transformations.isEmpty()) {
-                JavaFXSource jfxs = JavaFXSource.forFileObject(srcFO);
-                try {
-                    jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                        public void run(CompilationController cc) throws Exception {
-                            transformations.addAll(prepareTransformations(cc));
-                        }
-                    }, true);
-                } catch (IOException iOException) {
-                    LOGGER.log(Level.WARNING, null, iOException);
-                }
+                transformations.addAll(prepareTransformations(srcFO));
             }
-            return Collections.unmodifiableSet(transformations);
+            return new ArrayList<Transformation>(transformations);
         }
     }
 
-    abstract protected Set<Transformation> prepareTransformations(CompilationController cc);
+    abstract protected Set<Transformation> prepareTransformations(FileObject fo);
+    abstract protected String getRefactoringText();
 }

@@ -497,7 +497,7 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeClassDeclLeftBrace, getDefaultAsBoolean(spaceBeforeClassDeclLeftBrace));
     }
 
-    public boolean spaceBeforeMethodDeclLeftBrace() {
+    public boolean spaceBeforeFunctionDeclLeftBrace() {
         return preferences.getBoolean(spaceBeforeFunctionDeclLeftBrace, getDefaultAsBoolean(spaceBeforeFunctionDeclLeftBrace));
     }
 
@@ -533,14 +533,6 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeForLeftBrace, getDefaultAsBoolean(spaceBeforeForLeftBrace));
     }
 
-    public boolean spaceBeforeDoLeftBrace() {
-        return preferences.getBoolean(spaceBeforeDoLeftBrace, getDefaultAsBoolean(spaceBeforeDoLeftBrace));
-    }
-
-    public boolean spaceBeforeSwitchLeftBrace() {
-        return preferences.getBoolean(spaceBeforeSwitchLeftBrace, getDefaultAsBoolean(spaceBeforeSwitchLeftBrace));
-    }
-
     public boolean spaceBeforeTryLeftBrace() {
         return preferences.getBoolean(spaceBeforeTryLeftBrace, getDefaultAsBoolean(spaceBeforeTryLeftBrace));
     }
@@ -553,15 +545,7 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeFinallyLeftBrace, getDefaultAsBoolean(spaceBeforeFinallyLeftBrace));
     }
 
-    public boolean spaceBeforeSynchronizedLeftBrace() {
-        return preferences.getBoolean(spaceBeforeSynchronizedLeftBrace, getDefaultAsBoolean(spaceBeforeSynchronizedLeftBrace));
-    }
-
-    public boolean spaceBeforeStaticInitLeftBrace() {
-        return preferences.getBoolean(spaceBeforeStaticInitLeftBrace, getDefaultAsBoolean(spaceBeforeStaticInitLeftBrace));
-    }
-
-    public boolean spaceBeforeArrayInitLeftBrace() {
+    public boolean spaceBeforeSequenceInitLeftBrace() {
         return preferences.getBoolean(spaceBeforeSequenceInitLeftBrace, getDefaultAsBoolean(spaceBeforeSequenceInitLeftBrace));
     }
 
@@ -569,11 +553,11 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceWithinParens, getDefaultAsBoolean(spaceWithinParens));
     }
 
-    public boolean spaceWithinMethodDeclParens() {
+    public boolean spaceWithinFunctionDeclParens() {
         return preferences.getBoolean(spaceWithinFunctionDeclParens, getDefaultAsBoolean(spaceWithinFunctionDeclParens));
     }
 
-    public boolean spaceWithinMethodCallParens() {
+    public boolean spaceWithinFunctionCallParens() {
         return preferences.getBoolean(spaceWithinFunctionCallParens, getDefaultAsBoolean(spaceWithinFunctionCallParens));
     }
 
@@ -623,10 +607,6 @@ public final class CodeStyle {
 
     public boolean spaceAfterColon() {
         return preferences.getBoolean(spaceAfterColon, getDefaultAsBoolean(spaceAfterColon));
-    }
-
-    public boolean spaceAfterTypeCast() {
-        return preferences.getBoolean(spaceAfterTypeCast, getDefaultAsBoolean(spaceAfterTypeCast));
     }
 
     // Imports -----------------------------------------------------------------

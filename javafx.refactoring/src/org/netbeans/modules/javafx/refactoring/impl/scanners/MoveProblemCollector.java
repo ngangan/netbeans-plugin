@@ -115,7 +115,7 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
     @Override
     public R visitClassDeclaration(ClassDeclarationTree node, P p) {
         TypeElement te = (TypeElement)cc.getTrees().getElement(getCurrentPath());
-        if (!cc.getElementUtilities().isSynthetic(te)) {
+        if (te != null && !cc.getElementUtilities().isSynthetic(te)) {
             currentClass = te.asType();
         } else {
             return null;

@@ -40,6 +40,8 @@
 package org.netbeans.modules.javafx.source.tasklist;
 
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
@@ -66,6 +68,7 @@ import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.modules.masterfs.providers.AnnotationProvider;
@@ -279,12 +282,14 @@ public class FXErrorAnnotator extends AnnotationProvider {
             private void process() {
                 try {
                     JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
-                    jfxs.runWhenScanFinished(new Task<CompilationController>() {
+                    if (jfxs != null) {
+                        jfxs.runWhenScanFinished(new Task<CompilationController>() {
 
-                        public void run(CompilationController cc) throws Exception {
-                            FXErrorAnnotator.this.process(cc, ProcessRelatedFilesLambda.NULL);
-                        }
-                    }, true);
+                            public void run(CompilationController cc) throws Exception {
+                                FXErrorAnnotator.this.process(cc, ProcessRelatedFilesLambda.NULL);
+                            }
+                        }, true);
+                    }
                 } catch (IOException e) {
 
                 }
@@ -319,7 +324,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
         if (lambda != ProcessRelatedFilesLambda.NULL) {
             for(Tree t : cc.getCompilationUnit().getTypeDecls()) {
-                handles.add(ElementHandle.create(cc.getTrees().getElement(cc.getTrees().getPath(cc.getCompilationUnit(), t))));
+                handles.add(ElementHandle.create(JavafxTreeInfo.symbolFor((JFXTree)t)));
             }
             ClassIndex index = cc.getClasspathInfo().getClassIndex();
             Set<FileObject> dependencies = new HashSet<FileObject>();
@@ -329,6 +334,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
             try {
                 for (FileObject dep : dependencies) {
+                    if (dep == null) continue; // no idea why ...
                     top = mergeParents(top, dep);
                     if (top == null) {
                         top = dep.getFileSystem().getRoot();

@@ -46,12 +46,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.Collection;
-import java.util.Collections;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
@@ -60,7 +56,6 @@ import org.netbeans.modules.refactoring.spi.ui.RefactoringUI;
 import org.netbeans.modules.refactoring.spi.ui.RefactoringUIBypass;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.URLMapper;
-import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -69,7 +64,7 @@ import org.openide.util.lookup.Lookups;
 
 public class MoveClassUI implements RefactoringUI, RefactoringUIBypass {
     
-    private DataObject javaObject;    
+    private FileObject javaObject;
     private MoveClassPanel panel;
     private MoveRefactoring refactoring;
     private String targetPkgName = "";
@@ -81,17 +76,20 @@ public class MoveClassUI implements RefactoringUI, RefactoringUIBypass {
         return NbBundle.getMessage(MoveClassUI.class, key);
     }
     
-    public MoveClassUI (DataObject javaObject) {
-        this(javaObject, null, null, Collections.<ElementLocation>emptyList());
+    public MoveClassUI (MoveRefactoring refactoring) {
+        this(refactoring, null, null);
     }
     
-    public MoveClassUI (DataObject javaObject, FileObject targetFolder, PasteType pasteType, Collection<ElementLocation> locations) {
+    public MoveClassUI (MoveRefactoring refactoring, FileObject targetFolder, PasteType pasteType) {
         this.disable = targetFolder != null ;
         this.targetFolder = targetFolder;
-        this.javaObject = javaObject;
+        this.javaObject = refactoring.getRefactoringSource().lookup(FileObject.class);
         this.pasteType = pasteType;
-        this.refactoring = new MoveRefactoring(Lookups.fixed(javaObject.getPrimaryFile(), locations.toArray(new Object[locations.size()])));
-        this.refactoring.getContext().add(SourceUtils.getClasspathInfoFor(javaObject.getPrimaryFile()));
+        this.refactoring = refactoring;
+
+//        this.refactoring = new MoveRefactoring(Lookups.fixed(javaObject.getPrimaryFile(), locations.toArray(new Object[locations.size()])));
+//        this.refactoring.getContext().add(SourceUtils.getClasspathInfoFor(javaObject.getPrimaryFile()));
+//        this.refactoring.getContext().add(factory);
     }
     
     public String getName() {
@@ -110,12 +108,12 @@ public class MoveClassUI implements RefactoringUI, RefactoringUIBypass {
         
     public CustomRefactoringPanel getPanel(ChangeListener parent) {
         if (panel == null) {
-            String pkgName = targetFolder!=null?getPackageName(targetFolder):getPackageName(javaObject.getPrimaryFile().getParent());
+            String pkgName = targetFolder!=null?getPackageName(targetFolder):getPackageName(javaObject.getParent());
             panel = new MoveClassPanel (parent, pkgName, 
                     new MessageFormat(getString("LBL_MoveClassNamed")).format (
-                    new Object[] {javaObject.getPrimaryFile().getName()}
+                    new Object[] {javaObject.getName()}
                 ),
-                targetFolder != null ? targetFolder : (javaObject != null ? javaObject.getPrimaryFile(): null)
+                targetFolder != null ? targetFolder : (javaObject != null ? javaObject: null)
             );
             panel.setCombosEnabled(!disable);
         }

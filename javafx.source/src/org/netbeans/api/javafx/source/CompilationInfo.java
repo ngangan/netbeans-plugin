@@ -136,14 +136,18 @@ public class CompilationInfo {
 
     // XXX: hack around lack of support in compiler
     public JavaFXTreePath getPath(Element e) {
+        JFXTree tree = (JFXTree)getTree(e);
+        return tree == null ? null : getTrees().getPath(getCompilationUnit(), tree);
+    }
+
+    public Tree getTree(Element e) {
         Symbol sym = (Symbol) e;
         JavafxEnter enter = JavafxEnter.instance(impl.getContext());
         JavafxEnv env = enter.getEnv(sym.enclClass());
         if (env == null) {
             return null;
         }
-        JFXTree tree = declarationFor(sym, env.tree);
-        return tree == null ? null : getTrees().getPath(getCompilationUnit(), tree);
+        return declarationFor(sym, env.tree);
     }
 
     private static JFXTree declarationFor(final Symbol sym, final JFXTree tree) {
@@ -196,6 +200,7 @@ public class CompilationInfo {
                     super.visitVar(that);
                 }
             }
+
 
         }
         DeclScanner s = new DeclScanner();
