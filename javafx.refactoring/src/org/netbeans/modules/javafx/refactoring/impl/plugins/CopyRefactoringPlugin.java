@@ -352,7 +352,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                             if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
                                 TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
                                 String message = "";
-                                if (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) {
+                                if (e.getKind().isInterface() || e.getKind().isClass()) {
                                     message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()});
                                 } else {
                                     message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()});
@@ -368,7 +368,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                             if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
                                 TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
                                 String message = "";
-                                if (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) {
+                                if (e.getKind().isInterface() || e.getKind().isClass()) {
                                     message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()});
                                 } else {
                                     message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()});

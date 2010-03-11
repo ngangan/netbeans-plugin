@@ -251,7 +251,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                                             p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method)));
                                         }
                                         Element parentClz = method.getEnclosingElement();
-                                        while (parentClz != null && parentClz.getKind() != ElementKind.CLASS && parentClz.getKind() != ElementKind.INTERFACE) {
+                                        while (parentClz != null && !parentClz.getKind().isClass() && !parentClz.getKind().isInterface()) {
                                             parentClz = parentClz.getEnclosingElement();
                                         }
                                         if (parentClz == null || SourceUtils.isFromLibrary(parentClz, cc)) {
@@ -471,7 +471,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
 
     private static final Problem isSourceElement(Element el, CompilationInfo info) {
         Element e = el;
-        while(e != null && (e.getKind() != ElementKind.CLASS && e.getKind() != ElementKind.INTERFACE)) {
+        while(e != null && (!e.getKind().isClass() && !e.getKind().isInterface())) {
             e = e.getEnclosingElement();
         }
         return e != null ? isSourceElement((TypeElement)e, info) : null;

@@ -236,6 +236,8 @@ public final class ElementUtilities {
             DocEnv env = DocEnv.instance(ctx);
             switch (element.getKind()) {
                 case CLASS:
+                case ENUM:
+                case INTERFACE:
                     ClassDocImpl classDoc = null;
                     try {
                         classDoc = env.getClassDoc((ClassSymbol) element);

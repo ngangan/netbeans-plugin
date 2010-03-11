@@ -121,7 +121,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
 
             final ClassIndex index = RefactoringSupport.classIndex(refactoring);
             fireProgressListenerStep();
-            for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE))) {
+            for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
                     BaseRefactoringElementImplementation bre = new BaseRefactoringElementImplementation(referenced, reb.getSession()) {
 

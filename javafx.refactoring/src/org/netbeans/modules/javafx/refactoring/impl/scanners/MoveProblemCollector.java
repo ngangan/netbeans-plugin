@@ -202,7 +202,7 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
             String ownerTypeName = null;
             Element targetElement = e;
             while (e != null && e.getKind() != ElementKind.PACKAGE) {
-                if (ownerTypeName == null && e.getKind() == ElementKind.CLASS) {
+                if (ownerTypeName == null && (e.getKind().isInterface() || e.getKind().isClass())) {
                     ownerTypeName = e.asType().toString();
                     if (isProtected(targetElement) && cc.getTypes().isSubtype(currentClass, e.asType())) {
                         packageAccess = false;

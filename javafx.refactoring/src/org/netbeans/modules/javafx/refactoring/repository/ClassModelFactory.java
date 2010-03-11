@@ -263,7 +263,8 @@ final public class ClassModelFactory {
                     if (t != null) {
                         switch (e.getKind()) {
                             case CLASS:
-                            case INTERFACE: {
+                            case INTERFACE:
+                            case ENUM: {
                                 p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, getClassDef((TypeElement)e, p)));
                                 break;
                             }
@@ -361,7 +362,8 @@ final public class ClassModelFactory {
                         break;
                     }
                     case CLASS:
-                    case INTERFACE: {
+                    case INTERFACE:
+                    case ENUM: {
                         def = getClassDef((TypeElement)e, p);
                         break;
                     }

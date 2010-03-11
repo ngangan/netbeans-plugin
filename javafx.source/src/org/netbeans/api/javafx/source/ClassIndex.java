@@ -60,8 +60,8 @@ import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
 import org.netbeans.modules.javafx.source.indexing.IndexingUtilities;
+import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
 import org.netbeans.modules.parsing.impl.indexing.PathRecognizerRegistry;
 import org.netbeans.modules.parsing.impl.indexing.PathRegistry;
 import org.netbeans.modules.parsing.impl.indexing.friendapi.IndexingController;
@@ -343,7 +343,7 @@ final public class ClassIndex {
         assert handle.getSignatures()[0] != null;
         assert searchKind != null;
 
-        if (handle.getKind() != ElementKind.CLASS) {
+        if (!handle.getKind().isClass()  && !handle.getKind().isInterface()) {
             return Collections.EMPTY_SET;
         }
 
