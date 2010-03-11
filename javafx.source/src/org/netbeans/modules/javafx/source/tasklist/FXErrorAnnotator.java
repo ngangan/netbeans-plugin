@@ -40,6 +40,8 @@
 package org.netbeans.modules.javafx.source.tasklist;
 
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.URL;
@@ -322,7 +324,7 @@ public class FXErrorAnnotator extends AnnotationProvider {
 
         if (lambda != ProcessRelatedFilesLambda.NULL) {
             for(Tree t : cc.getCompilationUnit().getTypeDecls()) {
-                handles.add(ElementHandle.create(cc.getTrees().getElement(cc.getTrees().getPath(cc.getCompilationUnit(), t))));
+                handles.add(ElementHandle.create(JavafxTreeInfo.symbolFor((JFXTree)t)));
             }
             ClassIndex index = cc.getClasspathInfo().getClassIndex();
             Set<FileObject> dependencies = new HashSet<FileObject>();
