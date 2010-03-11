@@ -56,7 +56,11 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.completion.Completion;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
+import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
+import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -120,21 +124,27 @@ public class FXDCompletionItem implements CompletionItem {
         //Completion.get().hideAll();
     }
 
-    // TODO: replace text before.
-    protected void substituteText(JTextComponent c, final int offset, 
+    protected void substituteText(JTextComponent c, int offset,
             int len, final String text) {
         final BaseDocument doc = (BaseDocument) c.getDocument();
         try {
             String tx = doc.getText(0, doc.getLength());
-            len = getSubstitutionLenght(tx, offset, len);
+            int lenAfter = getSubstitutionLenghtAfter(tx, offset, len);
+            int lenBefore = getSubstitutionLenghtBefore(tx, offset, text);
+            
+            offset = offset - lenBefore;
+            len = lenBefore + lenAfter;
         } catch (BadLocationException e) {
         }
-        final int length = len;
-        doc.runAtomic (new Runnable () {
-            public void run () {
+
+        final int replaceLength = len;
+        final int replaceOffset = offset;
+        doc.runAtomic(new Runnable() {
+
+            public void run() {
                 try {
-                    doc.remove(offset, length);
-                    doc.insertString(m_startOffset, text, null);
+                    doc.remove(replaceOffset, replaceLength);
+                    doc.insertString(replaceOffset, text, null);
                 } catch (BadLocationException e) {
                     // Can't update
                 }
@@ -288,7 +298,7 @@ public class FXDCompletionItem implements CompletionItem {
         }
     }
 
-    private static int getSubstitutionLenght(final String text, final int offset, int length) {
+    private static int getSubstitutionLenghtAfter(final String text, final int offset, int length) {
         if (text == null) {
             return length;
         }
@@ -308,6 +318,20 @@ public class FXDCompletionItem implements CompletionItem {
             ret = length;
         }
         return ret;
+    }
+    
+    private int getSubstitutionLenghtBefore(String docText, int offset, String text) {
+        String docStart = docText.substring(0, offset);
+        int len = text.length();
+        if (len < 1) {
+            return 0;
+        }
+        for (int i = 1; i < len; i++) {
+            if (docStart.endsWith(text.substring(0, i))) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     public static String[] splitFullName(String classFullName) {
