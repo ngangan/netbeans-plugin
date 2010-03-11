@@ -491,7 +491,7 @@ public abstract class AbstractCompletionProvider {
         }
     }
 
-    private static class ElementNameFilter {
+    private static class ElementNameFilter implements ElementsFilter{
 
         boolean nameFull;
         String typedName;
@@ -504,7 +504,7 @@ public abstract class AbstractCompletionProvider {
             typedProperty = dot == -1 ? null : typedText.substring(dot + 1);
         }
 
-        boolean accept(Element element) {
+        public boolean accept(AbstractSchemaElement element) {
             if (typedName != null) {
                 if (nameFull) {
                     if (!idEqualsTo(element.id, typedName)) {
