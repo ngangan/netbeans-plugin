@@ -478,7 +478,7 @@ public abstract class AbstractCompletionProvider {
         List<Element> successors = new ArrayList<Element>();
         collectSuccessors(successors, elem);
         for (Element e : successors) {
-            if (!filter.accept(elem)) {
+            if (!filter.accept(e)) {
                 continue;
             }
             schElements.add(e);
