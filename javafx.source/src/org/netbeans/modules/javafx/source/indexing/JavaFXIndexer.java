@@ -60,12 +60,17 @@ import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
@@ -77,40 +82,44 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
-import org.netbeans.modules.parsing.api.Snapshot;
-import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.indexing.Context;
-import org.netbeans.modules.parsing.spi.indexing.EmbeddingIndexer;
-import org.netbeans.modules.parsing.spi.indexing.EmbeddingIndexerFactory;
+import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
+import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
 import org.netbeans.modules.parsing.spi.indexing.Indexable;
+import org.netbeans.modules.parsing.spi.indexing.PathRecognizerRegistration;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexDocument;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
+import org.netbeans.spi.java.classpath.ClassPathProvider;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-public class JavaFXIndexer extends EmbeddingIndexer {
+public class JavaFXIndexer extends CustomIndexer {
 
     final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(JavaFXIndexer.class.getName());
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
     final public static String NAME = "fx";
-    final public static int VERSION = 4;
+    final public static int VERSION = 5;
 
     private class IndexingVisitor extends JavaFXTreePathScanner<Void, IndexDocument> {
-
-        private JavaFXParserResult fxresult;
-        private Indexable indexable;
-
-        public IndexingVisitor(Indexable indexable, JavaFXParserResult fxresult) {
-            this.fxresult = fxresult;
-            this.indexable = indexable;
+        private CompilationController cc;
+        private FileObject fo;
+        public IndexingVisitor(CompilationController cc) {
+            this.cc = cc;
+            this.fo = cc.getFileObject();
         }
 
         @Override
@@ -138,7 +147,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     break;
                 }
             }
-            
+
             String indexVal = e != null ? jfxIdent.toString() : null;
             if (indexVal != null) {
                 if (DEBUG) {
@@ -155,7 +164,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
         @Override
         public Void visitClassDeclaration(ClassDeclarationTree node, IndexDocument document) {
             if (!node.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
-                Element e = fxresult.getTrees().getElement(getCurrentPath());
+                Element e = cc.getTrees().getElement(getCurrentPath());
                 if (e == null) {
                     if (DEBUG) {
                         LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -175,7 +184,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     for (ExpressionTree et : superTypes) {
                         JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), et);
                         if (tp != null) {
-                            TypeElement supr = (TypeElement) fxresult.getTrees().getElement(tp);
+                            TypeElement supr = (TypeElement) cc.getTrees().getElement(tp);
                             if (supr != null) {
                                 if (DEBUG) {
                                     LOG.log(Level.FINEST, "Indexing {0} as a supertype of {1}:", new Object[]{supr.getQualifiedName(), type.getQualifiedName()});
@@ -205,7 +214,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
         @Override
         public Void visitVariable(VariableTree node, IndexDocument document) {
             if (!node.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
-                VariableElement e = (VariableElement) fxresult.getTrees().getElement(getCurrentPath());
+                VariableElement e = (VariableElement) cc.getTrees().getElement(getCurrentPath());
                 if (e == null) {
                     if (DEBUG) {
                         LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -216,7 +225,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     ElementHandle eh = ElementHandle.create(e);
                     if (eh == null) {
                         if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing variable: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            LOG.log(Level.FINEST, "Error while processing variable: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                         }
                         return super.visitVariable(node, document);
                     }
@@ -244,7 +253,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
         @Override
         public Void visitFunctionDefinition(FunctionDefinitionTree node, IndexDocument document) {
             if (!node.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
-                Element el = fxresult.getTrees().getElement(getCurrentPath());
+                Element el = cc.getTrees().getElement(getCurrentPath());
                 if (el == null) {
                     if (DEBUG) {
                         LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -260,7 +269,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         ElementHandle eh = ElementHandle.create(e);
                         if (eh == null) {
                             if (DEBUG) {
-                                LOG.log(Level.FINEST, "Error while processing function definition: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                LOG.log(Level.FINEST, "Error while processing function definition: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                             }
                             return super.visitFunctionDefinition(node, document);
                         }
@@ -286,7 +295,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public Void visitMethodInvocation(FunctionInvocationTree node, IndexDocument document) {
-            Element el = fxresult.getTrees().getElement(getCurrentPath());
+            Element el = cc.getTrees().getElement(getCurrentPath());
             if (el == null) {
                 if (DEBUG) {
                     LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -295,7 +304,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
             }
             if (el.getKind() == ElementKind.METHOD) {
                 ExecutableElement e = (ExecutableElement) el;
-                Collection<ExecutableElement> overridenMethods = JavaFXSourceUtils.getOverridenMethods(e, CompilationController.create(fxresult));
+                Collection<ExecutableElement> overridenMethods = JavaFXSourceUtils.getOverridenMethods(e, cc);
                 Collection<ExecutableElement> methods = new ArrayList<ExecutableElement>();
 
                 methods.add(e);
@@ -304,7 +313,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     ElementHandle eh = ElementHandle.create(ee);
                     if (eh == null) {
                         if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing method invocation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            LOG.log(Level.FINEST, "Error while processing method invocation: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                         }
                         return super.visitMethodInvocation(node, document);
                     }
@@ -338,7 +347,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public Void visitTypeClass(TypeClassTree node, IndexDocument document) {
-            Element el = fxresult.getTrees().getElement(getCurrentPath());
+            Element el = cc.getTrees().getElement(getCurrentPath());
             if (el == null) {
                 if (DEBUG) {
                     LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -349,7 +358,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 ElementHandle eh = ElementHandle.create(el);
                 if (eh == null) {
                     if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error while processing type class: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                        LOG.log(Level.FINEST, "Error while processing type class: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                     }
                     return super.visitTypeClass(node, document);
                 }
@@ -401,7 +410,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                                 ElementHandle eh = ElementHandle.create(sy);
                                 if (eh == null) {
                                     if (DEBUG) {
-                                        LOG.log(Level.FINEST, "Error while processing member select: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                                        LOG.log(Level.FINEST, "Error while processing member select: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                                     }
                                     return super.visitMemberSelect(node, document);
                                 }
@@ -427,7 +436,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                         }
                     }
                 } catch (NullPointerException e) {
-                    LOG.log(Level.INFO, "Trying to index non-compilable file {0}. Giving up.", indexable.getRelativePath());
+                    LOG.log(Level.INFO, "Trying to index non-compilable file {0}. Giving up.", fo.getPath());
                 }
             }
 
@@ -436,7 +445,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public Void visitObjectLiteralPart(ObjectLiteralPartTree node, IndexDocument document) {
-            Element el = fxresult.getTrees().getElement(getCurrentPath());
+            Element el = cc.getTrees().getElement(getCurrentPath());
             if (el == null) {
                 if (DEBUG) {
                     LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -448,7 +457,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     ElementHandle eh = ElementHandle.create(el);
                     if (eh == null) {
                         if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing object literal part: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            LOG.log(Level.FINEST, "Error while processing object literal part: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                         }
                         return super.visitObjectLiteralPart(node, document);
                     }
@@ -468,7 +477,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public Void visitIdentifier(IdentifierTree node, IndexDocument document) {
-            Element el = fxresult.getTrees().getElement(getCurrentPath());
+            Element el = cc.getTrees().getElement(getCurrentPath());
             if (el == null) {
                 return super.visitIdentifier(node, document);
             }
@@ -477,7 +486,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                     ElementHandle eh = ElementHandle.create(el);
                     if (eh == null) {
                         if (DEBUG) {
-                            LOG.log(Level.FINEST, "Error while processing identifier: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                            LOG.log(Level.FINEST, "Error while processing identifier: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                         }
                         return super.visitIdentifier(node, document);
                     }
@@ -497,7 +506,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
 
         @Override
         public Void visitInstantiate(InstantiateTree node, IndexDocument document) {
-            Element el = fxresult.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
+            Element el = cc.getTrees().getElement(JavafxcTrees.getPath(getCurrentPath(), node.getIdentifier()));
             if (el == null) {
                 if (DEBUG) {
                     LOG.log(Level.FINEST, "Error resolving element of {0}", node);
@@ -508,7 +517,7 @@ public class JavaFXIndexer extends EmbeddingIndexer {
                 ElementHandle eh = ElementHandle.create(el);
                 if (eh == null) {
                     if (DEBUG) {
-                        LOG.log(Level.FINEST, "Error while processing instantiation: {0}\n({1})", new Object[]{node.toString(), indexable.toString()}); // NOI18N
+                        LOG.log(Level.FINEST, "Error while processing instantiation: {0}\n({1})", new Object[]{node.toString(), fo.getPath()}); // NOI18N
                     }
                     return super.visitInstantiate(node, document);
                 }
@@ -536,11 +545,17 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     }
 
     // <editor-fold defaultstate="collapsed" desc="Indexer Factory">
-    public static class Factory extends EmbeddingIndexerFactory {
+    @PathRecognizerRegistration(sourcePathIds={ClasspathInfo.FX_SOURCE}, mimeTypes={"text/x-fx"})
+    public static class Factory extends CustomIndexerFactory {
 
         @Override
-        public EmbeddingIndexer createIndexer(Indexable indexable, Snapshot snapshot) {
+        public CustomIndexer createIndexer() {
             return new JavaFXIndexer();
+        }
+
+        @Override
+        public boolean supportsEmbeddedIndexers() {
+            return true;
         }
 
         @Override
@@ -577,51 +592,110 @@ public class JavaFXIndexer extends EmbeddingIndexer {
     }// </editor-fold>
 
     @Override
-    protected void index(final Indexable indexable, Result result, final Context context) {
-        final JavaFXParserResult fxresult = (JavaFXParserResult) result;
-        if (DEBUG) {
-            LOG.log(Level.FINEST, "Indexing {0}", indexable.toString());
-            LOG.log(Level.FINEST, "Tree: {0}", fxresult.getCompilationUnit());
-        }
+    protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
+        Map<ClasspathInfo, Collection<FileObject>> map = new HashMap<ClasspathInfo, Collection<FileObject>>();
+        Map<FileObject, ClasspathInfo> cpInfoCache = new HashMap<FileObject, ClasspathInfo>();
 
-        IndexingSupport support;
-        try {
-            // if (fxresult.isErrors()) return;
-            // supplementary indexing used only for error annotations; don't unnecessarily reindex the files
-            if (!context.isSupplementaryFilesIndexing()) {
-                support = IndexingSupport.getInstance(context);
-                IndexDocument document = support.createDocument(indexable);
-                IndexingVisitor visitor = new IndexingVisitor(indexable, fxresult);
-                visitor.scan(fxresult.getCompilationUnit(), document);
-                support.addDocument(document);
-            }
-//            FXErrorAnnotator.getInstance().process(FileUtil.toFileObject(new File(indexable.getURL().toURI())));
-            FXErrorAnnotator.getInstance().process(CompilationController.create(fxresult),
-                    context.isSupplementaryFilesIndexing()
-                    ? FXErrorAnnotator.ProcessRelatedFilesLambda.NULL
-                    : new FXErrorAnnotator.ProcessRelatedFilesLambda() {
+        Iterator<? extends Indexable> iterator = itrbl.iterator();
+        if (iterator.hasNext()) {
+            while(iterator.hasNext()) {
+                try {
+                    Indexable ix = iterator.next();
+                    File f = new File(ix.getURL().toURI());
+                    FileObject fo = FileUtil.toFileObject(f);
 
-                public void processRelatedFiles(FileObject topRoot, Collection<FileObject> files) {
-                    Set<URL> urls = new HashSet<URL>();
-                    try {
-                        for (FileObject fo : files) {
-                            try {
-                                if (fo != null) {
-                                    urls.add(fo.getURL());
-                                }
-                            } catch (IOException e) {
-                                LOG.log(Level.WARNING, null, e);
-                            }
-                        }
-                        context.addSupplementaryFiles(topRoot.getURL(), urls);
-                    } catch (IOException e) {
-                        LOG.log(Level.WARNING, null, e);
+                    Project p = FileOwnerQuery.getOwner(fo);
+                    ClassPathProvider cpp = p.getLookup().lookup(ClassPathProvider.class);
+                    ClassPath cp = cpp.findClassPath(fo, ClassPath.SOURCE);
+
+                    FileObject root = cp.findOwnerRoot(fo);
+
+                    ClasspathInfo cpInfo = cpInfoCache.get(root);
+                    if (cpInfo == null) {
+                        cpInfo = ClasspathInfo.create(root);
+                        cpInfoCache.put(root, cpInfo);
                     }
+                    Collection<FileObject> files = map.get(cpInfo);
+                    if (files == null) {
+                        files = new HashSet<FileObject>();
+                        map.put(cpInfo, files);
+                    }
+                    files.add(fo);
+                } catch (URISyntaxException e) {
                 }
-            });
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "Error indexing " + indexable.toString(), e);
-            return;
+            }
+        } else {
+            FileObject root = cntxt.getRoot();
+            Collection<FileObject> fxFiles = new HashSet<FileObject>();
+            collectFxFiles(root, fxFiles);
+            if (!fxFiles.isEmpty()) {
+                if (DEBUG) {
+                    LOG.log(Level.FINEST, "Indexing {1} files under source root {0}", new Object[]{root, fxFiles.size()});
+                }
+                ClasspathInfo cpInfo = cpInfoCache.get(root);
+                if (cpInfo == null) {
+                    cpInfo = ClasspathInfo.create(root);
+                    cpInfoCache.put(root, cpInfo);
+                }
+                map.put(cpInfo, fxFiles);
+            }
+        }
+        
+        for(Map.Entry<ClasspathInfo, Collection<FileObject>> entry : map.entrySet()) {
+            JavaFXSource jfxs = JavaFXSource.create(entry.getKey(), entry.getValue());
+            try {
+                jfxs.runUserActionTask(new CancellableTask<CompilationController>() {
+
+                    public void cancel() {
+                        // hooo
+                    }
+
+                    public void run(CompilationController cc) throws Exception {
+                        if (!cntxt.isSupplementaryFilesIndexing()) {
+                            IndexingSupport support = IndexingSupport.getInstance(cntxt);
+                            IndexDocument document = support.createDocument(cc.getFileObject());
+                            IndexingVisitor visitor = new IndexingVisitor(cc);
+                            visitor.scan(cc.getCompilationUnit(), document);
+                            support.addDocument(document);
+                        }
+                        FXErrorAnnotator.getInstance().process(cc,
+                                cntxt.isSupplementaryFilesIndexing()
+                                ? FXErrorAnnotator.ProcessRelatedFilesLambda.NULL
+                                : new FXErrorAnnotator.ProcessRelatedFilesLambda() {
+
+                            public void processRelatedFiles(FileObject topRoot, Collection<FileObject> files) {
+                                Set<URL> urls = new HashSet<URL>();
+                                try {
+                                    for (FileObject fo : files) {
+                                        try {
+                                            if (fo != null) {
+                                                urls.add(fo.getURL());
+                                            }
+                                        } catch (IOException e) {
+                                            LOG.log(Level.WARNING, null, e);
+                                        }
+                                    }
+                                    cntxt.addSupplementaryFiles(topRoot.getURL(), urls);
+                                } catch (IOException e) {
+                                    LOG.log(Level.WARNING, null, e);
+                                }
+                            }
+                        });
+                    }
+                }, false);
+            } catch (IOException e) {
+                LOG.log(Level.WARNING, "Error indexing", e);
+            }
+        }
+    }
+
+    private void collectFxFiles(FileObject root, Collection<FileObject> files) {
+        for(FileObject fo : root.getChildren()) {
+            if (fo.isFolder()) {
+                collectFxFiles(fo, files);
+            } else if (fo.getExt().toLowerCase().equals("fx")) {
+                files.add(fo);
+            }
         }
     }
 
