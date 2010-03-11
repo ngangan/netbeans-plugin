@@ -162,11 +162,11 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
                 } else if (edef.getKind() == ElementKind.CONSTRUCTOR) {
                     labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_ConstructorUsages", getHeader(element[0],info), getSimpleName(element[0].getEnclosingElement())); // NOI18N
                 } else if (edef.getKind().isField()) {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_FieldUsages", element[0].getSimpleName(), getSimpleName(element[0].getEnclosingElement())); // NOI18N
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_FieldUsages", edef.getName(), getSimpleName(element[0].getEnclosingElement())); // NOI18N
                 } else if (edef.getKind() == ElementKind.PACKAGE) {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_PackageUsages", element[0].getSimpleName()); // NOI18N
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_PackageUsages", edef.getName()); // NOI18N
                 } else {
-                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_VariableUsages", element[0].getSimpleName()); // NOI18N
+                    labelText = NbBundle.getMessage(WhereUsedPanel.class, "DSC_VariableUsages", edef.getName()); // NOI18N
                 }
 
                 final Set<Modifier> modifiers = modif;

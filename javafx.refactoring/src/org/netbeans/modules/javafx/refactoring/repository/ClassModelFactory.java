@@ -326,6 +326,16 @@ final public class ClassModelFactory {
                 Tree t = cc.getTree(e);
                 if (t != null) {
                     p.addUsage(new Usage(startFQN, endFQN, getVarDef(e, p)));
+                } else {
+                    p.addUsage(new Usage(startFQN, endFQN,
+                                            new GlobalDef(
+                                                name, e.getKind(),
+                                                ElementUtilities.enclosingPackageElement(e).getQualifiedName().toString(),
+                                                -1, -1, -1, -1,
+                                                RefactoringSupport.getRefId(ElementHandle.create(e)), p
+                                            )
+                                        )
+                    );
                 }
             }
             return super.visitObjectLiteralPart(node, p);
@@ -423,6 +433,8 @@ final public class ClassModelFactory {
             }
             return super.visitFunctionDefinition(node, p);
         }
+
+
 
         private void processFunctionDef(ExecutableElement ee, ElementDef def, ClassModel p) {
             for(ExecutableElement overriden : JavaFXSourceUtils.getOverridenMethods(ee, cc)) {
