@@ -99,21 +99,8 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
 
     public Problem checkParameters() {
-        String newPkgName = getTargetPackageName();
-        String oldPkgName = getSourcePackageName();
-
-//        final Set<String> movedClasses = new HashSet<String>();
-//        final Map<String, String> renameMap = new HashMap<String, String>();
-//        renameMap.put(oldPkgName, newPkgName);
-
         Problem problem = null;
         Collection<? extends FileObject> affectedFiles = refactoring.getRefactoringSource().lookupAll(FileObject.class);
-//        for(FileObject fo : affectedFiles) {
-//            ClassModel cm = ClassModelFactory.forRefactoring(refactoring).classModelFor(fo);
-//            for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
-//                movedClasses.add(edef.createHandle().getQualifiedName());
-//            }
-//        }
         for(FileObject fo : affectedFiles) {
             problem = checkForProblem(fo, problem);
         }
@@ -148,6 +135,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         }
 
         for(FileObject fobj : affectedFiles) {
+            if (!SourceUtils.isJavaFXFile(fobj)) continue;
             final ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fobj);
             // Refactoring API doesn't handle copy of multiple files
             if (refactoring instanceof MultipleCopyRefactoring) {

@@ -283,7 +283,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             int batchSize = related.size() / 10; // the 10 allocated steps
             int cntr = 0;
             for(FileObject refFo : related) {
-                if (refFo.equals(file)) continue;
+                if (refFo.equals(file) || !SourceUtils.isJavaFXFile(refFo)) continue;
                 BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(refFo, reb.getSession()) {
 
                     @Override

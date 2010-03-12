@@ -36,6 +36,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
@@ -54,6 +55,7 @@ import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.progress.ProgressUtils;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.NodeToElementTask;
 import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.TextComponentTask;
@@ -68,6 +70,7 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.progress.spi.RunOffEDTProvider;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
@@ -125,19 +128,25 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             task = new TextComponentTask(ec) {
 
                 @Override
-                protected RefactoringUI createRefactoringUI(FileObject srcFo, int startOffset, int endOffset) {
+                protected RefactoringUI createRefactoringUI(final FileObject srcFo, int startOffset, int endOffset) {
                     ClassModel cm = RefactoringSupport.classModelFactory(query).classModelFor(srcFo);
-                    ElementDef edef = cm.getDefForPos(startOffset);
+                    final ElementDef edef = cm.getDefForPos(startOffset);
                     if (edef == null) {
                         return null;
                     }
 
-                    FileObject javaFile = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(srcFo));
+                    final AtomicBoolean ab = new AtomicBoolean();
+                    final FileObject[] javaFile = new FileObject[1];
+                    ProgressUtils.runOffEventDispatchThread(new Runnable() {
+                        public void run() {
+                            javaFile[0] = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(srcFo));
+                        }
+                    }, "Find Usages", ab, true);
 
                     lkpContent.add(edef);
                     query.getContext().add(srcFo);
                     if (javaFile != null) {
-                        TreePathHandle tph = RefactoringSupport.toJava(edef.createHandle(), javaFile);
+                        TreePathHandle tph = RefactoringSupport.toJava(edef.createHandle(), javaFile[0]);
                         if (tph != null) {
                             lkpContent.add(tph);
                         }

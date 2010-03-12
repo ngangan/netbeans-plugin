@@ -221,25 +221,25 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
 
     private Collection<? extends FileObject> lookupJavaFXFileObjects() {
         Lookup lkp = refactoring.getRefactoringSource();
-        Collection<? extends FileObject> javaFiles = null;
+        Collection<? extends FileObject> javaFXFiles = null;
         NonRecursiveFolder folder = lkp.lookup(NonRecursiveFolder.class);
         if (folder != null) {
-            javaFiles = getJavaFileObjects(folder.getFolder(), false);
+            javaFXFiles = getJavaFXFileObjects(folder.getFolder(), false);
         } else {
-            Collection<FileObject> javaFileObjects =  new ArrayList<FileObject>();
+            Collection<FileObject> javaFXFileObjects =  new ArrayList<FileObject>();
             for (FileObject fileObject : lkp.lookupAll(FileObject.class)) {
                 if (fileObject.isFolder()) {
-                    javaFileObjects.addAll(getJavaFileObjects(fileObject, true));
+                    javaFXFileObjects.addAll(getJavaFXFileObjects(fileObject, true));
                 }else if (SourceUtils.isRefactorable(fileObject)) {
-                    javaFileObjects.add(fileObject);
+                    javaFXFileObjects.add(fileObject);
                 }
             }
-            javaFiles = javaFileObjects;
+            javaFXFiles = javaFXFileObjects;
         }
-        return javaFiles;
+        return javaFXFiles;
     }
 
-     private static Collection<FileObject> getJavaFileObjects(FileObject dirFileObject, boolean isRecursive){
+     private static Collection<FileObject> getJavaFXFileObjects(FileObject dirFileObject, boolean isRecursive){
         Collection<FileObject> javaSrcFiles = new ArrayList<FileObject>();
         addSourcesInDir(dirFileObject, isRecursive, javaSrcFiles);
         return javaSrcFiles;
