@@ -466,7 +466,7 @@ public abstract class AbstractCompletionProvider {
             if (!filter.accept(e)) {
                 continue;
             }
-            if (filter.getTypedPropertyText() == null) {
+            if (filter.getTypedPropertyText() == null && !e.isAbstract) {
                 schElements.add(e);
             }
             // add static attributes
