@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
 import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
-import com.sun.javafx.tools.fxd.schema.model.Enumeration;
 import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
@@ -65,7 +64,8 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
     private static final Logger LOG = Logger.getLogger(NodeCompletionProvider.class.getName());
 
     @Override
-    protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
+    protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el,
+            int caretOffset, TokenSequence<FXDTokenId> ts) {
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
 
@@ -74,7 +74,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             TokenUtils.getNextNonWhite(ts, caretOffset);
             if (ts.offset() < caretOffset) {
                 // inside identifier
-                processNodeId(resultSet, el, caretOffset);
+                processNodeId(resultSet, el, caretOffset, ts);
             } else {
                 // before identifier
                 processParentDocElement(resultSet, el, caretOffset, ts);
@@ -84,7 +84,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before {
-                processNodeId(resultSet, el, caretOffset);
+                processNodeId(resultSet, el, caretOffset, ts);
             } else {
                 // between id and {
                 // nothing to suggest?
@@ -99,9 +99,9 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
     }
 
     private void processNodeId(final CompletionResultSet resultSet,
-            DocumentElement el, int caretOffset) {
-        // TODO: use the following when it is NOT in attribute value
-        fillNodeIdItems(resultSet, el, caretOffset);
+            DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
+        processAttrArrayValue(resultSet, el.getParentElement(), caretOffset, ts);
+        //fillNodeIdItems(resultSet, el, caretOffset);
     }
 
     private void fillNodeIdItems(final CompletionResultSet resultSet,
