@@ -21,13 +21,13 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
-import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
+import org.netbeans.modules.refactoring.java.api.WhereUsedQueryConstants;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
@@ -128,10 +128,15 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                 fireProgressListenerStop();
             }
             if (isFindOverridingMethods()) {
-                Element e = checking.getElement();
-                TypeElement te = ElementUtilities.enclosingTypeElement(e);
+                ElementHandle teh = null;
+                if (checking.getKind().isClass() || checking.getKind().isInterface()) {
+                    teh = checking.createHandle();
+                } else {
+                    ElementHandle eh = checking.createHandle();
+                    teh = new ElementHandle(ElementKind.CLASS, new String[]{eh.getSignatures()[0]});
+                }
                 fireProgressListenerStart(WhereUsedQuery.INIT, 1);
-                Set<FileObject> files = ci.getDependencyClosure(ElementHandle.create(te));
+                Set<FileObject> files = ci.getDependencyClosure(teh);
                 fireProgressListenerStop();
                 fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
                 for(FileObject fo : files) {
@@ -165,8 +170,14 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
             EnumSet.of(ClassIndex.SearchKind.FIELD_REFERENCES),
             EnumSet.allOf(ClassIndex.SearchScope.class));
 
-        TypeElement te = ElementUtilities.enclosingTypeElement(edef.getElement());
-        references.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
+        ElementHandle teh = null;
+        if (edef.getKind().isClass() || edef.getKind().isInterface()) {
+            teh = edef.createHandle();
+        } else {
+            ElementHandle eh = edef.createHandle();
+            teh = new ElementHandle(ElementKind.CLASS, new String[]{eh.getSignatures()[0]});
+        }
+        references.addAll(ci.getResources(teh, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
 
         fireProgressListenerStart(WhereUsedQuery.PREPARE, references.size());
         for(FileObject ref : references) {
