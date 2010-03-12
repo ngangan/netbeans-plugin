@@ -191,6 +191,12 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
         return simpleName.length() == 0 || Character.isDigit(simpleName.charAt(0));
     }
 
+    // do not delegate (yet), allow filtering while using sanitized sources
+    @Override
+    protected String getLeftHtmlText() {
+        return simpleName;
+    }
+
     @Override
     public String toString() {
         if (delegate != null) {
