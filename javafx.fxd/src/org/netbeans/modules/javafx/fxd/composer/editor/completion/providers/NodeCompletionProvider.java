@@ -71,7 +71,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
 
         if (prev == null && next == FXDTokenId.IDENTIFIER) {
             // move ts to next non-white token. DO NOT REMOVE
-            TokenUtils.getNextNonWhiteFwd(ts, caretOffset); 
+            TokenUtils.getNextNonWhite(ts, caretOffset);
             if (ts.offset() < caretOffset) {
                 // inside identifier
                 processNodeId(resultSet, el, caretOffset);
@@ -81,7 +81,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             }
         } else if (prev == FXDTokenId.IDENTIFIER && next == FXDTokenId.LBRACE) {
             // move ts to previous non-white token
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset); 
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before {
                 processNodeId(resultSet, el, caretOffset);
@@ -130,7 +130,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
         if (prev == FXDTokenId.LBRACE || prev == FXDTokenId.COMMA){
             if (next == FXDTokenId.IDENTIFIER_ATTR) {
                 // move ts to next non-white token. DO NOT REMOVE
-                TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
+                TokenUtils.getNextNonWhite(ts, caretOffset);
                 if (caretOffset <= ts.offset()) {
                     // between { and attr id
                     fillItemsWithNodeAttrs(resultSet, el, caretOffset, null);
@@ -142,7 +142,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
                 fillItemsWithNodeAttrs(resultSet, el, caretOffset, null);
             }
         } else if (prev == FXDTokenId.IDENTIFIER_ATTR && next == FXDTokenId.COLON){
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before :
                 processAttrId(resultSet, el, caretOffset, ts);
@@ -155,7 +155,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             processAttrValue(resultSet, el, caretOffset, ts);
         } else if (next == FXDTokenId.COMMA || next == FXDTokenId.RBRACE){
             if (prev == FXDTokenId.IDENTIFIER){
-                TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+                TokenUtils.getPrevNonWhite(ts, caretOffset);
                 FXDTokenId prevPrev = getPrevNonWhiteID(el, ts.offset(), ts);
                 if (prevPrev == FXDTokenId.COLON){
                     processAttrValue(resultSet, el, caretOffset, ts);

@@ -64,7 +64,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
 
         if (prev == null && next == FXDTokenId.IDENTIFIER_ATTR) {
             // move ts to next non-white token. DO NOT REMOVE
-            TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
+            TokenUtils.getNextNonWhite(ts, caretOffset);
             if (ts.offset() < caretOffset) {
                 // inside identifier
                 processArrElemId(resultSet, el, caretOffset);
@@ -74,7 +74,7 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
             }
         } else if (prev == FXDTokenId.IDENTIFIER_ATTR && next == FXDTokenId.COLON) {
             // move ts to previous non-white token
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before :
                 processArrElemId(resultSet, el, caretOffset);

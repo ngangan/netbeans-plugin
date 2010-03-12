@@ -68,7 +68,7 @@ public class ArrayElemCompletionProvider extends AbstractCompletionProvider {
             }
         } else if (prev == FXDTokenId.IDENTIFIER) {
             // move ts to previous non-white token
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id
                 processArrElemId(resultSet, el, caretOffset);
