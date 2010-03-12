@@ -446,11 +446,20 @@ public abstract class AbstractCompletionProvider {
     }
 
     private void doCollectValuesAsEmuneration(List<AbstractSchemaElement> schElements,
-            Enumeration enumn, String nameStart) {
-        // todo: completion may have errors. typed text is not taken into account
+            Enumeration enumn, String typedText) {
+        ElementNameFilter filter = new ElementNameFilter(typedText);
+        if (!filter.accept(enumn)) {
+            return;
+        }
+        if (filter.getTypedPropertyText() == null) {
+            schElements.add(enumn);
+        }
+
         Value[] values = enumn.values;
         for (Value value : values) {
-            schElements.add(value);
+            if (idStartsWith(value.id, filter.getTypedPropertyText())) {
+                schElements.add(value);
+            }
         }
     }
 
