@@ -1237,7 +1237,8 @@ public class JFXReformatTask implements ReformatTask {
             spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
             accept(JFXTokenId.LPAREN);
             List<? extends JFXVar> params = funcDef.getParams();
-            if (params != null && !params.isEmpty() && !magicOverridenFunc) {
+//            if (params != null && !params.isEmpty() && !magicOverridenFunc) {
+            if (params != null && !params.isEmpty()) {
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0, true);
                 wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
@@ -2664,6 +2665,30 @@ public class JFXReformatTask implements ReformatTask {
             lastBlankLinesDiff = null;
             return true;
         }
+
+        @Override
+        public Boolean visitOverrideClassVar(OverrideClassVarTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
+        }
+
+        @Override
+        public Boolean visitVariableInvalidate(VariableInvalidateTree node, Void p) {
+            do {
+                col += tokens.token().length();
+            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
+            return true;
+        }
+
+
 
         /// ===
         /// === END OF THE VISITOR IMPLEMENTATION
