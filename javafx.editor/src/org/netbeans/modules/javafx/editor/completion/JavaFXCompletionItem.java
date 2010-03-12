@@ -914,7 +914,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 }
             }
             if (inImport || params.isEmpty()) {
-                String add = "()"; //NOI18N
+                String add = inImport ? "" : "()"; //NOI18N
                 if (toAdd != null && !add.startsWith(toAdd))
                     add += toAdd;
                 super.substituteText(c, offset, len, add);

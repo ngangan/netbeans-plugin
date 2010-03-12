@@ -267,6 +267,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addMembers(final TypeMirror type,
             final boolean methods, final boolean fields,
             final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
+        addMembers(type, methods, fields, textToAdd, scope, statics, instance, false);
+    }
+    protected void addMembers(final TypeMirror type,
+            final boolean methods, final boolean fields,
+            final String textToAdd, JavafxcScope scope,boolean statics, boolean instance, boolean inImport) {
         if (LOGGABLE) log("addMembers: " + type); // NOI18N
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + (type != null ? type.getKind() : " type is null")); // NOI18N
@@ -405,7 +410,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
                             (ExecutableType) member.asType(),
-                            query.anchorOffset, isInherited, isDeprecated, false, false));
+                            query.anchorOffset, isInherited, isDeprecated, inImport, false));
                     }
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
