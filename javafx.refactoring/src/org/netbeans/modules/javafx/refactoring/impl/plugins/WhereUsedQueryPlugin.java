@@ -61,6 +61,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
+        fireProgressListenerStart(WhereUsedQuery.PREPARE, -1);
         final ElementDef edef = getElementDef();
 
         final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
@@ -84,7 +85,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                 break;
             }
         }
-
+        fireProgressListenerStop();
         return null;
     }
 
@@ -104,11 +105,15 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
         
         for(ElementDef checking : edefList) {
             if (isFindUsages()) {
-                for(FileObject fo : ci.getResources(
+                fireProgressListenerStart(WhereUsedQuery.INIT, 1);
+                Set<FileObject> files = ci.getResources(
                     checking.createHandle(),
                     EnumSet.of(ClassIndex.SearchKind.METHOD_REFERENCES),
-                    EnumSet.allOf(ClassIndex.SearchScope.class))
-                ) {
+                    EnumSet.allOf(ClassIndex.SearchScope.class));
+                fireProgressListenerStop();
+                fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
+                for(FileObject fo : files)  {
+                    fireProgressListenerStep();
                     if (!SourceUtils.isJavaFXFile(fo)) continue;
                     
                     ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
@@ -118,24 +123,28 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                             reb.add(refactoring, WhereUsedElement.create(usg));
                         }
                     }
+                    fireProgressListenerStep();
                 }
+                fireProgressListenerStop();
             }
             if (isFindOverridingMethods()) {
                 Element e = checking.getElement();
                 TypeElement te = ElementUtilities.enclosingTypeElement(e);
-                for(FileObject fo : ci.getResources(
-                    ElementHandle.create(te),
-                    EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
-                    EnumSet.allOf(ClassIndex.SearchScope.class))
-                ) {
+                fireProgressListenerStart(WhereUsedQuery.INIT, 1);
+                Set<FileObject> files = ci.getDependencyClosure(ElementHandle.create(te));
+                fireProgressListenerStop();
+                fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
+                for(FileObject fo : files) {
+                    fireProgressListenerStep();
                     if (!SourceUtils.isJavaFXFile(fo)) continue;
                     ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
-                    for(ElementDef refdef : cm.getElementDefs(EnumSet.of(edef.getKind()))) {
-                        if (refdef.overrides(edef)) {
-                            reb.add(refactoring, WhereUsedElement.create(cm.getDefaultUsage(refdef)));
+                    for(ElementDef refDef : cm.getElementDefs(EnumSet.of(edef.getKind()))) {
+                        if (refDef.overrides(edef)) {
+                            reb.add(refactoring, WhereUsedElement.create(cm.getDefaultUsage(refDef)));
                         }
                      }
                 }
+                fireProgressListenerStop();
             }
         }
     }
@@ -159,7 +168,9 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
         TypeElement te = ElementUtilities.enclosingTypeElement(edef.getElement());
         references.addAll(ci.getResources(ElementHandle.create(te), EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
 
+        fireProgressListenerStart(WhereUsedQuery.PREPARE, references.size());
         for(FileObject ref : references) {
+            fireProgressListenerStep();
             if (!SourceUtils.isJavaFXFile(ref)) continue;
             ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
 
@@ -169,6 +180,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                 }
             }
         }
+        fireProgressListenerStop();
     }
 
     private void collectTypeUsages(final ElementDef edef, RefactoringElementsBag reb, final ClassIndex ci) {
@@ -181,11 +193,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                 EnumSet.allOf(ClassIndex.SearchScope.class))
             );
         } else if (isFindDirectSubclassesOnly() || isFindSubclasses()) {
-            references.addAll(ci.getResources(
-                edef.createHandle(),
-                EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
-                EnumSet.allOf(ClassIndex.SearchScope.class))
-            );
+            references.addAll(ci.getDependencyClosure(edef.createHandle()));
         }
 
         Map<ElementDef, Set<FileObject>> workset = new HashMap<ElementDef, Set<FileObject>>();
@@ -199,8 +207,9 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
             Set<FileObject> files = workset.remove(checking);
 
             if (checked.contains(checking)) continue;
-
+            fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
             for(FileObject ref : files) {
+                fireProgressListenerStep();
                 if (!SourceUtils.isJavaFXFile(ref)) continue;
                 
                 ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
@@ -225,6 +234,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
                 }
                 checked.add(checking);
             }
+            fireProgressListenerStop();
         }
     }
 

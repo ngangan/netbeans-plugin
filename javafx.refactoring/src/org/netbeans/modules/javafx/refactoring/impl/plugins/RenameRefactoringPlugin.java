@@ -279,11 +279,16 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
     }
 
     public Problem prepare(RefactoringElementsBag bag) {
+        fireProgressListenerStart(RenameRefactoring.INIT, 6);
         final ElementDef edef = getElementDef();
+        fireProgressListenerStep();
+
         if (edef == null) return null; // fail earl
 
         final FileObject fo = getRefactoringFO();
         ClassIndex ci = RefactoringSupport.classIndex(refactoring);
+
+        fireProgressListenerStep();
 
         final Set<FileObject> files = new HashSet<FileObject>();
         if (SourceUtils.isJavaFXFile(fo)) {
@@ -307,14 +312,18 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                     eh = new ElementHandle(ElementKind.CLASS, new String[]{eh.getSignatures()[0]});
                 }
                 if (eh != null && (eh.getKind().isInterface() || eh.getKind().isClass())) {
-                    files.addAll(ci.getResources(
-                            eh,
-                            EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
-                            EnumSet.allOf(ClassIndex.SearchScope.class)));
+                    files.addAll(ci.getDependencyClosure(eh));
+//                    files.addAll(ci.getResources(
+//                            eh,
+//                            EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
+//                            EnumSet.allOf(ClassIndex.SearchScope.class)));
                 }
             }
         }
+        fireProgressListenerStop();
+        fireProgressListenerStart(RenameRefactoring.PREPARE, files.size());
         for(FileObject file : files) {
+            fireProgressListenerStep();
             if (!SourceUtils.isJavaFXFile(file)) continue;
             BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(file, bag.getSession()) {
 
@@ -352,6 +361,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                 bag.addFileChange(refactoring, new ReindexFilesElement(file, files));
             }
         }
+        fireProgressListenerStop();
         return null;
     }
 

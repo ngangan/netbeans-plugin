@@ -136,17 +136,12 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                     }
 
                     final AtomicBoolean ab = new AtomicBoolean();
-                    final FileObject[] javaFile = new FileObject[1];
-                    ProgressUtils.runOffEventDispatchThread(new Runnable() {
-                        public void run() {
-                            javaFile[0] = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(srcFo));
-                        }
-                    }, "Find Usages", ab, true);
+                    FileObject javaFile = getJavaFile(edef, srcFo, ab);
 
                     lkpContent.add(edef);
                     query.getContext().add(srcFo);
                     if (javaFile != null) {
-                        TreePathHandle tph = RefactoringSupport.toJava(edef.createHandle(), javaFile[0]);
+                        TreePathHandle tph = RefactoringSupport.toJava(edef.createHandle(), javaFile);
                         if (tph != null) {
                             lkpContent.add(tph);
                         }
@@ -217,7 +212,8 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                     ClasspathInfo cpInfo = ClasspathInfo.create(srcFo);
                     ClassIndex ci = cpInfo.getClassIndex();
 
-                    FileObject javaFile = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(srcFo));
+                    AtomicBoolean cancelled = new AtomicBoolean();
+                    FileObject javaFile = getJavaFile(edef, srcFo, cancelled);
 
                     if (edef.getKind() == ElementKind.PACKAGE) {
                         lkpContent.add(new NonRecursiveFolder() {
@@ -941,7 +937,14 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         return pt[1];
     }
 
-    private static boolean isRefactoringEnabled() {
-        return Boolean.getBoolean("javafx.refactoring");
+    private FileObject getJavaFile(final ElementDef edef, final FileObject fxFile, final AtomicBoolean cancelled) {
+        final FileObject[] javaFile = new FileObject[1];
+        ProgressUtils.runOffEventDispatchThread(new Runnable() {
+            public void run() {
+                javaFile[0] = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(fxFile));
+            }
+        }, "Accessing Java Index", cancelled, true);
+        return javaFile[0];
     }
+
 }
