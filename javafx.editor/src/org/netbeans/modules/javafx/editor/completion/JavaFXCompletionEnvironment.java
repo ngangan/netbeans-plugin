@@ -449,6 +449,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addLocalMembersAndVars(smart);
         addLocalAndImportedTypes(null, null, null, false, smart);
         addLocalAndImportedFunctions();
+        addLocalAndImportedVars();
+        addPseudoVariables();
     }
 
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
@@ -1404,6 +1406,28 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                                 (ExecutableElement) local,
                                 (ExecutableType) local.asType(),
                                 query.anchorOffset, false, false, false, false));
+                    }
+                }
+            }
+            scope = scope.getEnclosingScope();
+        }
+    }
+
+    protected void addLocalAndImportedVars() {
+        if (LOGGABLE) log("addLocalAndImportedVars"); // NOI18N
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
+        while (scope != null) {
+            if (LOGGABLE) log("  scope == " + scope); // NOI18N
+            for (Element local : scope.getLocalElements()) {
+                if (LOGGABLE) log("    local == " + local); // NOI18N
+                String name = local.getSimpleName().toString();
+                if (name.contains("$")) { // NOI18N
+                    continue;
+                }
+                if (local.getKind() == ElementKind.FIELD) {
+                    if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) { // NOI18N
+                        addResult(JavaFXCompletionItem.createVariableItem(local.asType(), name,
+                                query.anchorOffset, false));
                     }
                 }
             }

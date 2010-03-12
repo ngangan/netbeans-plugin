@@ -91,10 +91,11 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
                 if (!hasPublicDecls) {
                     addKeywordsForStatement();
                     addKeyword(EXTENDS_KEYWORD, SPACE, false);
-                    addPackages(""); // NOI18N
                     addLocalAndImportedTypes(null, null, null, false, null);
                     addLocalMembersAndVars(null);
                     addLocalAndImportedFunctions();
+                    addLocalAndImportedVars();
+                    addPackages(""); // NOI18N
                 }
             }
         }
