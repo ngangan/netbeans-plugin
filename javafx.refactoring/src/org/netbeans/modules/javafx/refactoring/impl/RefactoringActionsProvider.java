@@ -71,6 +71,7 @@ import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.progress.spi.RunOffEDTProvider;
+import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
@@ -129,9 +130,8 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(final FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = RefactoringSupport.classModelFactory(query).classModelFor(srcFo);
-                    final ElementDef edef = cm.getDefForPos(startOffset);
-                    if (edef == null) {
+                    ElementDef edef = getDefForPos(query, srcFo, startOffset);
+                    if (edef == ElementDef.NULL) {
                         return null;
                     }
 
@@ -202,9 +202,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(final FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
-
-                    final ElementDef edef = cm.getDefForPos(startOffset);
+                    final ElementDef edef = getDefForPos(ref, srcFo, startOffset);
                     if (edef == null) {
                         return null;
                     }
@@ -393,9 +391,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
-
-                    ElementDef edef = cm.getDefForPos(startOffset);
+                    ElementDef edef = getDefForPos(ref, srcFo, startOffset);
 
                     if (edef == null) {
                         LOGGER.log(Level.INFO, "doMove: " + edef, new NullPointerException("e")); // NOI18N
@@ -564,9 +560,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
                 @Override
                 protected RefactoringUI createRefactoringUI(FileObject srcFo, int startOffset, int endOffset) {
-                    ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
-
-                    ElementDef edef = cm.getDefForPos(startOffset);
+                    ElementDef edef = getDefForPos(ref, srcFo, startOffset);
                     if (edef == null) {
                         LOGGER.log(Level.INFO, "doDelete: " + edef, new NullPointerException("selected")); // NOI18N
                         return null;
@@ -947,4 +941,20 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         return javaFile[0];
     }
 
+    private ElementDef getDefForPos(AbstractRefactoring ref, FileObject srcFo, int pos) {
+        ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
+        ElementDef edef = cm.getDefForPos(pos);
+        if (edef == ElementDef.NULL) {
+            for(ElementDef tDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
+                if (edef == ElementDef.NULL) {
+                    edef = tDef;
+                }
+                if (tDef.getName().equals(srcFo.getName())) {
+                    edef = tDef;
+                    break;
+                }
+            }
+        }
+        return edef;
+    }
 }
