@@ -481,7 +481,9 @@ public abstract class AbstractCompletionProvider {
             if (!filter.accept(e)) {
                 continue;
             }
-            schElements.add(e);
+            if (filter.getTypedPropertyText() == null) {
+                schElements.add(e);
+            }
             // add static attributes
             attrs.clear();
             collectElementStaticAttrs(attrs, e, filter.getTypedPropertyText());
