@@ -70,7 +70,7 @@ public class TokenUtils {
      * @param ts TokenSequence
      * @return next non white token in forward direction
      */
-    public static Token<FXDTokenId> getNextNonWhiteFwd(TokenSequence<FXDTokenId> ts){
+    public static Token<FXDTokenId> getNextNonWhite(TokenSequence<FXDTokenId> ts){
         while (ts.moveNext()){
             if (!TokenUtils.isWhiteToken(ts.token()) ){
                 return ts.token();
@@ -86,10 +86,10 @@ public class TokenUtils {
      * @param startOffset start offset
      * @return next non white token in forward direction
      */
-    public static Token<FXDTokenId> getNextNonWhiteFwd(TokenSequence<FXDTokenId> ts,
+    public static Token<FXDTokenId> getNextNonWhite(TokenSequence<FXDTokenId> ts,
             int startOffset){
         ts.move(startOffset);
-        return getNextNonWhiteFwd(ts);
+        return getNextNonWhite(ts);
     }
 
     /**
@@ -98,7 +98,7 @@ public class TokenUtils {
      * @param ts TokenSequence
      * @return next non white token in backward direction
      */
-    public static Token<FXDTokenId> getNextNonWhiteBwd(TokenSequence<FXDTokenId> ts){
+    public static Token<FXDTokenId> getPrevNonWhite(TokenSequence<FXDTokenId> ts){
         while (ts.movePrevious()){
             if (!TokenUtils.isWhiteToken(ts.token()) ){
                 return ts.token();
@@ -114,10 +114,10 @@ public class TokenUtils {
      * @param startOffset start offset
      * @return next non white token in backward direction
      */
-    public static Token<FXDTokenId> getNextNonWhiteBwd(TokenSequence<FXDTokenId> ts,
+    public static Token<FXDTokenId> getPrevNonWhite(TokenSequence<FXDTokenId> ts,
             int startOffset){
         ts.move(startOffset);
-        return getNextNonWhiteBwd(ts);
+        return getPrevNonWhite(ts);
     }
 
     public static boolean isWhiteToken(Token<FXDTokenId> t){

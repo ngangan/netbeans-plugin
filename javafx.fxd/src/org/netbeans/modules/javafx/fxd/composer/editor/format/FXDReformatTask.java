@@ -141,7 +141,7 @@ public class FXDReformatTask implements ReformatTask {
 
         private void process() throws BadLocationException{
             m_ts.move(m_startOffset);
-            Token<FXDTokenId> token = TokenUtils.getNextNonWhiteFwd(m_ts);
+            Token<FXDTokenId> token = TokenUtils.getNextNonWhite(m_ts);
             while (token != null){
                 // current token row start
                 int currRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
@@ -181,7 +181,7 @@ public class FXDReformatTask implements ReformatTask {
                     formatMultilineString(token);
                 }
                 // get next token to process
-                token = TokenUtils.getNextNonWhiteFwd(m_ts);
+                token = TokenUtils.getNextNonWhite(m_ts);
             }
         }
 
@@ -192,7 +192,7 @@ public class FXDReformatTask implements ReformatTask {
             int lBracketStart = m_ts.offset();
             fixSpaces(prevTokenEnd, lBracketStart, 1);
             // line break
-            token = TokenUtils.getNextNonWhiteFwd(m_ts);
+            token = TokenUtils.getNextNonWhite(m_ts);
             if (token != null) {
                 int nextTokenRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
                 if (nextTokenRowStart == m_lastRowStart && !TokenUtils.isRBracketToken(token)) {
@@ -210,7 +210,7 @@ public class FXDReformatTask implements ReformatTask {
             if (!addBreakBeforeTokenIfNeed()){
                 fixSpaces(getPrevNotWhiteTokenEndOffset(), m_ts.offset(), 1);
             }
-            token = TokenUtils.getNextNonWhiteFwd(m_ts);
+            token = TokenUtils.getNextNonWhite(m_ts);
             if (token != null) {
                 if (!TokenUtils.isRBracketToken(token) && !TokenUtils.isAttribsSeparatorToken(token)) {
                     if (!addBreakBeforeTokenIfNeed()){
@@ -298,23 +298,23 @@ public class FXDReformatTask implements ReformatTask {
         }
 
         private int getPrevNotWhiteTokenRowStart() throws BadLocationException{
-            TokenUtils.getNextNonWhiteBwd(m_ts);
+            TokenUtils.getPrevNonWhite(m_ts);
             int prevTokenRowStart = IndentUtils.lineStartOffset(m_baseDoc, m_ts.offset());
-            TokenUtils.getNextNonWhiteFwd(m_ts);
+            TokenUtils.getNextNonWhite(m_ts);
             return prevTokenRowStart;
         }
 
         private int getPrevNotWhiteTokenEndOffset() throws BadLocationException {
-            Token<FXDTokenId> t = TokenUtils.getNextNonWhiteBwd(m_ts);
+            Token<FXDTokenId> t = TokenUtils.getPrevNonWhite(m_ts);
             int prevTokenEnd = m_ts.offset() + t.length();
-            TokenUtils.getNextNonWhiteFwd(m_ts);
+            TokenUtils.getNextNonWhite(m_ts);
             return prevTokenEnd;
         }
 
         private int getNextNotWhiteTokenOffset() throws BadLocationException {
-            Token<FXDTokenId> t = TokenUtils.getNextNonWhiteFwd(m_ts);
+            Token<FXDTokenId> t = TokenUtils.getNextNonWhite(m_ts);
             int nextTokenstart = m_ts.offset();
-            TokenUtils.getNextNonWhiteBwd(m_ts);
+            TokenUtils.getPrevNonWhite(m_ts);
             return nextTokenstart;
         }
 

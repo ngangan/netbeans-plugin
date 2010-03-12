@@ -46,6 +46,7 @@ import com.sun.javafx.tools.fxd.schema.model.Enumeration;
 import com.sun.javafx.tools.fxd.schema.model.Function;
 import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
 import com.sun.javafx.tools.fxd.schema.model.Property;
+import com.sun.javafx.tools.fxd.schema.model.Value;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -56,11 +57,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.completion.Completion;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
-import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -250,7 +247,9 @@ public class FXDCompletionItem implements CompletionItem {
         } else if (element instanceof Function) {
             return element.id;
         } else if (element instanceof Enumeration) {
-            return element.id;
+            return splitFullName(element.id)[1];
+        } else if (element instanceof Value){
+            return createDisplayText(element.parent) + '.' + element.id;
         } else if (element instanceof PrimitiveType){
             return element.id;
         } else if (element instanceof Element) {
@@ -272,7 +271,9 @@ public class FXDCompletionItem implements CompletionItem {
         } else if (element instanceof Function) {
             return element.id;
         } else if (element instanceof Enumeration) {
-            return element.id;
+            return splitFullName(element.id)[1];
+        } else if (element instanceof Value){
+            return createDisplayText(element.parent) + '.' + element.id;
         } else if (element instanceof PrimitiveType){
             return getPrimitiveTypeDefValue((PrimitiveType)element);
         } else if (element instanceof Element) {

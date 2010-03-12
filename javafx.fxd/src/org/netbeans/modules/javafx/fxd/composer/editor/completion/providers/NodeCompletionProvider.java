@@ -43,7 +43,6 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 
 import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
-import com.sun.javafx.tools.fxd.schema.model.Enumeration;
 import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
@@ -65,26 +64,27 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
     private static final Logger LOG = Logger.getLogger(NodeCompletionProvider.class.getName());
 
     @Override
-    protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
+    protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el,
+            int caretOffset, TokenSequence<FXDTokenId> ts) {
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
 
         if (prev == null && next == FXDTokenId.IDENTIFIER) {
             // move ts to next non-white token. DO NOT REMOVE
-            TokenUtils.getNextNonWhiteFwd(ts, caretOffset); 
+            TokenUtils.getNextNonWhite(ts, caretOffset);
             if (ts.offset() < caretOffset) {
                 // inside identifier
-                processNodeId(resultSet, el, caretOffset);
+                processNodeId(resultSet, el, caretOffset, ts);
             } else {
                 // before identifier
                 processParentDocElement(resultSet, el, caretOffset, ts);
             }
         } else if (prev == FXDTokenId.IDENTIFIER && next == FXDTokenId.LBRACE) {
             // move ts to previous non-white token
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset); 
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before {
-                processNodeId(resultSet, el, caretOffset);
+                processNodeId(resultSet, el, caretOffset, ts);
             } else {
                 // between id and {
                 // nothing to suggest?
@@ -99,9 +99,9 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
     }
 
     private void processNodeId(final CompletionResultSet resultSet,
-            DocumentElement el, int caretOffset) {
-        // TODO: use the following when it is NOT in attribute value
-        fillNodeIdItems(resultSet, el, caretOffset);
+            DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
+        processAttrArrayValue(resultSet, el.getParentElement(), caretOffset, ts);
+        //fillNodeIdItems(resultSet, el, caretOffset);
     }
 
     private void fillNodeIdItems(final CompletionResultSet resultSet,
@@ -130,7 +130,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
         if (prev == FXDTokenId.LBRACE || prev == FXDTokenId.COMMA){
             if (next == FXDTokenId.IDENTIFIER_ATTR) {
                 // move ts to next non-white token. DO NOT REMOVE
-                TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
+                TokenUtils.getNextNonWhite(ts, caretOffset);
                 if (caretOffset <= ts.offset()) {
                     // between { and attr id
                     fillItemsWithNodeAttrs(resultSet, el, caretOffset, null);
@@ -142,7 +142,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
                 fillItemsWithNodeAttrs(resultSet, el, caretOffset, null);
             }
         } else if (prev == FXDTokenId.IDENTIFIER_ATTR && next == FXDTokenId.COLON){
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before :
                 processAttrId(resultSet, el, caretOffset, ts);
@@ -155,7 +155,7 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
             processAttrValue(resultSet, el, caretOffset, ts);
         } else if (next == FXDTokenId.COMMA || next == FXDTokenId.RBRACE){
             if (prev == FXDTokenId.IDENTIFIER){
-                TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+                TokenUtils.getPrevNonWhite(ts, caretOffset);
                 FXDTokenId prevPrev = getPrevNonWhiteID(el, ts.offset(), ts);
                 if (prevPrev == FXDTokenId.COLON){
                     processAttrValue(resultSet, el, caretOffset, ts);
