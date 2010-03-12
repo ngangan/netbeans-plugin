@@ -108,7 +108,6 @@ final public class ClassModelFactory {
     final private static class ClassModelPopulator extends JavaFXTreePathScanner<Void, ClassModel> {
         private CompilationController cc;
         private SourcePositions positions;
-        private boolean inImport = false;
         private int localCounter = 0;
 
         private Set<ExpressionTree> superTypes = new HashSet<ExpressionTree>();
@@ -170,23 +169,25 @@ final public class ClassModelFactory {
                         if (se != null) {
                             Tree t = cc.getTree(se);
                             if (t != null) {
-                                def.addOverridenDef(getClassDef((TypeElement)se, p));
+                                ElementDef sDef = getClassDef((TypeElement)se, p);
+                                def.addOverridenDef(sDef);
+                                p.addUsage(new Usage(def.getStartFQN(), def.getEndFQN(), Usage.Kind.SUBTYPE, sDef));
                             }
                         } else {
                             // extending a java type
                             ElementHandle eh = ElementHandle.create(e);
                             if (eh != null) {
                                 PackageElement pe = ElementUtilities.enclosingPackageElement(e);
-                                def.addOverridenDef(
-                                    new GlobalDef(
-                                        e.getSimpleName().toString(),
-                                        e.getKind(),
-                                        ((TypeElement)e).getNestingKind(),
-                                        pe != null ? pe.getQualifiedName().toString() : "",
-                                        -1, -1, -1, -1,
-                                        RefactoringSupport.getRefId(eh), p
-                                    )
+                                ElementDef sDef = new GlobalDef(
+                                    e.getSimpleName().toString(),
+                                    e.getKind(),
+                                    ((TypeElement)e).getNestingKind(),
+                                    pe != null ? pe.getQualifiedName().toString() : "",
+                                    -1, -1, -1, -1,
+                                    RefactoringSupport.getRefId(eh), p
                                 );
+                                def.addOverridenDef(sDef);
+                                p.addUsage(new Usage(def.getStartFQN(), def.getEndFQN(), Usage.Kind.SUBTYPE, sDef));
                             }
                         }
                     }
@@ -200,7 +201,6 @@ final public class ClassModelFactory {
             if (isSynthetic(node)) return super.visitImport(node, p);
             
             try {
-                inImport = true;
                 boolean wildcard = node.getQualifiedIdentifier().toString().endsWith(".*"); // NOI18N
                 Tree t = node.getQualifiedIdentifier();
                 Element e = null;
@@ -240,7 +240,6 @@ final public class ClassModelFactory {
                 }
                 return super.visitImport(node, p);
             } finally {
-                inImport = false;
             }
         }
 
@@ -265,7 +264,7 @@ final public class ClassModelFactory {
                             case CLASS:
                             case INTERFACE:
                             case ENUM: {
-                                p.addUsage(new Usage(startPos, endPos, superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE, getClassDef((TypeElement)e, p)));
+                                p.addUsage(new Usage(startPos, endPos, Usage.Kind.REFERENCE, getClassDef((TypeElement)e, p)));
                                 break;
                             }
                             case FIELD:
