@@ -28,6 +28,7 @@
 package org.netbeans.modules.javafx.refactoring.impl;
 
 import java.awt.datatransfer.Transferable;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -37,6 +38,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
 import javax.swing.Action;
@@ -44,6 +46,10 @@ import javax.swing.JOptionPane;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
+import org.netbeans.api.java.source.CompilationController;
+import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.java.source.Task;
+import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
@@ -126,8 +132,16 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                         return null;
                     }
 
+                    FileObject javaFile = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(srcFo));
+
                     lkpContent.add(edef);
                     query.getContext().add(srcFo);
+                    if (javaFile != null) {
+                        TreePathHandle tph = RefactoringSupport.toJava(edef.createHandle(), javaFile);
+                        if (tph != null) {
+                            lkpContent.add(tph);
+                        }
+                    }
                     return new WhereUsedQueryUI(query);
                 }
             };
@@ -186,13 +200,15 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 protected RefactoringUI createRefactoringUI(final FileObject srcFo, int startOffset, int endOffset) {
                     ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(srcFo);
 
-                    ElementDef edef = cm.getDefForPos(startOffset);
+                    final ElementDef edef = cm.getDefForPos(startOffset);
                     if (edef == null) {
                         return null;
                     }
 
                     ClasspathInfo cpInfo = ClasspathInfo.create(srcFo);
                     ClassIndex ci = cpInfo.getClassIndex();
+
+                    FileObject javaFile = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(srcFo));
 
                     if (edef.getKind() == ElementKind.PACKAGE) {
                         lkpContent.add(new NonRecursiveFolder() {
@@ -211,6 +227,15 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                                 if (!defining.isEmpty()) {
                                     lkpContent.add(defining.iterator().next());
                                 }
+                            }
+                        }
+                        if (javaFile != null) {
+                            if ((edef.getKind().isClass() || edef.getKind().isInterface()) && edef.getName().equals(javaFile.getName())) {
+                                lkpContent.add(javaFile);
+                            }
+                            TreePathHandle tph = RefactoringSupport.toJava(edef.createHandle(), javaFile);
+                            if (tph != null) {
+                                lkpContent.add(tph);
                             }
                         }
                     }

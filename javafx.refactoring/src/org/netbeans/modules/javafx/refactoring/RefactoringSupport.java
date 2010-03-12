@@ -5,11 +5,15 @@
 
 package org.netbeans.modules.javafx.refactoring;
 
+import com.sun.source.util.TreePath;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import javax.lang.model.element.Element;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
+import org.netbeans.api.java.source.CompilationController;
+import org.netbeans.api.java.source.CompilationInfo;
 import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
@@ -149,5 +153,26 @@ final public class RefactoringSupport {
             }
         }
         return refdef[0];
+    }
+
+    public static TreePathHandle toJava(ElementHandle eh, FileObject javaFile) {
+        final TreePathHandle[] tph = new TreePathHandle[1];
+
+        final org.netbeans.api.java.source.ElementHandle ehj = eh.toJava();
+
+        JavaSource js = JavaSource.forFileObject(javaFile);
+        try {
+            js.runUserActionTask(new Task<CompilationController>() {
+
+                public void run(CompilationController cc) throws Exception {
+                    Object e = ehj.getClass().getMethod("resolve", CompilationInfo.class).invoke(ehj, cc); // NOI18N
+                    Class elementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+                    tph[0] = (TreePathHandle) TreePathHandle.class.getMethod("create", elementClass, CompilationInfo.class).invoke(null, elementClass.cast(e), cc);
+                }
+            }, false);
+        } catch (IOException e) {
+        }
+
+        return tph[0];
     }
 }
