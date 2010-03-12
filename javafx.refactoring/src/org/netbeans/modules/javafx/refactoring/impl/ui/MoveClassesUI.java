@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -90,7 +89,7 @@ public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
     private Collection<? extends FileObject> javaObjects;
     private MovePanel panel;
     private MoveRefactoring refactoring;
-    private String targetPkgName = "";
+    private String targetPkgName = ""; // NOI18N
     private boolean disable;
     private FileObject targetFolder;
     private PasteType pasteType;
@@ -151,9 +150,9 @@ public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
     private static String getDOPackageName(FileObject f) {
         ClassPath cp = ClassPath.getClassPath(f, ClassPath.SOURCE);
         if (cp!=null) {
-            return cp.getResourceName(f, '.', false);
+            return cp.getResourceName(f, '.', false); // NOI18N
         } else {
-            Logger.getLogger("org.netbeans.modules.refactoring.java").info("Cannot find classpath for " + f.getPath());
+            Logger.getLogger(MoveClassesUI.class.getName()).info(NbBundle.getMessage(MoveClassesUI.class, "MSG_NoClasspath", f.getPath())); // NOI18N
             return f.getName();
         }
     }

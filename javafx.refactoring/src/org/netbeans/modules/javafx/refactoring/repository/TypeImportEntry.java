@@ -77,7 +77,7 @@ public class TypeImportEntry extends ImportEntry {
 
     @Override
     public String toString() {
-        return "import " + getTypeName() + (isStatic ? ".*" : "");
+        return "import " + getTypeName() + (isStatic ? ".*" : ""); // NOI18N
     }
 
     @Override

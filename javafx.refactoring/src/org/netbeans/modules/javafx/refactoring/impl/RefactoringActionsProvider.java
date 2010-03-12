@@ -109,7 +109,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     @Override
     public boolean canFindUsages(Lookup lkp) {
         FileObject file = lkp.lookup(FileObject.class);
-        return file != null && file.getMIMEType().equals("text/x-fx");
+        return file != null && file.getMIMEType().equals("text/x-fx"); //NOI18N
     }
     volatile private boolean isFindUsages;
 
@@ -943,7 +943,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             public void run() {
                 javaFile[0] = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(fxFile));
             }
-        }, "Accessing Java Index", cancelled, true);
+        }, NbBundle.getMessage(RefactoringActionsProvider.class, "MSG_AccessingJavaIndex"), cancelled, true);
         return javaFile[0];
     }
 

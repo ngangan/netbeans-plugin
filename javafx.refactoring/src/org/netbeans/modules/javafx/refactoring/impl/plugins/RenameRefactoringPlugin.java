@@ -128,7 +128,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                     String oldFqn = edef.createHandle().getQualifiedName();
                     int pkgDelimitIndex = oldFqn.lastIndexOf(edef.getName());
                     String pkgname = oldFqn.substring(0, pkgDelimitIndex > 0 ? pkgDelimitIndex - 1 : 0);
-                    String newFqn = pkgname + "." + refactoring.getNewName();
+                    String newFqn = pkgname + "." + refactoring.getNewName(); // NOI18N
 
                     if (!ci.getDeclaredTypes(newFqn, ClassIndex.NameKind.EXACT, EnumSet.allOf(ClassIndex.SearchScope.class)).isEmpty()) {
                         msg = NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_ClassClash", new Object[] {refactoring.getNewName(), pkgname});
@@ -151,7 +151,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
         if (existing != null && primFile != existing) {
             // primFile != existing is check for case insensitive filesystems; #136434
             msg = NbBundle.getMessage(RenameRefactoringPlugin.class,
-                    "ERR_ClassClash", refactoring.getNewName(), folder.getPath());
+                    "ERR_ClassClash", refactoring.getNewName(), folder.getPath()); // NOI18N
         }
         fireProgressListenerStep();
         if (edef != null) {
@@ -197,7 +197,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
 
         for(ElementDef ed : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE))) {
             if (ed.getName().equals(refactoring.getNewName())) {
-                p = chainProblems(p, new Problem(true, "Can not rename to " + refactoring.getNewName() + " - it already exists."));
+                p = chainProblems(p, new Problem(true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_CanNotRenameExisting", refactoring.getNewName())));
             }
         }
 
@@ -248,7 +248,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                                     boolean fatal = false;
                                     for (ExecutableElement method : overridesMethods) {
                                         if (method.getModifiers().contains(Modifier.NATIVE)) {
-                                            p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method)));
+                                            p[0] = chainProblems(p[0], new Problem(false, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_RenameNative", method))); // NOI18N
                                         }
                                         Element parentClz = method.getEnclosingElement();
                                         while (parentClz != null && !parentClz.getKind().isClass() && !parentClz.getKind().isInterface()) {
@@ -259,7 +259,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                                             break;
                                         }
                                     }
-                                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fatal?"ERR_Overrides_Fatal":"ERR_Overrides");
+                                    String msg = NbBundle.getMessage(RenameRefactoringPlugin.class, fatal?"ERR_Overrides_Fatal":"ERR_Overrides"); // NOI18N
                                     p[0] = chainProblems(p[0], new Problem(fatal, msg));
                                     fireProgressListenerStep();
                                 }
@@ -350,7 +350,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                 }
 
                 protected String getRefactoringText() {
-                    return "Rename Occurences";
+                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "LBL_RenameOccurences", getElementDef().getName(), refactoring.getNewName()); // NOI18N
                 }
             };
             if (updateRefs.hasChanges()) {

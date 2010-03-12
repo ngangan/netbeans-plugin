@@ -54,6 +54,6 @@ public class ClassDef extends GlobalDef {
 
     @Override
     public String toString() {
-        return "class " + getName();
+        return "class " + getName(); // NOI18N
     }
 }

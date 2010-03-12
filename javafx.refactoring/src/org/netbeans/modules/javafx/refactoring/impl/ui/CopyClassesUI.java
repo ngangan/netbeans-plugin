@@ -50,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -61,7 +60,6 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.queries.VisibilityQuery;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
@@ -91,7 +89,7 @@ public class CopyClassesUI implements RefactoringUI, RefactoringUIBypass {
     private Collection<? extends FileObject> javaObjects;
     private CopyPanel panel;
     private MultipleCopyRefactoring refactoring;
-    private String targetPkgName = "";
+    private String targetPkgName = ""; // NOI18N
     private boolean disable;
     private FileObject targetFolder;
     private PasteType pasteType;
@@ -154,13 +152,13 @@ public class CopyClassesUI implements RefactoringUI, RefactoringUIBypass {
         if (cp!=null) {
             return cp.getResourceName(f, '.', false);
         } else {
-            Logger.getLogger(CopyClassesUI.class.getName()).info("Cannot find classpath for " + f.getPath());
+            Logger.getLogger(CopyClassesUI.class.getName()).info(NbBundle.getMessage(CopyClassesUI.class, "MSG_NoClasspath", f.getPath())); // NOI18N
             return f.getName();
         }
     }
 
     private String packageName () {
-        return targetPkgName.trim().length() == 0 ? getString ("LBL_DefaultPackage") : targetPkgName.trim ();
+        return targetPkgName.trim().length() == 0 ? getString ("LBL_DefaultPackage") : targetPkgName.trim (); // NOI18N
     }
     
     private Problem setParameters(boolean checkOnly) {
@@ -246,7 +244,7 @@ public class CopyClassesUI implements RefactoringUI, RefactoringUIBypass {
     // MovePanel ...............................................................
     class CopyPanel extends CopyClassPanel {
         public CopyPanel (final ChangeListener parent, String startPackage, String headLine) {
-            super(parent, headLine, startPackage, targetFolder != null ? targetFolder : (FileObject) javaObjects.iterator().next(), "" );
+            super(parent, headLine, startPackage, targetFolder != null ? targetFolder : (FileObject) javaObjects.iterator().next(), "" ); // NOI18N
             setCombosEnabled(!disable);
             JList list = new JList(getNodes());
             list.setCellRenderer(new NodeRenderer()); 

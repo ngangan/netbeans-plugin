@@ -141,7 +141,7 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
     @Override
     protected String getNewFileContent() {
         try {
-            StringBuilder content = new StringBuilder(srcFO.asText().replace("\r\n", "\n"));
+            StringBuilder content = new StringBuilder(srcFO.asText().replace("\r\n", "\n")); // NOI18N
 
             final Transformer t = Transformer.forText(content);
             if (t != null) {
@@ -150,7 +150,7 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
             }
         } catch (IOException e) {
         }
-        return "";
+        return ""; // NOI18N
     }
 
     final protected FileObject getSourceFO() {

@@ -14,7 +14,7 @@ final public class InsertTextTransformation extends Transformation {
 
     public InsertTextTransformation(int pos, String newText) {
         super(pos);
-        this.newText = newText != null ? newText : "";
+        this.newText = newText != null ? newText : ""; // NOI18N
     }
 
     @Override

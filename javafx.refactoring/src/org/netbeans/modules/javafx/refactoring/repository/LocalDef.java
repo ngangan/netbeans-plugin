@@ -63,7 +63,7 @@ public class LocalDef extends ElementDef {
     }
 
     public String getRefId() {
-        return getName() + "@" + getStartPos();
+        return getName() + "@" + getStartPos(); // NOI18N
     }
 
     @Override

@@ -128,6 +128,6 @@ public class Usage implements Referencable {
 
     @Override
     public String toString() {
-        return getDef().toString() + " [" + startPos + ", " + endPos + "]";
+        return getDef().toString() + " [" + startPos + ", " + endPos + "]"; // NOI18N
     }
 }

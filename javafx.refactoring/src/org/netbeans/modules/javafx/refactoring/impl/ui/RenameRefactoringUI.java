@@ -151,7 +151,7 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
     public CustomRefactoringPanel getPanel(ChangeListener parent) {
         if (panel == null) {
             String name = oldName;
-            String suffix = "";
+            String suffix = ""; // NOI18N
             boolean isType = true;
             if (elementDef != null) {
                 ElementKind kind = elementDef.getKind();
@@ -173,7 +173,7 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
                 }
             }
             suffix = suffix + " " + name; // NOI18N
-            panel = new RenamePanel(name, parent, NbBundle.getMessage(RenamePanel.class, "LBL_Rename") + " " + suffix, !fromListener, fromListener && !byPassPakageRename);
+            panel = new RenamePanel(name, parent, NbBundle.getMessage(RenamePanel.class, "LBL_Rename") + " " + suffix, !fromListener, fromListener && !byPassPakageRename); // NOI18N
         }
         return panel;
     }
@@ -240,7 +240,7 @@ public class RenameRefactoringUI implements RefactoringUI, RefactoringUIBypass {
             else if (k.isField())
                 postfix = ".Field";//NOI18N
             else
-                postfix = "";
+                postfix = ""; // NOI18N
         }
 
         return new HelpCtx(RenameRefactoringUI.class.getName() + postfix);

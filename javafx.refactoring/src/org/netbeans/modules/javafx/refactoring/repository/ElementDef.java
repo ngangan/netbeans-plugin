@@ -95,8 +95,8 @@ abstract public class ElementDef implements Referencable {
         this(name, kind, nestingKind, enclosingPkg, startPos, endPos, startFQN, endFQN, false, parent);
     }
 
-    final public static ElementDef NULL = new ElementDef("", ElementKind.OTHER, NestingKind.ANONYMOUS, "",  -1, -1, -1, -1, null){
-        final private ElementHandle NULL_HANDLE = new ElementHandle(ElementKind.OTHER, new String[]{""});
+    final public static ElementDef NULL = new ElementDef("", ElementKind.OTHER, NestingKind.ANONYMOUS, "",  -1, -1, -1, -1, null){ // NOI18N
+        final private ElementHandle NULL_HANDLE = new ElementHandle(ElementKind.OTHER, new String[]{""}); // NOI18N
         public String getRefId() {
             return "<null>"; // NOI18N
         }
@@ -212,7 +212,7 @@ abstract public class ElementDef implements Referencable {
         return hash;
     }
 
-        @Override
+    @Override
     public String toString() {
         return getRefId() + enclosing != null ? " (in " + enclosing.getSourceFile().getPath() + ")" : ""; // NOI18N
     }

@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 
 /**
@@ -145,11 +144,11 @@ public class ImportSet {
 
                 int pkgLen = typeOrigFQN.length() - typeSimple.length();
 
-                String fqnOrigPkg = pkgLen > 0 ? typeOrigFQN.substring(0, pkgLen -1) : "";
+                String fqnOrigPkg = pkgLen > 0 ? typeOrigFQN.substring(0, pkgLen -1) : ""; // NOI18N
                 pkgLen = typeFQN.length() - typeSimple.length();
 
                 if (pkgLen > 0) {
-                    String fqnPkg = pkgLen > 0 ? typeFQN.substring(0, pkgLen - 1) : "";
+                    String fqnPkg = pkgLen > 0 ? typeFQN.substring(0, pkgLen - 1) : ""; // NOI18N
                     TypeImportEntry tie = new TypeImportEntry(fqnPkg, typeFQN);
                     TypeImportEntry tieOrig = new TypeImportEntry(fqnOrigPkg, typeOrigFQN);
 
@@ -194,10 +193,10 @@ public class ImportSet {
                     int pkgLen = typeOrigFQN.length() - typeSimple.length();
 
                     if (pkgLen > 0) {
-                        String fqnOrigPkg = pkgLen > 0 ? typeOrigFQN.substring(0, pkgLen -1) : "";
+                        String fqnOrigPkg = pkgLen > 0 ? typeOrigFQN.substring(0, pkgLen -1) : ""; // NOI18N
                         pkgLen = typeFQN.length() - typeSimple.length();
 
-                        String fqnPkg = pkgLen > 0 ? typeFQN.substring(0, pkgLen - 1) : "";
+                        String fqnPkg = pkgLen > 0 ? typeFQN.substring(0, pkgLen - 1) : ""; // NOI18N
 
                         TypeImportEntry tie = new TypeImportEntry(fqnPkg, typeFQN);
                         TypeImportEntry tieOrig = new TypeImportEntry(fqnOrigPkg, typeOrigFQN);
@@ -222,11 +221,11 @@ public class ImportSet {
                 case METHOD:
                 case FIELD: {
                     String typeFQN = usg.getDef().createHandle().getSignatures()[0];
-                    TypeImportEntry tie = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1);
+                    TypeImportEntry tie = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1); // NOI18N
                     if (renames.containsKey(typeFQN)) {
                         typeFQN = renames.get(typeFQN);
                     }
-                    TypeImportEntry tieRenamed = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1);
+                    TypeImportEntry tieRenamed = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1); // NOI18N
                     for(Iterator<ImportEntry> iter=unused.iterator();iter.hasNext();) {
                         ImportEntry decl = iter.next();
                         if (renames.containsKey(decl.getTypeName())) {
@@ -247,7 +246,7 @@ public class ImportSet {
     }
 
     public boolean isImported(String packageName, String typeName) {
-        ImportEntry checking = new TypeImportEntry(packageName, packageName + "." + typeName);
+        ImportEntry checking = new TypeImportEntry(packageName, packageName + "." + typeName); // NOI18N
         for(ImportEntry ie : cm.getImports()) {
             if (ie.contains(checking)) {
                 return true;

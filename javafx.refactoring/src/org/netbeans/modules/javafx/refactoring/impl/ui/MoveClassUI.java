@@ -67,7 +67,7 @@ public class MoveClassUI implements RefactoringUI, RefactoringUIBypass {
     private FileObject javaObject;
     private MoveClassPanel panel;
     private MoveRefactoring refactoring;
-    private String targetPkgName = "";
+    private String targetPkgName = ""; // NOI18N
     private boolean disable;
     private FileObject targetFolder;
     private PasteType pasteType;

@@ -60,7 +60,7 @@ public class PackageImportEntry extends ImportEntry {
 
     @Override
     public String getTypeName() {
-        return "";
+        return ""; // NOI18N
     }
 
     @Override
@@ -70,7 +70,7 @@ public class PackageImportEntry extends ImportEntry {
 
     @Override
     public String toString() {
-        return "import " + getPackageName() + ".*";
+        return "import " + getPackageName() + ".*"; // NOI18N
     }
 
     @Override

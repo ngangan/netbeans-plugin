@@ -48,7 +48,7 @@
         <Component class="javax.swing.JCheckBox" name="searchInComments">
           <Properties>
             <Property name="selected" type="boolean" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="((Boolean) RefactoringModule.getOption(&quot;searchInComments.whereUsed&quot;, Boolean.FALSE)).booleanValue()" type="code"/>
+              <Connection code="((Boolean) RefactoringModule.getOption(java.util.ResourceBundle.getBundle(&quot;org/netbeans/modules/javafx/refactoring/impl/ui/Bundle&quot;).getString(&quot;SEARCHINCOMMENTS.WHEREUSED&quot;), Boolean.FALSE)).booleanValue()" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="org/netbeans/modules/javafx/refactoring/impl/ui/Bundle.properties" key="LBL_SafeDelInComents" replaceFormat="java.util.ResourceBundle.getBundle(&quot;{bundleNameSlashes}&quot;).getString(&quot;{key}&quot;)"/>

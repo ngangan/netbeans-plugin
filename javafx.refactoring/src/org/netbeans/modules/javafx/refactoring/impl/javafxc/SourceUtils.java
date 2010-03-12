@@ -301,7 +301,7 @@ final public class SourceUtils {
     }
 
     public static String getPackageName(FileObject folder) {
-        assert folder.isFolder() : "argument must be folder";
+        assert folder.isFolder() : "argument must be folder"; // NI18N
         ClassPath cp = ClassPath.getClassPath(folder, ClassPath.SOURCE);
         if (cp == null) {
             // see http://www.netbeans.org/issues/show_bug.cgi?id=159228
@@ -315,7 +315,7 @@ final public class SourceUtils {
         ExpressionTree name = unit.getPackageName();
         if (name==null) {
             //default package
-            return "";
+            return ""; // NOI18N
         }
         return name.toString();
     }
@@ -328,17 +328,17 @@ final public class SourceUtils {
         } catch (UnsupportedEncodingException u) {
             throw new IllegalArgumentException("Cannot create package name for url " + url); // NOI18N
         }
-        String suffix = "";
+        String suffix = ""; // NOI18N
 
         do {
             FileObject fo = FileUtil.toFileObject(f);
             if (fo != null) {
-                if ("".equals(suffix))
+                if (suffix.isEmpty())
                     return getPackageName(fo);
                 String prefix = getPackageName(fo);
                 return prefix + ("".equals(prefix)?"":".") + suffix; // NOI18N
             }
-            if (!"".equals(suffix)) {
+            if (!suffix.isEmpty()) {
                 suffix = "." + suffix; // NOI18N
             }
             try {
@@ -462,7 +462,7 @@ final public class SourceUtils {
         //If no cp found at all log the file and use nullPath since the ClasspathInfo.create
         //doesn't accept null compile or boot cp.
         if (compile == null) {
-            LOG.warning ("No classpath for: " + FileUtil.getFileDisplayName(files[0]) + " " + FileOwnerQuery.getOwner(files[0]));
+            LOG.warning (NbBundle.getMessage(SourceUtils.class, "MSG_NoClassPath", FileUtil.getFileDisplayName(files[0]), FileOwnerQuery.getOwner(files[0]))); // NOI18N
             compile = nullPath;
         }
         ClasspathInfo cpInfo = ClasspathInfo.create(boot, compile, rcp);
@@ -586,9 +586,9 @@ final public class SourceUtils {
                     waitTask.cancel();
                 }
             };
-            JLabel label = new JLabel(getString("MSG_WaitScan"), javax.swing.UIManager.getIcon("OptionPane.informationIcon"), SwingConstants.LEFT);
+            JLabel label = new JLabel(getString("MSG_WaitScan"), javax.swing.UIManager.getIcon("OptionPane.informationIcon"), SwingConstants.LEFT); // NOI18N
             label.setBorder(new EmptyBorder(12,12,11,11));
-            DialogDescriptor dd = new DialogDescriptor(label, actionName, true, new Object[]{getString("LBL_CancelAction", new Object[]{actionName})}, null, 0, null, listener);
+            DialogDescriptor dd = new DialogDescriptor(label, actionName, true, new Object[]{getString("LBL_CancelAction", new Object[]{actionName})}, null, 0, null, listener); // NOI18N
             waitDialog = DialogDisplayer.getDefault().createDialog(dd);
             waitDialog.pack();
             //100ms is workaround for 127536

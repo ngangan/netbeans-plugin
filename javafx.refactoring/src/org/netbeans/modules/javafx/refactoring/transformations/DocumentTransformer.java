@@ -73,7 +73,7 @@ public class DocumentTransformer extends Transformer {
                 return removed;
             } catch (BadLocationException e) {
             }
-            return "";
+            return ""; // NOI18N
         }
 
         public void replaceText(int pos, String oldText, String newText) {
@@ -106,7 +106,7 @@ public class DocumentTransformer extends Transformer {
         try {
             return doc.getText(0, doc.getLength());
         } catch (BadLocationException e) {
-            return "";
+            return ""; // NOI18N
         }
     }
 }

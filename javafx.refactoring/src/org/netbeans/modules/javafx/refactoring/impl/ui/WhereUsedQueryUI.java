@@ -171,16 +171,16 @@ public class WhereUsedQueryUI implements RefactoringUI {
                 case METHOD: {
                     String description = null;
                     if (panel.isMethodFindUsages()) {
-                        description = getString("DSC_FindUsages");
+                        description = getString("DSC_FindUsages"); // NOI18N
                     }
 
                     if (panel.isMethodOverriders()) {
                         if (description != null) {
-                            description += " " + getString("DSC_And") + " ";
+                            description += " " + getString("DSC_And") + " "; // NOI18N
                         } else {
-                            description = "";
+                            description = ""; // NOI18N
                         }
-                        description += getString("DSC_WhereUsedMethodOverriders");
+                        description += getString("DSC_WhereUsedMethodOverriders"); // NOI18N
                     }
 
                     description += " " + getString("DSC_WhereUsedOf", panel.getMethodDeclaringClass() + '.' + name); //NOI18N
@@ -191,14 +191,14 @@ public class WhereUsedQueryUI implements RefactoringUI {
                 case ENUM: {
                     if (!panel.isClassFindUsages())
                     if (!panel.isClassSubTypesDirectOnly()) {
-                    return getString("DSC_WhereUsedFindAllSubTypes", name);
+                    return getString("DSC_WhereUsedFindAllSubTypes", name); // NOI18N
                     } else {
-                    return getString("DSC_WhereUsedFindDirectSubTypes", name);
+                    return getString("DSC_WhereUsedFindDirectSubTypes", name); // NOI18N
                     }
                 }
             }
         }
-        return getString("DSC_WhereUsed", name);
+        return getString("DSC_WhereUsed", name); // NOI18N
     }
     
     private ResourceBundle bundle;

@@ -80,7 +80,7 @@ public class GlobalDef extends ElementDef {
 
     @Override
     public ElementHandle createHandle() {
-        StringTokenizer st = new StringTokenizer(refId, "#");
+        StringTokenizer st = new StringTokenizer(refId, "#"); // NOI18N
         int cnt = 0;
         switch (getKind()) {
             case PACKAGE:

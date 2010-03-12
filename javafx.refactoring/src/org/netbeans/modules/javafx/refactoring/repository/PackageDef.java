@@ -48,7 +48,7 @@ import javax.lang.model.element.ElementKind;
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
 public class PackageDef extends GlobalDef {
-    static public final PackageDef DEFAULT = new PackageDef("", -1, -1, -1, -1, null);
+    static public final PackageDef DEFAULT = new PackageDef("", -1, -1, -1, -1, null); // NOI81N
 
     public PackageDef(String name) {
         this(name, -1, -1, -1, -1, null);
@@ -61,9 +61,9 @@ public class PackageDef extends GlobalDef {
     @Override
     public String toString() {
         if (this == PackageDef.DEFAULT) {
-            return "<default>";
+            return "<default>"; // NOI18N
         }
-        return "package " + getName();
+        return "package " + getName(); /// NOI18N
     }
 
     @Override

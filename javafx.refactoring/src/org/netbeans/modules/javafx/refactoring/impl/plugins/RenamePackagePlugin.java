@@ -55,14 +55,14 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         if (f!=null) {
             String newName = ((RenameRefactoring) refactoring).getNewName();
             if (!SourceUtils.isValidPackageName(newName)) {
-                String msg = new MessageFormat(NbBundle.getMessage(RenamePackagePlugin.class, "ERR_InvalidPackage")).format(
+                String msg = new MessageFormat(NbBundle.getMessage(RenamePackagePlugin.class, "ERR_InvalidPackage")).format( // NOI18N
                         new Object[] {newName}
                 );
                 return new Problem(true, msg);
             }
 
             if (f.getParent().getFileObject(newName, f.getExt())!=null) {
-                String msg = new MessageFormat(NbBundle.getMessage(RenamePackagePlugin.class,"ERR_PackageExists")).format(
+                String msg = new MessageFormat(NbBundle.getMessage(RenamePackagePlugin.class,"ERR_PackageExists")).format( // NOI18N
                         new Object[] {newName}
                 );
                 return new Problem(true, msg);
@@ -77,8 +77,8 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
         if (!SourceUtils.isFileInOpenProject(file)) {
             preCheckProblem = chainProblems(preCheckProblem, new Problem(true, NbBundle.getMessage(
                     RenamePackagePlugin.class,
-                    "ERR_ProjectNotOpened",
-                FileUtil.getFileDisplayName(file))));
+                    NbBundle.getMessage(RenamePackagePlugin.class, "ERR_ProjectNotOpened", FileUtil.getFileDisplayName(file)))) // NOI18N
+            );
         }
         return preCheckProblem;
     }
@@ -111,7 +111,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                 }
 
                 protected String getRefactoringText() {
-                    return "Rename Package";
+                    return NbBundle.getMessage(RenamePackagePlugin.class, "LBL_RenamePackage", pd.getName(), targetPkgName); // NOI18N
                 }
             };
             if (ref.hasChanges()) {
@@ -136,7 +136,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                         }
 
                         protected String getRefactoringText() {
-                            return "Rename Occurences";
+                            return NbBundle.getMessage(RenamePackagePlugin.class, "LBL_RenameOccurences", sourcePkgName, targetPkgName); // NOI18N
                         }
                     };
                     if (bre.hasChanges()) {
@@ -187,12 +187,12 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     }
 
     private String concat(String s1, String s2, String s3) {
-        String result = "";
-        if (s1 != null && !"".equals(s1)) {
+        String result = ""; // NOI18N
+        if (s1 != null && s1.length() > 0) {
             result += s1 + "."; // NOI18N
         }
         result +=s2;
-        if (s3 != null && !"".equals(s3)) {
+        if (s3 != null && s3.length() > 0) {
             result += ("".equals(result)? "" : ".") + s3; // NOI18N
         }
         return result;

@@ -182,7 +182,7 @@ final public class ClassModelFactory {
                                     e.getSimpleName().toString(),
                                     e.getKind(),
                                     ((TypeElement)e).getNestingKind(),
-                                    pe != null ? pe.getQualifiedName().toString() : "",
+                                    pe != null ? pe.getQualifiedName().toString() : "", // NOI18N
                                     -1, -1, -1, -1,
                                     RefactoringSupport.getRefId(eh), p
                                 );
@@ -299,7 +299,7 @@ final public class ClassModelFactory {
                                     new GlobalDef(
                                         e.getSimpleName().toString(),
                                         e.getKind(),
-                                        pe != null ? pe.getQualifiedName().toString() : "",
+                                        pe != null ? pe.getQualifiedName().toString() : "", // NOI18N
                                         startPos, endPos, startPos, endPos,
                                         RefactoringSupport.getRefId(eh), p
                                     )
@@ -428,7 +428,7 @@ final public class ClassModelFactory {
 
             ExecutableElement ee = (ExecutableElement)cc.getTrees().getElement(getCurrentPath());
             ElementDef def  = getMethodDef(ee, p);
-            if (def != null && !def.getName().equals("javafx$run$")) {
+            if (def != null && !def.getName().equals("javafx$run$")) { // NOI18N
                 p.addDef(def);
                 p.addUsage(new Usage(def.getStartFQN(), def.getEndFQN(), def));
             }
@@ -493,7 +493,7 @@ final public class ClassModelFactory {
                             localCounter++,
                             name,
                             e.getKind(),
-                            pe != null ? pe.getQualifiedName().toString() : "",
+                            pe != null ? pe.getQualifiedName().toString() : "", // NOI18N
                             startPos, endPos, startFQN, endFQN,
                             p
                         );
@@ -501,7 +501,7 @@ final public class ClassModelFactory {
                         edef = new GlobalDef(
                             name,
                             e.getKind(),
-                            pe != null ? pe.getQualifiedName().toString() : "",
+                            pe != null ? pe.getQualifiedName().toString() : "", // NOI18N
                             startPos, endPos, startFQN, endFQN,
                             RefactoringSupport.getRefId(ElementHandle.create(e)),
                             p
@@ -529,14 +529,14 @@ final public class ClassModelFactory {
                     edef = new GlobalDef(
                         name,
                         e.getKind(),
-                        pe != null ? pe.getQualifiedName().toString() : "",
+                        pe != null ? pe.getQualifiedName().toString() : "", // NOI18N
                         startPos, endPos, startFQN, endFQN,
                         RefactoringSupport.getRefId(ElementHandle.create(e)),
                         p
                     );
                 }
             }
-            if (edef != null && !edef.getName().equals("javafx$run$")) {
+            if (edef != null && !edef.getName().equals("javafx$run$")) { // NOI18N
                 processFunctionDef(e, edef, p);
             }
             return edef;
@@ -561,7 +561,7 @@ final public class ClassModelFactory {
                     name,
                     te.getKind(),
                     te.getNestingKind(),
-                    pe != null ? pe.getQualifiedName().toString() : "",
+                    pe != null ? pe.getQualifiedName().toString() : "", // NOI18N
                     startPos, endPos, startFQN, startFQN + name.length(),
                     RefactoringSupport.getRefId(ElementHandle.create(te)),
                     isSynth,

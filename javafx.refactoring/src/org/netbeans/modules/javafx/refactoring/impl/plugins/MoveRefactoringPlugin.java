@@ -215,7 +215,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                             }
 
                             protected String getRefactoringText() {
-                                return "Remove Package Definition";
+                                return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_RemovePackage", oldPkgName); // NOI18N
                             }
                         };
                     } else {
@@ -228,7 +228,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 }
 
                                 protected String getRefactoringText() {
-                                    return "Add Package Definition";
+                                    return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_AddPackage", newPkgName); // NOI18N
                                 }
                             };
                         } else {
@@ -240,7 +240,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                                 }
 
                                 protected String getRefactoringText() {
-                                    return "Rename Package";
+                                    return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_RenamePackage", oldPkgName, newPkgName); // NOI18N
                                 }
                             };
                         }
@@ -267,7 +267,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     }
 
                     protected String getRefactoringText() {
-                        return "Fix Imports";
+                        return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_FixImports"); // NOI18N
                     }
                 };
                 if (fixImports.hasChanges()) {
@@ -302,7 +302,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                     }
 
                     protected String getRefactoringText() {
-                        return "Update References";
+                        return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_RenameOccurences", oldPkgName, newPkgName); // NOI18N
                     }
                 };
                 if (updateRefs.hasChanges()) {
@@ -325,7 +325,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         }
 
                         protected String getRefactoringText() {
-                            return "Fix Imports";
+                            return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_FixImports"); // NOI18N
                         }
                     };
                     if (fixImports.hasChanges()) {

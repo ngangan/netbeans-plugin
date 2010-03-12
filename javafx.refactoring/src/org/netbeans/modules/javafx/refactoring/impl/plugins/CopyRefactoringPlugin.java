@@ -150,7 +150,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     }
 
                     protected String getRefactoringText() {
-                        return "Remove Package Definition";
+                        return java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/plugins/Bundle").getString("REMOVE PACKAGE DEFINITION");
                     }
 
                     @Override
@@ -166,12 +166,12 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
-                            Transformation t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n");
+                            Transformation t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + "\n;"); // NOI18N
                             return Collections.singleton(t);
                         }
 
                         protected String getRefactoringText() {
-                            return "Add Package Definition";
+                            return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_AddPackage", newPkgName); // NOI18N
                         }
 
                         @Override
@@ -194,7 +194,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                         }
 
                         protected String getRefactoringText() {
-                            return "Rename Package";
+                            return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_RenamePackage", getSourcePackageName(), getTargetPackageName()); // NOI18N
                         }
 
                         @Override
@@ -225,7 +225,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     }
 
                     protected String getRefactoringText() {
-                        return "Fix Imports";
+                        return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_FixImports"); // NOI18N
                     }
 
                     @Override
@@ -273,7 +273,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                     }
 
                     protected String getRefactoringText() {
-                        return "Rename Class";
+                        return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_SetClassName", ((SingleCopyRefactoring)refactoring).getNewName()); // NOI18N
                     }
 
                     @Override
@@ -307,7 +307,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
             URL targetURL = null;
             if (refactoring instanceof SingleCopyRefactoring) {
                 targetURL = ((SingleCopyRefactoring) refactoring).getTarget().lookup(URL.class);
-                targetName = ((SingleCopyRefactoring)refactoring).getNewName() + ".fx";
+                targetName = ((SingleCopyRefactoring)refactoring).getNewName() + ".fx"; // NOI18N
             } else {
                 targetURL = ((MultipleCopyRefactoring) refactoring).getTarget().lookup(URL.class);
             }
@@ -333,17 +333,17 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                 public void run(final CompilationController cc) throws Exception {
                     JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
-                        private String clzName = "";
+                        private String clzName = ""; // NOI18N
                         @Override
                         public Void visitIdentifier(IdentifierTree node, Void p) {
                             Element e = cc.getTrees().getElement(getCurrentPath());
                             if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
                                 TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
-                                String message = "";
+                                String message = ""; // NOI18N
                                 if (e.getKind().isInterface() || e.getKind().isClass()) {
-                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()});
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()}); // NOI18N
                                 } else {
-                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()});
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()}); // NOI18N
                                 }
                                 problem[0] = createProblem(problem[0], false, message);
                             }
@@ -355,11 +355,11 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                             Element e = cc.getTrees().getElement(getCurrentPath());
                             if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
                                 TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
-                                String message = "";
+                                String message = ""; // NOI18N
                                 if (e.getKind().isInterface() || e.getKind().isClass()) {
-                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()});
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()}); // NOI18n
                                 } else {
-                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()});
+                                    message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature2", new Object[]{clzName, e.getSimpleName().toString(), topClass.getSimpleName().toString()}); // NOI18N
                                 }
                                 problem[0] = createProblem(problem[0], false, message);
                             }
