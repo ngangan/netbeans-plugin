@@ -180,8 +180,6 @@ class JavaFXActionProvider implements ActionProvider {
         commands.put(COMMAND_DEBUG_STEP_INTO, new String[] {"debug-stepinto"}); // NOI18N
 
         this.bkgScanSensitiveActions = new HashSet<String>(Arrays.asList(
-            COMMAND_RUN,
-            COMMAND_RUN_SINGLE,
             COMMAND_DEBUG,
             COMMAND_DEBUG_SINGLE,
             COMMAND_DEBUG_STEP_INTO
@@ -342,8 +340,7 @@ class JavaFXActionProvider implements ActionProvider {
 
         if (this.bkgScanSensitiveActions.contains(command)) {
             ScanDialog.runWhenScanFinished(action, NbBundle.getMessage (JavaFXActionProvider.class,"ACTION_"+command));   //NOI18N
-        }
-        else {
+        } else {
             action.run();
         }
     }

@@ -214,6 +214,6 @@ abstract public class ElementDef implements Referencable {
 
     @Override
     public String toString() {
-        return getRefId() + enclosing != null ? " (in " + enclosing.getSourceFile().getPath() + ")" : ""; // NOI18N
+        return getRefId() + (enclosing != null ? " (in " + enclosing.getSourceFile().getPath() + ")" : ""); // NOI18N
     }
 }
