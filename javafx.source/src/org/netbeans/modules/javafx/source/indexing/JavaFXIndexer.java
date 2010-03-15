@@ -66,12 +66,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -82,24 +84,28 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.ClassIndex;
+import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
+import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
-import org.netbeans.modules.javafx.source.tasklist.FXErrorAnnotator;
 import org.netbeans.modules.parsing.spi.indexing.Context;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
+import org.netbeans.modules.parsing.spi.indexing.ErrorsCache;
+import org.netbeans.modules.parsing.spi.indexing.ErrorsCache.Convertor;
+import org.netbeans.modules.parsing.spi.indexing.ErrorsCache.ErrorKind;
 import org.netbeans.modules.parsing.spi.indexing.Indexable;
 import org.netbeans.modules.parsing.spi.indexing.PathRecognizerRegistration;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexDocument;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
-import org.netbeans.spi.java.classpath.ClassPathProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
@@ -113,6 +119,18 @@ public class JavaFXIndexer extends CustomIndexer {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
     final public static String NAME = "fx";
     final public static int VERSION = 5;
+
+    static final Convertor<Diagnostic<?>> ERROR_CONVERTOR = new Convertor<Diagnostic<?>>() {
+        public ErrorKind getKind(Diagnostic<?> t) {
+            return t.getKind() == Diagnostic.Kind.ERROR ? ErrorKind.ERROR : ErrorKind.WARNING;
+        }
+        public int getLineNumber(Diagnostic<?> t) {
+            return (int) t.getLineNumber();
+        }
+        public String getMessage(Diagnostic<?> t) {
+            return t.getMessage(null);
+        }
+    };
 
     private class IndexingVisitor extends JavaFXTreePathScanner<Void, IndexDocument> {
         private CompilationController cc;
@@ -592,81 +610,62 @@ public class JavaFXIndexer extends CustomIndexer {
         }
     }// </editor-fold>
 
+    final private AtomicBoolean cancelled = new AtomicBoolean();
+
     @Override
     protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
-        Map<ClasspathInfo, Collection<FileObject>> map = new HashMap<ClasspathInfo, Collection<FileObject>>();
-        Map<FileObject, ClasspathInfo> cpInfoCache = new HashMap<FileObject, ClasspathInfo>();
+        final Map<FileObject, Indexable> indexables = new HashMap<FileObject, Indexable>();
+
+        cancelled.set(false);
 
         Iterator<? extends Indexable> iterator = itrbl.iterator();
-        if (iterator.hasNext()) {
-            while(iterator.hasNext()) {
-                try {
-                    Indexable ix = iterator.next();
-                    File f = new File(ix.getURL().toURI());
-                    FileObject fo = FileUtil.toFileObject(f);
-
-                    Project p = FileOwnerQuery.getOwner(fo);
-                    ClassPathProvider cpp = p.getLookup().lookup(ClassPathProvider.class);
-                    ClassPath cp = cpp.findClassPath(fo, ClassPath.SOURCE);
-
-                    FileObject root = cp.findOwnerRoot(fo);
-
-                    ClasspathInfo cpInfo = cpInfoCache.get(root);
-                    if (cpInfo == null) {
-                        cpInfo = ClasspathInfo.create(root);
-                        cpInfoCache.put(root, cpInfo);
-                    }
-                    Collection<FileObject> files = map.get(cpInfo);
-                    if (files == null) {
-                        files = new HashSet<FileObject>();
-                        map.put(cpInfo, files);
-                    }
-                    files.add(fo);
-                } catch (URISyntaxException e) {
-                }
+        while(iterator.hasNext()) {
+            try {
+                Indexable ix = iterator.next();
+                File f = new File(ix.getURL().toURI());
+                FileObject fo = FileUtil.toFileObject(f);
+                indexables.put(fo, ix);
+            } catch (URISyntaxException e) {
             }
         }
-        
-        for(Map.Entry<ClasspathInfo, Collection<FileObject>> entry : map.entrySet()) {
-            JavaFXSource jfxs = JavaFXSource.create(entry.getKey(), entry.getValue());
+
+        if (cntxt.getRoot() != null) {
+            ClasspathInfo cpInfo = ClasspathInfo.create(cntxt.getRoot());
+            final ClassIndex ci = cpInfo.getClassIndex();
+            JavaFXSource jfxs = JavaFXSource.create(cpInfo, indexables.keySet());
             try {
                 jfxs.runUserActionTask(new CancellableTask<CompilationController>() {
+                    private List<Diagnostic<? extends JavaFileObject>> getDiagnostics(CompilationController cc) {
+                        List<Diagnostic<? extends JavaFileObject>> dg = new ArrayList<Diagnostic<? extends JavaFileObject>>();
+                        for(Diagnostic d : cc.getDiagnostics()) {
+                            dg.add(d);
+                        }
+                        return dg;
+                    }
 
                     public void cancel() {
-                        // hooo
+                        cancelled.set(true);
                     }
 
                     public void run(CompilationController cc) throws Exception {
+                        Indexable ix = indexables.get(cc.getFileObject());
+                        if (ix != null) {
+                            ErrorsCache.setErrors(cntxt.getRootURI(), ix, getDiagnostics(cc), ERROR_CONVERTOR);
+                        }
                         if (!cntxt.isSupplementaryFilesIndexing()) {
                             IndexingSupport support = IndexingSupport.getInstance(cntxt);
                             IndexDocument document = support.createDocument(cc.getFileObject());
                             IndexingVisitor visitor = new IndexingVisitor(cc);
                             visitor.scan(cc.getCompilationUnit(), document);
                             support.addDocument(document);
-                        }
-                        FXErrorAnnotator.getInstance().process(cc,
-                                cntxt.isSupplementaryFilesIndexing()
-                                ? FXErrorAnnotator.ProcessRelatedFilesLambda.NULL
-                                : new FXErrorAnnotator.ProcessRelatedFilesLambda() {
-
-                            public void processRelatedFiles(FileObject topRoot, Collection<FileObject> files) {
-                                Set<URL> urls = new HashSet<URL>();
-                                try {
-                                    for (FileObject fo : files) {
-                                        try {
-                                            if (fo != null) {
-                                                urls.add(fo.getURL());
-                                            }
-                                        } catch (IOException e) {
-                                            LOG.log(Level.WARNING, null, e);
-                                        }
-                                    }
-                                    cntxt.addSupplementaryFiles(topRoot.getURL(), urls);
-                                } catch (IOException e) {
-                                    LOG.log(Level.WARNING, null, e);
-                                }
+                            for(TypeElement tte : cc.getTopLevelElements()) {
+                                if (cancelled.get()) return;
+                                reindexDependables(
+                                    ci.getResources(ElementHandle.create(tte), EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)),
+                                    cntxt
+                                );
                             }
-                        });
+                        }
                     }
                 }, false);
             } catch (IOException e) {
@@ -675,14 +674,29 @@ public class JavaFXIndexer extends CustomIndexer {
         }
     }
 
-    private void collectFxFiles(FileObject root, Collection<FileObject> files) {
-        for(FileObject fo : root.getChildren()) {
-            if (fo.isFolder()) {
-                collectFxFiles(fo, files);
-            } else if (fo.getExt().toLowerCase().equals("fx")) {
-                files.add(fo);
+    private void reindexDependables(Set<FileObject> dependables, Context cntxt) throws IOException {
+        Map<URL, Collection<URL>> supplementary = new HashMap<URL, Collection<URL>>();
+        for(FileObject fo : dependables) {
+            if (cancelled.get()) return;
+            URL root = getSrcRoot(fo);
+            Collection<URL> files = supplementary.get(root);
+            if (files == null) {
+                files = new LinkedList<URL>();
+                supplementary.put(root, files);
             }
+            files.add(fo.getURL());
         }
+
+        for(Map.Entry<URL, Collection<URL>> entry : supplementary.entrySet()) {
+            if (cancelled.get()) return;
+            cntxt.addSupplementaryFiles(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private URL getSrcRoot(FileObject fo) throws IOException {
+        ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+        FileObject root = cp.findOwnerRoot(fo);
+        return root.getURL();
     }
 
     private void index(IndexDocument document, IndexKey key, String value) {

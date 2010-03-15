@@ -511,6 +511,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 TypeMirror tm = trees.getTypeMirror(tp);
                 if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind())); // NOI18N
                 addMembers(tm, true, true);
+                addLocalAndImportedVars();
+                addLocalAndImportedFunctions();
             }
             if (k == JavaFXKind.BLOCK_EXPRESSION) {
                 addBlockExpressionLocals((BlockExpressionTree) t, tp, smart);
