@@ -235,11 +235,17 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     public void run() {
                         try {
                             document.insertString(positon, methods.toString(), null);
-                            JTextComponent target = HintsUtils.getEditorComponent(document);
+                            final JTextComponent target = HintsUtils.getEditorComponent(document);
                             if (target == null) {
                                 return;
                             }
-                            Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                            SwingUtilities.invokeLater(new Runnable() {
+
+                                public void run() {
+                                    Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                                }
+                            });
+
                             for (MethodSymbol method : abstractMethods) {
                                 addImport(target, method.asType());
                                 for (VarSymbol var : method.getParameters()) {
@@ -264,7 +270,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 addImport(target, type);
             }
 
-            private void addImport(JTextComponent target, Type type) {
+            private void addImport(final JTextComponent target, Type type) {
                 if (type == null) {
                     return;
                 }
@@ -277,8 +283,14 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     if (symbolMatcher.find()) {
                         importName = symbolMatcher.replaceAll("").trim(); //NOI18N
                     }
+                    final String processedImportName = importName;
                     if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
-                        Imports.addImport(target, importName);
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            public void run() {
+                                Imports.addImport(target, processedImportName);
+                            }
+                        });
                     }
                 }
             }
@@ -397,7 +409,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
 
         return FXSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) element);
     }
-    
+
     private static String getNativeArrayClassSimpleName(String fqName) {
         int start = fqName.lastIndexOf(".") + 1; //NOI18N
         if (start > 0) {

@@ -53,6 +53,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -268,12 +269,18 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         }
 
         public ChangeInfo implement() throws Exception {
-            JTextComponent target = HintsUtils.getEditorComponent(document);
+            final JTextComponent target = HintsUtils.getEditorComponent(document);
             if (target == null) {
                 return null;
             }
             document = null;
-            Imports.addImport(target, fqn);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                public void run() {
+                    Imports.addImport(target, fqn);
+                }
+            });
+            
 
             return null;
         }

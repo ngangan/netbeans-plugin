@@ -123,8 +123,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         }
 
         public void run(final CompilationController compilationController) throws Exception {
-            final FileObject fileObject = compilationController.getFileObject();
-            callback.setTasks(fileObject, getTasks(compilationController));
+            callback.setTasks(getTasks(compilationController));
         }
 
         private List<Task> getTasks(CompilationController compilationController) {

@@ -275,12 +275,18 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         if (kind != Kind.FUNCTION) {
                             return;
                         }
-                        JTextComponent target = HintsUtils.getEditorComponent(document);
+                        final JTextComponent target = HintsUtils.getEditorComponent(document);
                         if (target == null) {
                             LOGGER.severe("No GUI component for editor document " + document); //NOI18N
                             return;
                         }
-                        Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            public void run() {
+                                Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                            }
+                        });
+                        
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
