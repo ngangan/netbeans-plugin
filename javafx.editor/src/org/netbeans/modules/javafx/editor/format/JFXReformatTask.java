@@ -1191,6 +1191,7 @@ public class JFXReformatTask implements ReformatTask {
             int old = indent;
 
             // TODO work around for magic function modifiers compiler bug
+            // JFXC-3633
             if (magicOverridenFunc) { // even more magic!
                 // ---
                 JFXTokenId id = null;
@@ -1240,7 +1241,20 @@ public class JFXReformatTask implements ReformatTask {
 //            if (params != null && !params.isEmpty() && !magicOverridenFunc) {
             if (params != null && !params.isEmpty()) {
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0, true);
-                wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
+                // TODO work around for magic function modifiers compiler bug
+                // JFXC-4226
+                if (magicOverridenFunc) {
+                    accept(JFXTokenId.IDENTIFIER);
+                    processColon();
+                    accept(JFXTokenId.IDENTIFIER);
+                    accept(JFXTokenId.LBRACKET);
+                    if (cs.spaceWithinArrayInitBrackets()) {
+                        space();
+                    }
+                    accept(JFXTokenId.RBRACKET);
+                } else {
+                    wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
+                }
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
             }
             accept(JFXTokenId.RPAREN);
