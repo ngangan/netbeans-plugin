@@ -66,10 +66,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -98,8 +96,6 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.project.FileOwnerQuery;
-import org.netbeans.api.project.Project;
 import org.netbeans.modules.parsing.spi.indexing.Context;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
@@ -110,7 +106,6 @@ import org.netbeans.modules.parsing.spi.indexing.Indexable;
 import org.netbeans.modules.parsing.spi.indexing.PathRecognizerRegistration;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexDocument;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
-import org.netbeans.spi.java.classpath.ClassPathProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
@@ -699,10 +694,7 @@ public class JavaFXIndexer extends CustomIndexer {
     }
 
     private URL getSrcRoot(FileObject fo) throws IOException {
-        Project p = FileOwnerQuery.getOwner(fo);
-        ClassPathProvider cpp = p.getLookup().lookup(ClassPathProvider.class);
-        ClassPath cp = cpp.findClassPath(fo, ClassPath.SOURCE);
-
+        ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
         FileObject root = cp.findOwnerRoot(fo);
         return root.getURL();
     }
