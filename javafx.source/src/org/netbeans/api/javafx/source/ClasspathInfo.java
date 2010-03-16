@@ -287,6 +287,7 @@ public class ClasspathInfo {
                     // Kill FileManager
                     fileManager = null;
                 }
+                recalculateClassPaths();
                 fireChangeListenerStateChanged();
             }
         }
