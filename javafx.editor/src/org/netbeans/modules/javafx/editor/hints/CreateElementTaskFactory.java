@@ -92,6 +92,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
     private static final String JAVAFX_RUN = "public static synthetic function javafx$run$"; //NOI18N
+    private static final Kind[] EMPTY_KIND_ARRAY = {};
 
     public CreateElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -182,7 +183,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             return new Kind[]{Kind.FUNCTION}; //NOI18N
         }
 
-        throw new IllegalStateException();
+        return EMPTY_KIND_ARRAY;
     }
 
     private boolean isValidLocalVariable(final Diagnostic diagnostic, final CompilationInfo compilationInfo) {
@@ -274,12 +275,18 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         if (kind != Kind.FUNCTION) {
                             return;
                         }
-                        JTextComponent target = HintsUtils.getEditorComponent(document);
+                        final JTextComponent target = HintsUtils.getEditorComponent(document);
                         if (target == null) {
                             LOGGER.severe("No GUI component for editor document " + document); //NOI18N
                             return;
                         }
-                        Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            public void run() {
+                                Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
+                            }
+                        });
+                        
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

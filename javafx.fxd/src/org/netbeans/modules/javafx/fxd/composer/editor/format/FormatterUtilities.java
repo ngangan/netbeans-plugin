@@ -167,7 +167,7 @@ public class FormatterUtilities {
             return false;
         }
         ts.move(startOffset);
-        Token<FXDTokenId> t = TokenUtils.getNextNonWhiteFwd(ts);
+        Token<FXDTokenId> t = TokenUtils.getNextNonWhite(ts);
         if(t == null){
             return false;
         }
@@ -181,7 +181,7 @@ public class FormatterUtilities {
             throws BadLocationException {
 
         ts.move(startOffset);
-        Token<FXDTokenId> t = TokenUtils.getNextNonWhiteBwd(ts);
+        Token<FXDTokenId> t = TokenUtils.getPrevNonWhite(ts);
         if(t == null){
             return false;
         }
@@ -215,7 +215,7 @@ public class FormatterUtilities {
             if (!TokenUtils.isWhiteToken(ts.token())){
                 return Utilities.getFirstNonWhiteBwd(doc, offset);
             }
-            Token<FXDTokenId> t = TokenUtils.getNextNonWhiteBwd(ts);
+            Token<FXDTokenId> t = TokenUtils.getPrevNonWhite(ts);
             return t != null ? ts.offset() : -1;
 
         }

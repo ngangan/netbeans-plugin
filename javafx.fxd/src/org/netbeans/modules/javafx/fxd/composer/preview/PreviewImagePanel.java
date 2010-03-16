@@ -92,7 +92,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
 
     public JComponent getScenePanel() {
-        return getScenePanel(getScene());
+        if (getScene() != null){
+            return getScenePanel(getScene());
+        } else {
+            return null;
+        }
     }
 
     private JComponent getScenePanel(Scene scene) {
@@ -318,9 +322,14 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
 
         public void actionPerformed(ActionEvent e) {
             float zoom = m_dObj.getDataModel().getZoomRatio();
-            
+
+            JComponent scenePanel = getScenePanel();
+            if (scenePanel == null) {
+                return;
+            }
+
             Dimension panelSize = getParent().getSize();
-            Dimension sceneSize = getScenePanel().getSize();
+            Dimension sceneSize = scenePanel.getSize();
 
             double xRatio = (panelSize.getWidth() - 2 * ImageHolder.CROSS_SIZE) / 
                     (sceneSize.getWidth() / zoom);

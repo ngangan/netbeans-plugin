@@ -39,24 +39,20 @@
  * made subject to such option by the copyright holder.
  */
 package org.netbeans.modules.javafx.refactoring.impl.ui;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.util.Collection;
-import javax.lang.model.element.Element;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.RefactoringModule;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.api.SafeDeleteRefactoring;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 import org.openide.filesystems.FileObject;
@@ -64,17 +60,17 @@ import org.openide.awt.Mnemonics;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
-
 /**
  * Subclass of CustomRefactoringPanel representing the
  * Safe Delete refactoring UI
  * @author Bharath Ravikumar
  */
 public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
+
     private final transient SafeDeleteRefactoring refactoring;
     private boolean regulardelete;
     private ChangeListener parent;
-    
+
     /**
      * Creates new form RenamePanelName
      * @param refactoring The SafeDelete refactoring used by this panel
@@ -88,13 +84,13 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
         this.parent = parent;
         initComponents();
     }
-    
     private boolean initialized = false;
     private String methodDeclaringClass = null;
-    
+
     String getMethodDeclaringClass() {
         return methodDeclaringClass;
     }
+
     /**
      * Initialization method. Creates appropriate labels in the panel.
      */
@@ -103,78 +99,61 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
         //repeated invocation of SafeDelete follwing removal of references
         //to the element
         searchInComments.setEnabled(true);
-        
-        if (initialized) return;
-        
+
+        if (initialized) {
+            return;
+        }
+
         final String labelText;
-        
+
         Lookup lkp = refactoring.getRefactoringSource();
         NonRecursiveFolder folder = lkp.lookup(NonRecursiveFolder.class);
         Collection<? extends FileObject> files = lkp.lookupAll(FileObject.class);
-        final Collection<? extends ElementLocation> handles = lkp.lookupAll(ElementLocation.class);
+        final Collection<? extends ElementDef> defs = lkp.lookupAll(ElementDef.class);
         if (folder != null) {
             String pkgName = folder.getFolder().getNameExt().replace('/', '.');
             labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDelPkg", pkgName);
-        }else if (files.size()>1 && files.size() == handles.size()) {
+        } else if (files.size() > 1 && files.size() == defs.size()) {
             //delete multiple files
             if (regulardelete) {
-                labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_RegularDelete",handles.size());
+                labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_RegularDelete", defs.size());
             } else {
-                labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_Classes",handles.size());
+                labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_Classes", defs.size());
             }
-        } else if (handles.size()>1) {
-            labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_Classes",handles.size());
-        } else if (handles.size()==1) {
-          JavaFXSource s = JavaFXSource.forFileObject(handles.iterator().next().getSourceFile());
-          final String[] name = new String[1];
-          try {
-              s.runUserActionTask(new Task<CompilationController>() {
-                  public void cancel() {
-                  }
-                  
-                  public void run(CompilationController parameter) throws Exception {
-                      Element resolvedElement = handles.iterator().next().getElement(parameter);
-                      if (resolvedElement == null) {
-                          throw new NullPointerException(
-                                  "Please attach your {nb.userdir}/var/log/messages.log" + // NOI18N
-                                  " to http://www.netbeans.org/issues/show_bug.cgi?id=115462" + // NOI18N
-                                  "\nhandle: " + handles.iterator().next() + // NOI18N
-                                  "\nclasspath: " + parameter.getClasspathInfo()); // NOI18N
-                      }
-                      name[0] = resolvedElement.getSimpleName().toString();
-                  }
-              }, true);
-          } catch (IOException ioe) {
-              throw (RuntimeException) new RuntimeException().initCause(ioe);
-          }
-          if (regulardelete) {
-              labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_RegularDeleteElement",name[0]);
-          } else {
-              labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_Element",name[0]);
-          }
+        } else if (defs.size() > 1) {
+            labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_Classes", defs.size());
+        } else if (defs.size() == 1) {
+            ElementDef edef = defs.iterator().next();
+            if (regulardelete) {
+                labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_RegularDeleteElement", edef.getName());
+            } else {
+                labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDel_Element", edef.getName());
+            }
         } else {
             FileObject fileObject = files.iterator().next();
-            boolean isSingleFolderSelected = (files != null && files.size() == 1 
+            boolean isSingleFolderSelected = (files != null && files.size() == 1
                     && fileObject.isFolder());
             if (isSingleFolderSelected && !regulardelete) {
                 String folderName = fileObject.getName();
                 labelText = NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDelFolder", folderName);
-            }else{
-                labelText ="";
+            } else {
+                labelText = ""; // NOI18N
             }
         }
-        
+
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 if (regulardelete) {
                     safeDelete = new JCheckBox();
                     Mnemonics.setLocalizedText(safeDelete, NbBundle.getMessage(SafeDeletePanel.class, "LBL_SafeDelCheckBox"));
                     safeDelete.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(
                             SafeDeletePanel.class,
-                            "SafeDeletePanel.safeDelete.AccessibleContext.accessibleDescription"));
+                            "SafeDeletePanel.safeDelete.AccessibleContext.accessibleDescription")); // NOI18N
                     safeDelete.setMargin(new java.awt.Insets(2, 14, 2, 2));
                     searchInComments.setEnabled(false);
                     safeDelete.addItemListener(new ItemListener() {
+
                         public void itemStateChanged(ItemEvent evt) {
                             searchInComments.setEnabled(safeDelete.isSelected());
                             parent.stateChanged(null);
@@ -189,19 +168,19 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
         });
         initialized = true;
     }
-    
+
     @Override
     public void requestFocus() {
         super.requestFocus();
     }
 
     boolean isRegularDelete() {
-        if (safeDelete!=null) {
+        if (safeDelete != null) {
             return !safeDelete.isSelected();
         }
         return false;
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -236,7 +215,7 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
 
         add(checkBoxes, java.awt.BorderLayout.NORTH);
     }// </editor-fold>//GEN-END:initComponents
-    
+
     private void searchInCommentsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_searchInCommentsItemStateChanged
         // used for change default value for deleteInComments check-box.
         // The value is persisted and then used as default in next IDE run.
@@ -244,7 +223,6 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
         RefactoringModule.setOption("searchInComments.whereUsed", b); // NOI18N
         refactoring.setCheckInComments(b.booleanValue());
     }//GEN-LAST:event_searchInCommentsItemStateChanged
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup;
     private javax.swing.JPanel checkBoxes;
@@ -252,13 +230,13 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
     private javax.swing.JCheckBox searchInComments;
     // End of variables declaration//GEN-END:variables
     private javax.swing.JCheckBox safeDelete;
-    
+
     @Override
     public Dimension getPreferredSize() {
         Dimension orig = super.getPreferredSize();
-        return new Dimension(orig.width + 30 , orig.height + 30);
+        return new Dimension(orig.width + 30, orig.height + 30);
     }
-    
+
     /**
      * Indicates whether the element usage must be checked in comments
      * before deleting each element.
@@ -268,7 +246,7 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
     public boolean isSearchInComments() {
         return searchInComments.isSelected();
     }
-    
+
     public Component getComponent() {
         return this;
     }

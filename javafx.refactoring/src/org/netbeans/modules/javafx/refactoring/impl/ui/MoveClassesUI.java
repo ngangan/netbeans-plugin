@@ -47,9 +47,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 import javax.swing.JLabel;
@@ -86,10 +86,10 @@ import org.openide.util.lookup.Lookups;
 public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
     
     private List<FileObject> resources;
-    private Set<FileObject> javaObjects;
+    private Collection<? extends FileObject> javaObjects;
     private MovePanel panel;
     private MoveRefactoring refactoring;
-    private String targetPkgName = "";
+    private String targetPkgName = ""; // NOI18N
     private boolean disable;
     private FileObject targetFolder;
     private PasteType pasteType;
@@ -98,14 +98,15 @@ public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
         return NbBundle.getMessage(MoveClassUI.class, key);
     }
     
-    public MoveClassesUI(Set<FileObject> javaObjects) {
-        this(javaObjects, null, null);
+    public MoveClassesUI(MoveRefactoring refactoring) {
+        this(refactoring, null, null);
     }
 
-    public MoveClassesUI(Set<FileObject> javaObjects, FileObject targetFolder, PasteType paste) {
+    public MoveClassesUI(MoveRefactoring refactoring, FileObject targetFolder, PasteType paste) {
+        this.refactoring = refactoring;
         this.disable = targetFolder != null;
         this.targetFolder = targetFolder;
-        this.javaObjects=javaObjects;
+        this.javaObjects=refactoring.getRefactoringSource().lookupAll(FileObject.class);
         this.pasteType = paste;
         if (!disable) {
             resources = new ArrayList(javaObjects);
@@ -149,9 +150,9 @@ public class MoveClassesUI implements RefactoringUI, RefactoringUIBypass {
     private static String getDOPackageName(FileObject f) {
         ClassPath cp = ClassPath.getClassPath(f, ClassPath.SOURCE);
         if (cp!=null) {
-            return cp.getResourceName(f, '.', false);
+            return cp.getResourceName(f, '.', false); // NOI18N
         } else {
-            Logger.getLogger("org.netbeans.modules.refactoring.java").info("Cannot find classpath for " + f.getPath());
+            Logger.getLogger(MoveClassesUI.class.getName()).info(NbBundle.getMessage(MoveClassesUI.class, "MSG_NoClasspath", f.getPath())); // NOI18N
             return f.getName();
         }
     }

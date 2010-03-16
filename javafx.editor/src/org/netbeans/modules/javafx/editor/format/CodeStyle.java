@@ -296,6 +296,10 @@ public final class CodeStyle {
         return preferences.getBoolean(alignMultilineAssignment, getDefaultAsBoolean(alignMultilineAssignment));
     }
 
+    public boolean alignSequenceInit() {
+        return preferences.getBoolean(alignSequenceInit, getDefaultAsBoolean(alignSequenceInit));
+    }
+
     public boolean placeElseOnNewLine() {
         return preferences.getBoolean(placeElseOnNewLine, getDefaultAsBoolean(placeElseOnNewLine));
     }
@@ -329,16 +333,6 @@ public final class CodeStyle {
         return WrapStyle.valueOf(wrap);
     }
 
-    public WrapStyle wrapThrowsKeyword() {
-        String wrap = preferences.get(wrapThrowsKeyword, getDefaultAsString(wrapThrowsKeyword));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapThrowsList() {
-        String wrap = preferences.get(wrapThrowsList, getDefaultAsString(wrapThrowsList));
-        return WrapStyle.valueOf(wrap);
-    }
-
     public WrapStyle wrapMethodCallArgs() {
         String wrap = preferences.get(wrapFunctionCallArgs, getDefaultAsString(wrapFunctionCallArgs));
         return WrapStyle.valueOf(wrap);
@@ -351,11 +345,6 @@ public final class CodeStyle {
 
     public WrapStyle wrapSequenceInit() {
         String wrap = preferences.get(wrapSequenceInit, getDefaultAsString(wrapSequenceInit));
-        return WrapStyle.valueOf(wrap);
-    }
-
-    public WrapStyle wrapFor() {
-        String wrap = preferences.get(wrapFor, getDefaultAsString(wrapFor));
         return WrapStyle.valueOf(wrap);
     }
 
@@ -440,10 +429,6 @@ public final class CodeStyle {
 
     // Spaces ------------------------------------------------------------------
     
-    public boolean spaceBeforeWhile() {
-        return preferences.getBoolean(spaceBeforeWhile, getDefaultAsBoolean(spaceBeforeWhile));
-    }
-
     public boolean spaceBeforeElse() {
         return preferences.getBoolean(spaceBeforeElse, getDefaultAsBoolean(spaceBeforeElse));
     }
@@ -500,8 +485,8 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceAroundBinaryOps, getDefaultAsBoolean(spaceAroundBinaryOps));
     }
 
-    public boolean spaceAroundTernaryOps() {
-        return preferences.getBoolean(spaceAroundIfElseOps, getDefaultAsBoolean(spaceAroundIfElseOps));
+    public boolean spaceAroundRangeOps() {
+        return preferences.getBoolean(spaceAroundRangeOps, getDefaultAsBoolean(spaceAroundRangeOps));
     }
 
     public boolean spaceAroundAssignOps() {
@@ -512,7 +497,7 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeClassDeclLeftBrace, getDefaultAsBoolean(spaceBeforeClassDeclLeftBrace));
     }
 
-    public boolean spaceBeforeMethodDeclLeftBrace() {
+    public boolean spaceBeforeFunctionDeclLeftBrace() {
         return preferences.getBoolean(spaceBeforeFunctionDeclLeftBrace, getDefaultAsBoolean(spaceBeforeFunctionDeclLeftBrace));
     }
 
@@ -548,14 +533,6 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeForLeftBrace, getDefaultAsBoolean(spaceBeforeForLeftBrace));
     }
 
-    public boolean spaceBeforeDoLeftBrace() {
-        return preferences.getBoolean(spaceBeforeDoLeftBrace, getDefaultAsBoolean(spaceBeforeDoLeftBrace));
-    }
-
-    public boolean spaceBeforeSwitchLeftBrace() {
-        return preferences.getBoolean(spaceBeforeSwitchLeftBrace, getDefaultAsBoolean(spaceBeforeSwitchLeftBrace));
-    }
-
     public boolean spaceBeforeTryLeftBrace() {
         return preferences.getBoolean(spaceBeforeTryLeftBrace, getDefaultAsBoolean(spaceBeforeTryLeftBrace));
     }
@@ -568,15 +545,7 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceBeforeFinallyLeftBrace, getDefaultAsBoolean(spaceBeforeFinallyLeftBrace));
     }
 
-    public boolean spaceBeforeSynchronizedLeftBrace() {
-        return preferences.getBoolean(spaceBeforeSynchronizedLeftBrace, getDefaultAsBoolean(spaceBeforeSynchronizedLeftBrace));
-    }
-
-    public boolean spaceBeforeStaticInitLeftBrace() {
-        return preferences.getBoolean(spaceBeforeStaticInitLeftBrace, getDefaultAsBoolean(spaceBeforeStaticInitLeftBrace));
-    }
-
-    public boolean spaceBeforeArrayInitLeftBrace() {
+    public boolean spaceBeforeSequenceInitLeftBrace() {
         return preferences.getBoolean(spaceBeforeSequenceInitLeftBrace, getDefaultAsBoolean(spaceBeforeSequenceInitLeftBrace));
     }
 
@@ -584,11 +553,11 @@ public final class CodeStyle {
         return preferences.getBoolean(spaceWithinParens, getDefaultAsBoolean(spaceWithinParens));
     }
 
-    public boolean spaceWithinMethodDeclParens() {
+    public boolean spaceWithinFunctionDeclParens() {
         return preferences.getBoolean(spaceWithinFunctionDeclParens, getDefaultAsBoolean(spaceWithinFunctionDeclParens));
     }
 
-    public boolean spaceWithinMethodCallParens() {
+    public boolean spaceWithinFunctionCallParens() {
         return preferences.getBoolean(spaceWithinFunctionCallParens, getDefaultAsBoolean(spaceWithinFunctionCallParens));
     }
 
@@ -638,10 +607,6 @@ public final class CodeStyle {
 
     public boolean spaceAfterColon() {
         return preferences.getBoolean(spaceAfterColon, getDefaultAsBoolean(spaceAfterColon));
-    }
-
-    public boolean spaceAfterTypeCast() {
-        return preferences.getBoolean(spaceAfterTypeCast, getDefaultAsBoolean(spaceAfterTypeCast));
     }
 
     // Imports -----------------------------------------------------------------

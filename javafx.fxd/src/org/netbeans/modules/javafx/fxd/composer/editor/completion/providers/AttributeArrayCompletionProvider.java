@@ -50,8 +50,7 @@ import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**
- *
- * @author avk
+ * @author Andrey Korostelev
  */
 public class AttributeArrayCompletionProvider extends AbstractCompletionProvider {
 
@@ -59,28 +58,26 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
 
     @Override
     protected void fillCompletionItems(CompletionResultSet resultSet, DocumentElement el, int caretOffset, TokenSequence<FXDTokenId> ts) {
-        //resultSet.addItem(new FXDCompletionItem("NOT READY " + el.getName() + "[" + el.getType() + "]", caretOffset));
 
         FXDTokenId prev = getPrevNonWhiteID(el, caretOffset, ts);
         FXDTokenId next = getNextNonWhiteID(el, caretOffset, ts);
-        LOG.warning("ATTR_ARR PREV = " + prev + ", NEXT = " + next);
 
         if (prev == null && next == FXDTokenId.IDENTIFIER_ATTR) {
             // move ts to next non-white token. DO NOT REMOVE
-            TokenUtils.getNextNonWhiteFwd(ts, caretOffset);
+            TokenUtils.getNextNonWhite(ts, caretOffset);
             if (ts.offset() < caretOffset) {
                 // inside identifier
-                processAttrId(resultSet, el, caretOffset);
+                processArrElemId(resultSet, el, caretOffset);
             } else {
                 // before identifier
                 processParentDocElement(resultSet, el, caretOffset, ts);
             }
         } else if (prev == FXDTokenId.IDENTIFIER_ATTR && next == FXDTokenId.COLON) {
             // move ts to previous non-white token
-            Token<FXDTokenId> prevT = TokenUtils.getNextNonWhiteBwd(ts, caretOffset);
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id before :
-                processAttrId(resultSet, el, caretOffset);
+                processArrElemId(resultSet, el, caretOffset);
             } else {
                 // between id and :
                 // nothing to suggest?
@@ -94,11 +91,11 @@ public class AttributeArrayCompletionProvider extends AbstractCompletionProvider
         } else if (next != FXDTokenId.UNKNOWN) {
             // between { and }, but not before error
             //suggest possible attribute_array values
-            processAttrValue(resultSet, el, caretOffset);
+            processAttrArrayValue(resultSet, el, caretOffset, ts);
         }
     }
 
-    private void processAttrId(final CompletionResultSet resultSet,
+    private void processArrElemId(final CompletionResultSet resultSet,
             DocumentElement el, int caretOffset) {
         String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
         DocumentElement parent = el.getParentElement();

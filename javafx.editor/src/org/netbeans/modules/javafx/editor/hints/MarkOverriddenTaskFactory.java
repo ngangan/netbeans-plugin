@@ -106,7 +106,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                                 fqnString = classSymbol.getInterfaces().iterator().next().toString();
                             } else {
                                 for (Type classType : classSymbol.getInterfaces()) {
-                                    fqnString = getOwnerClass(classType.asElement().enclClass(), (MethodSymbol) element);
+                                    fqnString = getOwnerClassName(classType.asElement().enclClass(), (MethodSymbol) element);
                                     if (fqnString != null) {
                                         break;
                                     }
@@ -132,8 +132,11 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 clear();
             }
 
-            private String getOwnerClass(ClassSymbol classSymbol, MethodSymbol methodSymbol) {
+            private String getOwnerClassName(ClassSymbol classSymbol, MethodSymbol methodSymbol) {
                 String fqnType = null;
+                if (classSymbol == null || classSymbol.getEnclosedElements() == null) {
+                    return null;
+                }
                 for (Symbol symbol : classSymbol.getEnclosedElements()) {
                     if (symbol instanceof MethodSymbol) {
                         MethodSymbol method = (MethodSymbol) symbol;
@@ -156,7 +159,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 }
 
                 for (Type classType : classSymbol.getInterfaces()) {
-                    fqnType = getOwnerClass(classType.asElement().enclClass(), methodSymbol);
+                    fqnType = getOwnerClassName(classType.asElement().enclClass(), methodSymbol);
                 }
 
                 return fqnType;

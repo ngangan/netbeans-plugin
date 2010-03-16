@@ -267,6 +267,11 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
     protected void addMembers(final TypeMirror type,
             final boolean methods, final boolean fields,
             final String textToAdd, JavafxcScope scope,boolean statics, boolean instance) {
+        addMembers(type, methods, fields, textToAdd, scope, statics, instance, false);
+    }
+    protected void addMembers(final TypeMirror type,
+            final boolean methods, final boolean fields,
+            final String textToAdd, JavafxcScope scope,boolean statics, boolean instance, boolean inImport) {
         if (LOGGABLE) log("addMembers: " + type); // NOI18N
         if (type == null || type.getKind() != TypeKind.DECLARED) {
             if (LOGGABLE) log("RETURNING: type.getKind() == " + (type != null ? type.getKind() : " type is null")); // NOI18N
@@ -405,7 +410,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             JavaFXCompletionItem.createExecutableItem(
                             (ExecutableElement) member,
                             (ExecutableType) member.asType(),
-                            query.anchorOffset, isInherited, isDeprecated, false, false));
+                            query.anchorOffset, isInherited, isDeprecated, inImport, false));
                     }
                 }
             } else if (fields && member.getKind() == ElementKind.FIELD) {
@@ -444,6 +449,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         addLocalMembersAndVars(smart);
         addLocalAndImportedTypes(null, null, null, false, smart);
         addLocalAndImportedFunctions();
+        addLocalAndImportedVars();
+        addPseudoVariables();
     }
 
     protected void addMemberConstantsAndTypes(final TypeMirror type, final Element elem) throws IOException {
@@ -504,6 +511,8 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 TypeMirror tm = trees.getTypeMirror(tp);
                 if (LOGGABLE) log("  tm == " + tm + " ---- tm.getKind() == " + (tm == null ? "null" : tm.getKind())); // NOI18N
                 addMembers(tm, true, true);
+                addLocalAndImportedVars();
+                addLocalAndImportedFunctions();
             }
             if (k == JavaFXKind.BLOCK_EXPRESSION) {
                 addBlockExpressionLocals((BlockExpressionTree) t, tp, smart);
@@ -1399,6 +1408,28 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                                 (ExecutableElement) local,
                                 (ExecutableType) local.asType(),
                                 query.anchorOffset, false, false, false, false));
+                    }
+                }
+            }
+            scope = scope.getEnclosingScope();
+        }
+    }
+
+    protected void addLocalAndImportedVars() {
+        if (LOGGABLE) log("addLocalAndImportedVars"); // NOI18N
+        JavafxcScope scope = controller.getTreeUtilities().getScope(path);
+        while (scope != null) {
+            if (LOGGABLE) log("  scope == " + scope); // NOI18N
+            for (Element local : scope.getLocalElements()) {
+                if (LOGGABLE) log("    local == " + local); // NOI18N
+                String name = local.getSimpleName().toString();
+                if (name.contains("$")) { // NOI18N
+                    continue;
+                }
+                if (local.getKind() == ElementKind.FIELD) {
+                    if (JavaFXCompletionProvider.startsWith(name, prefix) && !name.contains("$")) { // NOI18N
+                        addResult(JavaFXCompletionItem.createVariableItem(local.asType(), name,
+                                query.anchorOffset, false));
                     }
                 }
             }

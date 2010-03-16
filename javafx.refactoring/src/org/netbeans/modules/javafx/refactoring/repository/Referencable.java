@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -38,28 +38,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl;
+
+package org.netbeans.modules.javafx.refactoring.repository;
 
 /**
- * @author Jan Becicka
- * @see WhereUsedQuery#putValue
- * @see WhereUsedQuery#getBooleanValue
+ *
+ * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public enum WhereUsedQueryConstants {
-    /**
-     * Find overriding methods
-     */
-    FIND_OVERRIDING_METHODS,
-    /**
-     * Find All Sublcasses recursively
-     */
-    FIND_SUBCLASSES,
-    /**
-     * Find only direct subclasses
-     */
-    FIND_DIRECT_SUBCLASSES,
-    /**
-     * Search from base class
-     */
-    SEARCH_FROM_BASECLASS;
+public interface Referencable {
+    public String getRefId();
 }

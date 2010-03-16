@@ -71,11 +71,13 @@ import org.netbeans.api.java.source.BuildArtifactMapper.ArtifactsUpdated;
 import org.netbeans.api.java.source.SourceUtils;
 import org.netbeans.api.queries.FileBuiltQuery;
 import org.netbeans.api.queries.FileBuiltQuery.Status;
-import org.netbeans.modules.javafx.source.usages.fcs.FileChangeSupport;
-import org.netbeans.modules.javafx.source.usages.fcs.FileChangeSupportEvent;
-import org.netbeans.modules.javafx.source.usages.fcs.FileChangeSupportListener;
 import org.netbeans.spi.queries.FileBuiltQueryImplementation;
+import org.openide.filesystems.FileAttributeEvent;
+import org.openide.filesystems.FileChangeAdapter;
+import org.openide.filesystems.FileChangeListener;
+import org.openide.filesystems.FileEvent;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileRenameEvent;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.ChangeSupport;
@@ -510,7 +512,7 @@ public class BuildArtifactMapperImpl {
                 if (l == null) {
                     file2Listener.put(tagFile, new WeakReference<FileChangeListenerImpl>(l = new FileChangeListenerImpl()));
                     listener2File.put(l, tagFile);
-                    FileChangeSupport.DEFAULT.addListener(l, tagFile);
+                    FileUtil.addFileChangeListener(l);
                 }
                 
                 file2Status.put(file, new WeakReference<Status>(result = new FileBuiltQueryStatusImpl(delegate, tagFile, l)));
@@ -563,24 +565,27 @@ public class BuildArtifactMapperImpl {
         
     }
 
-    private static final class FileChangeListenerImpl implements FileChangeSupportListener {
+    private static final class FileChangeListenerImpl extends FileChangeAdapter {
 
         private RequestProcessor NOTIFY = new RequestProcessor(FileChangeListenerImpl.class.getName());
         
         private Set<ChangeListener> notify = new WeakSet<ChangeListener>();
+
+        @Override
+        public void fileChanged(FileEvent fe) {
+            notifyListeners();
+        }
+
+        @Override
+        public void fileDataCreated(FileEvent fe) {
+            notifyListeners();
+        }
+
+        @Override
+        public void fileFolderCreated(FileEvent fe) {
+            notifyListeners();
+        }
         
-        public void fileCreated(FileChangeSupportEvent event) {
-            notifyListeners();
-        }
-
-        public void fileDeleted(FileChangeSupportEvent event) {
-            notifyListeners();
-        }
-
-        public void fileModified(FileChangeSupportEvent event) {
-            notifyListeners();
-        }
-
         private synchronized void addListener(ChangeListener l) {
             notify.add(l);
         }

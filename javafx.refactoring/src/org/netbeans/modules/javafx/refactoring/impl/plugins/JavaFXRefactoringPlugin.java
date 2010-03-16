@@ -150,7 +150,7 @@ abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter im
                 }
             }, true);
         } catch (IOException e) {
-            problem[0] = new Problem(true, e.getLocalizedMessage() != null ? e.getLocalizedMessage() : "");
+            problem[0] = new Problem(true, e.getLocalizedMessage() != null ? e.getLocalizedMessage() : java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/plugins/Bundle").getString(""));
         }
         return problem[0];
     }

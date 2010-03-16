@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -39,21 +39,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.source.usages.fcs;
-import java.util.EventListener;
+package org.netbeans.modules.javafx.refactoring.repository;
+
+import javax.lang.model.element.ElementKind;
 
 /**
- * Listener for changes in file existence and/or contents.
- * Unlike the Filesystems API, renames etc. are not considered special;
- * the "file" is identified uniquely by its path, not an object.
- * @author Jesse Glick
+ *
+ * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public interface FileChangeSupportListener extends EventListener {
+public class ClassDef extends GlobalDef {
+    public ClassDef(String name,  String fqn, String enclosingPkg, int startPos, int endPos, int startFQN, int endFQN, ClassModel parent) {
+        super(name, ElementKind.CLASS, enclosingPkg, startPos, endPos, startFQN, endFQN, fqn, parent);
+    }
 
-    void fileCreated(FileChangeSupportEvent event);
-
-    void fileDeleted(FileChangeSupportEvent event);
-
-    void fileModified(FileChangeSupportEvent event);
-
+    @Override
+    public String toString() {
+        return "class " + getName(); // NOI18N
+    }
 }

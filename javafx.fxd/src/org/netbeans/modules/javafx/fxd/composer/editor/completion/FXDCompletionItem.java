@@ -46,6 +46,7 @@ import com.sun.javafx.tools.fxd.schema.model.Enumeration;
 import com.sun.javafx.tools.fxd.schema.model.Function;
 import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
 import com.sun.javafx.tools.fxd.schema.model.Property;
+import com.sun.javafx.tools.fxd.schema.model.Value;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -120,20 +121,27 @@ public class FXDCompletionItem implements CompletionItem {
         //Completion.get().hideAll();
     }
 
-    protected void substituteText(JTextComponent c, final int offset, 
+    protected void substituteText(JTextComponent c, int offset,
             int len, final String text) {
         final BaseDocument doc = (BaseDocument) c.getDocument();
         try {
             String tx = doc.getText(0, doc.getLength());
-            len = getSubstitutionLenght(tx, offset, len);
+            int lenAfter = getSubstitutionLenghtAfter(tx, offset, len);
+            int lenBefore = getSubstitutionLenghtBefore(tx, offset, text);
+            
+            offset = offset - lenBefore;
+            len = lenBefore + lenAfter;
         } catch (BadLocationException e) {
         }
-        final int length = len;
-        doc.runAtomic (new Runnable () {
-            public void run () {
+
+        final int replaceLength = len;
+        final int replaceOffset = offset;
+        doc.runAtomic(new Runnable() {
+
+            public void run() {
                 try {
-                    doc.remove(offset, length);
-                    doc.insertString(m_startOffset, text, null);
+                    doc.remove(replaceOffset, replaceLength);
+                    doc.insertString(replaceOffset, text, null);
                 } catch (BadLocationException e) {
                     // Can't update
                 }
@@ -231,11 +239,17 @@ public class FXDCompletionItem implements CompletionItem {
 
     private static String createDisplayText(AbstractSchemaElement element) {
         if (element instanceof Property) {
-            return element.id;
+            Property prop = (Property) element;
+            if (prop.isStatic && prop.parent != null) {
+                return createDisplayText(prop.parent) + '.' + prop.id;
+            }
+            return prop.id;
         } else if (element instanceof Function) {
             return element.id;
         } else if (element instanceof Enumeration) {
-            return element.id;
+            return splitFullName(element.id)[1];
+        } else if (element instanceof Value){
+            return createDisplayText(element.parent) + '.' + element.id;
         } else if (element instanceof PrimitiveType){
             return element.id;
         } else if (element instanceof Element) {
@@ -247,15 +261,19 @@ public class FXDCompletionItem implements CompletionItem {
     private static String createText(AbstractSchemaElement element) {
         if (element instanceof Property) {
             Property prop = (Property) element;
-            String text = prop.id;
-            if (prop.defaultValue != null){
-                text += " : " + defaultValueToString(prop); // NOI18N
+            if (prop.isStatic && prop.parent != null) {
+                return createText(prop.parent) + '.' + prop.id;
             }
-            return text;
+            if (prop.defaultValue != null) {
+                return prop.id + " : " + defaultValueToString(prop); // NOI18N
+            }
+            return prop.id;
         } else if (element instanceof Function) {
             return element.id;
         } else if (element instanceof Enumeration) {
-            return element.id;
+            return splitFullName(element.id)[1];
+        } else if (element instanceof Value){
+            return createDisplayText(element.parent) + '.' + element.id;
         } else if (element instanceof PrimitiveType){
             return getPrimitiveTypeDefValue((PrimitiveType)element);
         } else if (element instanceof Element) {
@@ -281,7 +299,7 @@ public class FXDCompletionItem implements CompletionItem {
         }
     }
 
-    private static int getSubstitutionLenght(final String text, final int offset, int length) {
+    private static int getSubstitutionLenghtAfter(final String text, final int offset, int length) {
         if (text == null) {
             return length;
         }
@@ -301,6 +319,20 @@ public class FXDCompletionItem implements CompletionItem {
             ret = length;
         }
         return ret;
+    }
+    
+    private int getSubstitutionLenghtBefore(String docText, int offset, String text) {
+        String docStart = docText.substring(0, offset);
+        int len = text.length();
+        if (len < 1) {
+            return 0;
+        }
+        for (int i = 1; i < len; i++) {
+            if (docStart.endsWith(text.substring(0, i))) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     public static String[] splitFullName(String classFullName) {

@@ -42,16 +42,15 @@ package org.netbeans.modules.javafx.refactoring.impl.ui;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.swing.event.ChangeListener;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
-import org.netbeans.modules.javafx.refactoring.impl.WhereUsedQueryConstants;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
+import org.netbeans.modules.refactoring.java.api.WhereUsedQueryConstants;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 import org.netbeans.modules.refactoring.spi.ui.RefactoringUI;
+import org.openide.filesystems.FileObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
@@ -66,16 +65,26 @@ public class WhereUsedQueryUI implements RefactoringUI {
     private WhereUsedQuery query = null;
     private final String name;
     private WhereUsedPanel panel;
-    private final ElementLocation location;
-    private ElementKind kind;
+    private ElementDef edef;
+    private FileObject sourceFo;
     private AbstractRefactoring delegate;
 
-    public WhereUsedQueryUI(ElementLocation location, CompilationInfo info) {
-        this.query = new WhereUsedQuery(Lookups.singleton(location));
-        this.location = location;
-        Element e = location.getElement(info);
-        name = e.getSimpleName().toString();
-        kind = e.getKind();
+    public WhereUsedQueryUI(WhereUsedQuery query) {
+        this.query = query;
+        
+        edef = query.getRefactoringSource().lookup(ElementDef.class);
+        sourceFo = query.getContext().lookup(FileObject.class);
+        name = edef.getName();
+    }
+
+    public WhereUsedQueryUI(ElementDef def, ClassModelFactory factory, FileObject srcFile) {
+        this.query = new WhereUsedQuery(Lookups.fixed(def));
+        this.query.getContext().add(srcFile);
+        this.query.getContext().add(factory);
+        
+        edef = def;
+        name = edef.getName();
+        sourceFo = srcFile;
     }
     
 //    public WhereUsedQueryUI(TreePathHandle tph, String name, AbstractRefactoring delegate) {
@@ -91,19 +100,21 @@ public class WhereUsedQueryUI implements RefactoringUI {
 
     public CustomRefactoringPanel getPanel(ChangeListener parent) {
         if (panel == null) {
-            panel = new WhereUsedPanel(name, location, parent);
+            panel = new WhereUsedPanel(name, edef, sourceFo, parent);
         }
         return panel;
     }
 
     public org.netbeans.modules.refactoring.api.Problem setParameters() {
         query.putValue(WhereUsedQuery.SEARCH_IN_COMMENTS,panel.isSearchInComments());
-        switch (kind) {
+        switch (edef.getKind()) {
             case METHOD: {
                 setForMethod();
                 return query.checkParameters();    
             }
-            case CLASS: {
+            case CLASS:
+            case INTERFACE:
+            case ENUM: {
                 setForClass();
                 return query.checkParameters();
             }
@@ -119,7 +130,7 @@ public class WhereUsedQueryUI implements RefactoringUI {
 //        } else {
 //            query.setRefactoringSource(Lookups.singleton(handle));
 //        }
-        query.setRefactoringSource(Lookups.singleton(location));
+        query.setRefactoringSource(Lookups.singleton(edef));
 
         query.putValue(WhereUsedQueryConstants.FIND_OVERRIDING_METHODS,panel.isMethodOverriders());
         query.putValue(WhereUsedQuery.FIND_REFERENCES,panel.isMethodFindUsages());
@@ -133,12 +144,14 @@ public class WhereUsedQueryUI implements RefactoringUI {
     }
     
     public org.netbeans.modules.refactoring.api.Problem checkParameters() {
-        switch(kind) {
+        switch(edef.getKind()) {
             case METHOD: {
                 setForMethod();
                 return query.fastCheckParameters();
             }
-            case CLASS: {
+            case CLASS:
+            case INTERFACE:
+            case ENUM: {
                 setForClass();
                 return query.fastCheckParameters();
             }
@@ -154,36 +167,38 @@ public class WhereUsedQueryUI implements RefactoringUI {
 
     public String getDescription() {
         if (panel!=null) {
-            switch(kind) {
+            switch(edef.getKind()) {
                 case METHOD: {
                     String description = null;
                     if (panel.isMethodFindUsages()) {
-                        description = getString("DSC_FindUsages");
+                        description = getString("DSC_FindUsages"); // NOI18N
                     }
 
                     if (panel.isMethodOverriders()) {
                         if (description != null) {
-                            description += " " + getString("DSC_And") + " ";
+                            description += " " + getString("DSC_And") + " "; // NOI18N
                         } else {
-                            description = "";
+                            description = ""; // NOI18N
                         }
-                        description += getString("DSC_WhereUsedMethodOverriders");
+                        description += getString("DSC_WhereUsedMethodOverriders"); // NOI18N
                     }
 
                     description += " " + getString("DSC_WhereUsedOf", panel.getMethodDeclaringClass() + '.' + name); //NOI18N
                     return description;
                 }
-                case CLASS: {
+                case CLASS:
+                case INTERFACE:
+                case ENUM: {
                     if (!panel.isClassFindUsages())
                     if (!panel.isClassSubTypesDirectOnly()) {
-                    return getString("DSC_WhereUsedFindAllSubTypes", name);
+                    return getString("DSC_WhereUsedFindAllSubTypes", name); // NOI18N
                     } else {
-                    return getString("DSC_WhereUsedFindDirectSubTypes", name);
+                    return getString("DSC_WhereUsedFindDirectSubTypes", name); // NOI18N
                     }
                 }
             }
         }
-        return getString("DSC_WhereUsed", name);
+        return getString("DSC_WhereUsed", name); // NOI18N
     }
     
     private ResourceBundle bundle;

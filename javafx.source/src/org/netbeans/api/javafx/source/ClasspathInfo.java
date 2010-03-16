@@ -65,6 +65,7 @@ import org.openide.util.WeakListeners;
  * @author nenik
  */
 public class ClasspathInfo {
+    public static final String FX_SOURCE = "classpath/fxsource"; // NOI18N
 
     private static final ClassPath EMPTY_PATH = ClassPathSupport.createClassPath(new URL[0]);
     
@@ -81,7 +82,8 @@ public class ClasspathInfo {
     public static ClasspathInfo create(FileObject fo) {
         ClassPath bootPath = ClassPath.getClassPath(fo, ClassPath.BOOT);
         ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
-        ClassPath srcPath = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+        ClassPath srcPath = ClassPathSupport.createProxyClassPath(ClassPath.getClassPath(fo, ClassPath.SOURCE), ClassPath.getClassPath(fo, FX_SOURCE));
+
         if (bootPath == null) {
             //javac requires at least java.lang
             bootPath = JavaFXPlatform.getDefaultFXPlatform().getBootstrapLibraries();
@@ -285,6 +287,7 @@ public class ClasspathInfo {
                     // Kill FileManager
                     fileManager = null;
                 }
+                recalculateClassPaths();
                 fireChangeListenerStateChanged();
             }
         }

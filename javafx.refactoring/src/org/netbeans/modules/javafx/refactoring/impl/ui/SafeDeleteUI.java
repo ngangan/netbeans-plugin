@@ -48,8 +48,6 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.queries.VisibilityQuery;
-import org.netbeans.modules.javafx.refactoring.impl.ElementLocation;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.SafeDeleteRefactoring;
@@ -64,8 +62,6 @@ import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
-import org.openide.util.lookup.Lookups;
-import org.openide.util.lookup.ProxyLookup;
 
 /**
  * A CustomRefactoringUI subclass that represents Safe Delete
@@ -75,7 +71,7 @@ public class SafeDeleteUI implements RefactoringUI, RefactoringUIBypass{
     
     private final SafeDeleteRefactoring refactoring;
     
-    private Object[] elementsToDelete;
+    private Collection<? extends FileObject> elementsToDelete;
     
     private SafeDeletePanel panel;
     
@@ -87,10 +83,9 @@ public class SafeDeleteUI implements RefactoringUI, RefactoringUIBypass{
      * @param selectedElements An array of selected Elements that need to be 
      * safely deleted
      */
-    public SafeDeleteUI(FileObject[] selectedElements, Collection<ElementLocation> handles, boolean regulardelete) {
-        this.elementsToDelete = selectedElements;
-        refactoring = new SafeDeleteRefactoring(new ProxyLookup(Lookups.fixed(elementsToDelete), Lookups.fixed(handles.toArray(new Object[handles.size()]))));
-        refactoring.getContext().add(SourceUtils.getClasspathInfoFor(selectedElements));
+    public SafeDeleteUI(SafeDeleteRefactoring refactoring, boolean regulardelete) {
+        this.refactoring = refactoring;
+        this.elementsToDelete = refactoring.getRefactoringSource().lookupAll(FileObject.class);
         this.regulardelete = regulardelete;
     }
 
@@ -99,16 +94,8 @@ public class SafeDeleteUI implements RefactoringUI, RefactoringUIBypass{
      * @param selectedElements An array of selected Elements that need to be 
      * safely deleted
      */
-    public SafeDeleteUI(ElementLocation[] selectedElements) {
-        this.elementsToDelete = selectedElements;
-        refactoring = new SafeDeleteRefactoring(Lookups.fixed(elementsToDelete));
-        refactoring.getContext().add(SourceUtils.getClasspathInfoFor(selectedElements[0].getSourceFile()));
-    }
-
-    public SafeDeleteUI(NonRecursiveFolder nonRecursiveFolder, boolean regulardelete) {
-        refactoring = new SafeDeleteRefactoring(Lookups.fixed(nonRecursiveFolder));
-        refactoring.getContext().add(SourceUtils.getClasspathInfoFor(nonRecursiveFolder.getFolder()));
-        this.regulardelete = regulardelete;
+    public SafeDeleteUI(SafeDeleteRefactoring refactoring) {
+        this(refactoring, false);
     }
     
     /**
