@@ -145,7 +145,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         break;
                     case PACKAGE:
                         PackageElement pe = controller.getElements().getPackageElement(fullName(exp));
-                        addPackageContent(pe, EnumSet.of(ElementKind.PACKAGE), null, false);
+                        if (pe != null) addPackageContent(pe, EnumSet.of(ElementKind.PACKAGE), null, false);
                         break;
                     default:
                         if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
