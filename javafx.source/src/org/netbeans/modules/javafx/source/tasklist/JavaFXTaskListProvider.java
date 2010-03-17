@@ -50,7 +50,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -187,7 +186,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                     }
                 };
                 projectDirs.put(projectDir, listener);
-                //projectDir.addRecursiveListener(listener);
+                projectDir.addRecursiveListener(listener);
             }
 
             updateTasks(fileObject, callback, 20000);
