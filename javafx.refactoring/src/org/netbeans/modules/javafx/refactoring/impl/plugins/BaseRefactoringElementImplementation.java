@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.Position.Bias;
@@ -88,7 +89,6 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
                 DataObject dobj = DataObject.find(srcFO);
                 DataEditorSupport des = (DataEditorSupport) dobj.getCookie(EditorCookie.class);
                 pb = new PositionBounds(des.createPositionRef(0, Bias.Forward), des.createPositionRef(des.openDocument().getLength(), Bias.Forward));
-                getTransformations();
             } catch (IOException ex) {
                 LOGGER.log(Level.SEVERE, null, ex);
                 pb = null;
@@ -118,18 +118,21 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
     }
 
     private BackupFacility.Handle backupHandle = null;
+    final private AtomicBoolean performed = new AtomicBoolean(false);
 
     final public void performChange() {
-        FileObject targetFO = getTargetFO();
-        if (targetFO != null) {
-            try {
-                backupHandle = shouldBackup ? BackupFacility.getDefault().backup(targetFO) : null;
-                final Transformer t = Transformer.forFileObject(targetFO, session);
-                if (t != null) {
-                    t.transform(getTransformations());
+        if (performed.compareAndSet(false, true)) {
+            FileObject targetFO = getTargetFO();
+            if (targetFO != null) {
+                try {
+                    backupHandle = shouldBackup ? BackupFacility.getDefault().backup(targetFO) : null;
+                    final Transformer t = Transformer.forFileObject(targetFO, session);
+                    if (t != null) {
+                        t.transform(getTransformations());
+                    }
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, null, e);
                 }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, null, e);
             }
         }
     }

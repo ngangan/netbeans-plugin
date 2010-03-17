@@ -54,7 +54,8 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFilesElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
@@ -325,7 +326,8 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
         for(FileObject file : files) {
             fireProgressListenerStep();
             if (!SourceUtils.isJavaFXFile(file)) continue;
-            BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(file, bag.getSession()) {
+
+            RenameOccurencesElement updateRefs = new RenameOccurencesElement(edef.getName(), refactoring.getNewName(), file, bag.getSession()) {
 
                 @Override
                 protected Set<Transformation> prepareTransformations(FileObject fo) {
@@ -344,21 +346,15 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                         }
                     }
                     for(Usage usg : usages) {
-                        transformations.add(new ReplaceTextTransformation(usg.getStartPos(), usg.getDef().getName(), refactoring.getNewName()));
+                       transformations.add(new ReplaceTextTransformation(usg.getStartPos(), getOldName(), getNewName()));
                     }
                     return transformations;
-                }
-
-                protected String getRefactoringText() {
-                    return NbBundle.getMessage(RenameRefactoringPlugin.class, "LBL_RenameOccurences", getElementDef().getName(), refactoring.getNewName()); // NOI18N
                 }
             };
             if (updateRefs.hasChanges()) {
                 bag.add(refactoring, updateRefs);
-            }
-
-            if (file.equals(fo)) {
-                bag.addFileChange(refactoring, new ReindexFilesElement(file, files));
+            } else if (!file.equals(fo)) {
+                bag.addFileChange(refactoring, new ReindexFileElement(file));
             }
         }
         fireProgressListenerStop();

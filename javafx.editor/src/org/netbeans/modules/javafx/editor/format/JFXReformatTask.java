@@ -47,6 +47,8 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.*;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -2490,18 +2492,19 @@ public class JFXReformatTask implements ReformatTask {
                 int old = indent;
                 indent += continuationIndentSize;
 
-                accept(ReformatUtils.STRING_LITERALS); // accept first
-                index = tokens.index();
-                c = col;
-                d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
-                    spaces(0, true);
-                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
-                        spaces(0, true);
-                    }
-                } else {
-                    rollback(index, c, d);
-                }
+//                accept(ReformatUtils.STRING_LITERALS); // accept first
+//                index = tokens.index();
+//                c = col;
+//                d = diffs.isEmpty() ? null : diffs.getFirst();
+//                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
+//                    spaces(0, true);
+//                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+//                        spaces(0, true);
+//                    }
+//                } else {
+//                    rollback(index, c, d);
+//                }
+                processStringLiteral(node);
 
                 indent = old;
             } else {
@@ -3931,6 +3934,29 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
             return accepted;
+        }
+
+        private void processStringLiteral(LiteralTree node) {
+            int offset = tokens.offset();
+            String astText = (String) node.getValue();
+            String docText = fText.substring(offset, endPos);
+
+            Pattern pattern = Pattern.compile("\".*?\""); // NOI18N
+            Matcher matcher = pattern.matcher(docText);
+            int i = offset;
+            while (matcher.find()) {
+                String part = matcher.group();
+                i += part.length();
+                tokens.move(i);
+                spaces(0, true);
+            }
+
+//            do {
+//                col += tokens.token().length();
+//            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
         }
 
         private static class FakeBlock extends JFXBlock {

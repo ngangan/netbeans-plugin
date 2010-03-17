@@ -54,6 +54,8 @@ import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixImportsElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
@@ -141,74 +143,29 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
             if (refactoring instanceof MultipleCopyRefactoring) {
                 reb.add(refactoring, new CopyFile(fobj, reb.getSession()));
             }
-            if (newPkgName == null || newPkgName.length() == 0) {
-                BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
-                    @Override
-                    protected Set<Transformation> prepareTransformations(FileObject fo) {
-                        Transformation t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
-                        return Collections.singleton(t);
-                    }
-
-                    protected String getRefactoringText() {
-                        return java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/plugins/Bundle").getString("REMOVE PACKAGE DEFINITION");
-                    }
-
-                    @Override
-                    protected FileObject getTargetFO() {
-                        return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
-                    }
-                };
-                if (ref.hasChanges()) {
-                        reb.add(refactoring, ref);
-                    }
-            } else {
-                if (cm.getPackageDef() == PackageDef.DEFAULT) {
-                    BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
+            BaseRefactoringElementImplementation ref = null;
+            if (!cm.getPackageDef().getName().equals(newPkgName)) {
+                ref = new UpdatePackageDeclarationElement(cm.getPackageDef().getName(), newPkgName, fobj, reb.getSession()) {
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
-                            Transformation t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + "\n;"); // NOI18N
+                            Transformation t;
+                            if (isOldDefault()) {
+                                t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
+                            } else if (isNewDefault()) {
+                                t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n"); // NOI18N
+                            } else {
+                                t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), getOldPkgName(), getNewPkgName());
+                            }
                             return Collections.singleton(t);
                         }
-
-                        protected String getRefactoringText() {
-                            return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_AddPackage", newPkgName); // NOI18N
-                        }
-
-                        @Override
-                        protected FileObject getTargetFO() {
-                            return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
-                        }
                     };
-                    if (ref.hasChanges()) {
-                        reb.add(refactoring, ref);
-                    }
-                } else {
-                    BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
-                        @Override
-                        protected Set<Transformation> prepareTransformations(FileObject fo) {
-                            if (!cm.getPackageDef().getName().equals(newPkgName)) {
-                                Transformation t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), cm.getPackageDef().getName(), newPkgName);
-                                return Collections.singleton(t);
-                            }
-                            return Collections.EMPTY_SET;
-                        }
-
-                        protected String getRefactoringText() {
-                            return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_RenamePackage", getSourcePackageName(), getTargetPackageName()); // NOI18N
-                        }
-
-                        @Override
-                        protected FileObject getTargetFO() {
-                            return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
-                        }
-                    };
-                    if (ref.hasChanges()) {
-                        reb.add(refactoring, ref);
-                    }
-                }
             }
+            if (ref != null && ref.hasChanges()) {
+                reb.add(refactoring, ref);
+            }
+            
             if (!getSourcePackageName().equals(getTargetPackageName())) {
-                BaseRefactoringElementImplementation fixImports = new BaseRefactoringElementImplementation(fobj, reb.getSession(), false) {
+                FixImportsElement fixImports = new FixImportsElement(fobj, reb.getSession(), false) {
 
                     @Override
                     protected Set<Transformation> prepareTransformations(FileObject fo) {
@@ -222,10 +179,6 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
                         is.setPkgName(newPkgName);
                         fixImports(movingDefs, is, refCm, true, transformations);
                         return transformations;
-                    }
-
-                    protected String getRefactoringText() {
-                        return NbBundle.getMessage(CopyRefactoringPlugin.class, "LBL_FixImports"); // NOI18N
                     }
 
                     @Override
