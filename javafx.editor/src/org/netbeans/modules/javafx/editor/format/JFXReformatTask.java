@@ -769,7 +769,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeFields());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 if (isLastMemberOfSuchKind(i, treeArray, kind)) {
                                     blankLines(cs.getBlankLinesAfterFields());
@@ -783,7 +783,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeMethods());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 blankLines(cs.getBlankLinesAfterMethods());
                             }
@@ -794,7 +794,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeNonClassExpression());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 blankLines(cs.getBlankLinesAfterNonClassExpression());
                             }
@@ -803,7 +803,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(1);
                             }
-                            processClassMembers(Arrays.asList(new Tree[] {tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[] {tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 if (isLastMemberOfSuchKind(i, treeArray, kind)) {
                                     blankLines(1);
@@ -944,7 +944,7 @@ public class JFXReformatTask implements ReformatTask {
                         indent = old;
                     }
                     blankLines(cs.getBlankLinesAfterClassHeader());
-                    processClassMembers(node.getClassMembers(), p, false);
+                    processClassMembers(node.getClassMembers(), p, false, true);
                     if (lastBlankLinesTokenIndex < 0) {
                         newline();
                     }
@@ -954,17 +954,18 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.RBRACE);
                 indent = old;
             } else {
-                processClassMembers(node.getClassMembers(), p, false);
+                processClassMembers(node.getClassMembers(), p, false, true);
             }
             return true;
         }
 
-        private void processClassMembers(List<Tree> members, Void p, boolean isLastInCU) {
+        private void processClassMembers(List<Tree> members, Void p, boolean isLastInCU, boolean ignoreTopLevel) {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : members) {
-                if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
-                    // this class has been already processed in visitCompilationUnit()
+//                if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
+                if (ignoreTopLevel && cuTrees != null && cuTrees.contains(member)) {
+                    // this member has been already processed in visitCompilationUnit()
                     continue;
                 }
 
