@@ -15,6 +15,9 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
@@ -84,69 +87,64 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
-        fireProgressListenerStart(RenameRefactoring.INIT, 1);
+        fireProgressListenerStart(RenameRefactoring.INIT, 3);
         FileObject packageFolder = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
         final String targetPkgName = getTargetPackageName(packageFolder);
         final String sourcePkgName = getSourcePackageName(packageFolder);
 
         Set<FileObject> relevantFiles = new HashSet<FileObject>();
 
-        collectRelevantFiles(packageFolder, relevantFiles);
         fireProgressListenerStep();
+        collectRelevantFiles(packageFolder, relevantFiles);
         fireProgressListenerStop();
         
-        fireProgressListenerStart(RenameRefactoring.PREPARE, relevantFiles.size() * 3);
+        fireProgressListenerStart(RenameRefactoring.PREPARE, relevantFiles.size());
+        Set<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
         for(FileObject file : relevantFiles) {
             ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
             final PackageDef pd = cm.getPackageDef();
-            BaseRefactoringElementImplementation ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
+            UpdatePackageDeclarationElement ref = new UpdatePackageDeclarationElement(pd.getName(), targetPkgName, file, reb.getSession()) {
 
                 @Override
                 protected Set<Transformation> prepareTransformations(FileObject fo) {
                     Set<Transformation> transformations = new HashSet<Transformation>();
                     if (pd.getName().equals(sourcePkgName)) {
-                        transformations.add(new ReplaceTextTransformation(pd.getStartFQN(), pd.getName(), targetPkgName));
+                        transformations.add(new ReplaceTextTransformation(pd.getStartFQN(), getOldPkgName(), getNewPkgName()));
                     }
                     return transformations;
                 }
-
-                protected String getRefactoringText() {
-                    return NbBundle.getMessage(RenamePackagePlugin.class, "LBL_RenamePackage", pd.getName(), targetPkgName); // NOI18N
-                }
             };
-            if (ref.hasChanges()) {
-                reb.add(refactoring, ref);
-            }
-            fireProgressListenerStep();
-
+            refelems.add(ref);
+            
             final ClassIndex index = RefactoringSupport.classIndex(refactoring);
             fireProgressListenerStep();
             for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
-                    BaseRefactoringElementImplementation bre = new BaseRefactoringElementImplementation(referenced, reb.getSession()) {
+                    RenameOccurencesElement bre = new RenameOccurencesElement(sourcePkgName, targetPkgName, referenced, reb.getSession()) {
 
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Set<Transformation> transformations = new HashSet<Transformation>();
                             ClassModel rcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                             for(Usage usg : rcm.getUsages(pd)) {
-                                transformations.add(new ReplaceTextTransformation(usg.getStartPos(), sourcePkgName, targetPkgName));
+                                transformations.add(new ReplaceTextTransformation(usg.getStartPos(), getOldName(), getNewName()));
                             }
                             return transformations;
                         }
-
-                        protected String getRefactoringText() {
-                            return NbBundle.getMessage(RenamePackagePlugin.class, "LBL_RenameOccurences", sourcePkgName, targetPkgName); // NOI18N
-                        }
                     };
-                    if (bre.hasChanges()) {
-                        reb.add(refactoring, bre);
-                    }
+                    refelems.add(bre);
                 }
             }
             fireProgressListenerStep();
         }
-        fireProgressListenerStop();
+        for(BaseRefactoringElementImplementation ref : refelems) {
+            if (ref.hasChanges()) {
+                reb.add(refactoring, ref);
+            } else if (SourceUtils.isJavaFXFile(ref.getParentFile())) {
+                reb.add(refactoring, new ReindexFileElement(ref.getParentFile()));
+            }
+        }
+        
         return null;
     }
 

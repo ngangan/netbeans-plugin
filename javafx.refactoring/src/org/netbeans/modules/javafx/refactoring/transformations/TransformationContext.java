@@ -104,9 +104,9 @@ final public class TransformationContext {
         if (changeDiff == 0) return;
 
         if (changeDiff > 0) {
-            offset = offset + oldLen - 1;
+            offset = offset + oldLen;
         } else {
-            offset = offset + newLen - 1;
+            offset = offset + newLen;
         }
         changes.add(new Change(offset, changeDiff));
         synchronized(sortedLock) {

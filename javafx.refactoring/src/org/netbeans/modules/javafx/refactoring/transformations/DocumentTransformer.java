@@ -104,7 +104,7 @@ public class DocumentTransformer extends Transformer {
 
     private static String getText(AbstractDocument doc) {
         try {
-            return doc.getText(0, doc.getLength());
+            return doc.getText(0, doc.getLength()).replace("\r\n", "\n");
         } catch (BadLocationException e) {
             return ""; // NOI18N
         }

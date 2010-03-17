@@ -81,9 +81,11 @@ public class CompilerIndependentJFXIndentTask implements IndentTask {
         int indent = IndentUtils.lineIndent(document, prevElement.getStartOffset());
         if (startOffset > 1) {
             String prevChar = document.getText(startOffset - 2, 1);
-            int tabSize = IndentUtils.tabSize(document);
+            int indentLevelSize = IndentUtils.indentLevelSize(document);
+//            int tabSize = IndentUtils.tabSize(document);
             if (prevChar.equals("{") || prevChar.equals("[")) { // NOI18N
-                indent += tabSize;
+//                indent += tabSize;
+                indent += indentLevelSize;
 //            } else if (prevChar.equals("}") && indent >= tabSize) { // NOI18N
 //                indent -= tabSize;
             }
@@ -92,7 +94,7 @@ public class CompilerIndependentJFXIndentTask implements IndentTask {
     }
 
     public ExtraLock indentLock() {
-        return null;
+        return JavaFXReformatExtraLock.getInstance();
     }
 
 }

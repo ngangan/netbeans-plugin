@@ -679,12 +679,14 @@ public class JavaFXIndexer extends CustomIndexer {
         for(FileObject fo : dependables) {
             if (cancelled.get()) return;
             URL root = getSrcRoot(fo);
-            Collection<URL> files = supplementary.get(root);
-            if (files == null) {
-                files = new LinkedList<URL>();
-                supplementary.put(root, files);
+            if (root != null) {
+                Collection<URL> files = supplementary.get(root);
+                if (files == null) {
+                    files = new LinkedList<URL>();
+                    supplementary.put(root, files);
+                }
+                files.add(fo.getURL());
             }
-            files.add(fo.getURL());
         }
 
         for(Map.Entry<URL, Collection<URL>> entry : supplementary.entrySet()) {
@@ -694,9 +696,14 @@ public class JavaFXIndexer extends CustomIndexer {
     }
 
     private URL getSrcRoot(FileObject fo) throws IOException {
-        ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
-        FileObject root = cp.findOwnerRoot(fo);
-        return root.getURL();
+        if (fo != null) {
+            ClassPath cp = ClassPath.getClassPath(fo, ClassPath.SOURCE);
+            if (cp != null) {
+                FileObject root = cp.findOwnerRoot(fo);
+                return root.getURL();
+            }
+        }
+        return null;
     }
 
     private void index(IndexDocument document, IndexKey key, String value) {

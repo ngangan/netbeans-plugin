@@ -468,8 +468,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         extPanel.add(jvmText, gridBagConstraints);
 
         buttonGroup1.add(jRadioButton5);
+        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton5, org.openide.util.NbBundle.getMessage(CustomizerRun.class, "CustomizerRunComponent.jRadioButton5.text")); // NOI18N
         jRadioButton5.setActionCommand("Run in &TV Emulator");
-        jRadioButton5.setLabel("Run in TV Emulator");
         jRadioButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jRadioButton5ActionPerformed(evt);

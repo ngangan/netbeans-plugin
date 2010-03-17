@@ -47,6 +47,8 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.*;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -767,7 +769,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeFields());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 if (isLastMemberOfSuchKind(i, treeArray, kind)) {
                                     blankLines(cs.getBlankLinesAfterFields());
@@ -781,7 +783,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeMethods());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 blankLines(cs.getBlankLinesAfterMethods());
                             }
@@ -792,7 +794,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(cs.getBlankLinesBeforeNonClassExpression());
                             }
-                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[]{tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 blankLines(cs.getBlankLinesAfterNonClassExpression());
                             }
@@ -801,7 +803,7 @@ public class JFXReformatTask implements ReformatTask {
                             if (isFirstMemberOfSuchKind(i, treeArray, kind)) {
                                 blankLines(1);
                             }
-                            processClassMembers(Arrays.asList(new Tree[] {tree}), p, isLastInCU);
+                            processClassMembers(Arrays.asList(new Tree[] {tree}), p, isLastInCU, false);
                             if (!isLastInCU) {
                                 if (isLastMemberOfSuchKind(i, treeArray, kind)) {
                                     blankLines(1);
@@ -942,7 +944,7 @@ public class JFXReformatTask implements ReformatTask {
                         indent = old;
                     }
                     blankLines(cs.getBlankLinesAfterClassHeader());
-                    processClassMembers(node.getClassMembers(), p, false);
+                    processClassMembers(node.getClassMembers(), p, false, true);
                     if (lastBlankLinesTokenIndex < 0) {
                         newline();
                     }
@@ -952,17 +954,18 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.RBRACE);
                 indent = old;
             } else {
-                processClassMembers(node.getClassMembers(), p, false);
+                processClassMembers(node.getClassMembers(), p, false, true);
             }
             return true;
         }
 
-        private void processClassMembers(List<Tree> members, Void p, boolean isLastInCU) {
+        private void processClassMembers(List<Tree> members, Void p, boolean isLastInCU, boolean ignoreTopLevel) {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : members) {
-                if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
-                    // this class has been already processed in visitCompilationUnit()
+//                if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
+                if (ignoreTopLevel && cuTrees != null && cuTrees.contains(member)) {
+                    // this member has been already processed in visitCompilationUnit()
                     continue;
                 }
 
@@ -2502,6 +2505,8 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     rollback(index, c, d);
                 }
+                // #180187 - work suspended untill lexer will be fixed
+                //processStringLiteral(node);
 
                 indent = old;
             } else {
@@ -3931,6 +3936,29 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
             return accepted;
+        }
+
+        private void processStringLiteral(LiteralTree node) {
+            int offset = tokens.offset();
+            String astText = (String) node.getValue();
+            String docText = fText.substring(offset, endPos);
+
+            Pattern pattern = Pattern.compile("\".*?\""); // NOI18N
+            Matcher matcher = pattern.matcher(docText);
+            int i = offset;
+            while (matcher.find()) {
+                String part = matcher.group();
+                i += part.length();
+                tokens.move(i);
+                spaces(0, true);
+            }
+
+//            do {
+//                col += tokens.token().length();
+//            } while (tokens.moveNext() && tokens.offset() < endPos);
+            lastBlankLines = -1;
+            lastBlankLinesTokenIndex = -1;
+            lastBlankLinesDiff = null;
         }
 
         private static class FakeBlock extends JFXBlock {
