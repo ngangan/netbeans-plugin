@@ -281,7 +281,7 @@ public final class FixImportsLayout<T extends CompletionItem> implements KeyList
 
     private static final class FixPopup<T extends CompletionItem> extends PopupWindow<T> {
 
-        private InnerScrollPane completionScrollPane;
+        volatile private InnerScrollPane completionScrollPane;
 
         @SuppressWarnings({"MethodWithTooManyParameters", "MethodWithMoreThanThreeNegations"})
         public void show(List<T> data, String title, int anchorOffset,
