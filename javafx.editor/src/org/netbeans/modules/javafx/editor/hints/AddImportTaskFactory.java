@@ -102,6 +102,9 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
+                if (compilationInfo.getDocument() == null) {
+                    return;
+                }
                 if (!compilationInfo.isErrors()) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     return;
