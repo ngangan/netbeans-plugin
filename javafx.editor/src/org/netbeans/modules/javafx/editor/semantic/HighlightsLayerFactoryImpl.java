@@ -30,6 +30,7 @@ package org.netbeans.modules.javafx.editor.semantic;
 import org.netbeans.spi.editor.highlighting.HighlightsLayer;
 import org.netbeans.spi.editor.highlighting.HighlightsLayerFactory;
 import org.netbeans.spi.editor.highlighting.ZOrder;
+import org.netbeans.modules.javafx.editor.rename.InstantRenamePerformer;
 
 /**
  *
@@ -40,7 +41,8 @@ public class HighlightsLayerFactoryImpl implements HighlightsLayerFactory {
     public HighlightsLayer[] createLayers(Context context) {
         return new HighlightsLayer[] {
             HighlightsLayer.create(SemanticHighlighter.class.getName(), ZOrder.SYNTAX_RACK, false, SemanticHighlighter.getBag(context.getDocument())),
-            HighlightsLayer.create(MarkOccurrencesHighlighter.class.getName(), ZOrder.CARET_RACK.forPosition(50), false, MarkOccurrencesHighlighter.getHighlightsBag(context.getDocument()))
+            HighlightsLayer.create(MarkOccurrencesHighlighter.class.getName(), ZOrder.CARET_RACK.forPosition(50), false, MarkOccurrencesHighlighter.getHighlightsBag(context.getDocument())),
+            HighlightsLayer.create(InstantRenamePerformer.class.getName(), ZOrder.CARET_RACK.forPosition(75), false, InstantRenamePerformer.getHighlightsBag(context.getDocument())),
         };
     }
 
