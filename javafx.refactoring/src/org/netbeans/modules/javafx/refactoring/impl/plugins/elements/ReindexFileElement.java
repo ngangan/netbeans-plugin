@@ -41,8 +41,10 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -62,15 +64,25 @@ import org.openide.util.Lookup;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class ReindexFilesElement extends SimpleRefactoringElementImplementation {
+public class ReindexFileElement extends SimpleRefactoringElementImplementation {
     final private FileObject parent;
-    final private Map<URL, Collection<? extends URL>> reindex = new HashMap<URL, Collection<? extends URL>>();
-    final private Set<FileObject> related = new HashSet<FileObject>();
+    private URL root, url;
 
-    public ReindexFilesElement(FileObject parent, Set<FileObject> related) {
+    public ReindexFileElement(FileObject parent) {
         this.parent = parent;
-        this.related.addAll(related);
-        fillReindex();
+        ClassPath cp = ClassPath.getClassPath(parent, ClassPath.SOURCE);
+        if (cp != null) {
+            FileObject rootFo = cp.findOwnerRoot(parent);
+            if (rootFo != null) {
+                try {
+                    root = rootFo.getURL();
+                    url = parent.getURL();
+                } catch (IOException e) {
+                    root = null;
+                    url = null;
+                }
+            }
+        }
     }
 
     public String getDisplayText() {
@@ -94,39 +106,15 @@ public class ReindexFilesElement extends SimpleRefactoringElementImplementation 
     }
 
     public void performChange() {
-        for(Map.Entry<URL, Collection<? extends URL>> entry : reindex.entrySet()) {
-            IndexingManager.getDefault().refreshIndex(entry.getKey(), entry.getValue());
+        if (root != null && url != null) {
+            IndexingManager.getDefault().refreshIndex(root, Collections.singleton(url));
         }
     }
 
     @Override
     public void undoChange() {
-        for(Map.Entry<URL, Collection<? extends URL>> entry : reindex.entrySet()) {
-            IndexingManager.getDefault().refreshIndex(entry.getKey(), entry.getValue());
-        }
-    }
-
-    private void fillReindex() {
-        for(FileObject fo : related) {
-            if (fo.equals(parent)) continue;
-            
-            Project p = FileOwnerQuery.getOwner(fo);
-            ClassPathProvider cpp = p.getLookup().lookup(ClassPathProvider.class);
-            ClassPath cp = cpp.findClassPath(fo, ClassPath.SOURCE);
-
-            FileObject root = cp.findOwnerRoot(fo);
-
-            try {
-                URL fileUrl = fo.getURL();
-                URL rootUrl = root.getURL();
-                Collection<? extends URL> urls = reindex.get(rootUrl);
-                if (urls == null) {
-                    urls = new HashSet<URL>();
-                    reindex.put(rootUrl, urls);
-                }
-                ((Collection<URL>) urls).add(fileUrl);
-            } catch (FileStateInvalidException e) {
-            }
+        if (root != null && url != null) {
+            IndexingManager.getDefault().refreshIndex(root, Collections.singleton(url));
         }
     }
 }

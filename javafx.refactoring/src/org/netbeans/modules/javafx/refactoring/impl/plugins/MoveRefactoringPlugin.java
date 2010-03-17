@@ -5,6 +5,9 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import com.sun.source.tree.ClassTree;
+import com.sun.source.util.TreePathScanner;
+import com.sun.source.util.TreeScanner;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -14,17 +17,25 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.ElementKind;
+import org.netbeans.api.java.source.ElementHandle;
+import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.TreePathHandle;
 import org.netbeans.api.javafx.source.ClassIndex;
+import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFilesElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixImportsElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
@@ -38,7 +49,9 @@ import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransf
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
+import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
+import org.netbeans.modules.refactoring.spi.RefactoringElementImplementation;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
@@ -52,6 +65,11 @@ import org.openide.util.NbBundle;
 public class MoveRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
     private MoveRefactoring refactoring;
 
+    private Map<FileObject, Set<ElementDef>> movingDefs = null;
+    private Map<String, Set<FileObject>> relatedPerPkg = null;
+    private Set<FileObject> related = null;
+    private Map<String, String> renames = null;
+
     public MoveRefactoringPlugin(MoveRefactoring refactoring) {
         this.refactoring = refactoring;
     }
@@ -63,21 +81,16 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     public Problem checkParameters() {
         // for now use MoveProblemCollector; might rewrite it to use ClassModel later on
         final Set<String> movingClasses = new HashSet<String>();
-        final Map<String, String> renameMap = new HashMap<String, String>();
 
         Collection<? extends FileObject> files = refactoring.getRefactoringSource().lookupAll(FileObject.class);
-        Set<FileObject> related = new HashSet<FileObject>();
 
-        final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
+        collectMovingData(RefactoringSupport.classIndex(refactoring));
 
         final Problem p[] = new Problem[1];
 
-        Map<FileObject, Set<ElementDef>> moving = getMovingDefs();
-        for(Map.Entry<FileObject, Set<ElementDef>> entry : moving.entrySet()) {
+        for(Map.Entry<FileObject, Set<ElementDef>> entry : movingDefs.entrySet()) {
             for(ElementDef edef : entry.getValue()) {
-                related.addAll(ci.getResources(edef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class)));
                 movingClasses.add(edef.createHandle().getQualifiedName());
-                renameMap.put(edef.getPackageName(), getNewPackageName());
             }
         }
 
@@ -93,7 +106,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(CompilationController cc) throws Exception {
-                        MoveProblemCollector mpc = new MoveProblemCollector<Void, Void>(cc, movingClasses, renameMap);
+                        MoveProblemCollector mpc = new MoveProblemCollector<Void, Void>(cc, movingClasses, renames);
                         mpc.scan(cc.getCompilationUnit(), null);
                         if (mpc.getProblem() != null) {
                             p[0] = chainProblems(p[0], mpc.getProblem());
@@ -171,33 +184,24 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
-        final Collection<? extends FileObject> files = refactoring.getRefactoringSource().lookupAll(FileObject.class);
+        collectMovingData(RefactoringSupport.classIndex(refactoring));
 
-        fireProgressListenerStart(MoveRefactoring.PREPARE, 14);
+        fireProgressListenerStart(MoveRefactoring.PREPARE, 2 + movingDefs.size() + relatedPerPkg.size() + related.size());
         
-        final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
         fireProgressListenerStep();
 
         final Set<ElementDef> movingElDefs = new HashSet<ElementDef>();
-        for(Set<ElementDef> set : getMovingDefs().values()) {
+        for(Set<ElementDef> set : movingDefs.values()) {
             movingElDefs.addAll(set);
         }
         fireProgressListenerStep();
 
-        for(final Map.Entry<FileObject, Set<ElementDef>> entry : getMovingDefs().entrySet()) {
+        Set<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
+
+        final String newPkgName = getNewPackageName();
+        for(final Map.Entry<FileObject, Set<ElementDef>> entry : movingDefs.entrySet()) {
             final FileObject file = entry.getKey();
-
-            final String newPkgName = getNewPackageName();
-
-            String oldPkgNameTmp = null;
-            Set<FileObject> related = new HashSet<FileObject>();
-            for(ElementDef refDef : entry.getValue()) {
-                related.addAll(ci.getResources(refDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
-                if (oldPkgNameTmp == null) {
-                    oldPkgNameTmp = refDef.getPackageName();
-                }
-            }
-            final String oldPkgName = oldPkgNameTmp;
+            final String oldPkgName = entry.getValue().iterator().next().getPackageName();
 
             fireProgressListenerStep();
 
@@ -206,55 +210,27 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                 BaseRefactoringElementImplementation ref = null;
                 if (!(newPkgName == null && oldPkgName == null) && !oldPkgName.equals(newPkgName)) {
-                    if (newPkgName == null || newPkgName.length() == 0) {
-                        ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
-                            @Override
-                            protected Set<Transformation> prepareTransformations(FileObject fo) {
-                                Transformation t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
-                                return Collections.singleton(t);
+                    ref = new UpdatePackageDeclarationElement(cm.getPackageDef().getName(), newPkgName, file, reb.getSession()) {
+                        @Override
+                        protected Set<Transformation> prepareTransformations(FileObject fo) {
+                            Transformation t;
+                            if (isOldDefault()) {
+                                t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
+                            } else if (isNewDefault()) {
+                                t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n"); // NOI18N
+                            } else {
+                                t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), getOldPkgName(), getNewPkgName());
                             }
-
-                            protected String getRefactoringText() {
-                                return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_RemovePackage", oldPkgName); // NOI18N
-                            }
-                        };
-                    } else {
-                        if (cm.getPackageDef() == PackageDef.DEFAULT) {
-                            ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
-                                @Override
-                                protected Set<Transformation> prepareTransformations(FileObject fo) {
-                                    Transformation t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n"); // NOI18N
-                                    return Collections.singleton(t);
-                                }
-
-                                protected String getRefactoringText() {
-                                    return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_AddPackage", newPkgName); // NOI18N
-                                }
-                            };
-                        } else {
-                            ref = new BaseRefactoringElementImplementation(file, reb.getSession()) {
-                                @Override
-                                protected Set<Transformation> prepareTransformations(FileObject fo) {
-                                    Transformation t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), cm.getPackageDef().getName(), getNewPackageName());
-                                    return Collections.singleton(t);
-                                }
-
-                                protected String getRefactoringText() {
-                                    return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_RenamePackage", oldPkgName, newPkgName); // NOI18N
-                                }
-                            };
+                            return Collections.singleton(t);
                         }
-                    }
-
+                    };
                 }
 
-                if (ref != null && ref.hasChanges()) {
-                    reb.add(refactoring, ref);
+                if (ref != null) {
+                    refelems.add(ref);
                 }
-
-                fireProgressListenerStep();
-
-                BaseRefactoringElementImplementation fixImports = new BaseRefactoringElementImplementation(file, reb.getSession()) {
+                
+                FixImportsElement fixImports = new FixImportsElement(file, reb.getSession()) {
 
                     @Override
                     protected Set<Transformation> prepareTransformations(FileObject fo) {
@@ -265,81 +241,22 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                         fixImports(movingElDefs, is, cm, true, transformations);
                         return transformations;
                     }
-
-                    protected String getRefactoringText() {
-                        return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_FixImports"); // NOI18N
-                    }
                 };
-                if (fixImports.hasChanges()) {
-                    reb.add(refactoring, fixImports);
-                }
-
-                if ((ref != null && ref.hasChanges()) || fixImports.hasChanges()) {
-                    reb.addFileChange(refactoring, new ReindexFilesElement(file, related));
-                }
+                refelems.add(fixImports);
             }
-            fireProgressListenerStep();
-
-            int batchSize = related.size() / 10; // the 10 allocated steps
-            int cntr = 0;
-            for(FileObject refFo : related) {
-                if (refFo.equals(file) || !SourceUtils.isJavaFXFile(refFo)) continue;
-                BaseRefactoringElementImplementation updateRefs = new BaseRefactoringElementImplementation(refFo, reb.getSession()) {
-
-                    @Override
-                    protected Set<Transformation> prepareTransformations(FileObject fo) {
-                        Set<Transformation> transformations = new HashSet<Transformation>();
-                        ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
-                        for(Usage usg : refCm.getUsages(new PackageDef(oldPkgName))) {
-                            if (usg.getStartPos() == refCm.getPackageDef().getStartFQN()) continue; // don't process the package name
-                            // a small hack
-                            ElementDef typeDef = refCm.getDefForPos(usg.getEndPos() + 2); // move 1 character past the "." delimiter
-                            if (typeDef != null && movingElDefs.contains(typeDef)) {
-                                transformations.add(new ReplaceTextTransformation(usg.getStartPos(), oldPkgName, newPkgName));
-                            }
-                        }
-                        return transformations;
-                    }
-
-                    protected String getRefactoringText() {
-                        return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_RenameOccurences", oldPkgName, newPkgName); // NOI18N
-                    }
-                };
-                if (updateRefs.hasChanges()) {
-                    reb.add(refactoring, updateRefs);
-                }
-                if (!files.contains(refFo)) {
-                    BaseRefactoringElementImplementation fixImports = new BaseRefactoringElementImplementation(refFo, reb.getSession()) {
-
-                        @Override
-                        protected Set<Transformation> prepareTransformations(FileObject fo) {
-                            Set<Transformation> transformations = new HashSet<Transformation>();
-                            ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
-                            ImportSet is = refCm.getImportSet();
-                            for(ElementDef mDef : entry.getValue()) {
-                                String fqn = mDef.createHandle().getQualifiedName();
-                                is.addRename(fqn, fqn.replace(oldPkgName, newPkgName));
-                            }
-                            fixImports(movingElDefs, is, refCm, false, transformations);
-                            return transformations;
-                        }
-
-                        protected String getRefactoringText() {
-                            return NbBundle.getMessage(MoveRefactoringPlugin.class, "LBL_FixImports"); // NOI18N
-                        }
-                    };
-                    if (fixImports.hasChanges()) {
-                        reb.add(refactoring, fixImports);
-                    }
-                }
-                if (++cntr == batchSize) {
-                    fireProgressListenerStep();
-                    cntr = 0;
-                }
-            }
-
-            fireProgressListenerStop();
         }
+
+        refelems.addAll(getRenameOccurencesInRelated(newPkgName, movingElDefs, reb.getSession()));
+        refelems.addAll(getFixImportsInRelated(movingElDefs, reb.getSession()));
+
+        for(BaseRefactoringElementImplementation brei : refelems) {
+            if (brei.hasChanges()) {
+                reb.add(refactoring, brei);
+            } else {
+                reb.addFileChange(refactoring, new ReindexFileElement(brei.getSourceFO()));
+            }
+        }
+        fireProgressListenerStop();
 
         return null;
     }
@@ -380,34 +297,124 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         return p;
     }
 
-    private Map<FileObject, Set<ElementDef>> movingDefs = null;
+    synchronized private void collectMovingData(ClassIndex ci) {
+        if (movingDefs != null) return; // already initialized
+        
+        Collection<? extends FileObject> files = refactoring.getRefactoringSource().lookupAll(FileObject.class);
+        fireProgressListenerStart(MoveRefactoring.INIT, files.size());
 
-    synchronized private Map<FileObject, Set<ElementDef>> getMovingDefs() {
-        if (movingDefs == null) {
-            movingDefs = new HashMap<FileObject, Set<ElementDef>>();
-            Collection<? extends FileObject> files = refactoring.getRefactoringSource().lookupAll(FileObject.class);
-            fireProgressListenerStart(MoveRefactoring.INIT, files.size());
+        movingDefs = new HashMap<FileObject, Set<ElementDef>>();
+        related = new HashSet<FileObject>();
+        relatedPerPkg = new HashMap<String, Set<FileObject>>();
+        renames = new HashMap<String, String>();
 
-            for(FileObject file : files) {
-                if (SourceUtils.isJavaFXFile(file)) {
-                    ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
-                    movingDefs.put(file, cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
-                } else {
-                    Object[] hdls = refactoring.getRefactoringSource().lookup(new Object[0].getClass());
-                    if (hdls != null) {
-                        Set<ElementDef> defs = new HashSet<ElementDef>();
-                        for(final Object hdl : hdls) {
-                            if (hdl instanceof TreePathHandle) {
-                                defs.add(RefactoringSupport.fromJava((TreePathHandle)hdl));
-                            }
+        for(FileObject file : files) {
+            final Set<ElementDef> edefs = new HashSet<ElementDef>();
+            if (SourceUtils.isJavaFXFile(file)) {
+                ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
+                edefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
+            } else {
+                Object[] hdls = refactoring.getRefactoringSource().lookup(new Object[0].getClass());
+                if (hdls != null) {
+                    for(final Object hdl : hdls) {
+                        if (hdl instanceof TreePathHandle) {
+                            edefs.add(RefactoringSupport.fromJava((TreePathHandle)hdl));
                         }
-                        movingDefs.put(file, defs);
+                    }
+                } else {
+                    JavaSource js = JavaSource.forFileObject(file);
+                    try {
+                        js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
+
+                            public void run(final org.netbeans.api.java.source.CompilationController cc) throws Exception {
+                                if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                                    Object elements = cc.getClass().getMethod("getTopLevelElements").invoke(cc); // NOI18N
+                                    Iterator iter = (Iterator)List.class.getMethod("iterator").invoke(elements); // NOI18N
+
+                                    while (iter.hasNext()) {
+                                        Object te = iter.next();
+                                        ElementDef edef = RefactoringSupport.fromJava(te, cc);
+                                        edefs.add(edef);
+                                    }
+                                }
+                            }
+                        }, true);
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-                fireProgressListenerStep();
             }
-            fireProgressListenerStop();
+            String newPkgName = getNewPackageName();
+            for(ElementDef edef : edefs) {
+                org.netbeans.api.javafx.source.ElementHandle eh = edef.createHandle();
+                Set<FileObject> fileRelated = ci.getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
+                String fqn = eh.getQualifiedName();
+                renames.put(fqn, fqn.replace(edef.getPackageName(), newPkgName));
+                Set<FileObject> rppkg = relatedPerPkg.get(edef.getPackageName());
+                if (rppkg == null) {
+                    rppkg = new HashSet<FileObject>();
+                    relatedPerPkg.put(edef.getPackageName(), rppkg);
+                }
+                rppkg.addAll(fileRelated);
+                related.addAll(fileRelated);
+            }
+            movingDefs.put(file, edefs);
+
+            fireProgressListenerStep();
         }
-        return movingDefs;
+        related.removeAll(files); // don't process imports in dependencies which are also moved
+        fireProgressListenerStop();
+    }
+
+    private Collection<BaseRefactoringElementImplementation> getRenameOccurencesInRelated(final String newName, final Set<ElementDef> movingElDefs, RefactoringSession session) {
+        Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
+        for(final Map.Entry<String, Set<FileObject>> entry : relatedPerPkg.entrySet()) {
+            fireProgressListenerStep();
+            for(FileObject refFo : entry.getValue()) {
+                if (!SourceUtils.isJavaFXFile(refFo)) continue;
+                RenameOccurencesElement updateRefs = new RenameOccurencesElement(entry.getKey(), newName, refFo, session) {
+
+                    @Override
+                    protected Set<Transformation> prepareTransformations(FileObject fo) {
+                        Set<Transformation> transformations = new HashSet<Transformation>();
+                        ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
+                        for(Usage usg : refCm.getUsages(new PackageDef(entry.getKey()))) {
+                            if (usg.getStartPos() == refCm.getPackageDef().getStartFQN()) continue; // don't process the package name
+                            // a small hack
+                            ElementDef typeDef = refCm.getDefForPos(usg.getEndPos() + 2); // move 1 character past the "." delimiter
+                            if (typeDef != null && movingElDefs.contains(typeDef)) {
+                                transformations.add(new ReplaceTextTransformation(usg.getStartPos(), getOldName(), getNewName()));
+                            }
+                        }
+                        return transformations;
+                    }
+                };
+                refelems.add(updateRefs);
+            }
+        }
+        return refelems;
+    }
+
+    private Collection<BaseRefactoringElementImplementation> getFixImportsInRelated(final Set<ElementDef> movingElDefs, RefactoringSession session) {
+        Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
+        for(FileObject refFo : related) {
+            fireProgressListenerStep();
+            FixImportsElement fixImports = new FixImportsElement(refFo, session) {
+
+                @Override
+                protected Set<Transformation> prepareTransformations(FileObject fo) {
+                    Set<Transformation> transformations = new HashSet<Transformation>();
+                    ClassModel refCm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
+                    ImportSet is = refCm.getImportSet();
+                    for(Map.Entry<String, String> entry : renames.entrySet()) {
+                        is.addRename(entry.getKey(), entry.getValue());
+                    }
+                    fixImports(movingElDefs, is, refCm, false, transformations);
+                    return transformations;
+                }
+            };
+            refelems.add(fixImports);
+        }
+        return refelems;
     }
 }

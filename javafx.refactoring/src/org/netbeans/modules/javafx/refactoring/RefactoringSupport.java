@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.refactoring;
 
 import com.sun.source.util.TreePath;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.lang.model.element.Element;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
@@ -115,44 +116,49 @@ final public class RefactoringSupport {
                 js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
 
                     public void run(org.netbeans.api.java.source.CompilationController cc) throws Exception {
-
                         Method m = tph.getClass().getMethod("resolveElement", org.netbeans.api.java.source.CompilationInfo.class); // NOI18N
                         Object e = m.invoke(tph, cc);
-                        Class elementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
-                        Class elementsClass = e.getClass().getClassLoader().loadClass("javax.lang.model.util.Elements"); // NOI18N
-                        Class packageElementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.PackageElement"); // NOI18N
-
-                        m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", elementClass); // NOI18N
-                        Method nMethod = elementClass.getMethod("getSimpleName"); // NOI18N
-                        try {
-                            org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, e);
-                            Object elements = cc.getClass().getMethod("getElements").invoke(cc); // NOI18N
-                            Method pMethod = elementsClass.getMethod("getPackageOf", elementClass); // NOI18N
-                            Object pe = pMethod.invoke(elements, e);
-                            String pName = packageElementClass.getMethod("getQualifiedName").invoke(pe).toString(); // NOI18N
-
-                            ElementHandle eh = ElementHandle.fromJava(jeh);
-                            if (eh != null) {
-                                String simpleName = nMethod.invoke(e).toString();
-                                refdef[0] = new GlobalDef(
-                                    simpleName,
-                                    eh.getKind(),
-                                    pName,
-                                    -1, -1, -1, -1,
-                                    RefactoringSupport.getRefId(eh),
-                                    null
-                                );
-                            }
-                        } catch (Throwable ex) {
-                            // basically ignore
-                            ex.printStackTrace();
-                        }
+                        refdef[0] = fromJava(e, cc);
                     }
                 }, false);
             } catch (IOException e) {
             }
         }
         return refdef[0];
+    }
+
+    public static ElementDef fromJava(Object element, CompilationInfo ci) {
+        ElementDef edef = null;
+        try {
+            Class elementClass = element.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+            Class elementsClass = element.getClass().getClassLoader().loadClass("javax.lang.model.util.Elements"); // NOI18N
+            Class packageElementClass = element.getClass().getClassLoader().loadClass("javax.lang.model.element.PackageElement"); // NOI18N
+
+            Method m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", elementClass); // NOI18N
+            Method nMethod = elementClass.getMethod("getSimpleName"); // NOI18N
+            org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, element);
+            Object elements = ci.getClass().getMethod("getElements").invoke(ci); // NOI18N
+            Method pMethod = elementsClass.getMethod("getPackageOf", elementClass); // NOI18N
+            Object pe = pMethod.invoke(elements, element);
+            String pName = packageElementClass.getMethod("getQualifiedName").invoke(pe).toString(); // NOI18N
+
+            ElementHandle eh = ElementHandle.fromJava(jeh);
+            if (eh != null) {
+                String simpleName = nMethod.invoke(element).toString();
+                edef = new GlobalDef(
+                    simpleName,
+                    eh.getKind(),
+                    pName,
+                    -1, -1, -1, -1,
+                    RefactoringSupport.getRefId(eh),
+                    null
+                );
+            }
+        } catch (Throwable ex) {
+            // basically ignore
+            ex.printStackTrace();
+        }
+        return edef;
     }
 
     public static TreePathHandle toJava(ElementHandle eh, FileObject javaFile) {
