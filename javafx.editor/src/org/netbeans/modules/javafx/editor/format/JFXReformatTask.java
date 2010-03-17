@@ -2492,19 +2492,20 @@ public class JFXReformatTask implements ReformatTask {
                 int old = indent;
                 indent += continuationIndentSize;
 
-//                accept(ReformatUtils.STRING_LITERALS); // accept first
-//                index = tokens.index();
-//                c = col;
-//                d = diffs.isEmpty() ? null : diffs.getFirst();
-//                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
-//                    spaces(0, true);
-//                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
-//                        spaces(0, true);
-//                    }
-//                } else {
-//                    rollback(index, c, d);
-//                }
-                processStringLiteral(node);
+                accept(ReformatUtils.STRING_LITERALS); // accept first
+                index = tokens.index();
+                c = col;
+                d = diffs.isEmpty() ? null : diffs.getFirst();
+                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
+                    spaces(0, true);
+                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
+                        spaces(0, true);
+                    }
+                } else {
+                    rollback(index, c, d);
+                }
+                // #180187 - work suspended untill lexer will be fixed
+                //processStringLiteral(node);
 
                 indent = old;
             } else {
