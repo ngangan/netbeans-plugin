@@ -215,7 +215,7 @@ public class GoToSupport {
                 public void run() {
                     opener.run();
                 }
-            }, NbBundle.getMessage(GoToSupport.class, "LBL_GoToSupport"), cancelled); // NOI18N
+            }, NbBundle.getMessage(GoToSupport.class, "LBL_GoToSource"), cancelled); // NOI18N
         }
 
         return result[0];
