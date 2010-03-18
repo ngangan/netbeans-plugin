@@ -47,6 +47,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.ElementKind;
+import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 
 /**
  *
@@ -220,7 +221,7 @@ public class ImportSet {
                 }
                 case METHOD:
                 case FIELD: {
-                    String typeFQN = usg.getDef().createHandle().getSignatures()[0];
+                    String typeFQN = SourceUtils.getEnclosingTypeName(usg.getDef());
                     TypeImportEntry tie = new TypeImportEntry("", typeFQN, true, -1, -1, -1, -1); // NOI18N
                     if (renames.containsKey(typeFQN)) {
                         typeFQN = renames.get(typeFQN);

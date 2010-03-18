@@ -41,6 +41,7 @@ package org.netbeans.api.javafx.editor;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol;
+import java.io.IOException;
 import org.netbeans.modules.javafx.editor.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
@@ -55,6 +56,7 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.openide.filesystems.FileObject;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -76,35 +78,48 @@ public final class ElementOpen {
             return false;
         }
 
-        JavaFXSource js = JavaFXSource.forFileObject(srcFile);
+        final JavaFXSource js = JavaFXSource.forFileObject(srcFile);
         if (js == null) {
             return false;
         }
         
-        js.runUserActionTask(new Task<CompilationController>() {
-            public void run(CompilationController controller) throws Exception {
-                if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                    return; // convert the element to local element
-                }
-                Element el = elh.resolve(controller);
-                if (el == null) {
-                    return;
-                }
-                System.err.println("real=" + el); // NOI18N
+        final IOException[] thrown = new IOException[1];
+        Runnable r = new Runnable() {
+            public void run() {
+                try {
+                    js.runUserActionTask(new Task<CompilationController>() {
 
-                JavaFXTreePath elpath = controller.getPath(el);
-                Tree tree = elpath != null ? elpath.getLeaf() : null;
+                        public void run(CompilationController controller) throws Exception {
+                            if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
+                                return; // convert the element to local element
+                            }
+                            Element el = elh.resolve(controller);
+                            if (el == null) {
+                                return;
+                            }
 
-                if (tree != null) {
-                    long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
+                            JavaFXTreePath elpath = controller.getPath(el);
+                            Tree tree = elpath != null ? elpath.getLeaf() : null;
 
-                    if (startPos != -1l) {
-                        result.set(GoToSupport.doOpen(srcFile, (int) startPos));
-                    }
+                            if (tree != null) {
+                                long startPos = controller.getTrees().getSourcePositions().getStartPosition(controller.getCompilationUnit(), tree);
+
+                                if (startPos != -1l) {
+                                    result.set(GoToSupport.doOpen(srcFile, (int) startPos));
+                                }
+                            }
+                        }
+                    }, true);
+                } catch (IOException e) {
+                    thrown[0] = e;
                 }
             }
-        }, true);
-        return result.get();
+        };
+        AtomicBoolean cancelled = new AtomicBoolean(false);
+        RunOffAWT.runOffAWT(r, NbBundle.getMessage(ElementOpen.class, "LBL_OpeningSource"), cancelled); // NOI18N
+        if (thrown[0] != null) throw thrown[0];
+
+        return cancelled.get() ? false : result.get();
     }
     
 

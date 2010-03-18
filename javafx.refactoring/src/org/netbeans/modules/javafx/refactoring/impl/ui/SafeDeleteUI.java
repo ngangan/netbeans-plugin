@@ -75,8 +75,6 @@ public class SafeDeleteUI implements RefactoringUI, RefactoringUIBypass{
     
     private SafeDeletePanel panel;
     
-    private ResourceBundle bundle;
-    
     private boolean regulardelete = false;
     /**
      * Creates a new instance of SafeDeleteUI

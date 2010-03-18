@@ -62,6 +62,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
@@ -101,6 +102,7 @@ import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
@@ -394,6 +396,14 @@ final public class SourceUtils {
         }
 
         return null;
+    }
+
+    public static String getEnclosingTypeName(ElementDef def) {
+        ElementHandle handle = def.createHandle();
+        if (handle.getKind().isInterface() || handle.getKind().isClass()) {
+            return handle.getQualifiedName();
+        }
+        return new ElementHandle(ElementKind.CLASS, new String[]{handle.getSignatures()[0]}).getQualifiedName();
     }
 
     public static ClasspathInfo getClasspathInfoFor(FileObject ... files) {
