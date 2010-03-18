@@ -144,6 +144,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         addMembers(type, true, true, null, getScope(), true, !isStatic(el), parent.getJavaFXKind() == Tree.JavaFXKind.IMPORT);
                         break;
                     case PACKAGE:
+                        addPackages(fullName(exp)+"."); // NOI18N
                         PackageElement pe = controller.getElements().getPackageElement(fullName(exp));
                         if (pe != null) addPackageContent(pe, EnumSet.of(ElementKind.PACKAGE), null, false);
                         break;
@@ -151,6 +152,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                         if (LOGGABLE) log("   el(2) == " + el + "  el.getKind() == " + (el != null? el.getKind():"")); // NOI18N
                         if (type.getKind() == TypeKind.ERROR && el != null && el.getKind().isClass()) {
                             Name qualifiedName = ((TypeElement) el).getQualifiedName();
+                            addPackages(qualifiedName + "."); // NOI18N
                             addPackageContent(qualifiedName);
                             addPossibleMembers(el, qualifiedName);
                         }
