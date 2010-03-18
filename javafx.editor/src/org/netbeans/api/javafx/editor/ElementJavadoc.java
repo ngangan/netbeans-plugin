@@ -588,8 +588,14 @@ public class ElementJavadoc {
         // TODO modifierSpecifier() does not exist for javafx
 //        sb.append(Modifier.toString(mdoc.modifierSpecifier() & ~Modifier.NATIVE));
         len = sb.length() - len;
-        TypeVariable[] tvars = mdoc.typeParameters();
-        if (tvars.length > 0) {
+        TypeVariable[] tvars = null;
+        // #182002
+        try {
+            tvars = mdoc.typeParameters();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (tvars != null && tvars.length > 0) {
             if (len > 0) {
                 sb.append(' '); //NOI18N
                 len++;

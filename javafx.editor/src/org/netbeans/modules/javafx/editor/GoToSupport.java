@@ -79,6 +79,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.text.Line;
 import org.openide.text.NbDocument;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -214,7 +215,7 @@ public class GoToSupport {
                 public void run() {
                     opener.run();
                 }
-            }, "Go to Source", cancelled);
+            }, NbBundle.getMessage(GoToSupport.class, "LBL_GoToSource"), cancelled); // NOI18N
         }
 
         return result[0];

@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.FunctionDefinitionTree;
+import com.sun.javafx.api.tree.InitDefinitionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
@@ -207,6 +208,26 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         @Override
+        public Void visitInitDefinition(InitDefinitionTree node, Map<Element, Long> p) {
+            Element e = this.trees.getElement(this.getCurrentPath());
+            if (e != null) {
+                long pos = this.sourcePositions.getStartPosition(cu, node);
+                p.put(e, pos);
+            }
+            return null;
+        }
+
+        @Override
+        public Void visitPostInitDefinition(InitDefinitionTree node, Map<Element, Long> p) {
+            Element e = this.trees.getElement(this.getCurrentPath());
+            if (e != null) {
+                long pos = this.sourcePositions.getStartPosition(cu, node);
+                p.put(e, pos);
+            }
+            return null;
+        }
+
+        @Override
         public Void scan(Tree tree, Map<Element, Long> p) {
             if (!canceled.get()) {
                 return super.scan(tree, p);
@@ -314,7 +335,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             d.htmlHeader = FXSourceUtils.variableElementToString(javafxTypes, (VariableElement) e, isDeprecated, d.isInherited);
         }
 
-        d.modifiers = e.getModifiers();
+        d.modifiers = FXSourceUtils.getModifiers(e);
         d.pos = getPosition(e, pos);
 
         return d;

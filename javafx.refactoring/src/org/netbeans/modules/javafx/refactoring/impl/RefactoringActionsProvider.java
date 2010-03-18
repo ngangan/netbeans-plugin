@@ -42,6 +42,7 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
+import javax.lang.model.element.PackageElement;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.text.Document;
@@ -70,6 +71,7 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
 import org.netbeans.modules.progress.spi.RunOffEDTProvider;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
@@ -603,9 +605,16 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 @Override
                 protected RefactoringUI createRefactoringUI(FileObject[] files, NonRecursiveFolder[] pkgs) {
                     if (pkgs[0] != null) {
-                        lkpContent.add(pkgs[0]);
+                        lkpContent.add(pkgs[0]); // only single package is allowed to participate in refactoring
+                        lkpContent.add(new PackageDef(SourceUtils.getPackageName(pkgs[0].getFolder())));
                     } else {
-                        lkpContent.add(files[0]);
+                        for(FileObject fo : files) {
+                            ClassModel cm = RefactoringSupport.classModelFactory(ref).classModelFor(fo);
+                            for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
+                                lkpContent.add(edef);
+                            }
+                            lkpContent.add(fo);
+                        }
                     }
                     return new SafeDeleteUI(ref, b);
                 }

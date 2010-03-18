@@ -211,6 +211,10 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
         
         final ElementDef edef = getElementDef();
         if (edef == null) return null;
+
+        if (!edef.isFromSource()) { // the element definition is not from sources
+            return new Problem(true, NbBundle.getMessage(RenameRefactoringPlugin.class, "ERR_CannotRefactorLibraryClass", SourceUtils.getEnclosingTypeName(edef)));
+        }
         
         final Problem p[] = new Problem[1];
 
