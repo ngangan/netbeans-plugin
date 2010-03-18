@@ -89,9 +89,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
-        final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
-
+        
         return new CancellableTask<CompilationInfo>() {
 
             @Override
@@ -143,6 +141,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         return super.visitImport(node, p);
                     }
                 }.scan(compilationInfo.getCompilationUnit(), null);
+                final Map<String, Collection<ElementHandle<TypeElement>>> optionsCache = new HashMap<String, Collection<ElementHandle<TypeElement>>>();
+                final List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
                 for (final Diagnostic diagnostic : diagnostics) {
                     if (cancel.get()) {
                         break;
@@ -217,19 +217,15 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
-                clear();
             }
 
-            private void clear() {
-                optionsCache.clear();
-                errors.clear();
-            }
+           
 
             private Collection<Diagnostic> getValidDiagnostics(Collection<Diagnostic> diagnostics) {
                 Collection<Diagnostic> validDiagnostics = new HashSet<Diagnostic>();
                 Collection<Long> errorLines = new HashSet<Long>();
                 for (Diagnostic diagnostic : diagnostics) {
-                    if (!diagnostic.getMessage(Locale.ENGLISH).contains("cannot find symbol") || errorLines.contains(diagnostic.getLineNumber())) { //NOI18N
+                    if (errorLines.contains(diagnostic.getLineNumber())) { //NOI18N
                         continue;
                     }
                     if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {

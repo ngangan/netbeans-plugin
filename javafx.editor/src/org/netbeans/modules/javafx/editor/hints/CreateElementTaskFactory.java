@@ -126,8 +126,10 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
+                    if (cancel.get()) {
+                        break;
+                    }
                     if (isValidError(diagnostic, document)
-                            && !cancel.get()
                             && (diagnostic instanceof JCDiagnostic)) {
 
                         Kind kinds[] = getKinds(diagnostic, compilationInfo);
