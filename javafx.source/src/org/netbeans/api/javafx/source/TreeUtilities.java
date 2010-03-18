@@ -783,8 +783,11 @@ public final class TreeUtilities {
         Object env = ((JavafxcScope) scope).getEnv();
         @SuppressWarnings("unchecked")
         JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
+
+        // #182138: Prevent NPE inside javafxc
+        if (fxEnv.outer == null) return true;
+
         return JavafxResolve.isStatic(fxEnv);
-//        return Resolve.isStatic(((JavafxcScope) scope).getEnv());
     }
 
     private long[] findNameSpan(String name, Tree t, JFXTokenId... allowedTokens) {

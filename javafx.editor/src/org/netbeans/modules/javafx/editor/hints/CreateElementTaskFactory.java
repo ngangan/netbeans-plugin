@@ -44,6 +44,7 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
+import com.sun.javafx.api.tree.InstantiateTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
@@ -92,7 +93,6 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
     private static final String JAVAFX_RUN = "public static synthetic function javafx$run$"; //NOI18N
-    private static final Kind[] EMPTY_KIND_ARRAY = {};
 
     public CreateElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -130,8 +130,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                             && !cancel.get()
                             && (diagnostic instanceof JCDiagnostic)) {
 
-                        String message = diagnostic.getMessage(Locale.ENGLISH);
-                        Kind kinds[] = getKinds(message, diagnostic, compilationInfo);
+                        Kind kinds[] = getKinds(diagnostic, compilationInfo);
                         for (Kind kind : kinds) {
                             errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic, kind));
                         }
@@ -156,7 +155,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             final Kind kind) {
 
         if (kind == null || diagnostic.getArgs()[1] == null || diagnostic.getArgs()[5] == null) {
-            LOGGER.severe("Error Description has null kind or Diagnostic's args null"); //NOI18N
+            LOGGER.severe("Kind is null "); //NOI18N
             return null;
         }
         String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString(), compilationInfo.getCompilationUnit().getPackageName());
@@ -166,47 +165,62 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         return errorDescription;
     }
 
-    private Kind[] getKinds(String message, Diagnostic diagnostic, CompilationInfo compilationInfo) {
-        if (message.contains("symbol  : class")) { //NOI18N
-            return new Kind[]{Kind.LOCAL_CLASS, Kind.CLASS};
-        } else if (message.contains("symbol  : variable")) { //NOI18N
-            ArrayList<Kind> array = new ArrayList<Kind>();
+    private Kind[] getKinds(final Diagnostic diagnostic, final CompilationInfo compilationInfo) {
+        final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
+        final ArrayList<Kind> array = new ArrayList<Kind>();
 
-            if (isValidLocalVariable(diagnostic, compilationInfo)) {
-                array.add(Kind.LOCAL_VARIABLE);
+        new JavaFXTreePathScanner<Void,Void> () {
+
+            @Override
+            public Void visitInstantiate(InstantiateTree node, Void p) {
+                if (checkPosition(node, diagnostic)) {
+                    array.add(Kind.CLASS);
+                    array.add(Kind.LOCAL_CLASS);
+                    return null;
+                }
+                return super.visitInstantiate(node, p);
             }
-            array.add(Kind.VARIABLE);
-
-            return array.toArray(new Kind[array.size()]);
-            
-        } else if (message.contains("symbol  : function")) { //NOI18N
-            return new Kind[]{Kind.FUNCTION}; //NOI18N
-        }
-
-        return EMPTY_KIND_ARRAY;
-    }
-
-    private boolean isValidLocalVariable(final Diagnostic diagnostic, final CompilationInfo compilationInfo) {
-        final boolean[] validVar = new boolean[1];
-        new JavaFXTreePathScanner<Void, Void>() {
 
             @Override
             public Void visitIdentifier(IdentifierTree node, Void p) {
-                SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                int startPosition = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
-                if (startPosition == diagnostic.getStartPosition()) {
-                    validVar[0] = (getCurrentPath().getParentPath().getLeaf() instanceof JFXBlock);
+                if (checkPosition(node, diagnostic)) {
+                    if (getCurrentPath().getParentPath().getLeaf() instanceof JFXBlock) {
+                        array.add(Kind.LOCAL_VARIABLE);
+                    }
+                    array.add(Kind.VARIABLE);
                     return null;
                 }
 
                 return super.visitIdentifier(node, p);
             }
+
+            
+            @Override
+            public Void visitMethodInvocation(FunctionInvocationTree node, Void p) {
+                if (checkPosition(node, diagnostic)) {
+                    array.add(Kind.FUNCTION);
+                    return null;
+                }
+
+                return super.visitMethodInvocation(node, p);
+            }
+
+            private boolean checkPosition(Tree node, Diagnostic diagnostic) {
+                long start = sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node);
+                //long end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), node);
+
+                if (start == diagnostic.getStartPosition()) {
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            
         }.scan(compilationInfo.getCompilationUnit(), null);
 
-        return validVar[0];
+        return  array.toArray(new Kind[array.size()]);
     }
-
-    
 
     private static String getMessage(Kind kind, String elementName, String classFullName, ExpressionTree packageName) {
         String message = null;

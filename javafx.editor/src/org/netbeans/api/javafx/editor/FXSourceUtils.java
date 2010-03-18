@@ -630,6 +630,20 @@ public final class FXSourceUtils {
         return allMembers;
     }
 
+    // #163848, #181889
+    public static Set<Modifier> getModifiers(Element element) {
+        if (element == null) {
+            return null;
+        }
+        Set<Modifier> modifiers = null;
+        try {
+            modifiers = element.getModifiers();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return modifiers;
+    }
+
     private static CharSequence getFragment(Element e) {
         StringBuilder sb = new StringBuilder();
         if (!e.getKind().isClass() && !e.getKind().isInterface()) {
