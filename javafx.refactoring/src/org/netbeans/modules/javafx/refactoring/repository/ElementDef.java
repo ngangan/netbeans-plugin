@@ -169,6 +169,10 @@ abstract public class ElementDef implements Referencable {
         return synthetic;
     }
 
+    final public boolean isFromSource() {
+        return getStartPos() > -1;
+    }
+
     public Element getElement() {
         if (enclosing == null) return null;
         
