@@ -204,7 +204,7 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
                         return null;
                     }
                 }
-            }, "Instant Rename", js, JavaFXSource.Phase.ANALYZED);
+            }, NbBundle.getMessage(InstantRenamePerformer.class, "in-place-refactoring"), js, JavaFXSource.Phase.ANALYZED); // NOI18N
             
             if (wasResolved[0]) {
                 if (changePoints != null) {
