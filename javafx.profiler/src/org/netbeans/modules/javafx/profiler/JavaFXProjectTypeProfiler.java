@@ -39,6 +39,8 @@
  */
 package org.netbeans.modules.javafx.profiler;
 
+import java.awt.Dialog;
+import java.awt.event.MouseEvent;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.java.platform.Specification;
@@ -80,9 +82,21 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Properties;
+import javax.swing.JButton;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
 import org.netbeans.modules.javafx.project.api.JavaFXPropertyEvaluator;
+import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
+import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.java.api.common.ant.UpdateHelper;
+import org.netbeans.modules.javafx.project.ui.customizer.MainClassWarning;
+import org.netbeans.spi.project.support.ant.EditableProperties;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.awt.MouseUtils;
 
 /**
  * @author Tomas Hurka
@@ -228,16 +242,57 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     public boolean checkProjectCanBeProfiled(final Project project, final FileObject profiledClassFile) {
         if (profiledClassFile == null) {
-            final PropertyEvaluator pp = getProjectProperties(project);
-            String profiledClass = pp.getProperty("main.class"); // NOI18N
+            String config = ((JavaFXProject)project).evaluator().getProperty("config"); // JavaFXConfigurationProvider.PROP_CONFIG
+            String path;
+            if (config == null || config.length() == 0) {
+                path = AntProjectHelper.PROJECT_PROPERTIES_PATH;
+            } else {
+                // Set main class for a particular config only.
+                path = "nbproject/configs/" + config + ".properties"; // NOI18N
+            }
 
-            if ((profiledClass == null) || "".equals(profiledClass)) { // NOI18N
-                mainClassSetManually = ProjectUtilities.selectMainClass(project, null, ProjectUtilities.getProjectName(project),
-                        -1);
-                if (mainClassSetManually == null) {
-                    return false;
+            // check project's main class
+            // Check whether main class is defined in this config. Note that we use the evaluator,
+            // not ep.getProperty(MAIN_CLASS), since it is permissible for the default pseudoconfig
+            // to define a main class - in this case an active config need not override it.
+            UpdateHelper helper = ((JavaFXProject)project).getUpdateHelper();
+            EditableProperties ep = helper.getProperties(path);
+
+            String mainClass = ((JavaFXProject)project).evaluator().getProperty(JavaFXProjectProperties.MAIN_CLASS);
+            MainClassStatus result = isSetMainClass ((JavaFXProject)project, mainClass);
+  
+            if (result != MainClassStatus.SET_AND_VALID) {
+                do {
+                    // show warning, if cancel then return
+                    if (showMainClassWarning ((JavaFXProject)project, mainClass, ProjectUtils.getInformation(project).getDisplayName(), ep,result)) {
+                        return false;
+                    }
+                    // No longer use the evaluator: have not called putProperties yet so it would not work.
+                    mainClass = ep.get(JavaFXProjectProperties.MAIN_CLASS);
+                    result=isSetMainClass ((JavaFXProject)project, mainClass);
+                } while (result != MainClassStatus.SET_AND_VALID);
+                try {
+                    if (helper.requestUpdate()) {
+                        helper.putProperties(path, ep);
+                        ProjectManager.getDefault().saveProject(project);
+                    }
+                    else {
+                        return false;
+                    }
+                } catch (IOException ioe) {
+                    ErrorManager.getDefault().log(ErrorManager.INFORMATIONAL, "Error while saving project: " + ioe); // NOI18N
                 }
             }
+//            final PropertyEvaluator pp = getProjectProperties(project);
+//            String profiledClass = pp.getProperty("main.class"); // NOI18N
+//
+//            if ((profiledClass == null) || "".equals(profiledClass.trim())) { // NOI18N
+//                mainClassSetManually = ProjectUtilities.selectMainClass(project, null, ProjectUtilities.getProjectName(project),
+//                        -1);
+//                if (mainClassSetManually == null) {
+//                    return false;
+//                }
+//            }
 
             return true;
         } else {
@@ -594,5 +649,114 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 });
 
         return pe;
+    }
+
+    // Copied over from JavaFXActionProvider
+    private static enum MainClassStatus {
+        SET_AND_VALID,
+        SET_BUT_INVALID,
+        UNSET
+    }
+
+    /**
+     * Copied over from JavaFXActionProvider
+     * Tests if the main class is set
+     * @param sourcesRoots source roots
+     * @param mainClass main class name
+     * @return status code
+     */
+    private MainClassStatus isSetMainClass(JavaFXProject project, String mainClass) {
+        FileObject[] sourcesRoots = project.getSourceRoots().getRoots();
+        
+        if (mainClass == null || mainClass.length () == 0) {
+            return MainClassStatus.UNSET;
+        }
+        if (sourcesRoots.length > 0) {
+            ClassPath bootPath = ClassPath.getClassPath (sourcesRoots[0], ClassPath.BOOT);        //Single compilation unit
+            ClassPath compilePath = ClassPath.getClassPath (sourcesRoots[0], ClassPath.EXECUTE);
+            ClassPath sourcePath = ClassPath.getClassPath(sourcesRoots[0], ClassPath.SOURCE);
+            if (JavaFXProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
+                return MainClassStatus.SET_AND_VALID;
+            }
+        }
+        else {
+            ClassPathProviderImpl cpProvider = project.getClassPathProvider();
+            if (cpProvider != null) {
+                ClassPath bootPath = cpProvider.getProjectSourcesClassPath(ClassPath.BOOT);
+                ClassPath compilePath = cpProvider.getProjectSourcesClassPath(ClassPath.EXECUTE);
+                ClassPath sourcePath = cpProvider.getProjectSourcesClassPath(ClassPath.SOURCE);   //Empty ClassPath
+                if (JavaFXProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
+                    return MainClassStatus.SET_AND_VALID;
+                }
+            }
+        }
+        return MainClassStatus.SET_BUT_INVALID;
+    }
+
+    /**
+     * Copied over from JavaFXActionProvider
+     * Asks user for name of main class
+     * @param mainClass current main class
+     * @param projectName the name of project
+     * @param ep project.properties to possibly edit
+     * @param messgeType type of dialog
+     * @return true if user selected main class
+     */
+    private boolean showMainClassWarning(JavaFXProject project, String mainClass, String projectName, EditableProperties ep, MainClassStatus messageType) {
+        boolean canceled;
+        final JButton okButton = new JButton (NbBundle.getMessage (MainClassWarning.class, "LBL_MainClassWarning_ChooseMainClass_OK")); // NOI18N
+        okButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (MainClassWarning.class, "AD_MainClassWarning_ChooseMainClass_OK")); // NOI18N
+
+        // main class goes wrong => warning
+        String message;
+        switch (messageType) {
+            case UNSET:
+                message = MessageFormat.format (NbBundle.getMessage(MainClassWarning.class,"LBL_MainClassNotFound"), new Object[] { // NOI18N
+                    projectName
+                });
+                break;
+            case SET_BUT_INVALID:
+                message = MessageFormat.format (NbBundle.getMessage(MainClassWarning.class,"LBL_MainClassWrong"), new Object[] { // NOI18N
+                    mainClass,
+                    projectName
+                });
+                break;
+            default:
+                throw new IllegalArgumentException ();
+        }
+        final MainClassWarning panel = new MainClassWarning (message,project.getSourceRoots().getRoots());
+        Object[] options = new Object[] {
+            okButton,
+            DialogDescriptor.CANCEL_OPTION
+        };
+
+        panel.addChangeListener (new ChangeListener () {
+           public void stateChanged (ChangeEvent e) {
+               if (e.getSource () instanceof MouseEvent && MouseUtils.isDoubleClick (((MouseEvent)e.getSource ()))) {
+                   // click button and the finish dialog with selected class
+                   okButton.doClick ();
+               } else {
+                   okButton.setEnabled (panel.getSelectedMainClass () != null);
+               }
+           }
+        });
+
+        okButton.setEnabled (false);
+        DialogDescriptor desc = new DialogDescriptor (panel,
+            NbBundle.getMessage (MainClassWarning.class, "CTL_MainClassWarning_Title", ProjectUtils.getInformation(project).getDisplayName()), // NOI18N
+            true, options, options[0], DialogDescriptor.BOTTOM_ALIGN, null, null);
+        desc.setMessageType (DialogDescriptor.INFORMATION_MESSAGE);
+        Dialog dlg = DialogDisplayer.getDefault ().createDialog (desc);
+        dlg.setVisible (true);
+        if (desc.getValue() != options[0]) {
+            canceled = true;
+        } else {
+            mainClass = panel.getSelectedMainClass ();
+            canceled = false;
+            ep.put(JavaFXProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass); // NOI18N
+        }
+        dlg.dispose();
+
+        return canceled;
     }
 }

@@ -40,6 +40,8 @@
 
 package org.netbeans.modules.javafx.profiler.selector.node;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -57,12 +59,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -93,25 +97,33 @@ public class JavaFXPackageNode extends ContainerNode {
                     public void cancel() {
                     }
 
-                    public void run(CompilationController controller)
+                    public void run(final CompilationController cc)
                              throws Exception {
                         String pkgName = parent.getName();
-                        if (pkgName.equals(DEFAULT_NAME)) {
-                            pkgName = "";
-                        }
-                        PackageElement pelem = controller.getElements().getPackageElement(pkgName);
 
-                        if (pelem != null) {
-                            List<? extends Element> ee = pelem.getEnclosedElements();
-                            for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
-                                System.err.println(type);
-                                if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
-                                    nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
-                                }
+                        for(ElementHandle<TypeElement> teh : parent.cpInfo.getClassIndex().getDeclaredTypes((pkgName.equals(DEFAULT_NAME) ? "" : pkgName.replace(".", "\\.") + "\\.") + ".*", ClassIndex.NameKind.REGEXP, parent.scope)) {
+                            TypeElement e = teh.resolve(cc);
+                            if (e == null || e.getNestingKind() != NestingKind.TOP_LEVEL) continue;
+                            PackageElement pe = JavaFXSourceUtils.getEnclosingPackageElement(e);
+                            if ((pe.isUnnamed() && pkgName.equals(DEFAULT_NAME)) ||
+                                (pe.getQualifiedName().contentEquals(pkgName))) {
+                                nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, e, parent));
                             }
-                        } else {
-                            LOGGER.log(Level.FINEST, "Package name {0} resulted into a NULL element", parent.getName()); // NOI18N
                         }
+//
+//                        PackageElement pelem = cc.getElements().getPackageElement(pkgName);
+//
+//                        if (pelem != null) {
+//                            List<? extends Element> ee = pelem.getEnclosedElements();
+//                            for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
+//                                System.err.println(type);
+//                                if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
+//                                    nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
+//                                }
+//                            }
+//                        } else {
+//                            LOGGER.log(Level.FINEST, "Package name {0} resulted into a NULL element", parent.getName()); // NOI18N
+//                        }
                     }
                 }, true);
             } catch (IOException ex) {
