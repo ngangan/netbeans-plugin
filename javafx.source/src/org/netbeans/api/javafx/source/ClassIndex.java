@@ -266,6 +266,7 @@ final public class ClassIndex {
                 break;
             case REGEXP:
                 queryKind = QuerySupport.Kind.REGEXP;
+                indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
                 break;
             case EXACT:
                 indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;

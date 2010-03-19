@@ -478,7 +478,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         assert signature.length >= 1;
         String pkgName, className = null;
         int index = signature[0].lastIndexOf('.');                          //NOI18N
-        pkgName = FileObjects.convertPackage2Folder(signature[0].substring(0,index));
+        pkgName = index > -1 ? FileObjects.convertPackage2Folder(signature[0].substring(0,index)) : "";
         className = signature[0].substring(index+1);
 
         ClassPath bCP = cpInfo.getClassPath(ClasspathInfo.PathKind.BOOT);

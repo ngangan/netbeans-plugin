@@ -59,6 +59,7 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
@@ -182,6 +183,37 @@ public class JavaFXSourceUtils {
         }
 
         return (TypeElement) element.getEnclosingElement(); // Wrong
+    }
+
+    public static PackageElement getEnclosingPackageElement(Element element) throws IllegalArgumentException {
+        Element param = element;
+
+        if (element.getKind() == ElementKind.PACKAGE) {
+            return (PackageElement)element;
+        }
+
+        while (element != null && element.getEnclosingElement().getKind() != ElementKind.PACKAGE) {
+            element = element.getEnclosingElement();
+        }
+
+        if (element == null) {
+            //#130505:
+            StringBuilder sb = new StringBuilder();
+
+            while (param != null) {
+                sb.append(param.getKind());
+                sb.append(':'); // NOI18N
+                sb.append(param.toString());
+                sb.append('/'); // NOI18N
+                param = param.getEnclosingElement();
+            }
+
+            NullPointerException npe = new NullPointerException();
+
+            throw Exceptions.attachMessage(npe, sb.toString());
+        }
+
+        return (PackageElement) element.getEnclosingElement();
     }
 
     public static TypeElement getOutermostEnclosingTypeElement( Element element ) {
