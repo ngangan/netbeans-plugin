@@ -174,7 +174,7 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
         if (e != null && e.getKind() == ElementKind.FIELD) {
             problem = chainProblems(problem, checkVisibilty(e, new MoveProblemCallback() {
                 public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
-                    return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature"  + (outgoing ? java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/scanners/Bundle").getString("") : java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/scanners/Bundle").getString("1")), new String[]{srcTypeName, feature, targetTypeName}));
+                    return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateFeature"  + (outgoing ? "" : "1"), new String[]{srcTypeName, feature, targetTypeName}));
                 }
             }));
         }

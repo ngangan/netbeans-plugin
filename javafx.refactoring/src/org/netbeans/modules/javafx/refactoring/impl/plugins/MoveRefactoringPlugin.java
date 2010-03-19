@@ -99,6 +99,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     private Map<String, Set<FileObject>> relatedPerPkg = null;
     private Set<FileObject> related = null;
     private Map<String, String> renames = null;
+    private Map<String, String> pkgRenames = null;
 
     public MoveRefactoringPlugin(MoveRefactoring refactoring) {
         this.refactoring = refactoring;
@@ -136,7 +137,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(CompilationController cc) throws Exception {
-                        MoveProblemCollector mpc = new MoveProblemCollector<Void, Void>(cc, movingClasses, renames);
+                        MoveProblemCollector mpc = new MoveProblemCollector<Void, Void>(cc, movingClasses, pkgRenames);
                         mpc.scan(cc.getCompilationUnit(), null);
                         if (mpc.getProblem() != null) {
                             p[0] = chainProblems(p[0], mpc.getProblem());
@@ -337,6 +338,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         related = new HashSet<FileObject>();
         relatedPerPkg = new HashMap<String, Set<FileObject>>();
         renames = new HashMap<String, String>();
+        pkgRenames = new HashMap<String, String>();
 
         for(FileObject file : files) {
             final Set<ElementDef> edefs = new HashSet<ElementDef>();
@@ -380,6 +382,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
                 Set<FileObject> fileRelated = ci.getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
                 String fqn = eh.getQualifiedName();
                 renames.put(fqn, fqn.replace(edef.getPackageName(), newPkgName));
+                pkgRenames.put(edef.getPackageName(), newPkgName);
                 Set<FileObject> rppkg = relatedPerPkg.get(edef.getPackageName());
                 if (rppkg == null) {
                     rppkg = new HashSet<FileObject>();
