@@ -111,7 +111,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     private transient          int                           m_defaultViewIndex;
 
     private class CommonCookie implements EditorCookie, EditCookie, OpenCookie, LineCookie, EditorCookie.Observable {
-                
+
         public void open() {
             openNodeInExplorer();
             try {
@@ -157,7 +157,9 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         }
 
         public void edit() {
-            getBaseSupport().edit();
+            //getBaseSupport().edit();
+            getBaseSupport().editSuper();
+            //updateEditorCookie();
         }
 
         public void addPropertyChangeListener(PropertyChangeListener arg0) {
@@ -234,7 +236,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
                 return klass.cast( new CommonCookie());
             }
         });
-        
+
         m_ic = new InstanceContent();
         m_lookup = new ProxyLookup(getCookieSet().getLookup(), new AbstractLookup(m_ic));
         m_defaultViewIndex = VISUAL_VIEW_INDEX;
@@ -245,6 +247,17 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
                 if (DataObject.PROP_NAME.equals(evt.getPropertyName())) {
                     updateTCName();
                 }
+            }
+        });
+    }
+
+    public void updateEditorCookie() {
+        //getCookieSet().assign(EditorCookie.class, getBaseSupport());
+        EditorCookie c = getCookieSet().getCookie(EditorCookie.class);
+        if( c != null) { getCookieSet().remove(c); }
+        getCookieSet().add(EditorCookie.class, new CookieSet.Factory() {
+            public <T extends Cookie> T createCookie(Class<T> klass) {
+                return klass.cast( getBaseSupport());
             }
         });
     }
@@ -352,7 +365,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
 
     public synchronized String getEntryName() {
         if ( m_model == null) {
-            return FXDContainer.MAIN_CONTENT;
+            return m_entryCached != null ? m_entryCached : FXDContainer.MAIN_CONTENT;
         } else {
             return m_model.getSelectedEntry();
         }

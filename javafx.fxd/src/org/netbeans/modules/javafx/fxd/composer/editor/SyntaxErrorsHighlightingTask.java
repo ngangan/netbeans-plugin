@@ -45,8 +45,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
@@ -79,25 +77,17 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
             Document document = result.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
             for (FXDSyntaxErrorException syntaxError : syntaxErrors) {
-                TokenSequence<?> ts = result.getSnapshot().getTokenHierarchy().tokenSequence();
-                ts.move(syntaxError.getOffset());
-                if (ts.moveNext()) {
-                    int ErrRow = getRow(syntaxError, (BaseDocument)document);
-                    int ErrPosition = getPosition(syntaxError, (BaseDocument)document);
+                int ErrRow = getRow(syntaxError, (BaseDocument) document);
+                int ErrPosition = getPosition(syntaxError, (BaseDocument) document);
 
-                    Token token = ts.token();
-                    int start = ts.offset();
-                    int end = start + token.length();
-                    ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
-                            Severity.ERROR,
-                            syntaxError.getMessage()+ " at ["+ErrRow+","+ErrPosition+"]",
-                            document,
-                            document.createPosition(start),
-                            document.createPosition(end));
-                    errors.add(errorDescription);
-                }
+                ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
+                        Severity.ERROR,
+                        syntaxError.getMessage() + " at [" + ErrRow + "," + ErrPosition + "]",
+                        document,
+                        ErrRow);
+                errors.add(errorDescription);
             }
-            if(document != null){
+            if (document != null) {
                 HintsController.setErrors(document, "simple-java", errors);
             }
         } catch (BadLocationException ex1) {

@@ -69,7 +69,17 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //        // attach vetoable change listener to be cancel loosing validity when modified
 //        env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(l, env));        
     }
-      
+
+    @Override
+    public void edit() {
+        ((FXZDataObject)getDataObject()).getBaseSupport().editSuper();
+        //((FXZDataObject)getDataObject()).updateEditorCookie();
+    }
+
+    public void editSuper() {
+        super.edit();
+    }
+
 //    @Override
 //    public void open() {
 //        FXZEditorSupport base = getFXZDataObject().getBaseSupport();
@@ -79,7 +89,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //            System.out.println("Trying to open entry: " + m_entryName);
 //        }
 //    }
-    
+
     @Override
     public StyledDocument openDocument() throws IOException {
         return openDocument(true);

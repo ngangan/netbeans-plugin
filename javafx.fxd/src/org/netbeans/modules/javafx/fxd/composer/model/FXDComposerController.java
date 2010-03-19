@@ -5,7 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
-import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -270,6 +269,7 @@ public final class FXDComposerController {
 
     public void setSelectedEntry( String entryName) {
         if ( m_dObj.getDataModel().setSelectedEntry(entryName)) {
+            m_dObj.updateEditorCookie();
             m_screenChangeTicker++;
             refresh();
         }
