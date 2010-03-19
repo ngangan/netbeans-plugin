@@ -108,7 +108,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                             npe.printStackTrace();
                         }
                         mainClassElement[0] = compilationInfo.getTrees().getElement(getCurrentPath());
-                        
+
                         return super.visitClassDeclaration(node, v);
                     }
 
@@ -180,13 +180,24 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
     }
 
     private boolean checkIfOveridden(CompilationInfo compilationInfo, Collection<ExecutableElement> elementsToCheck, ExecutableElement overridden) {
+        TypeElement type = ElementUtilities.enclosingTypeElement(overridden);
+        if (type == null) {
+            return false;
+        }
         for (ExecutableElement override : elementsToCheck) {
-            TypeElement type = ElementUtilities.enclosingTypeElement(overridden);
-            if (compilationInfo.getElements().overrides(override, overridden, type)) {
-                return true;
+            if (override == null) {
+                continue;
+            }
+            try {
+                if (compilationInfo.getElements().overrides(override, overridden, type)) {
+                    return true;
+                }
+            } catch (NullPointerException npe) {
+                //This is bacuse sometimes method compilationInfo.getElements().overrides(override, overridden, type) throws NPE randomly
+                npe.printStackTrace();
             }
         }
+        
         return false;
     }
-
 }
