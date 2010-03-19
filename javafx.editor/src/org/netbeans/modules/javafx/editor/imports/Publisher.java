@@ -144,7 +144,7 @@ class Publisher implements Runnable {
                     || id == JFXTokenId.WS) {
                 if (id == JFXTokenId.WS) {
                     if (!wasWS) {
-                        lastNonWSOffset = ts.offset() - 1;
+                        lastNonWSOffset = ts.offset(); // don't decrement the offset; it makes the import appear inside the comments if there's no package declaration (#177269)
                         wasWS = true;
                     }
                 } else {
