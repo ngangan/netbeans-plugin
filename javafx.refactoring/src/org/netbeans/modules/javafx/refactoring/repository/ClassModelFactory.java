@@ -76,6 +76,7 @@ import java.util.WeakHashMap;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
@@ -252,7 +253,9 @@ final public class ClassModelFactory {
                 int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
                 // workaround for bug in javafxc reporting incorrect end position for an overridden variable
                 // not reporting it when it can be workaround ... what's the point, anyway?
-                int expectedEndPos = startPos + ((JFXIdent)node).getName().length();
+                Name n = ((JFXIdent)node).getName();
+                if (n == null) return super.visitIdentifier(node, p); // #182370; javafxc returns "null" as the name for identifier with certain kind of error
+                int expectedEndPos = startPos + n.length();
                 endPos = endPos > expectedEndPos ? endPos : expectedEndPos;
                 // *** tada ***
 
