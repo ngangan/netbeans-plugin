@@ -51,10 +51,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.spi.tasklist.PushTaskScanner;
 import org.netbeans.spi.tasklist.Task;
 import org.netbeans.spi.tasklist.TaskScanningScope;
@@ -72,10 +74,9 @@ import org.openide.util.RequestProcessor;
  * @author Karol Harezlak
  */
 
-//TODO Currrently not in use!
 public class JavaFXTaskListProvider extends PushTaskScanner {
-
-    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES");//NOI18N
+    final private static Logger LOG = Logger.getLogger(JavaFXTaskListProvider.class.getName());
+    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
     private final HashMap<FileObject, FileChangeListener> projectDirs = new HashMap<FileObject, FileChangeListener>();
     private final HashMap<FileObject, RequestProcessor.Task> taskMap = new HashMap<FileObject, RequestProcessor.Task>();
@@ -129,9 +130,9 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                         if (!active.get()) {
                             return;
                         }
-                        //System.out.println("File created: " + fe.getFile().getPath());
+                        LOG.info("File created: " + fe.getFile().getPath());  //NOI18N
                         if (fe.getFile().getExt().equals(FX_EXT)) {
-                            updateTasks(fe.getFile(), callback, 5000);
+                            updateTasks(fe.getFile(), callback, 4000);
                         }
 
                         super.fileDataCreated(fe);
@@ -142,10 +143,10 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                         if (!active.get()) {
                             return;
                         }
-                        //System.out.println("Folder created: " + fe.getFile().getPath());
+                        LOG.info("Folder created: " + fe.getFile().getPath());  //NOI18N
                         for (FileObject child : fe.getFile().getChildren()) {
                             if (child.getExt().equals(FX_EXT)) {
-                                updateTasks(child, callback, 5000);
+                                updateTasks(child, callback, 4000);
                             }
                         }
 
@@ -157,9 +158,9 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                         if (!active.get()) {
                             return;
                         }
-                        //System.out.println("File changed: " + fe.getFile().getPath());
+                        LOG.info("File changed: " + fe.getFile().getPath());  //NOI18N
                         if (fe.getFile().getExt().equals(FX_EXT)) {
-                            updateTasks(fe.getFile(), callback, 5000);
+                            updateTasks(fe.getFile(), callback, 4000);
                         }
                         super.fileChanged(fe);
                     }
@@ -176,10 +177,11 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                                 RequestProcessor.Task task = taskMap.get(fe.getFile());
                                 if (task != null && !task.isFinished()) {
                                     task.cancel();
-                                    //System.out.println("TASK CANCELED FOR: " + fe.getFile().getPath());
+                                    LOG.fine("Task canceled: " + fe.getFile().getPath()); //NOI18N
                                 }
                             }
-                            //System.out.println("File deleted: " + fe.getFile().getPath());
+                            LOG.info("Task and file removed: " + fe.getFile().getPath());  //NOI18N
+                            taskMap.remove(fe.getFile());
                             callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                         }
                         super.fileDeleted(fe);
@@ -189,42 +191,48 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                 projectDir.addRecursiveListener(listener);
             }
 
-            updateTasks(fileObject, callback, 20000);
+            updateTasks(fileObject, callback, 5000);
         }
 
     }
 
-    private void updateTasks(final FileObject fileObject, final Callback callback, int delay) {
+    private void updateTasks(final FileObject fileObject, final Callback callback, final int delay) {
 
-        RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
+        RequestProcessor.Task task = taskMap.get(fileObject);
+        if (taskMap.get(fileObject) == null) {
+            task = RequestProcessor.getDefault().create(new Runnable() {
 
-            public void run() {
-                if (!active.get()) {
-                    return;
-                }
-                if (!fileObject.isValid()) {
-                    //System.out.println("NOT VALID ANY MORE " + fileObject.getPath());
-                    callback.setTasks(fileObject, Collections.EMPTY_LIST);
-                }
-                JavaFXSource jfxs = JavaFXSource.forFileObject(fileObject);
+                public void run() {
+                    if (!active.get()) {
+                        return;
+                    }
+                    if (IndexingManager.getDefault().isIndexing()) {
+                        final RequestProcessor.Task task = taskMap.get(fileObject);
+                        if (task != null) {
+                            task.schedule(delay);
+                            LOG.info("Task " + fileObject.getPath() + " has to wait "+ delay +" ms"); //NOI18N
+                        }
+                    } else {
+                        LOG.info("Task execution started: " + fileObject.getPath()); //NOI18N
+                        if (!fileObject.isValid()) {
+                            callback.setTasks(fileObject, Collections.EMPTY_LIST);
+                        }
+                        JavaFXSource jfxs = JavaFXSource.forFileObject(fileObject);
 
-                if (jfxs == null) {
-                    return;
-                } else {
-                    System.out.println(">>>>>>>>>>>>>  TASK CREATED  FOR " + fileObject.getPath());
+                        if (jfxs == null) {
+                            return;
+                        }
+                        try {
+                            jfxs.runWhenScanFinished(new ScannerTask(callback), true);
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                    }
                 }
-                try {
-                    jfxs.runWhenScanFinished(new ScannerTask(callback), true);
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+            });
+            synchronized (taskMap) {
+                taskMap.put(fileObject, task);
             }
-        });
-        synchronized (taskMap) {
-            if (taskMap.get(fileObject) != null && !taskMap.get(fileObject).isFinished()) {
-                taskMap.get(fileObject).cancel();
-            }
-            taskMap.put(fileObject, task);
         }
         task.setPriority(Thread.MIN_PRIORITY);
         task.schedule(delay);
@@ -240,7 +248,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         }
 
         public void run(final CompilationController compilationController) throws Exception {
-            //System.out.println("TASK RAN FOR " + compilationController.getFileObject().getPath());
+            //LOG.info("Scaning for errors for Task List" + compilationController.getFileObject().getPath()); //NOI18N
             if (!active.get()) {
                 return;
             }
@@ -248,7 +256,6 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         }
 
         private void refreshTasks(CompilationController compilationController) {
-            //StringBuilder builder = new StringBuilder();
             if (compilationController.getDiagnostics().isEmpty()) {
                 callback.setTasks(compilationController.getFileObject(), Collections.EMPTY_LIST);
                 return;
@@ -266,9 +273,8 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                     Exceptions.printStackTrace(ex);
                 }
                 if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
-                    Task task = Task.create(currentFileObject, "nb-tasklist-error", diagnostic.getMessage(Locale.getDefault())/* + " " + currentFileObject.getName() + " " + diagnostic.getLineNumber()*/, (int) diagnostic.getLineNumber()); //NOI18N
-                    tasksMap.put(currentFileObject, addTask(tasksMap.get(currentFileObject), task));
-                    //builder.append("ERROR TASK - File: " + compilationController.getFileObject().getName()  + " Source File: " + currentFileObject.getName() + " Message " + diagnostic.getMessage(Locale.getDefault()) + " Line " + diagnostic.getLineNumber() + "\n");
+                    Task task = Task.create(currentFileObject, "nb-tasklist-error", diagnostic.getMessage(Locale.getDefault()), (int) diagnostic.getLineNumber()); //NOI18N
+                    tasksMap.put(currentFileObject, addTask(tasksMap.get(currentFileObject), task));                    
                 }
             }
             for (FileObject key : tasksMap.keySet()) {
