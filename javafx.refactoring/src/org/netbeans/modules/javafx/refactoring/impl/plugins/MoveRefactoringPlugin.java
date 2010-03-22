@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -81,9 +82,7 @@ import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
-import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -92,7 +91,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class MoveRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
     private MoveRefactoring refactoring;
 
     private Map<FileObject, Set<ElementDef>> movingDefs = null;
@@ -103,10 +102,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
     public MoveRefactoringPlugin(MoveRefactoring refactoring) {
         this.refactoring = refactoring;
-    }
-
-    public void cancelRequest() {
-        //
     }
 
     public Problem checkParameters() {
@@ -205,7 +200,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         Problem preCheckProblem = null;
         for (FileObject file:refactoring.getRefactoringSource().lookupAll(FileObject.class)) {
             if (!SourceUtils.isElementInOpenProject(file)) {
-                preCheckProblem = JavaFXRefactoringPlugin.createProblem(preCheckProblem, true, NbBundle.getMessage(
+                preCheckProblem = createProblem(preCheckProblem, true, NbBundle.getMessage(
                         MoveRefactoringPlugin.class,
                         "ERR_ProjectNotOpened", // NOI18N
                         FileUtil.getFileDisplayName(file)));
@@ -217,6 +212,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     public Problem prepare(RefactoringElementsBag reb) {
         collectMovingData(RefactoringSupport.classIndex(refactoring));
 
+        if (isCancelled()) return null;
         fireProgressListenerStart(MoveRefactoring.PREPARE, 2 + movingDefs.size() + relatedPerPkg.size() + related.size());
         
         fireProgressListenerStep();
@@ -231,6 +227,8 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
 
         final String newPkgName = getNewPackageName();
         for(final Map.Entry<FileObject, Set<ElementDef>> entry : movingDefs.entrySet()) {
+            if (isCancelled()) return null;
+
             final FileObject file = entry.getKey();
             final String oldPkgName = entry.getValue().iterator().next().getPackageName();
 
@@ -280,11 +278,13 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         refelems.addAll(getRenameOccurencesInRelated(newPkgName, movingElDefs, reb.getSession()));
         refelems.addAll(getFixImportsInRelated(movingElDefs, reb.getSession()));
 
+        if (isCancelled()) return null;
         for(BaseRefactoringElementImplementation brei : refelems) {
+            if (isCancelled()) return null;
             if (brei.hasChanges()) {
                 reb.add(refactoring, brei);
             } else {
-                reb.addFileChange(refactoring, new ReindexFileElement(brei.getSourceFO()));
+                reb.addFileChange(refactoring, new ReindexFileElement(brei.getParentFile()));
             }
         }
         fireProgressListenerStop();
@@ -315,19 +315,6 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         }
     }
 
-    private static Problem chainProblems(Problem p,Problem p1) {
-        Problem problem;
-
-        if (p==null) return p1;
-        if (p1==null) return p;
-        problem=p;
-        while(problem.getNext()!=null) {
-            problem=problem.getNext();
-        }
-        problem.setNext(p1);
-        return p;
-    }
-
     synchronized private void collectMovingData(ClassIndex ci) {
         if (movingDefs != null) return; // already initialized
         
@@ -341,6 +328,8 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         pkgRenames = new HashMap<String, String>();
 
         for(FileObject file : files) {
+            if (isCancelled()) return;
+
             final Set<ElementDef> edefs = new HashSet<ElementDef>();
             if (SourceUtils.isJavaFXFile(file)) {
                 ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
@@ -378,6 +367,8 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
             }
             String newPkgName = getNewPackageName();
             for(ElementDef edef : edefs) {
+                if (isCancelled()) return;
+                
                 org.netbeans.api.javafx.source.ElementHandle eh = edef.createHandle();
                 Set<FileObject> fileRelated = ci.getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
                 String fqn = eh.getQualifiedName();
@@ -404,6 +395,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
         for(final Map.Entry<String, Set<FileObject>> entry : relatedPerPkg.entrySet()) {
             fireProgressListenerStep();
             for(FileObject refFo : entry.getValue()) {
+                if (isCancelled()) return null;
                 if (!SourceUtils.isJavaFXFile(refFo)) continue;
                 RenameOccurencesElement updateRefs = new RenameOccurencesElement(entry.getKey(), newName, refFo, session) {
 
@@ -431,6 +423,7 @@ public class MoveRefactoringPlugin extends ProgressProviderAdapter implements Re
     private Collection<BaseRefactoringElementImplementation> getFixImportsInRelated(final Set<ElementDef> movingElDefs, RefactoringSession session) {
         Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
         for(FileObject refFo : related) {
+            if (isCancelled()) return null;
             fireProgressListenerStep();
             FixImportsElement fixImports = new FixImportsElement(refFo, session) {
 

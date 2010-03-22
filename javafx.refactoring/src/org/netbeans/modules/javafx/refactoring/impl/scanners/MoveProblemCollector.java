@@ -139,22 +139,16 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
 
     @Override
     public R visitInstantiate(InstantiateTree node, P p) {
-        try {
-            currentClassStack.push(currentClass);
-            TypeElement clzElement = (TypeElement)((JFXInstanciate)node).type.tsym;
-            if (clzElement != null) currentClass = clzElement.asType();
-            problem = chainProblems(problem,
-                checkVisibilty(clzElement, new MoveProblemCallback() {
+        TypeElement clzElement = (TypeElement)((JFXInstanciate)node).type.tsym;
+        problem = chainProblems(problem,
+            checkVisibilty(clzElement, new MoveProblemCallback() {
 
-                    public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
-                        return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass"  + (outgoing ? "" : "1"), new String[]{srcTypeName, targetTypeName, newPkgName})); // NOI18N
-                    }
-                })
-            );
-            return super.visitInstantiate(node, p);
-        } finally {
-            currentClass = currentClassStack.pop();
-        }
+                public Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing) {
+                    return new Problem(false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass"  + (outgoing ? "" : "1"), new String[]{srcTypeName, targetTypeName, newPkgName})); // NOI18N
+                }
+            })
+        );
+        return super.visitInstantiate(node, p);
     }
 
     @Override

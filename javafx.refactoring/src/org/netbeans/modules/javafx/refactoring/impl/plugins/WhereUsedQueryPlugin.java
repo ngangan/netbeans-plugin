@@ -61,24 +61,18 @@ import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.java.api.WhereUsedQueryConstants;
-import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     private WhereUsedQuery refactoring;
 
     public WhereUsedQueryPlugin(WhereUsedQuery refactoring) {
         this.refactoring = refactoring;
-    }
-
-    public void cancelRequest() {
-        //
     }
 
     public Problem checkParameters() {
@@ -123,6 +117,8 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
     }
 
     private void collectMethodUsages(ElementDef edef, RefactoringElementsBag reb, final ClassIndex ci) {
+        if (isCancelled()) return;
+        
         final List<ElementDef> edefList = new ArrayList<ElementDef>();
 
         edefList.add(edef);
@@ -137,6 +133,7 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
         }
         
         for(ElementDef checking : edefList) {
+            if (isCancelled()) return;
             if (isFindUsages()) {
                 fireProgressListenerStart(WhereUsedQuery.INIT, 1);
                 Set<FileObject> files = ci.getResources(
@@ -188,6 +185,8 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
     }
 
     private void collectFieldUsages(final ElementDef edef, RefactoringElementsBag reb, final ClassIndex ci) {
+        if (isCancelled()) return;
+        
         if (!edef.isIndexable()) {
             // local references
             ClassModel cm = getClassModel();
@@ -210,10 +209,12 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
             ElementHandle eh = edef.createHandle();
             teh = new ElementHandle(ElementKind.CLASS, new String[]{eh.getSignatures()[0]});
         }
+        if (isCancelled()) return;
         references.addAll(ci.getResources(teh, EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class)));
 
         fireProgressListenerStart(WhereUsedQuery.PREPARE, references.size());
         for(FileObject ref : references) {
+            if (isCancelled()) return;
             fireProgressListenerStep();
             if (!SourceUtils.isJavaFXFile(ref)) continue;
             ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
@@ -230,6 +231,8 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
     }
 
     private void collectTypeUsages(final ElementDef edef, RefactoringElementsBag reb, final ClassIndex ci) {
+        if (isCancelled()) return;
+
         Set<FileObject> references = new HashSet<FileObject>();
 
         if (isFindUsages()) {
@@ -249,6 +252,8 @@ public class WhereUsedQueryPlugin extends ProgressProviderAdapter implements Ref
         workset.put(edef, references);
 
         while (!workset.isEmpty()) {
+            if (isCancelled()) return;
+            
             ElementDef checking = workset.keySet().iterator().next();
             Set<FileObject> files = workset.remove(checking);
 

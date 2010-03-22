@@ -28,6 +28,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
@@ -41,9 +42,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -57,11 +56,9 @@ import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixImportsElement;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.ImportEntry;
 import org.netbeans.modules.javafx.refactoring.repository.ImportSet;
-import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
 import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
@@ -71,9 +68,7 @@ import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.netbeans.modules.refactoring.api.SingleCopyRefactoring;
-import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
@@ -89,15 +84,11 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class CopyRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
     private AbstractRefactoring refactoring;
 
     public CopyRefactoringPlugin(AbstractRefactoring refactoring) {
         this.refactoring = refactoring;
-    }
-
-    public void cancelRequest() {
-        //
     }
 
     public Problem checkParameters() {
@@ -132,11 +123,13 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         
         final Set<ElementDef> movingDefs = new HashSet<ElementDef>();
         for(FileObject fobj : affectedFiles) {
+            if (isCancelled()) return null;
             ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fobj);
             movingDefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
         }
 
         for(FileObject fobj : affectedFiles) {
+            if (isCancelled()) return null;
             if (!SourceUtils.isJavaFXFile(fobj)) continue;
             final ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fobj);
             // Refactoring API doesn't handle copy of multiple files
@@ -183,7 +176,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                     @Override
                     protected FileObject getTargetFO() {
-                        return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
+                        return CopyRefactoringPlugin.this.getTargetFO(getParentFile());
                     }
 
                     private void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
@@ -231,7 +224,7 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
 
                     @Override
                     protected FileObject getTargetFO() {
-                        return CopyRefactoringPlugin.this.getTargetFO(getSourceFO());
+                        return CopyRefactoringPlugin.this.getTargetFO(getParentFile());
                     }
                 };
                 if (renameClass.hasChanges()) {
@@ -340,26 +333,6 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         return problem[0];
     }
 
-    private static final Problem createProblem(Problem result, boolean isFatal, String message) {
-        Problem problem = new Problem(isFatal, message);
-        if (result == null) {
-            return problem;
-        } else if (isFatal) {
-            problem.setNext(result);
-            return problem;
-        } else {
-            //problem.setNext(result.getNext());
-            //result.setNext(problem);
-
-            // [TODO] performance
-            Problem p = result;
-            while (p.getNext() != null)
-                p = p.getNext();
-            p.setNext(problem);
-            return result;
-        }
-    }
-
     /**
      * WTH - the default file copy refactoring does not handle multiple files
      * So we just copy/paste the responsible code here .... Nice and clean, buhaha
@@ -438,18 +411,5 @@ public class CopyRefactoringPlugin extends ProgressProviderAdapter implements Re
         public PositionBounds getPosition() {
             return null;
         }
-    }
-
-    private static Problem chainProblems(Problem p,Problem p1) {
-        Problem problem;
-
-        if (p==null) return p1;
-        if (p1==null) return p;
-        problem=p;
-        while(problem.getNext()!=null) {
-            problem=problem.getNext();
-        }
-        problem.setNext(p1);
-        return p;
     }
 }
