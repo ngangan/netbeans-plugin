@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.util.*;
 import javax.lang.model.element.ElementKind;
 import javax.swing.Action;
@@ -76,7 +77,7 @@ import org.openide.util.lookup.Lookups;
  *
  * Copied over from the java implementation
  */
-public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+public class SafeDeleteRefactoringPlugin extends JavaFXRefactoringPlugin {
     private SafeDeleteRefactoring refactoring;
     private WhereUsedQuery[] whereUsedQueries;
     
@@ -91,10 +92,6 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         this.refactoring = refactoring;
     }
 
-    public void cancelRequest() {
-        // do nothing
-    }
-
     /**
      * Checks whether the element being refactored is a valid Method/Field/Class
      * @return Problem returns a generic problem message if the check fails
@@ -102,7 +99,8 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
     @Override
     public Problem preCheck() {
         ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
-        if (!edef.isFromSource()) {
+        if (edef != null && // #182465 - don't try to access ElementDef for eg. package deletion
+            !edef.isFromSource()) {
             return new Problem(true, NbBundle.getMessage(SafeDeleteRefactoringPlugin.class, "ERR_CannotRefactorLibraryClass", SourceUtils.getEnclosingTypeName(edef)));
         }
         return null;
@@ -182,6 +180,8 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
 
         fireProgressListenerStart(AbstractRefactoring.PARAMETERS_CHECK, whereUsedQueries.length + 1);
         for(int i = 0;i < whereUsedQueries.length; ++i) {
+            if (isCancelled()) return null;
+
             Object refactoredObject = whereUsedQueries[i].getRefactoringSource().lookup(FileObject.class);
             refactoredObjects.add(refactoredObject);
 
@@ -190,6 +190,8 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
         }
         Problem problemFromWhereUsed = null;
         for (RefactoringElement refacElem : inner.getRefactoringElements()) {
+            if (isCancelled()) return null;
+            
             Usage usg = refacElem.getLookup().lookup(Usage.class);
             ElementDef refdef = usg.getDef();
             if (refdef.getStartFQN() == usg.getStartPos() && !refdef.overrides(edef)) continue; // don't include the element definition in the usages
@@ -215,8 +217,11 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
             return problemFromWhereUsed;
         }
 
+        if (isCancelled()) return null;
         if (lookupJavaFXFileObjects().isEmpty()) { // element deletion; no associated file
             for(ElementDef refdef : refactoring.getRefactoringSource().lookupAll(ElementDef.class)) {
+                if (isCancelled()) return null;
+                
                 ElementHandle eh = refdef.createHandle();
                 ElementHandle teh = new ElementHandle(ElementKind.CLASS, new String[]{eh.getSignatures()[0]});
 
@@ -224,6 +229,7 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
                 if (defFo.size() == 1) {
                     ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(defFo.iterator().next());
                     for(final ElementDef def : cm.getElementDefs(EnumSet.of(refdef.getKind()))) {
+                        if (isCancelled()) return null;
                         if (def.equals(refdef)) {
                             reb.add(refactoring, new BaseRefactoringElementImplementation(cm.getSourceFile(), reb.getSession()) {
 

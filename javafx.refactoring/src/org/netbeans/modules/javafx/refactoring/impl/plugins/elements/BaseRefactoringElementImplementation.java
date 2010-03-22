@@ -38,7 +38,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -154,10 +154,6 @@ abstract public class BaseRefactoringElementImplementation extends SimpleRefacto
         } catch (IOException e) {
         }
         return ""; // NOI18N
-    }
-
-    final protected FileObject getSourceFO() {
-        return srcFO;
     }
 
     protected FileObject getTargetFO() {

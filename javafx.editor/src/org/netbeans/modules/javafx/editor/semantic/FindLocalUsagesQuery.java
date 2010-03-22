@@ -41,6 +41,7 @@
 package org.netbeans.modules.javafx.editor.semantic;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.InstantiateTree;
@@ -119,6 +120,15 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
         Element el = info.getTrees().getElement(getCurrentPath());
         handleJavadoc(el);
         super.visitMethodInvocation(node, p);
+        return null;
+    }
+
+    @Override
+    public Void visitFunctionDefinition(FunctionDefinitionTree node, Stack<Tree> p) {
+        handlePotentialVariable(getCurrentPath());
+        Element el = info.getTrees().getElement(getCurrentPath());
+        handleJavadoc(el);
+        super.visitFunctionDefinition(node, p);
         return null;
     }
 

@@ -41,6 +41,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.text.MessageFormat;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -63,9 +64,7 @@ import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
-import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
@@ -74,15 +73,11 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class RenamePackagePlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
     private AbstractRefactoring refactoring;
 
     public RenamePackagePlugin(AbstractRefactoring refactoring) {
         this.refactoring = refactoring;
-    }
-
-    public void cancelRequest() {
-        //
     }
 
     public Problem checkParameters() {
@@ -123,20 +118,19 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
-        fireProgressListenerStart(RenameRefactoring.INIT, 3);
         FileObject packageFolder = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
         final String targetPkgName = getTargetPackageName(packageFolder);
         final String sourcePkgName = getSourcePackageName(packageFolder);
 
         Set<FileObject> relevantFiles = new HashSet<FileObject>();
 
-        fireProgressListenerStep();
         collectRelevantFiles(packageFolder, relevantFiles);
-        fireProgressListenerStop();
-        
+        if (isCancelled()) return null;
+
         fireProgressListenerStart(RenameRefactoring.PREPARE, relevantFiles.size());
         Set<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
         for(FileObject file : relevantFiles) {
+            if (isCancelled()) return null;
             ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
             final PackageDef pd = cm.getPackageDef();
             UpdatePackageDeclarationElement ref = new UpdatePackageDeclarationElement(pd.getName(), targetPkgName, file, reb.getSession()) {
@@ -152,10 +146,11 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
             };
             refelems.add(ref);
             
+            if (isCancelled()) return null;
             final ClassIndex index = RefactoringSupport.classIndex(refactoring);
-            fireProgressListenerStep();
             for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
+                    if (isCancelled()) return null;
                     RenameOccurencesElement bre = new RenameOccurencesElement(sourcePkgName, targetPkgName, referenced, reb.getSession()) {
 
                         @Override
@@ -174,18 +169,21 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
             fireProgressListenerStep();
         }
         for(BaseRefactoringElementImplementation ref : refelems) {
+            if (isCancelled()) return null;
             if (ref.hasChanges()) {
                 reb.add(refactoring, ref);
             } else if (SourceUtils.isJavaFXFile(ref.getParentFile())) {
                 reb.add(refactoring, new ReindexFileElement(ref.getParentFile()));
             }
         }
+        fireProgressListenerStop();
         
         return null;
     }
 
     private void collectRelevantFiles(FileObject parent, Set<FileObject> relevantFiles) {
         for(FileObject fo : parent.getChildren()) {
+            if (isCancelled()) return;
             if (fo.isData() && SourceUtils.isJavaFXFile(fo)) {
                 relevantFiles.add(fo);
             } else if (fo.isFolder()) {
@@ -230,18 +228,5 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
             result += ("".equals(result)? "" : ".") + s3; // NOI18N
         }
         return result;
-    }
-
-    private static Problem chainProblems(Problem p,Problem p1) {
-        Problem problem;
-
-        if (p==null) return p1;
-        if (p1==null) return p;
-        problem=p;
-        while(problem.getNext()!=null) {
-            problem=problem.getNext();
-        }
-        problem.setNext(p1);
-        return p;
     }
 }

@@ -73,8 +73,8 @@ import org.openide.util.RequestProcessor;
  *
  * @author Karol Harezlak
  */
-
 public class JavaFXTaskListProvider extends PushTaskScanner {
+
     final private static Logger LOG = Logger.getLogger(JavaFXTaskListProvider.class.getName());
     private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
@@ -179,9 +179,9 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                                     task.cancel();
                                     LOG.fine("Task canceled: " + fe.getFile().getPath()); //NOI18N
                                 }
+                                taskMap.remove(fe.getFile());
                             }
                             LOG.info("Task and file removed: " + fe.getFile().getPath());  //NOI18N
-                            taskMap.remove(fe.getFile());
                             callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                         }
                         super.fileDeleted(fe);
@@ -196,21 +196,20 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
 
     }
 
-    private void updateTasks(final FileObject fileObject, final Callback callback, final int delay) {
-
+    private synchronized void updateTasks(final FileObject fileObject, final Callback callback, final int delay) {
         RequestProcessor.Task task = taskMap.get(fileObject);
         if (taskMap.get(fileObject) == null) {
             task = RequestProcessor.getDefault().create(new Runnable() {
 
                 public void run() {
-                    if (!active.get()) {
+                    if (!active.get() || !fileObject.isValid()) {
                         return;
                     }
                     if (IndexingManager.getDefault().isIndexing()) {
                         final RequestProcessor.Task task = taskMap.get(fileObject);
                         if (task != null) {
                             task.schedule(delay);
-                            LOG.info("Task " + fileObject.getPath() + " has to wait "+ delay +" ms"); //NOI18N
+                            LOG.info("Task " + fileObject.getPath() + " has to wait " + delay + " ms"); //NOI18N
                         }
                     } else {
                         LOG.info("Task execution started: " + fileObject.getPath()); //NOI18N
@@ -230,10 +229,11 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                     }
                 }
             });
-            synchronized (taskMap) {
-                taskMap.put(fileObject, task);
-            }
+            taskMap.put(fileObject, task);
+        } else if (!task.isFinished()) {
+            task.cancel();
         }
+
         task.setPriority(Thread.MIN_PRIORITY);
         task.schedule(delay);
     }
@@ -274,7 +274,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                 }
                 if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
                     Task task = Task.create(currentFileObject, "nb-tasklist-error", diagnostic.getMessage(Locale.getDefault()), (int) diagnostic.getLineNumber()); //NOI18N
-                    tasksMap.put(currentFileObject, addTask(tasksMap.get(currentFileObject), task));                    
+                    tasksMap.put(currentFileObject, addTask(tasksMap.get(currentFileObject), task));
                 }
             }
             for (FileObject key : tasksMap.keySet()) {

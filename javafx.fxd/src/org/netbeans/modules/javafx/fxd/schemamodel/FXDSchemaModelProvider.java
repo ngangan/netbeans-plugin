@@ -55,6 +55,8 @@ import org.openide.util.Exceptions;
  */
 public class FXDSchemaModelProvider {
 
+    public static final String FXD_ROOT_NAME = "FXD"; //NOI18N
+
     public static final String FXD_SCHEMA_FILE = "/com/sun/javafx/tools/fxd/schema/fxd-schema.fxdl"; //NOI18N
 
     private static FXDSchema m_schema;
