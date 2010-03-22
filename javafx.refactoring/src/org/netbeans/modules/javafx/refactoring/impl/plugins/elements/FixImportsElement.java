@@ -42,7 +42,6 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
 
 import java.util.Set;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.BaseRefactoringElementImplementation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.filesystems.FileObject;

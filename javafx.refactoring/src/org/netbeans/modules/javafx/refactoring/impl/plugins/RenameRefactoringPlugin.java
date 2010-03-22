@@ -64,9 +64,7 @@ import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransf
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
-import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
-import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -78,7 +76,7 @@ import org.openide.util.Utilities;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class RenameRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
     private RenameRefactoring refactoring;
 
     public RenameRefactoringPlugin(RenameRefactoring refactoring) {
@@ -99,9 +97,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
         }
     }
 
-    public void cancelRequest() {
-        //
-    }
+    
 
     public Problem checkParameters() {
         FileObject fo = getRefactoringFO();
@@ -288,7 +284,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
         final ElementDef edef = getElementDef();
         fireProgressListenerStep();
 
-        if (edef == null) return null; // fail earl
+        if (edef == null) return null; // fail early
 
         final FileObject fo = getRefactoringFO();
         ClassIndex ci = RefactoringSupport.classIndex(refactoring);
@@ -307,6 +303,7 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
                 edefs.addAll(edef.getOverridden());
             }
             for(ElementDef ed : edefs) {
+                if (isCancelled()) return null;
                 ElementHandle eh = ed.createHandle();
                 files.addAll(ci.getResources(
                         eh,
@@ -326,8 +323,10 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
             }
         }
         fireProgressListenerStop();
+        if (isCancelled()) return null;
         fireProgressListenerStart(RenameRefactoring.PREPARE, files.size());
         for(FileObject file : files) {
+            if (isCancelled()) return null;
             fireProgressListenerStep();
             if (!SourceUtils.isJavaFXFile(file)) continue;
 
@@ -363,18 +362,6 @@ public class RenameRefactoringPlugin extends ProgressProviderAdapter implements 
         }
         fireProgressListenerStop();
         return null;
-    }
-
-    private static Problem chainProblems(Problem p,Problem p1) {
-        Problem problem;
-        if (p==null) return p1;
-        if (p1==null) return p;
-        problem=p;
-        while(problem.getNext()!=null) {
-            problem=problem.getNext();
-        }
-        problem.setNext(p1);
-        return p;
     }
 
     private String variableClashes() {

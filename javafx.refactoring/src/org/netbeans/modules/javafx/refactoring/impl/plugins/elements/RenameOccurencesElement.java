@@ -41,7 +41,6 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
 
-import org.netbeans.modules.javafx.refactoring.impl.plugins.BaseRefactoringElementImplementation;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -93,7 +92,7 @@ abstract public class RenameOccurencesElement extends BaseRefactoringElementImpl
         if ((this.newName == null) ? (other.newName != null) : !this.newName.equals(other.newName)) {
             return false;
         }
-        if ((getSourceFO() == null) ? (other.getSourceFO() != null) : !this.getSourceFO().equals(other.getSourceFO())) {
+        if ((getParentFile() == null) ? (other.getParentFile() != null) : !this.getParentFile().equals(other.getParentFile())) {
             return false;
         }
         return true;
@@ -104,7 +103,7 @@ abstract public class RenameOccurencesElement extends BaseRefactoringElementImpl
         int hash = 5;
         hash = 89 * hash + (this.oldName != null ? this.oldName.hashCode() : 0);
         hash = 89 * hash + (this.newName != null ? this.newName.hashCode() : 0);
-        hash = 89 * hash + (this.getSourceFO() != null ? this.getSourceFO().hashCode() : 0);
+        hash = 89 * hash + (this.getParentFile() != null ? this.getParentFile().hashCode() : 0);
         return hash;
     }
 }
