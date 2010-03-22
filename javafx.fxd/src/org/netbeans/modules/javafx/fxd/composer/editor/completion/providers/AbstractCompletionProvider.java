@@ -44,6 +44,7 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
 import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
 import com.sun.javafx.tools.fxd.schema.model.Element;
 import com.sun.javafx.tools.fxd.schema.model.Enumeration;
+import com.sun.javafx.tools.fxd.schema.model.FXDSchema;
 import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
 import com.sun.javafx.tools.fxd.schema.model.Property;
 import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
@@ -63,6 +64,7 @@ import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
+import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaModelProvider;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**
@@ -259,6 +261,9 @@ public abstract class AbstractCompletionProvider {
      * @return
      */
     private AbstractSchemaElement getSchemaElementsForDE(DocumentElement el) {
+        if(FXDSchemaModelProvider.FXD_ROOT_NAME.equals(el.getName())){
+            return FXDCompletionQuery.getFXDSchema();
+        }
         final List<AbstractSchemaElement> result = new ArrayList<AbstractSchemaElement>();
         final String id = getSchemaIdByDocElem(el);
         FXDCompletionQuery.getFXDSchema().visit(new SchemaVisitor() {
@@ -389,6 +394,14 @@ public abstract class AbstractCompletionProvider {
                 doCollectFilteredElementAttrs(attrs, elem.extendsElement, filter);
             }
 
+        } else if (ae instanceof FXDSchema){
+            FXDSchema schema = (FXDSchema) ae;
+            Property[] props = schema.properties;
+            for (Property prop : props) {
+                if (filter == null || filter.accept(prop)){
+                    attrs.add(prop);
+                }
+            }
         }
     }
 
