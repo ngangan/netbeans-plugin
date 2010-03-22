@@ -102,7 +102,8 @@ public class SafeDeleteRefactoringPlugin extends ProgressProviderAdapter impleme
     @Override
     public Problem preCheck() {
         ElementDef edef = refactoring.getRefactoringSource().lookup(ElementDef.class);
-        if (!edef.isFromSource()) {
+        if (edef != null && // #182465 - don't try to access ElementDef for eg. package deletion
+            !edef.isFromSource()) {
             return new Problem(true, NbBundle.getMessage(SafeDeleteRefactoringPlugin.class, "ERR_CannotRefactorLibraryClass", SourceUtils.getEnclosingTypeName(edef)));
         }
         return null;
