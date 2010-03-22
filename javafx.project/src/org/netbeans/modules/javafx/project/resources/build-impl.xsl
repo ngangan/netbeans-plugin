@@ -216,7 +216,7 @@ is divided into following sections:
         <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
         </target>
         <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-            <exec executable="${{platform.fxhome}}/bin/javafxpackager${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/bin/javafxpackager${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="-src"/>
                 <arg>
                     <xsl:attribute name="value">
@@ -281,7 +281,7 @@ is divided into following sections:
             <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
                 <istrue value="${{jad.install}}"/>
             </condition>
-            <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="${{run.jvmargs}}"/>
                 <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                 <arg value="-Xdevice:${{mobile.device}}"/>
@@ -290,7 +290,7 @@ is divided into following sections:
         <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="-profile"/>
                 <arg value="tv"/>
                 <arg value="-classpath"/>
@@ -310,7 +310,7 @@ is divided into following sections:
             <condition property="javaws.home" value="/usr" else="${{java.home}}">
                 <os family="mac"/>
             </condition>
-            <exec executable="${{javaws.home}}/bin/javaws" failonerror="true">
+            <exec executable="${{javaws.home}}/bin/javaws" failonerror="true" logerror="true">
                 <env key="JAVAWS_VM_ARGS" value="${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
@@ -379,7 +379,7 @@ is divided into following sections:
                 socket.close();
             ]]></script>
             <parallel failonany="true">
-                <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}">
+                <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}" failonerror="true" logerror="true">
                     <arg value="${{run.jvmargs}}"/>
                     <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                     <arg value="-Xdebug"/>
@@ -401,7 +401,7 @@ is divided into following sections:
         <target name="-debug-tv-debuggee" if="tv.execution.trigger">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true">
+            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="-Xdebug"/>
                 <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
                 <arg value="-profile"/>
@@ -416,7 +416,7 @@ is divided into following sections:
             <condition property="javaws.home" value="/usr" else="${{java.home}}">
                 <os family="mac"/>
             </condition>
-            <exec executable="${{javaws.home}}/bin/javaws">
+            <exec executable="${{javaws.home}}/bin/javaws" failonerror="true" logerror="true">
                 <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}} ${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>

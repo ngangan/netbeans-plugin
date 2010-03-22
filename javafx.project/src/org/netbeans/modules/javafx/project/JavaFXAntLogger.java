@@ -155,7 +155,7 @@ public final class JavaFXAntLogger extends AntLogger {
     }
        
     public void taskFinished(AntEvent event) {
-        if ("java".equals(event.getTaskName()) || "javafx".equals(event.getTaskName()) || "javac".equals(event.getTaskName()) || "javafxc".equals(event.getTaskName())) { // NOI18N
+        if (event.getSession().getVerbosity() <= AntEvent.LOG_INFO && ("exec".equals(event.getTaskName()) || "java".equals(event.getTaskName()) || "javafx".equals(event.getTaskName()) || "javac".equals(event.getTaskName()) || "javafxc".equals(event.getTaskName()))) { // NOI18N
             Throwable t = event.getException();
             AntSession session = event.getSession();
             if (t != null && !session.isExceptionConsumed(t)) {
