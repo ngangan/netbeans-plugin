@@ -151,6 +151,7 @@ is divided into following sections:
             <condition property="sign.arg" value="-sign" else="">
                 <istrue value="${{jnlp.signed}}"/>
             </condition>
+            <property name="jnlp.update.model" value="always"/>
             <property name="javadoc.preview" value="true"/>
             <property name="source.encoding" value="${{file.encoding}}"/>
             <condition property="binary.extension" value=".exe" else="">
@@ -248,6 +249,10 @@ is divided into following sections:
                 <arg value="${{draggable.arg}}"/>
                 <arg value="${{pack200.arg}}"/>
                 <arg value="${{sign.arg}}"/>
+<!-- temporary disabled until http://javafx-jira.kenai.com/browse/RT-7359 is on place
+                <arg value="-updatecheck"/>
+                <arg value="${{jnlp.update.model}}"/>
+-->
                 <arg value="-cp"/>
                 <arg path="${{javac.classpath}}"/>
             </exec>

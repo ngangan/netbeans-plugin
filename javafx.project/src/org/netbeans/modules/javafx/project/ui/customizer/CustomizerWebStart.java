@@ -69,6 +69,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
 //        codebaseTextField.setDocument(jwsProps.codebaseURLDocument);
         jCheckBox1.setModel(jwsProps.enablePack200Model);
         jCheckBox2.setModel(jwsProps.signedModel);
+        jComboBoxUpdate.setModel(jwsProps.updateModel);
 //        setCodebaseComponents();
         
     }
@@ -86,6 +87,8 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         panelDescLabel = new javax.swing.JLabel();
         jCheckBox2 = new javax.swing.JCheckBox();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jLabelUpdate = new javax.swing.JLabel();
+        jComboBoxUpdate = new javax.swing.JComboBox();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -104,6 +107,7 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
         add(jCheckBox2, gridBagConstraints);
@@ -112,9 +116,26 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(8, 6, 0, 0);
         add(jCheckBox1, gridBagConstraints);
+
+        jLabelUpdate.setLabelFor(jComboBoxUpdate);
+        org.openide.awt.Mnemonics.setLocalizedText(jLabelUpdate, org.openide.util.NbBundle.getMessage(CustomizerWebStart.class, "CustomizerWebStart.jLabelUpdate.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 0);
+        add(jLabelUpdate, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(12, 6, 0, 0);
+        add(jComboBoxUpdate, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     public HelpCtx getHelpCtx() {
@@ -163,6 +184,8 @@ public class CustomizerWebStart extends JPanel implements HelpCtx.Provider {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
+    private javax.swing.JComboBox jComboBoxUpdate;
+    private javax.swing.JLabel jLabelUpdate;
     private javax.swing.JLabel panelDescLabel;
     // End of variables declaration//GEN-END:variables
     

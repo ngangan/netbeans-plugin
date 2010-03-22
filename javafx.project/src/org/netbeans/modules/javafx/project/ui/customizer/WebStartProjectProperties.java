@@ -85,6 +85,10 @@ public class WebStartProjectProperties {
     public static final String JNLP_SIGNED = "jnlp.signed"; // NOI18N
     public static final String CB_TYPE_LOCAL = "local"; // NOI18N
     public static final String CB_TYPE_USER = "user"; // NOI18N
+    public static final String UP_TYPE_ALWAYS = "always"; // NOI18N
+    public static final String UP_TYPE_TIMEOUT = "timeout"; // NOI18N
+    public static final String UP_TYPE_BACKGROUND = "background"; // NOI18N
+    public static final String JNLP_UPDATE_MODEL = "jnlp.update.model"; // NOI18N
     public static final String PACK200_COMPRESS_MODEL="pack200.jar.compress"; // NOI18N
     public static final String PACK200_ENABLE_MODEL = "jnlp.packEnabled"; // NOI18N
     // special value to persist Ant script handling
@@ -99,6 +103,7 @@ public class WebStartProjectProperties {
     ButtonModel pack200Model;
     ButtonModel enablePack200Model;
     ComboBoxModel codebaseModel;
+    ComboBoxModel updateModel;
     // and Documents
     Document iconDocument;
     Document codebaseURLDocument;
@@ -125,6 +130,7 @@ public class WebStartProjectProperties {
         pack200Model = jnlpPropGroup.createToggleButtonModel(evaluator, PACK200_COMPRESS_MODEL);
         enablePack200Model = jnlpPropGroup.createToggleButtonModel(evaluator, PACK200_ENABLE_MODEL);
         codebaseModel = new CodebaseComboBoxModel();
+        updateModel = new UpdateComboBoxModel();
         codebaseURLDocument = createCBTextFieldDocument();
     }
 
@@ -151,6 +157,7 @@ public class WebStartProjectProperties {
             editableProps.setProperty(JNLP_CBASE_TYPE, selItem);
             editableProps.setProperty(propName, propValue);
         }
+        editableProps.setProperty(JNLP_UPDATE_MODEL, ((UpdateComboBoxModel)updateModel).getSelectedUpdateItem());
     }
 
     public void store() throws IOException {
@@ -410,6 +417,34 @@ public class WebStartProjectProperties {
 
         public String getSelectedCodebaseItem() {
             return cbItems[getIndexOf(getSelectedItem())];
+        }
+    }
+
+    public class UpdateComboBoxModel extends DefaultComboBoxModel {
+
+        String alwaysLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_UP_Combo_Always"); // NOI18N
+        String timeoutLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_UP_Combo_Timeout"); // NOI18N
+        String backgroundLabel = NbBundle.getBundle(WebStartProjectProperties.class).getString("LBL_UP_Combo_Background"); // NOI18N
+        Object[] visItems = new Object[]{alwaysLabel, timeoutLabel, backgroundLabel};
+        String[] upItems = new String[]{UP_TYPE_ALWAYS, UP_TYPE_TIMEOUT, UP_TYPE_BACKGROUND};
+
+        public UpdateComboBoxModel() {
+            super();
+            addElement(visItems[0]);
+            addElement(visItems[1]);
+            addElement(visItems[2]);
+            String propValue = evaluator.getProperty(JNLP_UPDATE_MODEL);
+            if (upItems[2].equals(propValue)) {
+                setSelectedItem(visItems[2]);
+            } else if (upItems[1].equals(propValue)) {
+                setSelectedItem(visItems[1]);
+            } else {
+                setSelectedItem(visItems[0]);
+            }
+        }
+
+        public String getSelectedUpdateItem() {
+            return upItems[getIndexOf(getSelectedItem())];
         }
     }
 }
