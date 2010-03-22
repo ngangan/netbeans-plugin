@@ -60,6 +60,7 @@ import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.PathMatcher;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.ErrorManager;
+import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
 
 /**
@@ -181,19 +182,18 @@ final class SourcePathImplementation implements ClassPathImplementation, Propert
     }
 
 
-    public void propertyChange(PropertyChangeEvent evt) {
-        if (SourceRoots.PROP_ROOTS.equals (evt.getPropertyName())) {
-            synchronized (this) {
-                this.resources = null;
+    public void propertyChange(final PropertyChangeEvent evt) {
+        if (SourceRoots.PROP_ROOTS.equals (evt.getPropertyName()) ||
+           (evaluator != null && evt.getSource() == evaluator &&
+           (evt.getPropertyName() == null || PROP_BUILD_DIR.equals(evt.getPropertyName())))) {
+            synchronized (SourcePathImplementation.this) {
+                resources = null;
             }
-            this.support.firePropertyChange (PROP_RESOURCES,null,null);
-        }
-        else if (this.evaluator != null && evt.getSource() == this.evaluator && 
-            (evt.getPropertyName() == null || PROP_BUILD_DIR.equals(evt.getPropertyName()))) {
-            synchronized (this) {
-                this.resources = null;
-            }
-            this.support.firePropertyChange (PROP_RESOURCES,null,null);
+            RequestProcessor.getDefault().post(new Runnable() {
+                public void run() {
+                    support.firePropertyChange (PROP_RESOURCES,null,null);
+                }
+            });
         }
     }
 
