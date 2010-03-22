@@ -123,16 +123,13 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
-        fireProgressListenerStart(RenameRefactoring.INIT, 3);
         FileObject packageFolder = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
         final String targetPkgName = getTargetPackageName(packageFolder);
         final String sourcePkgName = getSourcePackageName(packageFolder);
 
         Set<FileObject> relevantFiles = new HashSet<FileObject>();
 
-        fireProgressListenerStep();
         collectRelevantFiles(packageFolder, relevantFiles);
-        fireProgressListenerStop();
         
         fireProgressListenerStart(RenameRefactoring.PREPARE, relevantFiles.size());
         Set<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
@@ -153,7 +150,6 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
             refelems.add(ref);
             
             final ClassIndex index = RefactoringSupport.classIndex(refactoring);
-            fireProgressListenerStep();
             for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
                     RenameOccurencesElement bre = new RenameOccurencesElement(sourcePkgName, targetPkgName, referenced, reb.getSession()) {
@@ -180,6 +176,7 @@ public class RenamePackagePlugin extends ProgressProviderAdapter implements Refa
                 reb.add(refactoring, new ReindexFileElement(ref.getParentFile()));
             }
         }
+        fireProgressListenerStop();
         
         return null;
     }
