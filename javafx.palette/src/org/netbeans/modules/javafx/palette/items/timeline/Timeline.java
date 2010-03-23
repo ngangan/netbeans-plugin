@@ -60,7 +60,7 @@ public class Timeline implements ActiveEditorDrop {
         
         // Imports
         Imports.addImport( targetComponent, "javafx.animation.Timeline" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.animation.KeyFrame" ); // NOI18N
+        Imports.addImport( targetComponent, "javafx.animation.Interpolator" ); // NOI18N
         
         return true;
     }
