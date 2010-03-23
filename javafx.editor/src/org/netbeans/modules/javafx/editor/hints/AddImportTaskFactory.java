@@ -77,8 +77,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private static final String HINTS_IDENT = "addimportjavafx"; //NOI18N
     private static final String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
-    private static final String message = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
-    private static final Comparator IMPORT_CMPERATOR = new ImportComperator();
+    private static final String MESSAGE = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
+    private static final Comparator IMPORT_COMPERATOR = new ImportComperator();
 
     private final AtomicBoolean cancel = new AtomicBoolean();
 
@@ -212,7 +212,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                     if (fixList.isEmpty()) {
                         continue;
                     }
-                    Collections.sort(fixList, IMPORT_CMPERATOR);
+                    Collections.sort(fixList, IMPORT_COMPERATOR);
                     ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixList, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
                 }
@@ -264,7 +264,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         }
 
         public String getText() {
-            return message + fqn;
+            return MESSAGE + fqn;
         }
 
         public ChangeInfo implement() throws Exception {
