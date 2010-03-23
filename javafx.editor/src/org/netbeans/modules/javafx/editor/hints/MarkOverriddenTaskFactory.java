@@ -52,7 +52,9 @@ import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.Modifier;
 import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import javax.tools.Diagnostic;
@@ -100,6 +102,9 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                     }
                     ClassSymbol classSymbol = (ClassSymbol) currentClass;
                     for (Element element : overriddenMethods.get(currentClass)) {
+                        if (element.getModifiers().contains(Modifier.STATIC)) {
+                            continue;
+                        }
                         if (element instanceof MethodSymbol) {
                             String fqnString = null;
                             if (classSymbol.getInterfaces().size() == 1) {
