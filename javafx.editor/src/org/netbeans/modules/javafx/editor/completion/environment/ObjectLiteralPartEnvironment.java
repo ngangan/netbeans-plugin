@@ -71,7 +71,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
         // For fields with String type add double-quotes completion item
         if (path != null) {
             Element e = controller.getTrees().getElement(path);
-            if (e.getKind() == ElementKind.FIELD) {
+            if (e != null && e.getKind() == ElementKind.FIELD) {
                 TypeMirror type = e.asType();
                 if (type.getKind() == TypeKind.DECLARED) {
                     TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
