@@ -184,6 +184,18 @@ public final class UIStubGenerator {
 //                            }
 //                        }
 //
+
+    private String getIdAttribute(AttributeSet attrs) {
+        String id = (String) attrs.getAttribute("id"); //NOI18N
+        if (id == null){
+            id = (String) attrs.getAttribute("Id"); //NOI18N
+        }
+        if (id == null){
+            id = (String) attrs.getAttribute("ID"); //NOI18N
+        }
+        return id;
+    }
+
     private void implGenerate( final String archiveName, final String stubLocation, 
             final String packagePath, final Map<String,String> selected, final boolean generateWarning) {
         Thread th = new Thread() {
@@ -203,7 +215,7 @@ public final class UIStubGenerator {
 
                         model.visitElements( new FXDFileModel.ElementVisitor() {
                             public boolean visitElement(String elemType, String elemName, AttributeSet attrs) throws AttributeConflictException {
-                                String id = (String) attrs.getAttribute("id"); //NOI18N
+                                String id = getIdAttribute(attrs);
                                 int    len;
                                 if ( id != null && (len=id.length()) > 0) {
                                     if ( len > 2 && id.charAt(0) == '"' && id.charAt(len-1) == '"') { // NOI18N
