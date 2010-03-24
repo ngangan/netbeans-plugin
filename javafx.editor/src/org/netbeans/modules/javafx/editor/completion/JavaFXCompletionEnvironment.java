@@ -1614,7 +1614,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
             if (LOGGABLE) { log("  start = " + start); } // NOI18N
             String end = d.getText(offset + 1, d.getLength() - offset - 1);
             if (LOGGABLE) { log("  end = " + end); } // NOI18N
-            useSanitizedSource(start + "\n;" + end, offset); // NOI18N
+            useSanitizedSource(start + "x\n;" + end, offset); // NOI18N
             return true;
         } catch (BadLocationException ble) {
             if (LOGGABLE) {

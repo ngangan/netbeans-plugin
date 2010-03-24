@@ -68,6 +68,11 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
     protected void inside(JFXObjectLiteralPart t) throws IOException {
         if (LOGGABLE) log("inside JFXObjectLiteralPart " + t + "  offset == " + offset); // NOI18N
 
+        if (t.getExpression() instanceof JFXErroneous
+                && tryToUseSanitizedSource()) {
+            return;
+        }
+
         // For fields with String type add double-quotes completion item
         if (path != null) {
             Element e = controller.getTrees().getElement(path);
@@ -81,10 +86,6 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
                     }
                 }
             }
-        }
-        if (t.getExpression() instanceof JFXErroneous
-                && tryToUseSanitizedSource()) {
-            return;
         }
         addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
         addLocalMembersAndVars(getSmartType(t));
