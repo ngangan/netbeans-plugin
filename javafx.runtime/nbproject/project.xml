@@ -65,6 +65,10 @@
                 <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-controls.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-charts.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-charts.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-desktop.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-desktop.jar</binary-origin>
             </class-path-extension>
