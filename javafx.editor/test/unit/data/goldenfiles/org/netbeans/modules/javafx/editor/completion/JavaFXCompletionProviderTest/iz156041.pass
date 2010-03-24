@@ -1,4 +1,11 @@
-<any> a
+com.sun.javafx.runtime.sequence.Sequence<? extends java.lang.Object> a
+com.sun.javafx.runtime.FXBase super
+Test this
+public static boolean isInitialized(arg0 : java.lang.Object)
+public static boolean isReadOnly(arg0 : java.lang.Object)
+public static boolean isSameObject(arg0 : java.lang.Object, arg1 : java.lang.Object)
+public static void print(arg0 : java.lang.Object)
+public static void println(arg0 : java.lang.Object)
 bind
 false
 function
@@ -6,11 +13,12 @@ new
 null
 true
 A
+DragViewHandler
 Duration
 FX
+MenuItemSize
 Object
 String
-SubMenuItem
 Test
 com
 java
