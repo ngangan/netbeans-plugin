@@ -239,7 +239,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
         visitElements( m_docModel.getRootElement(), visitor);
     }
     
-    private boolean visitElements( DocumentElement de, ElementVisitor visitor) throws Exception {
+    public boolean visitElements( DocumentElement de, ElementVisitor visitor) throws Exception {
         visitor.visitElement( de.getType(), de.getName(), de.getAttributes());
         List<DocumentElement> children = de.getChildren();
         for (DocumentElement cde : children) {
