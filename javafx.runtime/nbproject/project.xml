@@ -7,6 +7,7 @@
             <suite-component/>
             <module-dependencies/>
             <public-packages>
+                <subpackages>com.javafx</subpackages>
                 <package>com.sun.embeddedswing</package>
                 <subpackages>com.sun.javafx</subpackages>
                 <subpackages>com.sun.media.jmc</subpackages>
