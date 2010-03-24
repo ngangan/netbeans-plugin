@@ -161,7 +161,7 @@ public class FXDCompletionQuery extends AsyncCompletionQuery {
         try {
             DocumentModel m = DocumentModel.getDocumentModel(doc);
             DocumentElement el = m.getLeafElementForOffset(caretOffset);
-            DocumentModelUtils.dumpElementStructure(el);
+            //DocumentModelUtils.dumpElementStructure(el);
             return el;
         } catch (DocumentModelException ex) {
             Exceptions.printStackTrace(ex);
