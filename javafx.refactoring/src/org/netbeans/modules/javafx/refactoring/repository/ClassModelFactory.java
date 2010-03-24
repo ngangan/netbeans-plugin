@@ -234,12 +234,16 @@ final public class ClassModelFactory {
                     ImportEntry entry;
                     if (e.getKind() == ElementKind.PACKAGE) {
                         entry = new PackageImportEntry(((PackageElement)e).getQualifiedName().toString(), startPos, endPos, startFQN, endFQN);
+                        p.addUsage(new Usage(startFQN, endFQN, new PackageDef(entry.getPackageName())));
                     } else {
                         entry = new TypeImportEntry(cc.getElements().getPackageOf(e).getQualifiedName().toString(), ((TypeElement)e).getQualifiedName().toString(), wildcard, startPos, endPos, startFQN, endFQN);
+                        p.addUsage(new Usage(startFQN, endFQN, getClassDef((TypeElement)e, p)));
+                        p.addUsage(new Usage(startFQN, startFQN + entry.getPackageName().length() - 1, new PackageDef(entry.getPackageName())));
                     }
                     p.addImport(entry);
+                    
                 }
-                return super.visitImport(node, p);
+                return null;
             } finally {
             }
         }

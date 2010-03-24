@@ -984,6 +984,7 @@ public class JFXReformatTask implements ReformatTask {
                                     blankLines(cs.getBlankLinesBeforeFields());
                                 }
                                 scan(member, p);
+                                semiRead = processSemicolon();
                                 if (!isLastInCU) {
                                     blankLines(cs.getBlankLinesAfterFields());
                                 }

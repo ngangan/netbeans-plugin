@@ -44,8 +44,10 @@ import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -81,6 +83,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
     private final HashMap<FileObject, FileChangeListener> projectDirs = new HashMap<FileObject, FileChangeListener>();
     private final HashMap<FileObject, RequestProcessor.Task> taskMap = new HashMap<FileObject, RequestProcessor.Task>();
     private AtomicBoolean active = new AtomicBoolean();
+    private boolean updated = false;
 
     private JavaFXTaskListProvider() {
         super(TASK_LIST_NAME, TASK_LIST_NAME, TASK_LIST_NAME);
@@ -112,27 +115,24 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         active.set(true);
 
         Iterator<FileObject> iterator = taskScanningScope.iterator();
+        Collection<FileObject> fileObjects = new HashSet<FileObject>();
         while (iterator.hasNext()) {
             FileObject fileObject = iterator.next();
 
             if (!fileObject.getExt().equals(FX_EXT)) {
                 continue;
             }
-
+            fileObjects.add(fileObject);
             final FileObject projectDir = FileOwnerQuery.getOwner(fileObject).getProjectDirectory();
-
 
             if (!projectDirs.keySet().contains(projectDir)) {
                 FileChangeListener listener = new FileChangeAdapter() {
 
                     @Override
                     public void fileDataCreated(FileEvent fe) {
-                        if (!active.get()) {
-                            return;
-                        }
-                        LOG.info("File created: " + fe.getFile().getPath());  //NOI18N
-                        if (fe.getFile().getExt().equals(FX_EXT)) {
-                            updateTasks(fe.getFile(), callback, 4000);
+                        if (fe.getFile().getExt().equals(FX_EXT) && !active.get()) {
+                            LOG.info("File created: " + fe.getFile().getPath());  //NOI18N
+                            updateTask(fe.getFile(), callback, 4000);
                         }
 
                         super.fileDataCreated(fe);
@@ -143,10 +143,10 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                         if (!active.get()) {
                             return;
                         }
-                        LOG.info("Folder created: " + fe.getFile().getPath());  //NOI18N
                         for (FileObject child : fe.getFile().getChildren()) {
                             if (child.getExt().equals(FX_EXT)) {
-                                updateTasks(child, callback, 4000);
+                                LOG.info("Folder created and update: " + fe.getFile().getPath());  //NOI18N
+                                updateTask(child, callback, 4000);
                             }
                         }
 
@@ -155,12 +155,12 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
 
                     @Override
                     public void fileChanged(FileEvent fe) {
-                        if (!active.get()) {
-                            return;
-                        }
-                        LOG.info("File changed: " + fe.getFile().getPath());  //NOI18N
                         if (fe.getFile().getExt().equals(FX_EXT)) {
-                            updateTasks(fe.getFile(), callback, 4000);
+                            if (!active.get()) {
+                                return;
+                            }
+                            LOG.info("File changed: " + fe.getFile().getPath());  //NOI18N
+                            updateTask(fe.getFile(), callback, 4000);
                         }
                         super.fileChanged(fe);
                     }
@@ -190,13 +190,14 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                 projectDirs.put(projectDir, listener);
                 projectDir.addRecursiveListener(listener);
             }
-
-            updateTasks(fileObject, callback, 5000);
         }
-
+        //if (!updated) {
+            updateTasks(fileObjects, callback, 5000);
+          //  updated = true;
+        //}
     }
 
-    private synchronized void updateTasks(final FileObject fileObject, final Callback callback, final int delay) {
+    private synchronized void updateTask(final FileObject fileObject, final Callback callback, final int delay) {
         RequestProcessor.Task task = taskMap.get(fileObject);
         if (taskMap.get(fileObject) == null) {
             task = RequestProcessor.getDefault().create(new Runnable() {
@@ -213,11 +214,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
                         }
                     } else {
                         LOG.info("Task execution started: " + fileObject.getPath()); //NOI18N
-                        if (!fileObject.isValid()) {
-                            callback.setTasks(fileObject, Collections.EMPTY_LIST);
-                        }
                         JavaFXSource jfxs = JavaFXSource.forFileObject(fileObject);
-
                         if (jfxs == null) {
                             return;
                         }
@@ -233,6 +230,53 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         } else if (!task.isFinished()) {
             task.cancel();
         }
+
+        task.setPriority(Thread.MIN_PRIORITY);
+        task.schedule(delay);
+    }
+
+    final RequestProcessor.Task[] majorTask = new RequestProcessor.Task[1];
+
+    private synchronized void updateTasks(final Collection<FileObject> fileObjects, final Callback callback, final int delay) {
+        final RequestProcessor.Task t = majorTask[0];
+        if (t != null) {
+            t.cancel();
+        }
+        LOG.info(">>>>>>>>>>>>>>>>>> Major Task has been created"); //NOI18N
+        for (FileObject fo : fileObjects) {
+            System.out.println(fo.getName());
+        }
+        final RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
+
+            public void run() {
+                if (!active.get()) {
+                    return;
+                }
+                RequestProcessor.Task task = majorTask[0];
+                if (IndexingManager.getDefault().isIndexing()) {
+                    if (task != null) {
+                        task.schedule(delay);
+                        LOG.info("Major task update for " + task.toString() + " has to wait " + delay + " ms"); //NOI18N
+                    } else {
+                        return;
+                    }
+                } else {
+                    for (FileObject fileObject : fileObjects) {
+                        JavaFXSource jfxs = JavaFXSource.forFileObject(fileObject);
+                        if (jfxs == null) {
+                            return;
+                        }
+                        try {
+                            jfxs.runWhenScanFinished(new ScannerTask(callback), true);
+                        } catch (IOException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
+                        LOG.info("Major task execution started: " + fileObject.getName()); //NOI18N
+                    }
+                }
+            }
+        });
+        majorTask[0] = task;
 
         task.setPriority(Thread.MIN_PRIORITY);
         task.schedule(delay);
@@ -262,15 +306,15 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             }
             Map<FileObject, List<Task>> tasksMap = new HashMap<FileObject, List<Task>>();
             for (Diagnostic diagnostic : compilationController.getDiagnostics()) {
-                if (!(diagnostic instanceof JCDiagnostic)) {
-                    continue;
-                }
+//                if (!(diagnostic instanceof JCDiagnostic)) {
+//                    continue;
+//                }
                 JCDiagnostic jcd = ((JCDiagnostic) diagnostic);
                 FileObject currentFileObject = null;
                 try {
                     currentFileObject = URLMapper.findFileObject(jcd.getSource().toUri().toURL());
                 } catch (MalformedURLException ex) {
-                    Exceptions.printStackTrace(ex);
+                    ex.printStackTrace();
                 }
                 if (diagnostic.getKind() == Diagnostic.Kind.ERROR) {
                     Task task = Task.create(currentFileObject, "nb-tasklist-error", diagnostic.getMessage(Locale.getDefault()), (int) diagnostic.getLineNumber()); //NOI18N
@@ -280,10 +324,12 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             for (FileObject key : tasksMap.keySet()) {
                 List<Task> list = tasksMap.get(key);
                 if (list != null) {
-                    callback.setTasks(key, list);
+                    
                 }
             }
-
+            synchronized (tasksMap) {
+                tasksMap.remove(compilationController.getFileObject());
+            }
         }
 
         private List<Task> addTask(List<Task> list, Task task) {

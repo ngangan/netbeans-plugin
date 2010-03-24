@@ -41,14 +41,20 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
+import java.io.IOException;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.text.MessageFormat;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.source.CompilationController;
+import org.netbeans.api.java.source.JavaSource;
+import org.netbeans.api.java.source.Task;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
@@ -131,33 +137,62 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
         Set<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
         for(FileObject file : relevantFiles) {
             if (isCancelled()) return null;
-            ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
-            final PackageDef pd = cm.getPackageDef();
-            UpdatePackageDeclarationElement ref = new UpdatePackageDeclarationElement(pd.getName(), targetPkgName, file, reb.getSession()) {
+            
+            final Collection<ElementDef> edefs = new HashSet<ElementDef>();
+            final PackageDef[] pd = new PackageDef[]{PackageDef.DEFAULT};
 
-                @Override
-                protected Set<Transformation> prepareTransformations(FileObject fo) {
-                    Set<Transformation> transformations = new HashSet<Transformation>();
-                    if (pd.getName().equals(sourcePkgName)) {
-                        transformations.add(new ReplaceTextTransformation(pd.getStartFQN(), getOldPkgName(), getNewPkgName()));
+            if (SourceUtils.isJavaFXFile(file)) {
+                ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
+                pd[0] = cm.getPackageDef();
+                UpdatePackageDeclarationElement ref = new UpdatePackageDeclarationElement(pd[0].getName(), targetPkgName, file, reb.getSession()) {
+
+                    @Override
+                    protected Set<Transformation> prepareTransformations(FileObject fo) {
+                        Set<Transformation> transformations = new HashSet<Transformation>();
+                        if (pd[0].getName().equals(sourcePkgName)) {
+                            transformations.add(new ReplaceTextTransformation(pd[0].getStartFQN(), getOldPkgName(), getNewPkgName()));
+                        }
+                        return transformations;
                     }
-                    return transformations;
+                };
+                edefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
+                refelems.add(ref);
+            } else {
+                JavaSource js = JavaSource.forFileObject(file);
+                try {
+                    js.runUserActionTask(new Task<CompilationController>() {
+
+                        public void run(CompilationController cc) throws Exception {
+                            if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                                for(Object te : (Collection)cc.getClass().getMethod("getTopLevelElements").invoke(cc)) { // NOI18N
+                                    ElementDef edef = RefactoringSupport.fromJava(te, cc);
+                                    edefs.add(edef);
+                                    if (pd[0] == PackageDef.DEFAULT) {
+                                        pd[0] = new PackageDef(edef.getPackageName());
+                                    }
+                                }
+                            }
+
+                        }
+                    }, false);
+                } catch (IOException e) {
+                    return new Problem(true, e.getLocalizedMessage());
                 }
-            };
-            refelems.add(ref);
+            }
             
             if (isCancelled()) return null;
             final ClassIndex index = RefactoringSupport.classIndex(refactoring);
-            for(ElementDef cDef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {
+            for(ElementDef cDef : edefs) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
                     if (isCancelled()) return null;
+                    if (!SourceUtils.isJavaFXFile(referenced)) continue;
+                    
                     RenameOccurencesElement bre = new RenameOccurencesElement(sourcePkgName, targetPkgName, referenced, reb.getSession()) {
-
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Set<Transformation> transformations = new HashSet<Transformation>();
                             ClassModel rcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
-                            for(Usage usg : rcm.getUsages(pd)) {
+                            for(Usage usg : rcm.getUsages(pd[0])) {
                                 transformations.add(new ReplaceTextTransformation(usg.getStartPos(), getOldName(), getNewName()));
                             }
                             return transformations;
@@ -184,11 +219,9 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
     private void collectRelevantFiles(FileObject parent, Set<FileObject> relevantFiles) {
         for(FileObject fo : parent.getChildren()) {
             if (isCancelled()) return;
-            if (fo.isData() && SourceUtils.isJavaFXFile(fo)) {
+            if (fo.isData() && (SourceUtils.isJavaFXFile(fo) || fo.getExt().toLowerCase().equals("java"))) { // NOI18N
                 relevantFiles.add(fo);
-            } else if (fo.isFolder()) {
-                collectRelevantFiles(fo, relevantFiles);
-            }
+            } // package renaming works only on one level; it doesn't recurse to subpackages
         }
     }
 
