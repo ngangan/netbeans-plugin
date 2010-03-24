@@ -52,7 +52,7 @@ import org.netbeans.api.javafx.lexer.JFXTokenId;
  */
 public final class ReformatUtils {
 
-    public static EnumSet<JFXTokenId> NON_RESERVER_KEYWORDS = EnumSet.of(JFXTokenId.FIRST,
+    public static EnumSet<JFXTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.FIRST,
             JFXTokenId.IN, JFXTokenId.INIT, JFXTokenId.INTO, JFXTokenId.INVERSE,
             JFXTokenId.LAST, JFXTokenId.ON, JFXTokenId.POSTINIT, JFXTokenId.REPLACE,
             JFXTokenId.STEP, JFXTokenId.TRIGGER, JFXTokenId.TWEEN, JFXTokenId.WHERE,
