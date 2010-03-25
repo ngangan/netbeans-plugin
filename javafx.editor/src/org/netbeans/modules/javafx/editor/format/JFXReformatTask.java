@@ -685,37 +685,19 @@ public class JFXReformatTask implements ReformatTask {
                     endPos = Integer.MAX_VALUE;
                 } else {
                     endPos = (int) getEndPos(tree);
-
-//                    final int _startOffset = doc.getStartPosition().getOffset();
-//                    final int _endOffset = doc.getEndPosition().getOffset();
-//                    if (endPos > _startOffset && endPos < _endOffset + 1) {
-//                        try {
-//                            int i = 0;
-//                            String txt = null;
-//                            do {
-//                                txt = doc.getText(endPos + i, 1);
-//                                i++;
-//                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
-//                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
-////                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
-//                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
-////                                endPos += i;
-//                            }
-//                        } catch (BadLocationException ex) {
-//                        }
-//                    }
                 }
             }
             try {
                 if (endPos < 0) {
                     return false;
                 }
-                if (tokens.offset() <= endPos) {
+                // this endPos checking has been disabled due to string expression parsing bug in compiler JFXC-4061
+//                if (tokens.offset() <= endPos) {
                     final Boolean scan = super.scan(tree, p);
 //                    final Boolean scan = super.myScan(tree, p);
                     return scan != null ? scan : false;
-                }
-                return true;
+//                }
+//                return true;
             } finally {
                 endPos = lastEndPos;
             }
@@ -2431,13 +2413,6 @@ public class JFXReformatTask implements ReformatTask {
                         spaces(0, true);
                     }
                 }
-            } else {
-                do {
-                    col += tokens.token().length();
-                } while (tokens.moveNext() && tokens.offset() < endPos);
-                lastBlankLines = -1;
-                lastBlankLinesTokenIndex = -1;
-                lastBlankLinesDiff = null;
             }
             return true;
         }
