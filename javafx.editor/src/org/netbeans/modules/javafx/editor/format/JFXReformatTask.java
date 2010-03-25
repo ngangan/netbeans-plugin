@@ -2406,19 +2406,28 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitStringExpression(StringExpressionTree node, Void p) {
             List<ExpressionTree> partList = node.getPartList();
             if (partList != null && !partList.isEmpty()) {
+                boolean isQuoted = false;
                 for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
                     // #178966
-                    int index = tokens.index();
-                    int c = col;
-                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
-                        rollback(index, c, d);
-                    }
+                    processTranslationKey();
 
-                    ExpressionTree tree = it.next();
-                    scan(tree, p);
                     // JFXC-3494
-                    if (it.hasNext() && !tree.toString().contentEquals("")) { // NOI18N
+                    ExpressionTree tree = it.next();
+                    if (!isQuoted) {
+                        isQuoted = acceptAndRollback(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL) == JFXTokenId.QUOTE_LBRACE_STRING_LITERAL;
+                        if (isQuoted) {
+                            accept(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL);
+                            continue;
+                        }
+                    } else {
+                        if (acceptAndRollback(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) {
+                            accept(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+                            spaces(0, true);
+                            isQuoted = false;
+                        }
+                    }
+                    scan(tree, p);
+                    if (it.hasNext() && !isQuoted) {
                         spaces(0, true);
                     }
                 }
@@ -2464,7 +2473,8 @@ public class JFXReformatTask implements ReformatTask {
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
                 boolean insideSE = parent.getJavaFXKind() == JavaFXKind.STRING_EXPRESSION;
                 if (insideSE) {
-                    accept(ReformatUtils.STRING_LITERALS);
+//                    accept(ReformatUtils.STRING_LITERALS);
+                    accept(JFXTokenId.STRING_LITERAL);
                 } else {
                     // JFXC-4061
                     boolean isNextTokenSL = true;
@@ -2472,9 +2482,11 @@ public class JFXReformatTask implements ReformatTask {
                         index = tokens.index();
                         c = col;
                         d = diffs.isEmpty() ? null : diffs.getFirst();
-                        boolean accepted = accept(ReformatUtils.STRING_LITERALS) != null;
+//                        boolean accepted = accept(ReformatUtils.STRING_LITERALS) != null;
+                        boolean accepted = accept(JFXTokenId.STRING_LITERAL) != null;
                         if (accepted) {
-                            isNextTokenSL = acceptAndRollback(ReformatUtils.STRING_LITERALS) != null;
+//                            isNextTokenSL = acceptAndRollback(ReformatUtils.STRING_LITERALS) != null;
+                            isNextTokenSL = acceptAndRollback(JFXTokenId.STRING_LITERAL) != null;
                             if (isNextTokenSL) {
                                 spaces(0, true);
                             }
@@ -2846,6 +2858,10 @@ public class JFXReformatTask implements ReformatTask {
                 }
             } while (tokens.moveNext());
             return null;
+        }
+
+        private JFXTokenId acceptAndRollback(JFXTokenId tokenId) {
+            return acceptAndRollback(EnumSet.of(tokenId));
         }
 
         private JFXTokenId acceptAndRollback(EnumSet<JFXTokenId> tokenIds) {
@@ -3919,6 +3935,15 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
             return accepted;
+        }
+
+        private void processTranslationKey() {
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
+                rollback(index, c, d);
+            }
         }
 
         private static class FakeBlock extends JFXBlock {
