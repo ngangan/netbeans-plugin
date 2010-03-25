@@ -242,7 +242,7 @@ final public class ClassModelFactory {
                         p.addUsage(new Usage(startFQN, endFQN, new PackageDef(entry.getPackageName())));
                     } else {
                         entry = new TypeImportEntry(cc.getElements().getPackageOf(e).getQualifiedName().toString(), ((TypeElement)e).getQualifiedName().toString(), wildcard, startPos, endPos, startFQN, endFQN);
-                        p.addUsage(new Usage(startFQN, endFQN, getClassDef((TypeElement)e, p)));
+                        p.addUsage(new Usage(startFQN + entry.getPackageName().length() + 1, endFQN, getClassDef((TypeElement)e, p)));
                         p.addUsage(new Usage(startFQN, startFQN + entry.getPackageName().length() - 1, new PackageDef(entry.getPackageName())));
                     }
                     p.addImport(entry);
