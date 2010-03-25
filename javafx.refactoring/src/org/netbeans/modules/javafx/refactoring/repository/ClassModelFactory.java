@@ -73,6 +73,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -104,6 +106,9 @@ import org.openide.filesystems.FileObject;
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
 final public class ClassModelFactory {
+    final private static Logger LOG = Logger.getLogger(ClassModelFactory.class.getName());
+    final private static boolean DEBUG = LOG.isLoggable(Level.FINE);
+
 //    final private static Map<RefactoringSession, ClassModelFactory> factories = new WeakHashMap<RefactoringSession, ClassModelFactory>();
 
     final private static class ClassModelPopulator extends JavaFXTreePathScanner<Void, ClassModel> {
@@ -473,10 +478,21 @@ final public class ClassModelFactory {
                     e = ((JFXVar)t).getSymbol();
                 }
             }
+            if (e == null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Can not retrieve Symbol for Tree!\n");
+                sb.append("Tree class: ").append(t.getClass().getName()).append("\n");
+                sb.append("Tree kind: ").append(t.getJavaFXKind()).append("\n");
+                sb.append("Tree content: \n").append(t).append("\n===\n");
+                LOG.log(Level.WARNING, sb.toString());
+            }
+
             return e;
         }
 
         private ElementDef getVarDef(Element e, ClassModel p) {
+            if (e == null) return null; // #182710: make the routine just ignore the NULL input
+
             VariableTree node = (VariableTree)cc.getTree(e);
 
             boolean missingTree = (node == null || node.getName() == null);
