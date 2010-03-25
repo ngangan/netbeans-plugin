@@ -93,7 +93,7 @@ public final class ExtImportWarningTaskFactory extends EditorAwareJavaFXSourceTa
                                 final ImportPosition start = new ImportPosition((int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), node));
                                 final ImportPosition end = new ImportPosition((int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), node));
                                 String message = NbBundle.getMessage(ExtImportWarningTaskFactory.class, "TIP_IMPORT_WARNING", fqn); //NOI18N
-                                ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.WARNING, message, compilationInfo.getDocument(), start, end);//NOI18N
+                                ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.WARNING, message, compilationInfo.getDocument(), start, end);
                                 extWarnings.add(er);
                             }
                         }
