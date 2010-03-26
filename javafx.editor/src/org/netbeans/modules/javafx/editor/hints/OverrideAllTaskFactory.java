@@ -40,6 +40,9 @@
  */
 package org.netbeans.modules.javafx.editor.hints;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -52,6 +55,7 @@ import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.*;
@@ -80,6 +84,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
     //private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private final static Logger LOG = Logger.getAnonymousLogger();
 
     public OverrideAllTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -99,6 +104,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                 if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
                     return;
                 }
+
                 JavaFXDocument document = (JavaFXDocument) compilationInfo.getDocument();
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
@@ -109,11 +115,34 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     if (!(diagnostic instanceof JCDiagnostic) || position < 0) {
                         continue;
                     }
-                    errorDescriptions.add(getErrorDescription(compilationInfo.getDocument(), file, compilationInfo, diagnostic));
+                    if (!isMixin(diagnostic, compilationInfo)) {
+                        errorDescriptions.add(getErrorDescription(compilationInfo.getDocument(), file, compilationInfo, diagnostic));
+                    }
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
             }
         };
+    }
+
+    public boolean isMixin(Diagnostic diagnostic, final CompilationInfo compilationInfo) {
+        final ClassSymbol classSymbol = getClassSymbol(diagnostic);
+
+        final boolean[] active = new boolean[1];
+        new JavaFXTreePathScanner<Void, Void>() {
+
+            @Override
+            public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
+                JavaFXTreePath path = getCurrentPath();
+                Element element = compilationInfo.getTrees().getElement(path);
+                if (element == classSymbol && !node.getMixins().isEmpty()) {
+                    active[0] = true;
+                }
+
+                return super.visitClassDeclaration(node, v);
+            }
+        }.scan(compilationInfo.getCompilationUnit(), null);
+
+        return active[0];
     }
 
     private boolean isValidError(Diagnostic diagnostic, CompilationInfo compilationInfo) {
@@ -168,6 +197,19 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return -1;
     }
 
+    private ClassSymbol getClassSymbol(Diagnostic diagnostic) {
+        JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
+        ClassSymbol classSymbol = null;
+        for (Object arg : jcDiagnostic.getArgs()) {
+            if (arg instanceof JavafxClassSymbol) {
+                classSymbol = (JavafxClassSymbol) arg;
+                return classSymbol;
+            }
+        }
+
+        return null;
+    }
+
     private ErrorDescription getErrorDescription(final Document document,
             final FileObject file,
             final CompilationInfo compilationInfo,
@@ -180,20 +222,14 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             }
 
             public ChangeInfo implement() throws Exception {
-                JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
-                ClassSymbol classSymbol = null;
-                for (Object arg : jcDiagnostic.getArgs()) {
-                    if (arg instanceof JavafxClassSymbol) {
-                        classSymbol = (JavafxClassSymbol) arg;
-                        break;
-                    }
-                }
+                ClassSymbol classSymbol = getClassSymbol(diagnostic);
                 final Collection<MethodSymbol> abstractMethods = new HashSet<MethodSymbol>();
                 if (classSymbol != null) {
                     Collection<? extends Element> elements = getAllMembers(compilationInfo, classSymbol);
                     for (Element e : elements) {
                         if (e instanceof MethodSymbol) {
                             MethodSymbol method = (MethodSymbol) e;
+                            Logger.getLogger(this.getClass().toString()).info(method.name.toString());
                             for (Modifier modifier : method.getModifiers()) {
                                 if (modifier == Modifier.ABSTRACT) {
                                     boolean methodExists = false;

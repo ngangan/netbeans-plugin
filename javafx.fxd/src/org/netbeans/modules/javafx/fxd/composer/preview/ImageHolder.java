@@ -101,9 +101,9 @@ final class ImageHolder extends JPanel {
             doPaintChildren(g);
         } catch (OutOfMemoryError oom) {
             System.err.println("Out of Memory");
-            handlePaintChildrenError(oom, "MSG_CANNOT_SHOW_OOM"); //NOI18N
+            handlePaintChildrenError(oom, PreviewImagePanel.MSG_CANNOT_SHOW_OOM);
         } catch (Exception e) {
-            handlePaintChildrenError(e, "MSG_CANNOT_SHOW"); //NOI18N
+            handlePaintChildrenError(e, PreviewImagePanel.MSG_CANNOT_SHOW);
         }
     }
 

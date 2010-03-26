@@ -47,8 +47,6 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.*;
 import java.io.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -687,37 +685,19 @@ public class JFXReformatTask implements ReformatTask {
                     endPos = Integer.MAX_VALUE;
                 } else {
                     endPos = (int) getEndPos(tree);
-
-//                    final int _startOffset = doc.getStartPosition().getOffset();
-//                    final int _endOffset = doc.getEndPosition().getOffset();
-//                    if (endPos > _startOffset && endPos < _endOffset + 1) {
-//                        try {
-//                            int i = 0;
-//                            String txt = null;
-//                            do {
-//                                txt = doc.getText(endPos + i, 1);
-//                                i++;
-//                             // TODO remove it after missing semi-colon and missing parenthesis fixes in parser
-//                            } while ((txt.matches(WS_TEMPLATE) || txt.matches("\\)")) && i < _endOffset - _startOffset); // NOI18N
-////                            } while (txt.matches(WS_TEMPLATE) && i < _endOffset - _startOffset); // NOI18N
-//                            if (SEMI.equals(txt) || RCBRACE.equals(txt) || LCBRACE.equals(txt)) {
-////                                endPos += i;
-//                            }
-//                        } catch (BadLocationException ex) {
-//                        }
-//                    }
                 }
             }
             try {
                 if (endPos < 0) {
                     return false;
                 }
-                if (tokens.offset() <= endPos) {
+                // this endPos checking has been disabled due to string expression parsing bug in compiler JFXC-4061
+//                if (tokens.offset() <= endPos) {
                     final Boolean scan = super.scan(tree, p);
 //                    final Boolean scan = super.myScan(tree, p);
                     return scan != null ? scan : false;
-                }
-                return true;
+//                }
+//                return true;
             } finally {
                 endPos = lastEndPos;
             }
@@ -950,7 +930,7 @@ public class JFXReformatTask implements ReformatTask {
                     }
                 }
                 indent = halfIndent;
-                processClassWS();
+                processWSBeforeRB();
                 accept(JFXTokenId.RBRACE);
                 indent = old;
             } else {
@@ -1043,7 +1023,7 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        private void processClassWS() {
+        private void processWSBeforeRB() {
             Diff diff = diffs.isEmpty() ? null : diffs.getFirst();
             if (diff != null && diff.end == tokens.offset()) {
                 if (diff.text != null) {
@@ -1481,7 +1461,7 @@ public class JFXReformatTask implements ReformatTask {
                     expressions.add(value);
                 }
             }
-            for (ExpressionTree stat : expressions) {
+            for (ExpressionTree expression : expressions) {
                 if (magicFunc || !isSynthetic((JFXTree) node)) {
 //                    isEmpty = false;
                     if (node instanceof FakeBlock) {
@@ -1503,7 +1483,7 @@ public class JFXReformatTask implements ReformatTask {
                         space();
                     }
 
-                    processExpression(stat, p);
+                    processExpression(expression, p);
                 }
             }
 
@@ -1548,42 +1528,14 @@ public class JFXReformatTask implements ReformatTask {
                 lastBlankLinesDiff = null;
             } else {
                 if (!magicFunc) {
+                    indent = halfIndent;
                     if (parentTree.getJavaFXKind() == JavaFXKind.FUNCTION_DEFINITION || parentTree.getJavaFXKind() == JavaFXKind.INSTANTIATE_OBJECT_LITERAL) {
                         spaces(1, true);
                     } else {
                         blankLines();
                     }
-                    indent = halfIndent;
-                    Diff diff = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (diff != null && diff.end == tokens.offset()) {
-                        if (diff.text != null) {
-                            int idx = diff.text.lastIndexOf(NEWLINE);
-                            if (idx < 0) {
-                                diff.text = getIndent();
-                            } else {
-                                diff.text = diff.text.substring(0, idx + 1) + getIndent();
-                            }
-
-                        }
-                        String spaces = diff.text != null ? diff.text : getIndent();
-                        if (spaces.equals(fText.substring(diff.start, diff.end))) {
-                            diffs.removeFirst();
-                        }
-                    } else if (tokens.movePrevious()) {
-                        if (tokens.token().id() == JFXTokenId.WS) {
-                            String text = tokens.token().text().toString();
-                            int idx = text.lastIndexOf(NEWLINE);
-                            if (idx >= 0) {
-                                text = text.substring(idx + 1);
-                                String ind = getIndent();
-                                if (!ind.equals(text)) {
-                                    addDiff(new Diff(tokens.offset() + idx + 1, tokens.offset() + tokens.token().length(), ind));
-                                }
-                            }
-                        }
-                        tokens.moveNext();
-                    }
-                    JFXTokenId accept = accept(JFXTokenId.RBRACE);
+                    processWSBeforeRB();
+                    accept(JFXTokenId.RBRACE);
                     indent = old;
                 }
             }
@@ -2035,17 +1987,21 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
+            // JFXC-3954
+            boolean quoted = acceptAndRollback(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            if (quoted) {
+                accept(JFXTokenId.LPAREN);
+                scan(node.getClassName(), p);
+                accept(JFXTokenId.RPAREN);
+            }
+
             // sequence type
-            int index = tokens.index();
-            int c = col;
-            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-            if (accept(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
+            if (acceptAndRollback(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
+                accept(JFXTokenId.LBRACKET);
                 if (cs.spaceWithinArrayInitBrackets()) {
                     space();
                 }
                 accept(JFXTokenId.RBRACKET);
-            } else {
-                rollback(index, c, d);
             }
             return true;
         }
@@ -2432,33 +2388,35 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // remove that workaround after JFXC-3494 fix
         @Override
         public Boolean visitStringExpression(StringExpressionTree node, Void p) {
             List<ExpressionTree> partList = node.getPartList();
             if (partList != null && !partList.isEmpty()) {
+                boolean isQuoted = false;
                 for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
                     // #178966
-                    int index = tokens.index();
-                    int c = col;
-                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
-                        rollback(index, c, d);
-                    }
+                    processTranslationKey();
 
+                    // JFXC-3494
                     ExpressionTree tree = it.next();
+                    if (!isQuoted) {
+                        isQuoted = acceptAndRollback(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL) == JFXTokenId.QUOTE_LBRACE_STRING_LITERAL;
+                        if (isQuoted) {
+                            accept(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL);
+                            continue;
+                        }
+                    } else {
+                        if (acceptAndRollback(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) {
+                            accept(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+                            spaces(0, true);
+                            isQuoted = false;
+                        }
+                    }
                     scan(tree, p);
-                    if (it.hasNext()) {
+                    if (it.hasNext() && !isQuoted) {
                         spaces(0, true);
                     }
                 }
-            } else {
-                do {
-                    col += tokens.token().length();
-                } while (tokens.moveNext() && tokens.offset() < endPos);
-                lastBlankLines = -1;
-                lastBlankLinesTokenIndex = -1;
-                lastBlankLinesDiff = null;
             }
             return true;
         }
@@ -2490,26 +2448,32 @@ public class JFXReformatTask implements ReformatTask {
             // ---
 
             JavaFXKind kind = node.getJavaFXKind();
-            if (kind == JavaFXKind.STRING_LITERAL || kind == JavaFXKind.STRING_EXPRESSION) {
-                int old = indent;
-                indent += continuationIndentSize;
-
-                accept(ReformatUtils.STRING_LITERALS); // accept first
-                index = tokens.index();
-                c = col;
-                d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) { // if there is more - process spaces between
-                    spaces(0, true);
-                    while (ReformatUtils.STRING_LITERALS.contains(accept(ReformatUtils.STRING_LITERALS))) {
-                        spaces(0, true);
-                    }
+            if (kind == JavaFXKind.STRING_LITERAL) {
+                Tree parent = getCurrentPath().getParentPath().getLeaf();
+                boolean insideSE = parent.getJavaFXKind() == JavaFXKind.STRING_EXPRESSION;
+                if (insideSE) {
+//                    accept(ReformatUtils.STRING_LITERALS);
+                    accept(JFXTokenId.STRING_LITERAL);
                 } else {
-                    rollback(index, c, d);
+                    // JFXC-4061
+                    boolean isNextTokenSL = true;
+                    while (isNextTokenSL) {
+                        index = tokens.index();
+                        c = col;
+                        d = diffs.isEmpty() ? null : diffs.getFirst();
+//                        boolean accepted = accept(ReformatUtils.STRING_LITERALS) != null;
+                        boolean accepted = accept(JFXTokenId.STRING_LITERAL) != null;
+                        if (accepted) {
+//                            isNextTokenSL = acceptAndRollback(ReformatUtils.STRING_LITERALS) != null;
+                            isNextTokenSL = acceptAndRollback(JFXTokenId.STRING_LITERAL) != null;
+                            if (isNextTokenSL) {
+                                spaces(0, true);
+                            }
+                        } else {
+                            rollback(index, c, d);
+                        }
+                    }
                 }
-                // #180187 - work suspended untill lexer will be fixed
-                //processStringLiteral(node);
-
-                indent = old;
             } else {
                 // #176654: probably compiler bug
                 // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token
@@ -2725,7 +2689,7 @@ public class JFXReformatTask implements ReformatTask {
 
             // JavaFX Non-reserved keywords feature, see v4Parser.g
             if (tokenIds.contains(JFXTokenId.IDENTIFIER)) {
-                tokenIds.addAll(ReformatUtils.NON_RESERVER_KEYWORDS);
+                tokenIds.addAll(ReformatUtils.NON_RESERVED_KEYWORDS);
             }
 
             // javafx lexer generates one token for each WS
@@ -2873,6 +2837,19 @@ public class JFXReformatTask implements ReformatTask {
                 }
             } while (tokens.moveNext());
             return null;
+        }
+
+        private JFXTokenId acceptAndRollback(JFXTokenId tokenId) {
+            return acceptAndRollback(EnumSet.of(tokenId));
+        }
+
+        private JFXTokenId acceptAndRollback(EnumSet<JFXTokenId> tokenIds) {
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            JFXTokenId tokenId = accept(tokenIds);
+            rollback(index, c, d);
+            return tokenId;
         }
 
         // TODO uncomment it after switching to SoMa
@@ -3939,27 +3916,13 @@ public class JFXReformatTask implements ReformatTask {
             return accepted;
         }
 
-        private void processStringLiteral(LiteralTree node) {
-            int offset = tokens.offset();
-            String astText = (String) node.getValue();
-            String docText = fText.substring(offset, endPos);
-
-            Pattern pattern = Pattern.compile("\".*?\""); // NOI18N
-            Matcher matcher = pattern.matcher(docText);
-            int i = offset;
-            while (matcher.find()) {
-                String part = matcher.group();
-                i += part.length();
-                tokens.move(i);
-                spaces(0, true);
+        private void processTranslationKey() {
+            int index = tokens.index();
+            int c = col;
+            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
+            if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
+                rollback(index, c, d);
             }
-
-//            do {
-//                col += tokens.token().length();
-//            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
         }
 
         private static class FakeBlock extends JFXBlock {

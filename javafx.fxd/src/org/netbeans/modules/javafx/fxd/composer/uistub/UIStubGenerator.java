@@ -30,10 +30,13 @@ import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaModelProvider;
 
 
 /**
@@ -184,6 +187,7 @@ public final class UIStubGenerator {
 //                            }
 //                        }
 //
+
     private void implGenerate( final String archiveName, final String stubLocation, 
             final String packagePath, final Map<String,String> selected, final boolean generateWarning) {
         Thread th = new Thread() {
@@ -198,23 +202,11 @@ public final class UIStubGenerator {
                         FXDFileModel model = dataModel.getFXDContainer().getFileModel( entry);
                         model.updateModel();
 
-                        final AttributeHolder attributes = new AttributeHolder();
+                        AttributeHolder attributes = new AttributeHolder();
                         attributes.setStrictTypes(false);
 
-                        model.visitElements( new FXDFileModel.ElementVisitor() {
-                            public boolean visitElement(String elemType, String elemName, AttributeSet attrs) throws AttributeConflictException {
-                                String id = (String) attrs.getAttribute("id"); //NOI18N
-                                int    len;
-                                if ( id != null && (len=id.length()) > 0) {
-                                    if ( len > 2 && id.charAt(0) == '"' && id.charAt(len-1) == '"') { // NOI18N
-                                        attributes.add( id.substring(1, len-1), elemName);
-                                    } else {
-                                        System.err.println("Invalid node id: " + id);  //NOI18N
-                                    }
-                                }
-                                return true;
-                            }
-                        });
+                        visitFXDModel(model, attributes);
+
                         attributes.processNames();
                         uiStubFile = new File(stubLocation, selected.get(entry));
                         writeUIStub( archiveName, uiStubFile, packagePath, entry, attributes, generateWarning);
@@ -267,7 +259,57 @@ public final class UIStubGenerator {
         th.setPriority( Thread.MIN_PRIORITY);
         th.start();
     }
-    
+
+    private void visitFXDModel(FXDFileModel model, AttributeHolder attributes) throws Exception {
+        FXDFileModel.ElementVisitor visitor = new ElementVisitorImpl(attributes);
+        DocumentElement de = model.getDocumentModel().getRootElement().getElement(0);
+        // for FXD root node process "FXD" itself and "content" only
+        if (de.getName().equalsIgnoreCase(FXDSchemaModelProvider.FXD_ROOT_NAME)) {
+            visitor.visitElement(de.getType(), de.getName(), de.getAttributes());
+            List<DocumentElement> children = de.getChildren();
+            for (DocumentElement cde : children) {
+                if (cde.getName().equalsIgnoreCase(FXDSchemaModelProvider.FXD_CONTENT_NAME)) {
+                    de = cde;
+                    break;
+                }
+            }
+        }
+        model.visitElements(de, visitor);
+    }
+
+    private static class ElementVisitorImpl implements FXDFileModel.ElementVisitor {
+
+        private AttributeHolder m_attributes;
+
+        public ElementVisitorImpl(AttributeHolder attributes) {
+            m_attributes = attributes;
+        }
+
+        public boolean visitElement(String elemType, String elemName, AttributeSet attrs) throws Exception {
+            String id = getIdAttribute(attrs);
+            int len;
+            if (id != null && (len = id.length()) > 0) {
+                if (len > 2 && id.charAt(0) == '"' && id.charAt(len - 1) == '"') { // NOI18N
+                    m_attributes.add(id.substring(1, len - 1), elemName);
+                } else {
+                    System.err.println("Invalid node id: " + id);  //NOI18N
+                }
+            }
+            return true;
+        }
+
+        private static String getIdAttribute(AttributeSet attrs) {
+            String id = (String) attrs.getAttribute("id"); //NOI18N
+            if (id == null) {
+                id = (String) attrs.getAttribute("Id"); //NOI18N
+            }
+            if (id == null) {
+                id = (String) attrs.getAttribute("ID"); //NOI18N
+            }
+            return id;
+        }
+    }
+
     private void writeUIStub( final String archiveName, final File stubFile,
             String packagePath, String entry, AttributeHolder attrs, boolean generateWarning) throws FileNotFoundException, IOException, AttributeConflictException {
         FXWriter writer = new FXWriter(stubFile);

@@ -73,6 +73,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -104,6 +106,9 @@ import org.openide.filesystems.FileObject;
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
 final public class ClassModelFactory {
+    final private static Logger LOG = Logger.getLogger(ClassModelFactory.class.getName());
+    final private static boolean DEBUG = LOG.isLoggable(Level.FINE);
+
 //    final private static Map<RefactoringSession, ClassModelFactory> factories = new WeakHashMap<RefactoringSession, ClassModelFactory>();
 
     final private static class ClassModelPopulator extends JavaFXTreePathScanner<Void, ClassModel> {
@@ -234,12 +239,16 @@ final public class ClassModelFactory {
                     ImportEntry entry;
                     if (e.getKind() == ElementKind.PACKAGE) {
                         entry = new PackageImportEntry(((PackageElement)e).getQualifiedName().toString(), startPos, endPos, startFQN, endFQN);
+                        p.addUsage(new Usage(startFQN, endFQN, new PackageDef(entry.getPackageName())));
                     } else {
                         entry = new TypeImportEntry(cc.getElements().getPackageOf(e).getQualifiedName().toString(), ((TypeElement)e).getQualifiedName().toString(), wildcard, startPos, endPos, startFQN, endFQN);
+                        p.addUsage(new Usage(startFQN + entry.getPackageName().length() + 1, endFQN, getClassDef((TypeElement)e, p)));
+                        p.addUsage(new Usage(startFQN, startFQN + entry.getPackageName().length() - 1, new PackageDef(entry.getPackageName())));
                     }
                     p.addImport(entry);
+                    
                 }
-                return super.visitImport(node, p);
+                return null;
             } finally {
             }
         }
@@ -469,10 +478,21 @@ final public class ClassModelFactory {
                     e = ((JFXVar)t).getSymbol();
                 }
             }
+            if (e == null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Can not retrieve Symbol for Tree!\n");
+                sb.append("Tree class: ").append(t.getClass().getName()).append("\n");
+                sb.append("Tree kind: ").append(t.getJavaFXKind()).append("\n");
+                sb.append("Tree content: \n").append(t).append("\n===\n");
+                LOG.log(Level.WARNING, sb.toString());
+            }
+
             return e;
         }
 
         private ElementDef getVarDef(Element e, ClassModel p) {
+            if (e == null) return null; // #182710: make the routine just ignore the NULL input
+
             VariableTree node = (VariableTree)cc.getTree(e);
 
             boolean missingTree = (node == null || node.getName() == null);

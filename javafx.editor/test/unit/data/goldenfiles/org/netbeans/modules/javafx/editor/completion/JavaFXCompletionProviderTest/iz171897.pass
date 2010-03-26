@@ -4,7 +4,7 @@ javafx.stage.Screen primary
 com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> screens
 javafx.geometry.Rectangle2D visualBounds
 public boolean equals(arg0 : java.lang.Object)
-public final native java.lang.Class<? extends java.lang.Object> getClass()
+public final native java.lang.Class<?> getClass()
 public static com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> getScreensForRectangle(arg0 : javafx.geometry.Rectangle2D)
 public static com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> getScreensForRectangle(arg0 : float, arg1 : float, arg2 : float, arg3 : float)
 public int hashCode()

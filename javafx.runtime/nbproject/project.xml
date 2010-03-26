@@ -7,6 +7,7 @@
             <suite-component/>
             <module-dependencies/>
             <public-packages>
+                <subpackages>com.javafx</subpackages>
                 <package>com.sun.embeddedswing</package>
                 <subpackages>com.sun.javafx</subpackages>
                 <subpackages>com.sun.media.jmc</subpackages>
@@ -63,6 +64,10 @@
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-controls.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-controls.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-charts.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-charts.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-desktop.jar</runtime-relative-path>

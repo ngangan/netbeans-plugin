@@ -28,12 +28,7 @@
 
 package org.netbeans.modules.javafx.refactoring.impl.plugins;
 
-import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.Task;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.spi.ProgressProviderAdapter;
 import org.netbeans.modules.refactoring.spi.RefactoringPlugin;

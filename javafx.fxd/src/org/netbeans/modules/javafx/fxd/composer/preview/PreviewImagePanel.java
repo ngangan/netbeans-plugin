@@ -54,8 +54,8 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 final class PreviewImagePanel extends JPanel implements ActionLookup {
-    private static final String      MSG_CANNOT_SHOW     = "MSG_CANNOT_SHOW"; // NOI18N
-    private static final String      MSG_CANNOT_SHOW_OOM = "MSG_CANNOT_SHOW_OOM"; // NOI18N
+    static final String      MSG_CANNOT_SHOW     = "MSG_CANNOT_SHOW"; // NOI18N
+    static final String      MSG_CANNOT_SHOW_OOM = "MSG_CANNOT_SHOW_OOM"; // NOI18N
     private static final String      LBL_PARSING         = "LBL_PARSING"; // NOI18N
     private static final String      LBL_RENDERING       = "LBL_RENDERING"; // NOI18N
 

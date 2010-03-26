@@ -29,9 +29,9 @@ public class ClassNameComponentChooser implements ComponentChooser {
     public boolean checkComponent(Component component) {
         String description = component.toString();
         //System.out.println("[ClassNameComponentChooser] check: " + description);
-        if(description.contains("JList")){
-            System.out.println("[ClassNameComponentChooser] check: " + description);
-        }
+        //if(description.contains("JList")){
+            //System.out.println("[ClassNameComponentChooser] check: " + description);
+        //}
         return description.contains(name) && description.contains(text);
     }
 

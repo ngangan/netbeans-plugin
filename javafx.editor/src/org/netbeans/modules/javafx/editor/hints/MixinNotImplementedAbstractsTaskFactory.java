@@ -38,6 +38,8 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
+
+//TODO Not is used anymore this issue has been resolved in compiler
 package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.javafx.api.tree.ClassDeclarationTree;
@@ -193,7 +195,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                     return true;
                 }
             } catch (NullPointerException npe) {
-                //This is bacuse sometimes method compilationInfo.getElements().overrides(override, overridden, type) throws NPE randomly
+                //sometimes method compilationInfo.getElements().overrides(override, overridden, type) throws NPE
                 npe.printStackTrace();
             }
         }
