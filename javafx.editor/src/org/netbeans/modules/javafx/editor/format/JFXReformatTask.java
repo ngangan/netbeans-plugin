@@ -1987,17 +1987,21 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
+            // JFXC-3954
+            boolean quoted = acceptAndRollback(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            if (quoted) {
+                accept(JFXTokenId.LPAREN);
+                scan(node.getClassName(), p);
+                accept(JFXTokenId.RPAREN);
+            }
+
             // sequence type
-            int index = tokens.index();
-            int c = col;
-            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-            if (accept(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
+            if (acceptAndRollback(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
+                accept(JFXTokenId.LBRACKET);
                 if (cs.spaceWithinArrayInitBrackets()) {
                     space();
                 }
                 accept(JFXTokenId.RBRACKET);
-            } else {
-                rollback(index, c, d);
             }
             return true;
         }
