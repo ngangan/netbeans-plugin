@@ -313,7 +313,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             if (!compilationController.isErrors() || !active.get()) {
                 return;
             }
-            //LOG.info("Scanning " + compilationController.getFileObject().getName()); //NOI18N
+            LOG.info("Scanning " + compilationController.getFileObject().getName()); //NOI18N
             refreshTasks(compilationController);
         }
 
