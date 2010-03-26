@@ -315,10 +315,6 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                 }
                 if (eh != null && (eh.getKind().isInterface() || eh.getKind().isClass())) {
                     files.addAll(ci.getDependencyClosure(eh));
-//                    files.addAll(ci.getResources(
-//                            eh,
-//                            EnumSet.of(ClassIndex.SearchKind.IMPLEMENTORS),
-//                            EnumSet.allOf(ClassIndex.SearchScope.class)));
                 }
             }
         }
@@ -338,7 +334,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
                     Set<Transformation> transformations = new HashSet<Transformation>();
                     Set<Usage> usages = new HashSet<Usage>();
-                    usages.addAll(localCm.getUsages(edef));
+                    usages.addAll(localCm.getUsages(edef, EnumSet.of(Usage.Kind.REFERENCE)));
                     if (edef.getKind() == ElementKind.METHOD) {
                         for(Usage usg : localCm.getUsages()) {
                             if (usg.getDef().getKind() == edef.getKind()) {
