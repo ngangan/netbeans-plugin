@@ -39,8 +39,10 @@
 
 package org.netbeans.modules.javafx.editor.completion.environment;
 
+import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.javafx.api.tree.OverrideClassVarTree;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.mjavac.code.Type;
@@ -57,6 +59,7 @@ import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.TypeElement;
 
 /**
  * @author David Strupl
@@ -70,6 +73,16 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
     protected void inside(VariableTree t) throws IOException {
         if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset); // NOI18N
         boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
+        boolean isOverride = t instanceof OverrideClassVarTree;
+
+        if (isOverride & !isLocal) {
+            ClassDeclarationTree cdt = (ClassDeclarationTree)path.getParentPath().getLeaf();
+            System.err.println("cdt=" + cdt);
+            TypeMirror type = controller.getTrees().getTypeMirror(path.getParentPath());
+            TypeElement te = (TypeElement) ((Type.ClassType)type).asElement();
+            TypeMirror parent = te.getSuperclass();
+            addMembers(parent, false, true);
+        }
         Tree type = t.getType();
         int typePos;
         // for overiden expressions, getType returns null tree, because
