@@ -79,7 +79,7 @@ import org.openide.util.RequestProcessor;
  */
 public class JavaFXTaskListProvider extends PushTaskScanner {
 
-    private static final Logger LOG = Logger.getAnonymousLogger("Task List Errors"); //NOI18N
+    private static final Logger LOG = Logger.getAnonymousLogger(); //NOI18N
     private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
     private final HashMap<FileObject, FileChangeListener> projectDirs = new HashMap<FileObject, FileChangeListener>();
@@ -313,7 +313,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             if (!compilationController.isErrors() || !active.get()) {
                 return;
             }
-            //LOG.info("Scanning " + compilationController.getFileObject().getName()); //NOI18N
+            LOG.info("Scanning " + compilationController.getFileObject().getName()); //NOI18N
             refreshTasks(compilationController);
         }
 
