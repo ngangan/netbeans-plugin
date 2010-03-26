@@ -186,11 +186,11 @@ final class SourcePathImplementation implements ClassPathImplementation, Propert
         if (SourceRoots.PROP_ROOTS.equals (evt.getPropertyName()) ||
            (evaluator != null && evt.getSource() == evaluator &&
            (evt.getPropertyName() == null || PROP_BUILD_DIR.equals(evt.getPropertyName())))) {
-            synchronized (SourcePathImplementation.this) {
-                resources = null;
-            }
             RequestProcessor.getDefault().post(new Runnable() {
                 public void run() {
+                    synchronized (SourcePathImplementation.this) {
+                        resources = null;
+                    }
                     support.firePropertyChange (PROP_RESOURCES,null,null);
                 }
             });
