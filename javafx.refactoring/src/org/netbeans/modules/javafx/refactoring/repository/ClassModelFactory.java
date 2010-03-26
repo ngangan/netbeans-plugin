@@ -270,6 +270,7 @@ final public class ClassModelFactory {
 
                 Element e = getElement((JFXTree)node);
                 if (e != null) {
+                    Tree t1 = cc.getTrees().getTree(e);
                     Tree t = cc.getTree(e);
                     if (t != null) {
                         switch (e.getKind()) {
@@ -386,6 +387,7 @@ final public class ClassModelFactory {
                     int startPos = (int)positions.getStartPosition(cc.getCompilationUnit(), node) + (def.getKind() != ElementKind.PACKAGE ? node.getExpression().toString().length() + 1 : 0);
                     int endPos = def.getKind() != ElementKind.PACKAGE ? startPos + node.getIdentifier().length() : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
                     p.addUsage(new Usage(startPos, endPos, def));
+                    if (def.getKind() == ElementKind.PACKAGE) return null; // don't add usages to superpackages - it is not correct
                 }
             }
             return super.visitMemberSelect(node, p);
