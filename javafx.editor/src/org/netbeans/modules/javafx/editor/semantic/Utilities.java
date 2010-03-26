@@ -463,10 +463,16 @@ public class Utilities {
     
     public static boolean isKeyword(Tree tree) {
         if (tree.getJavaFXKind() == JavaFXKind.IDENTIFIER) {
-            return keywords.contains(((IdentifierTree) tree).getName().toString());
+            final Name name = ((IdentifierTree) tree).getName();
+            if (null != name) {
+                return keywords.contains(name.toString());
+            }
         }
         if (tree.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) {
-            return keywords.contains(((MemberSelectTree) tree).getIdentifier().toString());
+            final Name identifier = ((MemberSelectTree) tree).getIdentifier();
+            if (null != identifier) {
+                return keywords.contains(identifier.toString());
+            }
         }
         
         return false;
