@@ -5,6 +5,10 @@
 
 package org.netbeans.modules.javafx.fxd.composer.model;
 
+import com.sun.javafx.tools.fxd.FXDArrayElement;
+import com.sun.javafx.tools.fxd.FXDObjectElement;
+import com.sun.javafx.tools.fxd.FXDReference;
+import com.sun.javafx.tools.fxd.FXDRootElement;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.io.IOException;
@@ -17,11 +21,12 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import com.sun.javafx.tools.fxd.*;
+import com.sun.javafx.tools.fxd.container.ContainerEntry;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
 import java.io.Reader;
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
@@ -36,11 +41,13 @@ final class DocumentElementWrapper {
 
     private static abstract class FXDElementWrapper implements com.sun.javafx.tools.fxd.FXDElement {
         protected DocumentElement m_de;
+        protected WrappingInfo m_info;
         protected List<DocumentElement> m_children;
         private static FXDParser m_parser = createParser();
 
-        public FXDElementWrapper( final DocumentElement de) {
+        public FXDElementWrapper( WrappingInfo info, final DocumentElement de) {
             m_de = de;
+            m_info = info;
             m_children = m_de.getChildren();
 
             /* it is not necessary. remove in case will not find cases when it is useful
@@ -87,7 +94,13 @@ final class DocumentElementWrapper {
 
         Object parseValue(String strValue) {
             try {
-                // TODO: providing FXDParser will allow to support references
+                /* XXXX TODO:  resolve value. skip for now.
+                if (isReferenceStr(strValue)){
+                    System.out.println(">>> reference value: "+strValue);
+                    FXDReference ref = FXDReference.parse(strValue, this);
+                    // resolve reference here
+                }
+                 */
                 return FXDParser.parseValue(strValue, m_parser);
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
@@ -110,13 +123,139 @@ final class DocumentElementWrapper {
         }
     };
 
+    private static class FXDExtendedNodeWrapper extends FXDNodeWrapper {
+
+        private FXDReference m_reference;
+        private com.sun.javafx.tools.fxd.FXDObjectElement m_refObj;
+        private String m_typeName;
+
+        public FXDExtendedNodeWrapper(WrappingInfo info, final DocumentElement de, com.sun.javafx.tools.fxd.FXDElement parent) {
+            super(info, de);
+            //System.out.println(">>> reference Node name: " + m_de.getName());
+            initReference(parent);
+        }
+
+        private void initReference(com.sun.javafx.tools.fxd.FXDElement parent) {
+            try {
+                m_reference = FXDReference.parse(m_de.getName(), parent);
+                m_reference.setResolutionListener(new FXDReference.ResolutionListener() {
+
+                    public void resolved(FXDReference ref) {
+                        m_refObj = m_reference.getReferencedElement();
+                        m_typeName = m_refObj.getTypeName();
+                        m_info.rmUnresolved(m_de);
+                    }
+                });
+                if (m_reference.isLocal(m_info.getEntry())) {
+                    m_info.addUnresolved(m_de);
+                    if (m_reference.resolveRerefence(m_info.getRoot()) == false) {
+                        throw new FXDSyntaxErrorException("The reference '" + m_reference.getText() + "' at " + m_reference.getContext() + " cannot be resolved");
+                    }
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name", ex);
+            } catch (FXDSyntaxErrorException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name", ex);
+            }
+        }
+
+        @Override
+        public String getTypeName() {
+            return m_typeName != null ? m_typeName : super.getTypeName();
+        }
+
+        @Override
+        public int getAttrNum() {
+            checkState();
+            return super.getAttrNum() + m_refObj.getAttrNum();
+        }
+
+        @Override
+        public Object getAttrValue(String name) {
+            checkState();
+            Object value = super.getAttrValue(name);
+            if (value == null) {
+                value = m_refObj.getAttrValue(name);
+            }
+//            if (value == null && m_typeName == null) {
+//                if (FXDObjectElement.ATTR_NAME_ID.equals(name)) {
+//                    value = FXDObjectElement.VALUE_NOT_READY;
+//                } else {
+//                    throw new IllegalStateException("The reference " + m_fxdRef + " must be resolved first.");
+//                }
+//            }
+            return value;
+        }
+
+        @Override
+        public Enumeration getAttrNames() {
+            checkState();
+            return merge(super.getAttrNames(), m_refObj.getAttrNames());
+        }
+
+        @Override
+        public boolean isLeaf() {
+            checkState();
+            return super.isLeaf() && m_refObj.isLeaf();
+        }
+
+        @Override
+        public Enumeration children() {
+            checkState();
+            final Enumeration e1 = super.children();
+            final Enumeration e2 = m_refObj.children();
+            return new Enumeration() {
+
+                public boolean hasMoreElements() {
+                    return e1.hasMoreElements() && e2.hasMoreElements();
+                }
+
+                public Object nextElement() {
+                    if (e1.hasMoreElements()) {
+                        return e1.nextElement();
+                    } else {
+                        return e2.nextElement();
+                    }
+                }
+            };
+        }
+
+        @Override
+        public String toString() {
+            checkState();
+            // TODO merge
+            return super.toString() + "  references to [ "+m_refObj.toString()+" ]";
+        }
+
+        private void checkState() {
+            if (m_typeName == null) {
+                throw new IllegalStateException("The reference " + m_reference + " must be resolved first.");
+            }
+        }
+
+        private static Enumeration merge(Enumeration toEnum, Enumeration fromEnum){
+            ArrayList toArr = Collections.list(toEnum);
+            Object el;
+            while (fromEnum.hasMoreElements()){
+                el = fromEnum.nextElement();
+                if (!toArr.contains(el)){
+                    toArr.add(el);
+                }
+            }
+            return Collections.enumeration(toArr);
+        }
+
+    }
+
     private static class FXDNodeWrapper extends FXDElementWrapper implements FXDObjectElement, Enumeration {
         private final boolean     m_injectID;
         private       Enumeration m_attrEnum = null;
         protected     int         m_refID = -1;
 
-        public FXDNodeWrapper(final DocumentElement de) {
-            super(de);
+        public FXDNodeWrapper(WrappingInfo info, final DocumentElement de) {
+            super(info, de);
             m_injectID = m_de.getAttributes().isDefined(FXDObjectElement.ATTR_NAME_ID) == false &&
                          isIDSupported(getTypeName());
         }        
@@ -135,7 +274,8 @@ final class DocumentElementWrapper {
 
         public Object getAttrValue(String name) {
           if ( FXDObjectElement.ATTR_NAME_ID.equals(name)) {
-                //override existing ID with the element start offset
+                //provide ID connected to the element start offset only if element doesn't have id.
+
                 return FXDFileModel.getElementId(m_de);
             } else {
                 String strValue = (String) m_de.getAttributes().getAttribute(name);
@@ -147,10 +287,10 @@ final class DocumentElementWrapper {
                             if ( name.equals(cde.getName())) {
                                 if ( FXDFileModel.FXD_ATTRIBUTE.equals( cde.getType())) {
                                     assert cde.getElementCount() == 1;
-                                    return wrap(cde.getChildren().get(0), false);
+                                    return wrap(m_info, cde.getChildren().get(0), FXDNodeWrapper.this);
                                 } else {
                                     assert FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals( cde.getType());
-                                    return wrap(cde, false);
+                                    return wrap(m_info, cde, FXDNodeWrapper.this);
                                 }
                             }
                         }
@@ -196,7 +336,7 @@ final class DocumentElementWrapper {
                     if ( m_index >= childDE.size()) {
                         throw new NoSuchElementException();
                     }
-                    return wrap( childDE.get(m_index++), false);
+                    return wrap( m_info, childDE.get(m_index++), FXDNodeWrapper.this);
                 }
             };
         }
@@ -265,10 +405,12 @@ final class DocumentElementWrapper {
             }
         }
     }
-    
+
+    // TODO support extended roon nodfe wrapper
     private static final class FXDRootNodeWrapper extends FXDNodeWrapper implements FXDRootElement {
-        public FXDRootNodeWrapper(final DocumentElement de) {
-            super(de);
+        public FXDRootNodeWrapper(WrappingInfo info, final DocumentElement de) {
+            super(info, de);
+            m_info.setRoot(this);
         }
         
         @Override
@@ -288,8 +430,8 @@ final class DocumentElementWrapper {
     
     private static final class FXDNodeArrayWrapper extends FXDElementWrapper implements FXDArrayElement {
 
-        public FXDNodeArrayWrapper(final DocumentElement de) {
-            super(de);
+        public FXDNodeArrayWrapper(WrappingInfo info, final DocumentElement de) {
+            super(info, de);
         }        
 
         public int getLength() {
@@ -302,7 +444,7 @@ final class DocumentElementWrapper {
             if ( FXDFileModel.FXD_ARRAY_ELEM.equals(de.getType())){
                 return parseValue(de.getName());
             } else {
-                return wrap( de, false);
+                return wrap( m_info, de, FXDNodeArrayWrapper.this);
             }
         }
 
@@ -326,7 +468,8 @@ final class DocumentElementWrapper {
                     if ( m_index >= m_children.size()) {
                         throw new NoSuchElementException();
                     }
-                    com.sun.javafx.tools.fxd.FXDElement elem = wrap( m_children.get(m_index), false);
+                    com.sun.javafx.tools.fxd.FXDElement elem =
+                            wrap( m_info, m_children.get(m_index), FXDNodeArrayWrapper.this);
                     m_index = advance(m_index+1);
                     return elem;
                 }
@@ -342,12 +485,38 @@ final class DocumentElementWrapper {
         }        
     }
 
-    public static com.sun.javafx.tools.fxd.FXDElement wrap( final DocumentElement de, boolean isRoot) {
+    /**
+     * wraps root DocumentElemnt into com.sun.javafx.tools.fxd.FXDElement.
+     * If you want to wrap non-root element, use wrap( DocumentElement, FXDElement) method.
+     * @param de root DocumentElement
+     * @return FXDElement
+     */
+    public static com.sun.javafx.tools.fxd.FXDElement wrap( ContainerEntry ce, DocumentElement de) {
+        return wrap(new WrappingInfo(ce, null), de, null);
+    }
+
+    /**
+     * wraps non-root DocumentElemnt into com.sun.javafx.tools.fxd.FXDElement.
+     * Providing parent FXDElement is necessary.
+     * @param de root DocumentElement
+     * @param parent parent FXDElement. If null, de is wrapped as root element
+     * @return FXDElement
+     */
+    static com.sun.javafx.tools.fxd.FXDElement wrap(WrappingInfo info,
+            final DocumentElement de, com.sun.javafx.tools.fxd.FXDElement parent) {
+        if (info.isUnresolved(de)){
+            System.out.println("+++++++++ still unresolved: "+de);
+            return null;
+        }
         String type = de.getType();
         if ( FXDFileModel.FXD_NODE.equals( type)) {
-            return isRoot ? new FXDRootNodeWrapper(de) : new FXDNodeWrapper(de);
+            if (isReferenceStr(de.getName())) {
+                return parent == null ? new FXDRootNodeWrapper(info, de) : new FXDExtendedNodeWrapper(info, de, parent);
+            } else {
+                return parent == null ? new FXDRootNodeWrapper(info, de) : new FXDNodeWrapper(info, de);
+            }
         } else if ( FXDFileModel.FXD_ATTRIBUTE_ARRAY.equals(type)) {
-            return new FXDNodeArrayWrapper(de);
+            return new FXDNodeArrayWrapper(info, de);
         } else if ( FXDFileModel.FXD_ERROR.equals(type)) {
             // nothing to do
             return null;
@@ -357,6 +526,7 @@ final class DocumentElementWrapper {
     }
 
     private static Map<String,Boolean> CLASSES_WITH_ID = new HashMap<String, Boolean>();
+    private final static String REF_SEPARATOR = String.valueOf(FXDReference.REF_SEPARATOR);
 
     public static boolean isIDSupported( String typeName) {
         Boolean state = CLASSES_WITH_ID.get(typeName);
@@ -365,6 +535,16 @@ final class DocumentElementWrapper {
             CLASSES_WITH_ID.put(typeName, state);
         }
         return state.booleanValue();
+    }
+
+    static boolean isReferenceStr(String str){
+        if (str == null || str.length() == 0){
+            return false;
+        }
+        if (str.startsWith(REF_SEPARATOR) || str.startsWith(FXDReference.REF_PREFIX_WITHOUT_COLON)){
+            return true;
+        }
+        return false;
     }
 
     private static boolean isIDSupportedImpl( String typeName) {
@@ -410,7 +590,8 @@ final class DocumentElementWrapper {
             return null;
         }
 
-        public FXDReference createReference(String string) throws FXDException {
+        public com.sun.javafx.tools.fxd.FXDReference createReference(String string) throws FXDException {
+            // TODO if we have
             // TODO support references?
             return null;
         }
