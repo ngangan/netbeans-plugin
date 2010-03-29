@@ -480,13 +480,13 @@ final public class ClassModelFactory {
                     e = ((JFXVar)t).getSymbol();
                 }
             }
-            if (e == null) {
+            if (e == null && LOG.isLoggable(Level.FINE)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Can not retrieve Symbol for Tree!\n");
                 sb.append("Tree class: ").append(t.getClass().getName()).append("\n");
                 sb.append("Tree kind: ").append(t.getJavaFXKind()).append("\n");
                 sb.append("Tree content: \n").append(t).append("\n===\n");
-                LOG.log(Level.WARNING, sb.toString());
+                LOG.log(Level.FINE, sb.toString());
             }
 
             return e;
