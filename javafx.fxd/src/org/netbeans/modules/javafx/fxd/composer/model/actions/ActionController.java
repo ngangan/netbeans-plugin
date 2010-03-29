@@ -6,8 +6,6 @@
 package org.netbeans.modules.javafx.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
@@ -15,6 +13,7 @@ import org.netbeans.modules.javafx.fxd.composer.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import javax.swing.JComponent;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
 import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
 import org.netbeans.modules.javafx.fxd.composer.uistub.UIStubGenerator;
@@ -127,7 +126,10 @@ public class ActionController implements ActionLookup {
                     }
                 }  
             }
-            controller.getScenePanel().setCursor(cursor != null ? cursor.getCursor() : null);
+            JComponent c = controller.getScenePanel();
+            if (c != null) {
+                c.setCursor(cursor != null ? cursor.getCursor() : null);
+            }
          }
     }
 
