@@ -2452,24 +2452,22 @@ public class JFXReformatTask implements ReformatTask {
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
                 boolean insideSE = parent.getJavaFXKind() == JavaFXKind.STRING_EXPRESSION;
                 if (insideSE) {
-//                    accept(ReformatUtils.STRING_LITERALS);
                     accept(JFXTokenId.STRING_LITERAL);
                 } else {
                     // JFXC-4061
-                    boolean isNextTokenSL = true;
-                    while (isNextTokenSL) {
+                    boolean isNextTokenStringLiteral = true;
+                    while (isNextTokenStringLiteral) {
                         index = tokens.index();
                         c = col;
                         d = diffs.isEmpty() ? null : diffs.getFirst();
-//                        boolean accepted = accept(ReformatUtils.STRING_LITERALS) != null;
                         boolean accepted = accept(JFXTokenId.STRING_LITERAL) != null;
                         if (accepted) {
-//                            isNextTokenSL = acceptAndRollback(ReformatUtils.STRING_LITERALS) != null;
-                            isNextTokenSL = acceptAndRollback(JFXTokenId.STRING_LITERAL) != null;
-                            if (isNextTokenSL) {
+                            isNextTokenStringLiteral = acceptAndRollback(JFXTokenId.STRING_LITERAL) != null;
+                            if (isNextTokenStringLiteral) {
                                 spaces(0, true);
                             }
                         } else {
+                            isNextTokenStringLiteral = false;
                             rollback(index, c, d);
                         }
                     }
