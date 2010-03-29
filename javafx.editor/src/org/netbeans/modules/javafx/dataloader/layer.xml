@@ -468,7 +468,7 @@ made subject to such option by the copyright holder.
                 <attr name="instantiatingIterator"
                       methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
             <file name="JavaFXClass.fx" url="JavaFXClass.fx_">
                 <attr name="position" intvalue="200"/>
@@ -482,7 +482,7 @@ made subject to such option by the copyright holder.
                 <attr name="instantiatingIterator"
                       methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
 
             <file name="JavaFXStage.fx" url="JavaFXStage.fx_">
@@ -497,7 +497,7 @@ made subject to such option by the copyright holder.
                 <attr name="instantiatingIterator"
                       methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
 
         </folder>
