@@ -308,7 +308,7 @@ final public class ClassModelFactory {
                                 new Usage(
                                     startPos,
                                     endPos,
-                                    superTypes.contains(node) ? Usage.Kind.SUBTYPE : Usage.Kind.REFERENCE,
+                                    Usage.Kind.REFERENCE,
                                     new GlobalDef(
                                         e.getSimpleName().toString(),
                                         e.getKind(),
