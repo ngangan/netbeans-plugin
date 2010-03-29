@@ -28,6 +28,8 @@ import javax.lang.model.type.TypeMirror;
 import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.util.Elements;
 import javax.swing.text.Document;
 import org.openide.cookies.EditorCookie;
@@ -51,6 +53,8 @@ public final class FXSourceUtils {
     // colors for navigator
     private static final String TYPE_COLOR = "#707070"; // NOI18N
     private static final String INHERITED_COLOR = "#7D694A"; // NOI18N
+
+    private static Logger log = Logger.getLogger(FXSourceUtils.class.getName());
 
     private FXSourceUtils() {
     }
@@ -625,7 +629,9 @@ public final class FXSourceUtils {
         try {
             allMembers = elements.getAllMembers(type);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (log.isLoggable(Level.FINE)) {
+                log.log(Level.FINE, "exception occured", e); // NOI18N
+            }
         }
         return allMembers;
     }
@@ -639,7 +645,9 @@ public final class FXSourceUtils {
         try {
             modifiers = element.getModifiers();
         } catch (Exception e) {
-            e.printStackTrace();
+            if (log.isLoggable(Level.FINE)) {
+                log.log(Level.FINE, "exception occured", e); // NOI18N
+            }
         }
         return modifiers;
     }

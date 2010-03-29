@@ -47,6 +47,8 @@ import com.sun.javafx.api.tree.UnitTree;
 import com.sun.tools.javafx.tree.*;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -80,6 +82,8 @@ public class JFXReformatTask implements ReformatTask {
     private static final String LCBRACE = "{"; //NOI18N
     private static final String RCBRACE = "}"; //NOI18N
     private static final String MAGIC_FUNCTION = "javafx$run$"; //NOI18N
+
+    private static Logger log = Logger.getLogger(JFXReformatTask.class.getName());
 
     private final Context context;
     private CompilationController controller;
@@ -164,7 +168,9 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }, true);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (log.isLoggable(Level.FINE)) {
+                log.log(Level.FINE, "exception occured", ex); // NOI18N
+            }
         }
         return sb.toString();
     }
@@ -857,7 +863,8 @@ public class JFXReformatTask implements ReformatTask {
                     indent += continuationIndentSize;
                 }
                 space();
-                if (!ERROR.contentEquals(node.getSimpleName())) {
+                final Name simpleName = node.getSimpleName();
+                if (simpleName != null && !ERROR.contentEquals(simpleName)) {
                     accept(JFXTokenId.IDENTIFIER);
                 }
 
