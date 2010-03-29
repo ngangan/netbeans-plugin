@@ -45,9 +45,7 @@ import org.netbeans.jellytools.PaletteOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComponentOperator;
 import org.netbeans.jemmy.operators.JListOperator;
-import qa.javafx.functional.library.JavaFXTestCase.ClassNameComponentChooser;
 import qa.javafx.functional.library.MouseRobot;
-import qa.javafx.functional.library.Util;
 
 /**
  *
