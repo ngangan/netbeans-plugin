@@ -269,7 +269,7 @@ public final class FXDComposerController {
 
     public void setSelectedEntry( String entryName) {
         if ( m_dObj.getDataModel().setSelectedEntry(entryName)) {
-            m_dObj.updateEditorCookie();
+            //m_dObj.updateEditorCookie();
             m_screenChangeTicker++;
             refresh();
         }
