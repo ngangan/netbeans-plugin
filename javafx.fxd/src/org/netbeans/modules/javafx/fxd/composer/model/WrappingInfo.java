@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ *  Copyright 2008 Sun Microsystems, Inc. All rights reserved.
+ *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 package org.netbeans.modules.javafx.fxd.composer.model;
 
@@ -27,7 +27,6 @@ public class WrappingInfo {
     }
 
     public boolean addUnresolved(DocumentElement elem){
-        System.out.println(">>> add unresolved: "+elem);
         return m_unresolved.add(elem);
     }
 
@@ -36,7 +35,6 @@ public class WrappingInfo {
     }
 
     public boolean rmUnresolved(DocumentElement elem){
-        System.out.println(">>> remove unresolved: "+elem);
         return m_unresolved.remove(elem);
     }
 
