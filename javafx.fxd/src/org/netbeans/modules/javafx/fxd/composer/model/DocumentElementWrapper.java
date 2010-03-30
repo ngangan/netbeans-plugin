@@ -122,7 +122,11 @@ final class DocumentElementWrapper {
 
                 public void resolved(FXDReference ref) {
                     FXDObjectElement elem = ref.getReferencedElement();
-                    property[0] = elem.getAttrValue(ref.getProperty());
+                    if (ref.getProperty() == null) {
+                        property[0] = elem;
+                    } else {
+                        property[0] = elem.getAttrValue(ref.getProperty());
+                    }
                     m_info.rmUnresolved(m_de);
                 }
             });
