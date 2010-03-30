@@ -458,6 +458,9 @@
             <file name="ToggleGroup.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleGroup.xml">
                 <attr name="position" intvalue="1400"/>
             </file>
+            <file name="ScrollView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScrollView.xml">
+                <attr name="position" intvalue="1500"/>
+            </file>
         </folder>
         <folder name="Layouts">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
