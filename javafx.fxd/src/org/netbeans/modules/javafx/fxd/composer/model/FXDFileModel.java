@@ -19,6 +19,7 @@ import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelStateListener;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
 import com.sun.javafx.tools.fxd.FXDRootElement;
+import com.sun.javafx.tools.fxd.container.ContainerEntry;
 import java.io.IOException;
 import javax.swing.text.Document;
 import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
@@ -130,7 +131,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
         if (m_docModel != null) {
             DocumentElement elem = m_docModel.getRootElement().getElement(0);
             if (elem != null) {
-                return (FXDRootElement) DocumentElementWrapper.wrap(elem, true);
+                return (FXDRootElement) DocumentElementWrapper.wrap(ContainerEntry.create(m_archive, m_entryName), elem);
             }
         }
         return null;
@@ -138,6 +139,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
         
     protected DocumentElement findElement( final DocumentElement de, final String id) {
         //TODO Do not use the String id, use number instead and use fact that the sequence is monotonuous
+        // TODO: we have leaved existing ids to have working references
         DocumentElement result = null;
 
         if (id.equals(getElementId(de))) {
@@ -154,7 +156,14 @@ public final class FXDFileModel implements DocumentModelStateListener {
     }
             
     public static String getElementId(final DocumentElement de) {
-        if ( de.getStartOffset() < de.getEndOffset()) {
+        AttributeSet attrs = de.getAttributes();
+        if ( attrs.isDefined(FXDObjectElement.ATTR_NAME_ID)){
+            String id = (String) attrs.getAttribute(FXDObjectElement.ATTR_NAME_ID);
+            if (id.charAt(0) == '"'){
+                return id.substring(1, id.length() - 1);
+            }
+            return id;
+        } else if ( de.getStartOffset() < de.getEndOffset()) {
             String entryName = getEntryPrefixForDocument( de.getDocument());
             return entryName.concat( String.valueOf(de.getStartOffset()));
         } else {
