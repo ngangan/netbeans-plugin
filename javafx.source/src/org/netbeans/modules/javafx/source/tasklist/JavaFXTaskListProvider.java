@@ -120,8 +120,10 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             projectDirs.clear();
             waitingTasks.clear();
             scannerTasks.clear();
-            processor.stop();
-            processor.shutdown();
+            if (processor != null) {
+                processor.stop();
+                processor.shutdown();
+            }
             return;
         }
         active.set(true);
@@ -205,7 +207,7 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
         if (scannerTasks.size() > 7) {
             //LOG.info("No more scanner tasks can be registered: " + scannerTasks.size());
             return;
-        } 
+        }
         if (!fileObject.isValid() || !ErrorsCache.isInError(fileObject, false)) {
             callback.setTasks(fileObject, Collections.EMPTY_LIST);
             return;
