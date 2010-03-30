@@ -65,6 +65,9 @@ public class SafeTokenSequence<T extends TokenId> {
     }
 
     public boolean moveNext() {
+        if (doc == null) {
+            return false;
+        }
         final boolean[] res = new boolean[1];
         doc.render(new Runnable() {
             public void run() {
@@ -82,6 +85,9 @@ public class SafeTokenSequence<T extends TokenId> {
     }
 
     public boolean movePrevious() {
+        if (doc == null) {
+            return false;
+        }
         final boolean[] res = new boolean[1];
         doc.render(new Runnable() {
             public void run() {
@@ -99,6 +105,9 @@ public class SafeTokenSequence<T extends TokenId> {
     }
 
     public void moveEnd() {
+        if (doc == null) {
+            return;
+        }
         doc.render(new Runnable() {
             public void run() {
                 if (cancellable.isCancelled()) {
@@ -114,6 +123,9 @@ public class SafeTokenSequence<T extends TokenId> {
     }
 
     public int move(final int offset) {
+        if (doc == null) {
+            return -1;
+        }
         final int[] res = new int[1];
         doc.render(new Runnable() {
             public void run() {
