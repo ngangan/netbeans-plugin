@@ -58,7 +58,7 @@ made subject to such option by the copyright holder.
         <folder name="Scanners">
             <file name="JavaFXTaskListProvider.instance">
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.tasklist.PushTaskScanner"/>
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.source.tasklist.JavaFXTaskListProvider.create"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.source.tasklist.JavaFXErrorTaskListProvider.create"/>
             </file>
         </folder>
     </folder>
