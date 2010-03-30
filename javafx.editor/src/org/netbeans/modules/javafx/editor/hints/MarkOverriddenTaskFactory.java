@@ -148,7 +148,18 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                         if (!method.name.toString().equals(methodSymbol.name.toString())) {
                             continue;
                         }
-                        if (method.getReturnType() != methodSymbol.getReturnType()) {
+                        //FIX IT  Bug 182631 -  NullPointerException at com.sun.tools.mjavac.code.Symbol$MethodSymbol.getReturnType
+                        Type methodType = null;
+                        Type methodSymbolType = null;
+                        try {
+                            //Check if getReturnType() type throws NPE
+                            methodType = method.getReturnType();
+                            methodSymbolType = methodSymbol.getReturnType();
+                        } catch (NullPointerException npe) {
+                            npe.printStackTrace();
+                            return null;
+                        }
+                        if (methodType != methodSymbolType) {
                             continue;
                         }
                         if (method.getParameters().size() != methodSymbol.getParameters().size()) {
