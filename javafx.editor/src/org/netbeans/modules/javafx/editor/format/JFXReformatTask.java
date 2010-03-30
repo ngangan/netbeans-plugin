@@ -1251,7 +1251,7 @@ public class JFXReformatTask implements ReformatTask {
             accept(JFXTokenId.RPAREN);
 
             JFXType retType = funcDef.getJFXReturnType();
-            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN && !magicOverridenFunc) {
+            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
                 // #179454, if function is overriden then return type could be not specified
                 if (processColon()) {
                     scan(retType, p);
