@@ -249,10 +249,8 @@ is divided into following sections:
                 <arg value="${{draggable.arg}}"/>
                 <arg value="${{pack200.arg}}"/>
                 <arg value="${{sign.arg}}"/>
-<!-- temporary disabled until http://javafx-jira.kenai.com/browse/RT-7359 is on place
                 <arg value="-updatecheck"/>
                 <arg value="${{jnlp.update.model}}"/>
--->
                 <arg value="-cp"/>
                 <arg path="${{javac.classpath}}"/>
             </exec>
