@@ -94,22 +94,45 @@ final class DocumentElementWrapper {
 
         Object parseValue(String strValue) {
             try {
-                /* XXXX TODO:  resolve value. skip for now.
                 if (isReferenceStr(strValue)){
-                    System.out.println(">>> reference value: "+strValue);
-                    FXDReference ref = FXDReference.parse(strValue, this);
-                    // resolve reference here
+                    Object property = resolvePropertyValue(strValue);
+                    if (property != null){
+                        return property;
+                    }
                 }
-                 */
                 return FXDParser.parseValue(strValue, m_parser);
+            } catch (IOException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.WARNING, "Exception while resolving reference for \"" + strValue + "\" ", ex);
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value", ex);
+                        log(Level.WARNING, "Exception while parsing or resolving reference for \"" + strValue + "\" value", ex);
             } catch (FXDException ex) {
                 Logger.getLogger(this.getClass().getName()).
                         log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value", ex);
             }
             return strValue;
+        }
+
+        private Object resolvePropertyValue(String strValue)
+                throws FXDSyntaxErrorException, IOException {
+            FXDReference reference = FXDReference.parse(strValue, this);
+            final Object[] property = new Object[1];
+            reference.setResolutionListener(new FXDReference.ResolutionListener() {
+
+                public void resolved(FXDReference ref) {
+                    FXDObjectElement elem = ref.getReferencedElement();
+                    property[0] = elem.getAttrValue(ref.getProperty());
+                    m_info.rmUnresolved(m_de);
+                }
+            });
+            if (reference.isLocal(m_info.getEntry())) {
+                m_info.addUnresolved(m_de);
+                if (reference.resolveRerefence(m_info.getRoot()) == false) {
+                    throw new FXDSyntaxErrorException("The reference '" + reference.getText() + "' at " + reference.getContext() + " cannot be resolved");
+                }
+            }
+            return property[0];
         }
     }
 
@@ -131,7 +154,6 @@ final class DocumentElementWrapper {
 
         public FXDExtendedNodeWrapper(WrappingInfo info, final DocumentElement de, com.sun.javafx.tools.fxd.FXDElement parent) {
             super(info, de);
-            //System.out.println(">>> reference Node name: " + m_de.getName());
             initReference(parent);
         }
 
@@ -505,7 +527,8 @@ final class DocumentElementWrapper {
     static com.sun.javafx.tools.fxd.FXDElement wrap(WrappingInfo info,
             final DocumentElement de, com.sun.javafx.tools.fxd.FXDElement parent) {
         if (info.isUnresolved(de)){
-            System.out.println("+++++++++ still unresolved: "+de);
+            //Logger.getLogger(DocumentElementWrapper.class.getName()).
+            //        info("skip wrapping of unresolved refenence in DE: "+de);
             return null;
         }
         String type = de.getType();
@@ -526,7 +549,7 @@ final class DocumentElementWrapper {
     }
 
     private static Map<String,Boolean> CLASSES_WITH_ID = new HashMap<String, Boolean>();
-    private final static String REF_SEPARATOR = String.valueOf(FXDReference.REF_SEPARATOR);
+    private final static String REF_SEPARATOR = String.valueOf((char)FXDReference.REF_SEPARATOR);
 
     public static boolean isIDSupported( String typeName) {
         Boolean state = CLASSES_WITH_ID.get(typeName);
