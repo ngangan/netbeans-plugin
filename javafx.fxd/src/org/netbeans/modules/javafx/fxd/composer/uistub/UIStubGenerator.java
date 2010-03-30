@@ -5,6 +5,7 @@
 
 package org.netbeans.modules.javafx.fxd.composer.uistub;
 
+import com.sun.javafx.tools.fxd.FXDObjectElement;
 import com.sun.javafx.tools.fxd.container.FXDContainer;
 import com.sun.javafx.tools.fxd.container.generator.FXWriter;
 import java.awt.Dialog;
@@ -286,7 +287,7 @@ public final class UIStubGenerator {
         }
 
         public boolean visitElement(String elemType, String elemName, AttributeSet attrs) throws Exception {
-            String id = getIdAttribute(attrs);
+            String id = (String) attrs.getAttribute(FXDObjectElement.ATTR_NAME_ID);
             int len;
             if (id != null && (len = id.length()) > 0) {
                 if (len > 2 && id.charAt(0) == '"' && id.charAt(len - 1) == '"') { // NOI18N
@@ -296,17 +297,6 @@ public final class UIStubGenerator {
                 }
             }
             return true;
-        }
-
-        private static String getIdAttribute(AttributeSet attrs) {
-            String id = (String) attrs.getAttribute("id"); //NOI18N
-            if (id == null) {
-                id = (String) attrs.getAttribute("Id"); //NOI18N
-            }
-            if (id == null) {
-                id = (String) attrs.getAttribute("ID"); //NOI18N
-            }
-            return id;
         }
     }
 

@@ -105,14 +105,17 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
     private int getPosition(FXDSyntaxErrorException syntaxError, BaseDocument document)
             throws BadLocationException {
         int offset = syntaxError.getOffset();
-        int rowStart = Utilities.getRowStart((BaseDocument) document, offset);
-        int position = offset - rowStart;
-        int tabs = syntaxError.getTabsInLastRow();
-        if (tabs > 0){
-            // replace 1 tab char by number of spaces in tab
-            position = position - tabs + ( tabs * IndentUtils.tabSize(document));
+        if (offset > -1) {
+            int rowStart = Utilities.getRowStart((BaseDocument) document, offset);
+            int position = offset - rowStart;
+            int tabs = syntaxError.getTabsInLastRow();
+            if (tabs > 0) {
+                // replace 1 tab char by number of spaces in tab
+                position = position - tabs + (tabs * IndentUtils.tabSize(document));
+            }
+            return position;
         }
-        return position;
+        return 0;
     }
 
 

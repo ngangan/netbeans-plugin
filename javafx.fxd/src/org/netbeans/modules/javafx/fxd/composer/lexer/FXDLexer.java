@@ -79,13 +79,19 @@ public class FXDLexer implements Lexer<FXDTokenId> {
         final LexerInput input = m_info.input();
         Reader reader = new LexerInputReader(input);
         ContentLexerImpl contLexer = new ContentLexerImpl(m_info, m_tokensList);
+        FXDParser parser = null;
 
         try {
-            FXDParser tokensSequenceBuilder = new FXDParser(reader, contLexer);
-            tokensSequenceBuilder.parseObject();
+            parser= new FXDParser(reader, contLexer);
+            parser.parseObject();
         } catch (FXDSyntaxErrorException syntaxEx) {
-            //Exceptions.printStackTrace(syntaxEx);
+            syntaxEx.printStackTrace();
             try {
+                // workaround for #183149.
+                // TODO: FXDSyntaxErrorException thrown by FXDReference.parse should have offset.
+                if (syntaxEx.getOffset() == -1 && parser!= null){
+                    syntaxEx = new FXDSyntaxErrorException(syntaxEx.getLocalizedMessage(), parser.getPosition());
+                }
                 contLexer.markError(syntaxEx);
             } catch (Exception e) {
                 Exceptions.printStackTrace(e);

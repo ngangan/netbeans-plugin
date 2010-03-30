@@ -103,13 +103,18 @@ final class DocumentElementWrapper {
                 return FXDParser.parseValue(strValue, m_parser);
             } catch (IOException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while resolving reference for \"" + strValue + "\" ", ex);
+                        log(Level.WARNING, "Exception while resolving reference for \"" + strValue + "\" ");
+                ex.printStackTrace();
+                throw new RuntimeException(ex.getLocalizedMessage(), ex);
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing or resolving reference for \"" + strValue + "\" value", ex);
+                        log(Level.WARNING, "Exception while parsing or resolving reference for \"" + strValue + "\" value");
+                ex.printStackTrace();
+                throw new RuntimeException(ex.getLocalizedMessage(), ex);
             } catch (FXDException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value", ex);
+                        log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value");
+                ex.printStackTrace();
             }
             return strValue;
         }
@@ -180,10 +185,14 @@ final class DocumentElementWrapper {
                 }
             } catch (IOException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name", ex);
+                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name");
+                ex.printStackTrace();
+                throw new RuntimeException(ex.getLocalizedMessage(), ex);
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name", ex);
+                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name");
+                ex.printStackTrace();
+                throw new RuntimeException(ex.getLocalizedMessage(), ex);
             }
         }
 
