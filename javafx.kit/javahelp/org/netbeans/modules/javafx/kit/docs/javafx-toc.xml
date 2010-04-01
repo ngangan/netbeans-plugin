@@ -26,14 +26,14 @@
 			<tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
 		</tocitem>
 		<tocitem text="Refactoring JavaFX Source">
-			<tocitem text="About Refactoring JavaFX Code" target="about_javafx_refactoring" />
-			<tocitem text="Refactoring: Quick Reference" target="refactor_quick_ref" />
-			<tocitem text="Undoing Refactoring Changes" target="undo_refactor_changes" />
-			<tocitem text="Renaming a Class" target="rename_class" />
-			<tocitem text="Renaming a Function or Variable" target="rename_function_var" />
-			<tocitem text="Moving a Class" target="move_class" />
-			<tocitem text="Copying a Class" target="copy_class" />
-			<tocitem text="Safely Deleting JavaFX Code" target="safely_delete" />
+			<tocitem text="About Refactoring JavaFX Code" target="javafx_refactor_about_javafx_refactoring" />
+			<tocitem text="Refactoring: Quick Reference" target="javafx_refactor_refactor_quick_ref" />
+			<tocitem text="Undoing Refactoring Changes" target="javafx_refactor_undo_refactor_changes" />
+			<tocitem text="Renaming a Class" target="javafx_refactor_rename_class" />
+			<tocitem text="Renaming a Function or Variable" target="javafx_refactor_rename_function_var" />
+			<tocitem text="Moving a Class" target="javafx_refactor_move_class" />
+			<tocitem text="Copying a Class" target="javafx_refactor_copy_class" />
+			<tocitem text="Safely Deleting JavaFX Code" target="javafx_refactor_safely_delete" />
 		</tocitem>
 		<tocitem text="Building JavaFX Applications" expand="false">
 			<tocitem text="About Building JavaFX Applications" target="javafx_comp_about" />
@@ -45,6 +45,10 @@
 			<tocitem text="Working with JavaFX Project Execution" target="javafx_run_process" />
 			<tocitem text="Running a JavaFX Application" target="javafx_run_app" />
 			<tocitem text="Setting the Main JavaFX Class and Runtime Arguments" target="javafx_run_args" />
+		</tocitem>
+		<tocitem text="Working With Graphics Exported From the JavaFX Production Suite">
+			<tocitem text="Viewing JavaFX Graphics " target="javafx_fxz_viewing_fxz_files" />
+			<tocitem text="Generating a UI Stub File for a JavaFX Graphic" target="javafx_fxz_generating_ui_stub_file" />
 		</tocitem>
 		<tocitem text="Debugging JavaFX Applications" target="javafx_debug_about" />
 		<tocitem text="Profiling JavaFX Applications" target="javafx_profile_about" />
