@@ -38,12 +38,14 @@
 	<mapID target="javafx_run_app" url="run/javafx_run_app.html"/>
 	<mapID target="javafx_run_args" url="run/javafx_run_args.html"/>
 	<mapID target="javafx_run_process" url="run/javafx_run_process.html"/>
-	<mapID target="about_javafx_refactoring" url="refactor/about_javafx_refactoring.html"/>
-	<mapID target="refactor_quick_ref" url="refactor/refactor_quick_ref.html"/>
-	<mapID target="undo_refactor_changes" url="refactor/undo_refactor_changes.html"/>
-	<mapID target="copy_class" url="refactor/copy_class.html"/>
-	<mapID target="safely_delete" url="refactor/safely_delete.html"/>
-	<mapID target="move_class" url="refactor/move_class.html"/>
-	<mapID target="rename_class" url="refactor/rename_class.html"/>
-	<mapID target="rename_function_var" url="refactor/rename_function_var.html"/>
+	<mapID target="javafx_refactor_about_javafx_refactoring" url="refactor/about_javafx_refactoring.html"/>
+	<mapID target="javafx_refactor_refactor_quick_ref" url="refactor/refactor_quick_ref.html"/>
+	<mapID target="javafx_refactor_undo_refactor_changes" url="refactor/undo_refactor_changes.html"/>
+	<mapID target="javafx_refactor_copy_class" url="refactor/copy_class.html"/>
+	<mapID target="javafx_refactor_safely_delete" url="refactor/safely_delete.html"/>
+	<mapID target="javafx_refactor_move_class" url="refactor/move_class.html"/>
+	<mapID target="javafx_refactor_rename_class" url="refactor/rename_class.html"/>
+	<mapID target="javafx_refactor_rename_function_var" url="refactor/rename_function_var.html"/>
+	<mapID target="javafx_fxz_generating_ui_stub_file" url="fxz_graphics/generating_ui_stub_file.html"/>
+	<mapID target="javafx_fxz_viewing_fxz_files" url="fxz_graphics/viewing_fxz_files.html"/>
 </map>
