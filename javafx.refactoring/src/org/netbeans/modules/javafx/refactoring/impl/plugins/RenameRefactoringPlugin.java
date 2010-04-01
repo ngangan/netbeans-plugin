@@ -43,7 +43,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
+import javax.swing.text.Document;
 import org.netbeans.api.java.source.TreePathHandle;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationController;
@@ -52,9 +54,14 @@ import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.ElementUtilities;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.lexer.Token;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameInCommentsElement;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
@@ -65,6 +72,7 @@ import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
+import org.openide.cookies.EditorCookie;
 import org.openide.cookies.SaveCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -350,9 +358,20 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                     return transformations;
                 }
             };
+            BaseRefactoringElementImplementation updateRefsInComment = null;
+            if (refactoring.isSearchInComments()) {
+                updateRefsInComment = new RenameInCommentsElement(edef.getName(), refactoring.getNewName(), file, bag.getSession());
+            }
+            boolean needReindex = true;
             if (updateRefs.hasChanges()) {
                 bag.add(refactoring, updateRefs);
-            } else if (!file.equals(fo)) {
+                needReindex = false;
+            }
+            if (updateRefsInComment != null && updateRefsInComment.hasChanges()) {
+                bag.add(refactoring, updateRefsInComment);
+                needReindex = false;
+            }
+            if (needReindex && !file.equals(fo)) {
                 bag.addFileChange(refactoring, new ReindexFileElement(file));
             }
         }

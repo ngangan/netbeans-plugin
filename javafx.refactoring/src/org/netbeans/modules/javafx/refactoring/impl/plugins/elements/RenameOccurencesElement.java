@@ -66,7 +66,7 @@ abstract public class RenameOccurencesElement extends BaseRefactoringElementImpl
 
     @Override
     final protected String getRefactoringText() {
-        return NbBundle.getMessage(RenameOccurencesElement.class, "LBL_RenameOccurences", oldName, newName); // NOI18N
+        return NbBundle.getMessage(RenameOccurencesElement.class, "LBL_ReplaceOccurences", oldName, newName); // NOI18N
     }
 
     final protected String getOldName() {
