@@ -150,9 +150,11 @@ final public class RefactoringSupport {
                 js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
 
                     public void run(org.netbeans.api.java.source.CompilationController cc) throws Exception {
-                        Method m = tph.getClass().getMethod("resolveElement", org.netbeans.api.java.source.CompilationInfo.class); // NOI18N
-                        Object e = m.invoke(tph, cc);
-                        refdef[0] = fromJava(e, cc);
+                        if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                            Method m = tph.getClass().getMethod("resolveElement", org.netbeans.api.java.source.CompilationInfo.class); // NOI18N
+                            Object e = m.invoke(tph, cc);
+                            refdef[0] = fromJava(e, cc);
+                        }
                     }
                 }, false);
             } catch (IOException e) {
@@ -161,32 +163,34 @@ final public class RefactoringSupport {
         return refdef[0];
     }
 
-    public static ElementDef fromJava(Object element, CompilationInfo ci) {
+    public static ElementDef fromJava(Object element, CompilationController cc) {
         ElementDef edef = null;
         try {
-            Class elementClass = element.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
-            Class elementsClass = element.getClass().getClassLoader().loadClass("javax.lang.model.util.Elements"); // NOI18N
-            Class packageElementClass = element.getClass().getClassLoader().loadClass("javax.lang.model.element.PackageElement"); // NOI18N
+            if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                Class elementClass = element.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+                Class elementsClass = element.getClass().getClassLoader().loadClass("javax.lang.model.util.Elements"); // NOI18N
+                Class packageElementClass = element.getClass().getClassLoader().loadClass("javax.lang.model.element.PackageElement"); // NOI18N
 
-            Method m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", elementClass); // NOI18N
-            Method nMethod = elementClass.getMethod("getSimpleName"); // NOI18N
-            org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, element);
-            Object elements = ci.getClass().getMethod("getElements").invoke(ci); // NOI18N
-            Method pMethod = elementsClass.getMethod("getPackageOf", elementClass); // NOI18N
-            Object pe = pMethod.invoke(elements, element);
-            String pName = packageElementClass.getMethod("getQualifiedName").invoke(pe).toString(); // NOI18N
+                Method m = org.netbeans.api.java.source.ElementHandle.class.getMethod("create", elementClass); // NOI18N
+                Method nMethod = elementClass.getMethod("getSimpleName"); // NOI18N
+                org.netbeans.api.java.source.ElementHandle jeh = (org.netbeans.api.java.source.ElementHandle)m.invoke(org.netbeans.api.java.source.ElementHandle.class, element);
+                Object elements = cc.getClass().getMethod("getElements").invoke(cc); // NOI18N
+                Method pMethod = elementsClass.getMethod("getPackageOf", elementClass); // NOI18N
+                Object pe = pMethod.invoke(elements, element);
+                String pName = packageElementClass.getMethod("getQualifiedName").invoke(pe).toString(); // NOI18N
 
-            ElementHandle eh = ElementHandle.fromJava(jeh);
-            if (eh != null) {
-                String simpleName = nMethod.invoke(element).toString();
-                edef = new GlobalDef(
-                    simpleName,
-                    eh.getKind(),
-                    pName,
-                    -1, -1, -1, -1,
-                    RefactoringSupport.getRefId(eh),
-                    null
-                );
+                ElementHandle eh = ElementHandle.fromJava(jeh);
+                if (eh != null) {
+                    String simpleName = nMethod.invoke(element).toString();
+                    edef = new GlobalDef(
+                        simpleName,
+                        eh.getKind(),
+                        pName,
+                        -1, -1, -1, -1,
+                        RefactoringSupport.getRefId(eh),
+                        null
+                    );
+                }
             }
         } catch (Throwable ex) {
             // basically ignore
@@ -205,9 +209,11 @@ final public class RefactoringSupport {
             js.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
-                    Object e = ehj.getClass().getMethod("resolve", CompilationInfo.class).invoke(ehj, cc); // NOI18N
-                    Class elementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
-                    tph[0] = (TreePathHandle) TreePathHandle.class.getMethod("create", elementClass, CompilationInfo.class).invoke(null, elementClass.cast(e), cc);
+                    if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                        Object e = ehj.getClass().getMethod("resolve", CompilationInfo.class).invoke(ehj, cc); // NOI18N
+                        Class elementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+                        tph[0] = (TreePathHandle) TreePathHandle.class.getMethod("create", elementClass, CompilationInfo.class).invoke(null, elementClass.cast(e), cc);
+                    }
                 }
             }, false);
         } catch (IOException e) {
