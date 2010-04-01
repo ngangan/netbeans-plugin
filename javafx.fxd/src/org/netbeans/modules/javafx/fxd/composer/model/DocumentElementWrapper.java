@@ -95,28 +95,22 @@ final class DocumentElementWrapper {
         Object parseValue(String strValue) {
             try {
                 if (isReferenceStr(strValue)){
-                    Object property = resolvePropertyValue(strValue);
-                    if (property != null){
-                        return property;
-                    }
+                    return resolvePropertyValue(strValue);
                 }
                 return FXDParser.parseValue(strValue, m_parser);
             } catch (IOException ex) {
-                Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while resolving reference for \"" + strValue + "\" ");
-                ex.printStackTrace();
-                throw new RuntimeException(ex.getLocalizedMessage(), ex);
+                throwRuntimeExeption(ex);
             } catch (FXDSyntaxErrorException ex) {
-                Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing or resolving reference for \"" + strValue + "\" value");
-                ex.printStackTrace();
-                throw new RuntimeException(ex.getLocalizedMessage(), ex);
+                throwRuntimeExeption(ex);
             } catch (FXDException ex) {
-                Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing \"" + strValue + "\" value");
-                ex.printStackTrace();
+                throwRuntimeExeption(ex);
             }
             return strValue;
+        }
+
+        private void throwRuntimeExeption(Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex.getLocalizedMessage(), ex);
         }
 
         private Object resolvePropertyValue(String strValue)
