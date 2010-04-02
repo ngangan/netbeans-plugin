@@ -195,9 +195,17 @@ public class FXDLexer implements Lexer<FXDTokenId> {
 
         public void parsingFinished() throws IOException, FXDException {
             // TODO tokenize the rest instead of marking it as error?
-            int c = m_parser.peekClean();
-            if (c != 0){
+            if (m_parser.peekClean() != 0){
                 markError(null);
+            } else {
+                markTailParsed();
+            }
+        }
+
+        private void markTailParsed() throws IOException {
+            char c = m_parser.peek();
+            while (c != 0) {
+                c = m_parser.fetch();
             }
             addTokenData(FXDTokenId.EOF, m_parser.getPosition(), 1);
         }
