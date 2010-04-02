@@ -64,8 +64,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
@@ -92,6 +94,7 @@ import org.openide.filesystems.FileObject;
  */
 public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
+    //private final static Logger LOG = Logger.getAnonymousLogger();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MarkUnusedElementsTaskFactory() {
@@ -110,11 +113,12 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
-                final Map<Element, Tree> varInit = new HashMap<Element, Tree>();
-                final Map<Tree, String> varNames = new HashMap<Tree, String>();
-                final Map<Element, Tree> varToRemove = new HashMap<Element, Tree>();
+                final Map<Element, Tree> elementsToAdd = new HashMap<Element, Tree>();
+                final Map<Tree, String> elementsNames = new HashMap<Tree, String>();
+                final Map<Element, Tree> elementsToRemove = new HashMap<Element, Tree>();
+                //final Map<Tree, Integer> cachedPositions = new HashMap<Tree, Integer>();
 
-                JavaFXTreePathScanner<Void, Void> varVisitor = new JavaFXTreePathScanner<Void, Void>() {
+                JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
 
                     boolean parentClass = true;
 
@@ -124,7 +128,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             return null;
                         }
                         if (!parentClass && !isPublic(node.getModifiers().toString())) {
-                            addToInit(node);
+                            addElementToAdd(node);
                         } else {
                             parentClass = false;
                         }
@@ -137,7 +141,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        addToRemove(node);
+                        addElementToRemove(node);
 
                         return super.visitInstantiate(node, v);
                     }
@@ -148,7 +152,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             return null;
                         }
                         if (!isPublic(node.getModifiers().toString())) {
-                            addToInit(node);
+                            addElementToAdd(node);
 
                         }
 
@@ -160,7 +164,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        addToRemove(node);
+                        addElementToRemove(node);
 
                         return super.visitIdentifier(node, v);
                     }
@@ -171,7 +175,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             return null;
                         }
                         for (Tree tree : node.getFunctionValue().getParameters()) {
-                            addToInit(tree);
+                            addElementToAdd(tree);
                         }
                         Element element = compilationInfo.getTrees().getElement(getCurrentPath());
                         Collection<Modifier> modifiers = node.getModifiers().getFlags();
@@ -179,7 +183,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             //TODO Hack for package modifiers which does not provide info about package
                             if (!isPackage(node.getModifiers().toString())) {
                                 if (modifiers.isEmpty() || modifiers.size() == 1 && modifiers.iterator().next() == Modifier.STATIC) {
-                                    addToInit(node);
+                                    addElementToAdd(node);
                                 }
                             }
                         }
@@ -195,7 +199,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         for (Tree tree : node.getInClauses()) {
                             if (tree instanceof JFXForExpressionInClause) {
                                 Tree variable = ((JFXForExpressionInClause) tree).getVariable();
-                                addToInit(variable);
+                                addElementToAdd(variable);
                             }
                         }
 
@@ -207,7 +211,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        addToInit(node.getParameter());
+                        addElementToAdd(node.getParameter());
 
                         return super.visitCatch(node, v);
                     }
@@ -217,7 +221,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (cancel.get()) {
                             return null;
                         }
-                        addToRemove(node);
+                        addElementToRemove(node);
 
                         return super.visitMethodInvocation(node, v);
                     }
@@ -226,11 +230,11 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         StringTokenizer tokenizer = new StringTokenizer(modifiersString);
                         while (tokenizer.hasMoreTokens()) {
                             String token = tokenizer.nextToken();
-                            if (token.contains("public") || token.contains("protected")) {
+                            if (token.contains("public") || token.contains("protected")) { //NOI18N
                                 return true;
                             }
                         }
-                        
+
                         return false;
                     }
 
@@ -244,7 +248,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         return false;
                     }
 
-                    private void addToInit(Tree node) {
+                    private void addElementToAdd(Tree node) {
                         if (node == null) {
                             return;
                         }
@@ -253,43 +257,68 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (element == null || element.getSimpleName() == null) {
                             return;
                         }
-                        varInit.put(element, node);
-                        varNames.put(node, element.getSimpleName().toString());
+                        elementsToAdd.put(element, node);
+                        elementsNames.put(node, element.getSimpleName().toString());
                     }
 
-                    private void addToRemove(Tree node) {
+                    private void addElementToRemove(Tree node) {
                         if (node == null) {
                             return;
                         }
                         JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                         Element element = compilationInfo.getTrees().getElement(path);
-                        varToRemove.put(element, node);
+                        elementsToRemove.put(element, node);
                     }
+
                 };
-                varVisitor.scan(compilationInfo.getCompilationUnit(), null);
+                scanner.scan(compilationInfo.getCompilationUnit(), null);
                 if (cancel.get()) {
                     return;
                 }
-                for (Element element : varInit.keySet()) {
-                    Tree tree = varInit.get(element);
+                for (Element element : elementsToAdd.keySet()) {
+                    Tree tree = elementsToAdd.get(element);
                     if (tree instanceof JFXVar) {
-                        if (((JFXVar) varInit.get(element)).isBound()) {
-                            varToRemove.put(element, tree);
-                            varNames.put(tree, element.getSimpleName().toString());
+                        if (((JFXVar) elementsToAdd.get(element)).isBound()) {
+                            elementsToRemove.put(element, tree);
+                            elementsNames.put(tree, element.getSimpleName().toString());
                         }
                     }
                 }
-                for (Element element : varToRemove.keySet()) {
-                    if (varInit.containsKey(element)) {
-                        varInit.remove(element);
+                for (Element element : elementsToRemove.keySet()) {
+                    if (element == null) {
+                        continue;
+                    }
+                    if (elementsToAdd.containsKey(element)) {
+                        elementsToAdd.remove(element);
+                    } else if (elementsNames.values().contains(element.getSimpleName().toString())) {
+                        Element toRemvEncElement = element.getEnclosingElement();
+                        if (toRemvEncElement == null) {
+                            continue;
+                        }
+                        String toRemvEncName = toRemvEncElement.getSimpleName().toString();
+                        String simpleName = element.getSimpleName().toString();
+                        Set<Element> toAddCheck = getElementsForSimpleName(simpleName, elementsToAdd.keySet());
+
+                        for (Element e : toAddCheck) {
+                            Element toAddEncElement = e.getEnclosingElement();
+                            if (toAddEncElement == null) {
+                                continue;
+                            }
+                            String toAddEncName = toAddEncElement.getSimpleName().toString();
+                            //FIXME This part of code compare elements based on simple names. Something more reliable then string simple name is need it.
+                            if (toAddEncName.contains(toRemvEncName) || toRemvEncName.contains(toAddEncName)) {
+                                elementsToAdd.remove(e);
+                            }
+                        }
+
                     }
                 }
-                if (varInit.isEmpty()) {
+                if (elementsToAdd.isEmpty()) {
                     return;
                 }
                 SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                Collection<Position> positions = new HashSet<Position>(varInit.size());
-                for (Tree tree : varInit.values()) {
+                Collection<Position> positions = new HashSet<Position>(elementsToAdd.size());
+                for (Tree tree : elementsToAdd.values()) {
                     long start = sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
                     if (start < 0 || end < 0) {
@@ -312,7 +341,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     }
                     while (tokenSequence.moveNext()) {
                         Token token = tokenSequence.token();
-                        if (token.toString().equals(varNames.get(tree))) {
+                        if (token.toString().equals(elementsNames.get(tree))) {
                             start = tokenSequence.offset();
                             end = start + token.length();
                         }
@@ -324,6 +353,16 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 } else {
                     SwingUtilities.invokeLater(updateEditor(positions, document));
                 }
+            }
+
+            Set<Element> getElementsForSimpleName(String simpleName, Set<Element> elements) {
+                Set<Element> results = new HashSet<Element>();
+                for (Element e : elements) {
+                    if (e != null && e.getSimpleName().toString().equals(simpleName)) {
+                        results.add(e);
+                    }
+                }
+                return results;
             }
         };
     }
