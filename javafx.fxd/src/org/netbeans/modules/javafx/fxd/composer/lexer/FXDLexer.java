@@ -207,6 +207,10 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             while (c != 0) {
                 c = m_parser.fetch();
             }
+            if (m_tokenizedLength < m_parser.getPosition()) {
+                addTokenData(FXDTokenId.WS, m_tokenizedLength,
+                        m_parser.getPosition() - m_tokenizedLength);
+            }
             addTokenData(FXDTokenId.EOF, m_parser.getPosition(), 1);
         }
 
