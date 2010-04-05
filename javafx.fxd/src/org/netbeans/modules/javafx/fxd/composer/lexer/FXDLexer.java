@@ -129,6 +129,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
     }
 
     public void release() {
+        m_tokensList = null;
     }
 
     public Object state() {
