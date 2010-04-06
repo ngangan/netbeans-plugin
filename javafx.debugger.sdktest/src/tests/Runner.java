@@ -5,9 +5,7 @@
 
 package tests;
 
-import debugger.framework.DebugServiceDriverSE;
-import junit.framework.Test;
-import junit.framework.TestResult;
+import org.junit.runner.JUnitCore;
 
 /**
  *
@@ -15,10 +13,7 @@ import junit.framework.TestResult;
  */
 public class Runner {
 
-    public static void main( String[] args ) {
-        Test t = DebugServiceDriverSE.suite();
-
-        TestResult tr = new TestResult();
-        t.run( tr );
+    public static void main( String[] args ) throws Exception {
+        JUnitCore.main( "debugger.framework.DebugServiceDriverSE" );
     }
 }
