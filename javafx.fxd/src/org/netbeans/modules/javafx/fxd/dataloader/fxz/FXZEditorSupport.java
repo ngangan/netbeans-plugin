@@ -37,6 +37,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.awt.UndoRedo.Manager;
 import org.openide.util.Task;
 import org.openide.util.UserQuestionException;
+import org.openide.windows.CloneableTopComponent;
 import org.openide.windows.TopComponent;
 
 /**
@@ -92,6 +93,19 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //            System.out.println("Trying to open entry: " + m_entryName);
 //        }
 //    }
+    @Override
+    public void open() {
+        if (allEditors.getArbitraryComponent() == null) {
+            TopComponent tc = ((FXZDataObject) getDataObject()).getMVTC();
+            if (tc instanceof CloneableTopComponent) {
+                CloneableTopComponent ctc = (CloneableTopComponent) tc;
+                if (allEditors != null) {
+                    ctc.setReference(allEditors);
+                }
+            }
+        }
+        super.open();
+    }
 
     @Override
     public StyledDocument openDocument() throws IOException {
