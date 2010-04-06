@@ -95,6 +95,8 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //    }
     @Override
     public void open() {
+        // #183588. Looks more like hack then like fix.
+        // TODO: should be less dependent on CloneableOpenSupport#openCloneableTopComponent() implementation
         if (allEditors.getArbitraryComponent() == null) {
             TopComponent tc = ((FXZDataObject) getDataObject()).getMVTC();
             if (tc instanceof CloneableTopComponent) {
