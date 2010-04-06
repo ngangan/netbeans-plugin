@@ -69,7 +69,11 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution";               //NOI18N
     private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution";    //NOI18N
     private static final String buttonPrintFXPreview = "print-fx-preview";                              //NOI18N
+    public static final String selectNextElementAction = "select-element-next";                         //NOI18N
+    public static final String selectPreviousElementAction = "select-element-previous";                 //NOI18N
+
     public static final String FX_MIME_TYPE = "text/x-fx";                                              //NOI18N
+
     private static Logger log = Logger.getLogger(JavaFXEditorKit.class.getName());
 
     public JavaFXEditorKit() {
@@ -108,6 +112,8 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
                 new InstantRenameAction(),
                 new JavaFXGoToSourceAction(),
                 new JavaFXGotoHelpAction(),
+                new SelectCodeElementAction(selectNextElementAction, true),
+                new SelectCodeElementAction(selectPreviousElementAction, false),
                 JavaFXImports.getInstance(),
 //                new JavaFXFormatAction(),
                 new JavaFXInsertBreakAction()

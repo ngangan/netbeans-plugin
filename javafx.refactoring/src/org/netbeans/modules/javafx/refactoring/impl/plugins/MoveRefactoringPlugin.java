@@ -424,6 +424,8 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
         for(FileObject refFo : related) {
             if (isCancelled()) return null;
+            if (!SourceUtils.isJavaFXFile(refFo)) continue;
+            
             fireProgressListenerStep();
             FixImportsElement fixImports = new FixImportsElement(refFo, session) {
 

@@ -217,13 +217,18 @@ public class JavaFXIndexer extends CustomIndexer {
                 index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
                 String fqn = type.getQualifiedName().toString();
                 index(document, IndexKey.CLASS_FQN, fqn);
-                if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
-                    int pkgLen = fqn.lastIndexOf(".");
-                    if (pkgLen > -1) {
-                        index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
-                    } else {
-                        index(document, IndexKey.PACKAGE_NAME, IndexingUtilities.DEFAULT_PACKAGE);
+                try {
+                    if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
+                        int pkgLen = fqn.lastIndexOf(".");
+                        if (pkgLen > -1) {
+                            index(document, IndexKey.PACKAGE_NAME, fqn.substring(0, pkgLen));
+                        } else {
+                            index(document, IndexKey.PACKAGE_NAME, IndexingUtilities.DEFAULT_PACKAGE);
+                        }
                     }
+                } catch (NullPointerException npe) {
+                    // #183260: javafxc throwing a NPE for certaing uncompilable sources
+                    LOG.log(Level.FINE, fqn, npe);
                 }
             }
             return super.visitClassDeclaration(node, document);

@@ -84,7 +84,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
     //private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-    private final static Logger LOG = Logger.getAnonymousLogger();
+    //private final static Logger LOG = Logger.getAnonymousLogger();
 
     public OverrideAllTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -229,7 +229,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
                     for (Element e : elements) {
                         if (e instanceof MethodSymbol) {
                             MethodSymbol method = (MethodSymbol) e;
-                            Logger.getLogger(this.getClass().toString()).info(method.name.toString());
+                            //LOG.info(method.name.toString());
                             for (Modifier modifier : method.getModifiers()) {
                                 if (modifier == Modifier.ABSTRACT) {
                                     boolean methodExists = false;

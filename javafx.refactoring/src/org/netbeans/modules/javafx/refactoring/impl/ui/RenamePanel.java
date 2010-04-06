@@ -45,6 +45,7 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.netbeans.modules.javafx.refactoring.RefactoringModule;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 
 
@@ -178,6 +179,7 @@ public class RenamePanel extends JPanel implements CustomRefactoringPanel {
         // used for change default value for searchInComments check-box.                                                  
         // The value is persisted and then used as default in next IDE run.
         Boolean b = evt.getStateChange() == ItemEvent.SELECTED ? Boolean.TRUE : Boolean.FALSE;
+        RefactoringModule.setOption("searchInComments.rename", b); // NOI18N
     }//GEN-LAST:event_textCheckBoxItemStateChanged
                                                              
     // Variables declaration - do not modify//GEN-BEGIN:variables

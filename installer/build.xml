@@ -12,6 +12,7 @@
     <delete dir="../build/installers"/>
     <condition property="running.on.mac">
       <and>
+        <isfalse value="${skip.mac.installer}"/>
         <os family="mac"/>
         <available file="/Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker"/>
       </and>  

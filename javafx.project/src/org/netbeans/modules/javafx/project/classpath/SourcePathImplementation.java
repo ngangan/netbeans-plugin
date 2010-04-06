@@ -69,7 +69,8 @@ import org.openide.util.WeakListeners;
 final class SourcePathImplementation implements ClassPathImplementation, PropertyChangeListener {
 
     private static final String PROP_BUILD_DIR = "build.dir";   //NOI18N
-    
+
+    private final RequestProcessor propertyChangeRP = new RequestProcessor("PropertyChangeRP", Runtime.getRuntime().availableProcessors()); // NOI18N
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
     private List<PathResourceImplementation> resources;
     private final SourceRoots sourceRoots;
@@ -186,7 +187,7 @@ final class SourcePathImplementation implements ClassPathImplementation, Propert
         if (SourceRoots.PROP_ROOTS.equals (evt.getPropertyName()) ||
            (evaluator != null && evt.getSource() == evaluator &&
            (evt.getPropertyName() == null || PROP_BUILD_DIR.equals(evt.getPropertyName())))) {
-            RequestProcessor.getDefault().post(new Runnable() {
+            propertyChangeRP.post(new Runnable() {
                 public void run() {
                     synchronized (SourcePathImplementation.this) {
                         resources = null;

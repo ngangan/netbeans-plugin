@@ -77,11 +77,12 @@ import org.openide.util.RequestProcessor;
  *
  * @author Karol Harezlak
  */
-public class JavaFXTaskListProvider extends PushTaskScanner {
+public class JavaFXErrorTaskListProvider extends PushTaskScanner {
 
     private static final Logger LOG = Logger.getAnonymousLogger(); //NOI18N
-    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
+    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXErrorTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
+    private static final int TASKS_LIMIT = 10;
     private final HashMap<FileObject, FileChangeListener> projectDirs = new HashMap<FileObject, FileChangeListener>();
     private final HashMap<FileObject, RequestProcessor.Task> waitingTasks = new HashMap<FileObject, RequestProcessor.Task>();
     private final HashMap<FileObject, Future<Void>> scannerTasks = new HashMap<FileObject, Future<Void>>();
@@ -89,12 +90,13 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
     private RequestProcessor.Task majorTask;
     private RequestProcessor processor;
 
-    private JavaFXTaskListProvider() {
+
+    private JavaFXErrorTaskListProvider() {
         super(TASK_LIST_NAME, TASK_LIST_NAME, TASK_LIST_NAME);
     }
 
     public static final PushTaskScanner create() {
-        return new JavaFXTaskListProvider();
+        return new JavaFXErrorTaskListProvider();
     }
 
     @Override
@@ -120,8 +122,10 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
             projectDirs.clear();
             waitingTasks.clear();
             scannerTasks.clear();
-            processor.stop();
-            processor.shutdown();
+            if (processor != null) {
+                processor.stop();
+                processor.shutdown();
+            }
             return;
         }
         active.set(true);
@@ -202,10 +206,10 @@ public class JavaFXTaskListProvider extends PushTaskScanner {
 
     private void createTask(FileObject fileObject, Callback callback) {
         //LOG.info("Number of register scanner tasks: " + scannerTasks.size());
-        if (scannerTasks.size() > 7) {
+        if (scannerTasks.size() > TASKS_LIMIT) {
             //LOG.info("No more scanner tasks can be registered: " + scannerTasks.size());
             return;
-        } 
+        }
         if (!fileObject.isValid() || !ErrorsCache.isInError(fileObject, false)) {
             callback.setTasks(fileObject, Collections.EMPTY_LIST);
             return;

@@ -46,7 +46,6 @@ import org.openide.util.NbPreferences;
 
 /**
  * Module installation class for Refactoring module.
- *
  * @author Jan Becicka
  * @author Pavel Flaska
  */

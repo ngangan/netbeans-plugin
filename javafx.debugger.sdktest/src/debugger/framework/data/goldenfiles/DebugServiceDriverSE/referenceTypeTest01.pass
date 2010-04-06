@@ -1,0 +1,6 @@
+		breakpoint reached in class: j2se_tests.reference_type.test01.RefTypeTestCase01 on line: 19
+si = 99
+sb = true
+		breakpoint reached in class: j2se_tests.reference_type.test01.RefTypeTestCase01 on line: 21
+si = 100
+sb = false

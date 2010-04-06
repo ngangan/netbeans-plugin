@@ -59,6 +59,7 @@ import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
 import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameInCommentsElement;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
 import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
@@ -80,9 +81,9 @@ import org.openide.util.NbBundle;
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
 public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
-    private AbstractRefactoring refactoring;
+    private RenameRefactoring refactoring;
 
-    public RenamePackagePlugin(AbstractRefactoring refactoring) {
+    public RenamePackagePlugin(RenameRefactoring refactoring) {
         this.refactoring = refactoring;
     }
 
@@ -93,7 +94,7 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
     public Problem fastCheckParameters() {
         FileObject f = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
         if (f!=null) {
-            String newName = ((RenameRefactoring) refactoring).getNewName();
+            String newName = refactoring.getNewName();
             if (!SourceUtils.isValidPackageName(newName)) {
                 String msg = new MessageFormat(NbBundle.getMessage(RenamePackagePlugin.class, "ERR_InvalidPackage")).format( // NOI18N
                         new Object[] {newName}
@@ -157,6 +158,9 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
                 };
                 edefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
                 refelems.add(ref);
+                if (refactoring.isSearchInComments()) {
+                    refelems.add(new RenameInCommentsElement(pd[0].getName(), sourcePkgName, file, reb.getSession()));
+                }
             } else {
                 JavaSource js = JavaSource.forFileObject(file);
                 try {
