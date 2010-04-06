@@ -64,6 +64,7 @@ import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
+import javax.tools.StandardLocation;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.CompilationPhase;
 import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
@@ -272,6 +273,8 @@ public final class JavaFXParser extends Parser {
             return CompilationPhase.MODIFIED;
         }
 
+        if (brokenPlatform) return currentPhase; // don't try to analyze sources with broken platform
+
         if (currentPhase == CompilationPhase.PARSED && !phase.lessThan(CompilationPhase.ANALYZED)) {
             if (LOG.isLoggable(Level.FINE)) LOG.fine("Starting to analyze " + fileObject().getNameExt()); // NOI18N
             long start = System.currentTimeMillis();
@@ -321,6 +324,7 @@ public final class JavaFXParser extends Parser {
         return phase;
     }
 
+    private boolean brokenPlatform = false;
     private JavafxcTaskImpl createJavafxcTaskImpl() {
         JavafxcTool tool = JavafxcTool.create();
         FileObject fileObject = fileObject();
@@ -337,6 +341,17 @@ public final class JavaFXParser extends Parser {
                 LOG.log(Level.FINEST, "Cannot get file content.", ex); // NOI18N
             }
         }
+
+        try {
+            if (fileManager.getFileForInput(StandardLocation.PLATFORM_CLASS_PATH, "java.lang", "Object.class") == null) {
+                // not able to retrieve java.lang.Object => broken platform
+                brokenPlatform = true;
+            }
+        } catch (IOException e) {
+            LOG.log(Level.WARNING, null, e);
+            brokenPlatform = true;
+        }
+
 
         List<String> options = new ArrayList<String>();
         //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions

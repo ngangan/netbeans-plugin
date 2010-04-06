@@ -52,6 +52,7 @@ import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.TreePathHandle;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
 import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
@@ -110,8 +111,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     final private static Logger LOGGER = Logger.getLogger(RefactoringActionsProvider.class.getName());
 
     @Override
-    public boolean canFindUsages(Lookup lkp) {
+    public boolean canFindUsages(Lookup lkp) {       
         FileObject file = lkp.lookup(FileObject.class);
+        if (!SourceUtils.isAnalyzable(file)) return false;
+        
         return file != null && file.getMIMEType().equals("text/x-fx"); //NOI18N
     }
     volatile private boolean isFindUsages;
@@ -186,10 +189,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
-//        if (!isRefactoringEnabled()) return false;
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
+        
         return dobj != null && SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
 
@@ -315,7 +319,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     }
 
     @Override
-    public boolean canMove(Lookup lkp) {
+    public boolean canMove(Lookup lkp) {        
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -336,6 +340,9 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                     return false;
                 }
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
+                    return false;
+                }
+                if (!SourceUtils.isAnalyzable(dob.getPrimaryFile())) {
                     return false;
                 }
                 if (dob instanceof DataFolder) {
@@ -370,6 +377,9 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                     return drop != null;
                 }
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
+                    return false;
+                }
+                if (!SourceUtils.isAnalyzable(dob.getPrimaryFile())) {
                     return false;
                 }
                 if (SourceUtils.isJavaFXFile(dob.getPrimaryFile())) {
