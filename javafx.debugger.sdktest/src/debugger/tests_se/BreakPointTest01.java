@@ -23,8 +23,8 @@ import debugger.framework.VMCapabilities;
  */
 public class BreakPointTest01 implements DebuggerTest {
 
-    private final static int BREAKPOINT_LINE = 31;
-    public static String CLASS_NAME = "j2se_tests.breakpoint.test01.BreakpointTestCase01";
+    private final static int BREAKPOINT_LINE = 9;
+    public static String CLASS_NAME = "testsuite.Main";
 
     private DebugService debugService;
     private ArrayList requests = new ArrayList();
@@ -50,8 +50,11 @@ public class BreakPointTest01 implements DebuggerTest {
             ClassPrepareEvent classPrepareEvent = (ClassPrepareEvent) event;
             if (classPrepareEvent.referenceType().name().equals(CLASS_NAME)) {
                 try {
-                    req = this.debugService.setBreakPoint(classPrepareEvent.referenceType(), BREAKPOINT_LINE);
-                    this.debugService.setBreakPoint(classPrepareEvent.referenceType(), BREAKPOINT_LINE + 1);
+                    req = this.debugService.setBreakPoint( classPrepareEvent.referenceType(), BREAKPOINT_LINE );
+                    this.debugService.setBreakPoint( classPrepareEvent.referenceType(), BREAKPOINT_LINE + 1 );
+                    this.debugService.setBreakPoint( classPrepareEvent.referenceType(), BREAKPOINT_LINE + 2 );
+                    
+                    this.debugService.setBreakPoint( classPrepareEvent.referenceType(), BREAKPOINT_LINE + 4 );
                 }
                 catch (AbsentInformationException e) {
                     e.printStackTrace();
