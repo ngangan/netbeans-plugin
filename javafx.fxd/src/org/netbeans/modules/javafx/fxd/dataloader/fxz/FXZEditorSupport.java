@@ -71,18 +71,14 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //        env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(l, env));        
     }
 
-    /*
     @Override
     public void edit() {
         ((FXZDataObject)getDataObject()).getBaseSupport().editSuper();
-        //((FXZDataObject)getDataObject()).updateEditorCookie();
     }
 
     public void editSuper() {
         super.edit();
     }
-     * 
-     */
 
 //    @Override
 //    public void open() {

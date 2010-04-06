@@ -157,9 +157,8 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         }
 
         public void edit() {
-            getBaseSupport().edit();
-            //getBaseSupport().editSuper();
-            //updateEditorCookie();
+            //getBaseSupport().edit();
+            getBaseSupport().editSuper();
         }
 
         public void addPropertyChangeListener(PropertyChangeListener arg0) {
@@ -251,7 +250,6 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         });
     }
 
-    /*
     public void updateEditorCookie() {
         //getCookieSet().assign(EditorCookie.class, getBaseSupport());
         EditorCookie c = getCookieSet().getCookie(EditorCookie.class);
@@ -262,7 +260,6 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
             }
         });
     }
-    */
 
     public void updateTCName() {
         TopComponent tc = getMVTC();
