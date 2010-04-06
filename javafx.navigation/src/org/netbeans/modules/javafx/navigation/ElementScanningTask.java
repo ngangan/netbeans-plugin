@@ -241,27 +241,15 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         if (e == null || e.asType().getKind() == TypeKind.ERROR) {
             return;
         }
-        List<? extends Element> members = null;
-        try {
-            members = info.getElements().getAllMembers(e);
-        // TODO this is temporary for debug
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            System.err.println("* e = " + e); // NOI18N
-            System.err.println("* e.getKind() = " + e.getKind()); // NOI18N
-            System.err.println("* e.asType() = " + e.asType()); // NOI18N
-        }
-        if (members != null) {
-            for (Element m : members) {
-                if (canceled.get()) {
-                    return;
-                }
-                Description d = element2description(m, e, parentDescription.isInherited, info, pos);
-                if (null != d) {
-                    parentDescription.subs.add(d);
-                    if (m instanceof TypeElement && !d.isInherited) {
-                        addMembers((TypeElement) m, d, info, pos);
-                    }
+        for (Element m : FXSourceUtils.getAllMembers(info.getElements(), e)) {
+            if (canceled.get()) {
+                return;
+            }
+            Description d = element2description(m, e, parentDescription.isInherited, info, pos);
+            if (null != d) {
+                parentDescription.subs.add(d);
+                if (m instanceof TypeElement && !d.isInherited) {
+                    addMembers((TypeElement) m, d, info, pos);
                 }
             }
         }
