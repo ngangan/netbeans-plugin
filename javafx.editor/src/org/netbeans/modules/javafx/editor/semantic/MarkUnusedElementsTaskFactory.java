@@ -153,7 +153,6 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         }
                         if (!isPublic(node.getModifiers().toString())) {
                             addElementToAdd(node);
-
                         }
 
                         return super.visitVariable(node, v);
@@ -277,7 +276,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 }
                 for (Element element : elementsToAdd.keySet()) {
                     Tree tree = elementsToAdd.get(element);
-                    if (tree instanceof JFXVar) {
+                    if (tree instanceof JFXVar && element.getSimpleName() != null) {
                         if (((JFXVar) elementsToAdd.get(element)).isBound()) {
                             elementsToRemove.put(element, tree);
                             elementsNames.put(tree, element.getSimpleName().toString());
@@ -290,7 +289,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     }
                     if (elementsToAdd.containsKey(element)) {
                         elementsToAdd.remove(element);
-                    } else if (elementsNames.values().contains(element.getSimpleName().toString())) {
+                    } else if (element.getSimpleName() != null && elementsNames.values().contains(element.getSimpleName().toString())) {
                         Element toRemvEncElement = element.getEnclosingElement();
                         if (toRemvEncElement == null) {
                             continue;
@@ -358,10 +357,11 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
             Set<Element> getElementsForSimpleName(String simpleName, Set<Element> elements) {
                 Set<Element> results = new HashSet<Element>();
                 for (Element e : elements) {
-                    if (e != null && e.getSimpleName().toString().equals(simpleName)) {
+                    if (e != null && e.getSimpleName() != null && e.getSimpleName().toString().equals(simpleName)) {
                         results.add(e);
                     }
                 }
+                
                 return results;
             }
         };
