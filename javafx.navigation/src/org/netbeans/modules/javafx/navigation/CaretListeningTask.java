@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.navigation;
 
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -514,9 +515,20 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             if (tree == null) {
                 break;
             }
-            switch (tree.getJavaFXKind()) {
+            JavaFXKind javaFXKind = null;
+            // JFXC-4282
+            try {
+                javaFXKind  = tree.getJavaFXKind();
+            } catch (Exception ex) {
+            }
+            if (javaFXKind == null) {
+                break;
+            }
+            switch (javaFXKind) {
                 case FUNCTION_DEFINITION:
                 case CLASS_DECLARATION:
+                case INIT_DEFINITION:
+                case POSTINIT_DEFINITION:
                 case COMPILATION_UNIT:
                     e = ci.getTrees().getElement(tp);
                     break;
