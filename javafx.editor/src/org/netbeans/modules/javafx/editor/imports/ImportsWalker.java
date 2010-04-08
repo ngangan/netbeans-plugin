@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -185,7 +186,11 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
                     doResolve(nodeName, tree, model);
                 }
             } else {
-                model.addUsage(findTopClass(e).toString());
+                String className = findTopClass(e).toString();
+                if (e.getKind().isField() || e.getKind() == ElementKind.METHOD) {
+                    model.addUsage(className + "." + e.getSimpleName().toString()); // NOI18N
+                }
+                model.addUsage(className);
             }
         } else {
             if (resolve) {

@@ -151,6 +151,11 @@ public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
                             }
                             return Collections.singleton(t);
                         }
+
+                        @Override
+                        protected FileObject getTargetFO() {
+                            return CopyRefactoringPlugin.this.getTargetFO(getParentFile());
+                        }
                     };
             }
             if (ref != null && ref.hasChanges()) {

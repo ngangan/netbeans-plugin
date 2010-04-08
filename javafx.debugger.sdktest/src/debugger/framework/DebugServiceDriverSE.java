@@ -43,18 +43,19 @@ public class DebugServiceDriverSE extends NbTestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-//        suite.addTest(new DebugServiceDriverSE("breakpointTest01"));
+        suite.addTest( new DebugServiceDriverSE( "breakpointTest01" ));
 //        suite.addTest(new DebugServiceDriverSE("evaluationTest01"));
 //        suite.addTest(new DebugServiceDriverSE("stepTest01"));
 //        suite.addTest(new DebugServiceDriverSE("threadTest02"));
 //        suite.addTest(new DebugServiceDriverSE("superTypeTest01"));
-        suite.addTest(new DebugServiceDriverSE("vmTest01"));
+//        suite.addTest( new DebugServiceDriverSE( "vmTest01" ));
 //        suite.addTest(new DebugServiceDriverSE("referenceTypeTest01"));
         return suite;
     }
 
     
     
+    @Override
     public void compareReferenceFiles() {
         String product = System.getProperty("product");
         String platform = System.getProperty("platform");
@@ -79,6 +80,12 @@ public class DebugServiceDriverSE extends NbTestCase {
             if (this.getClass().getResource(goldenFilePath) != null) {
                 goldenFileName = this.getName() + suffixes[i] + ".pass";
             }
+        }
+        File testFile = null;
+        try {
+            testFile = new File(getWorkDir(),this.getName()+".ref");
+        } catch( IOException ioe ) {
+            ioe.printStackTrace();
         }
         assertNotNull(goldenFileName);
         compareReferenceFiles(
@@ -179,9 +186,9 @@ public class DebugServiceDriverSE extends NbTestCase {
         try {
             DebugService debugService = new DebugServiceImpl(getLog(), getRef());
             new VMTest01(debugService, getRef());
-            process = startProcess( getProcessCommandLine( VMTest01.MAIN_CLASS_NAME));
-            debugService.startService(address);
-            log("DebugService finished vmTest01");
+            process = startProcess( getProcessCommandLine( VMTest01.MAIN_CLASS_NAME ));
+            debugService.startService( address );
+            log( "DebugService finished vmTest01" );
             killProcess(process);
             compareReferenceFiles();
         }

@@ -7,12 +7,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
@@ -50,6 +52,50 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
     private Process pr;
     private int timer;
 
+    private static boolean isResource(String name) {
+        if (name.endsWith(".class")) return false;
+        if (name.endsWith(".java")) return false;
+        if (name.endsWith(".fx")) return false;
+        if (name.endsWith(".cvsignore")) return false;
+        if (name.endsWith(".hgignore")) return false;
+        if (name.endsWith("vssver.scc")) return false;
+        if (name.endsWith(".DS_Store")) return false;
+        if (name.endsWith("~")) return false;
+        if (name.indexOf("/CVS/") >= 0) return false;
+        if (name.indexOf("/.svn/") >= 0) return false;
+        if (name.indexOf("/.hg/") >= 0) return false;
+        if (name.indexOf("/.#") >= 0) return false;
+        if (name.indexOf("/._") >= 0) return false;
+        if (name.endsWith("#") && name.indexOf("/#") >= 0) return false;
+        if (name.endsWith("%") && name.indexOf("/%") >= 0) return false;
+        if (name.endsWith("MANIFEST.MF")) return false;
+        return true;
+    }
+
+    private void copyResources(FileObject dir1, FileObject dir2) {
+        for (FileObject f : dir1.getChildren()) try {
+            if (f.isFolder()) {
+                dir2 = FileUtil.createFolder(dir2, f.getNameExt());
+                copyResources(f, dir2);
+            } else if (isResource(f.getPath())) {
+                FileObject f2 = dir2.getFileObject(f.getName(), f.getExt());
+                if (f2 == null || f.lastModified().after(f2.lastModified())) {
+                    if (f.getExt().equals("fxz")) {
+                        dir2 = FileUtil.createFolder(dir2, f.getNameExt());
+                        InputStream is = f.getInputStream();
+                        try {
+                            FileUtil.extractJar(dir2, is);
+                        } finally {
+                            is.close();
+                        }
+                    } else FileUtil.copyFile(f, dir2, f.getName());
+                }
+            }
+        } catch (IOException ioe) {
+            log.severe(ioe.getLocalizedMessage());
+        }
+    }
+
     private final RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
         public void run() {
             synchronized (JavaFXPreviewTopComponent.this) {
@@ -79,20 +125,26 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             FileObject srcRoots[] = ((JavaFXProject)p).getFOSourceRoots();
                             StringBuffer src = new StringBuffer();
                             String className = null;
-                            for (FileObject srcRoot : srcRoots) {
-                                if (src.length() > 0) src.append(';');
-                                src.append(FileUtil.toFile(srcRoot).getAbsolutePath());
-                                if (FileUtil.isParentOf(srcRoot, f)) {
-                                    className = FileUtil.getRelativePath(srcRoot, f);
-                                    className = className.substring(0, className.length() - 3).replace('/', '.');
+                            File basedir = FileUtil.toFile(p.getProjectDirectory());
+                            File build = PropertyUtils.resolveFile(basedir, "build/compiled"); //NOI18N
+                            try {
+                                FileObject buildCompiled = FileUtil.createFolder(build);
+                                for (FileObject srcRoot : srcRoots) {
+                                    if (src.length() > 0) src.append(';');
+                                    src.append(FileUtil.toFile(srcRoot).getAbsolutePath());
+                                    if (FileUtil.isParentOf(srcRoot, f)) {
+                                        className = FileUtil.getRelativePath(srcRoot, f);
+                                        className = className.substring(0, className.length() - 3).replace('/', '.');
+                                    }
+                                    copyResources(srcRoot, buildCompiled);
                                 }
+                            } catch (IOException ioe) {
+                                log.severe(ioe.getLocalizedMessage());
                             }
                             String cp = ev.getProperty("javac.classpath"); //NOI18N
                             cp = cp == null ? "" : cp.trim();
                             String enc = ev.getProperty("source.encoding");  //NOI18N
                             if (enc == null || enc.trim().length() == 0) enc = "UTF-8"; //NOI18N
-                            File basedir = FileUtil.toFile(p.getProjectDirectory());
-                            File build = PropertyUtils.resolveFile(basedir, "build/compiled"); //NOI18N
                             ArrayList<String> args = new ArrayList<String>();
                             args.add(fxHome + "/bin/javafxc" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
                             args.add("-cp"); //NOI18N

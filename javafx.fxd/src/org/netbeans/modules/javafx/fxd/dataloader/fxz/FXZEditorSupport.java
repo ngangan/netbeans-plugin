@@ -37,6 +37,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.awt.UndoRedo.Manager;
 import org.openide.util.Task;
 import org.openide.util.UserQuestionException;
+import org.openide.windows.CloneableTopComponent;
 import org.openide.windows.TopComponent;
 
 /**
@@ -70,18 +71,14 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //        env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(l, env));        
     }
 
-    /*
     @Override
     public void edit() {
         ((FXZDataObject)getDataObject()).getBaseSupport().editSuper();
-        //((FXZDataObject)getDataObject()).updateEditorCookie();
     }
 
     public void editSuper() {
         super.edit();
     }
-     * 
-     */
 
 //    @Override
 //    public void open() {
@@ -92,6 +89,21 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //            System.out.println("Trying to open entry: " + m_entryName);
 //        }
 //    }
+    @Override
+    public void open() {
+        // #183588. Looks more like hack then like fix.
+        // TODO: should be less dependent on CloneableOpenSupport#openCloneableTopComponent() implementation
+        if (allEditors.getArbitraryComponent() == null) {
+            TopComponent tc = ((FXZDataObject) getDataObject()).getMVTC();
+            if (tc instanceof CloneableTopComponent) {
+                CloneableTopComponent ctc = (CloneableTopComponent) tc;
+                if (allEditors != null) {
+                    ctc.setReference(allEditors);
+                }
+            }
+        }
+        super.open();
+    }
 
     @Override
     public StyledDocument openDocument() throws IOException {

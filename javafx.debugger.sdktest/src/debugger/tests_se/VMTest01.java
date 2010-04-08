@@ -54,8 +54,10 @@ public class VMTest01 implements DebuggerTest {
         if (event instanceof ThreadStartEvent) {
             ThreadStartEvent threadStartEvent = (ThreadStartEvent) event;
             String threadClassName = threadStartEvent.thread().referenceType().name();
+            System.out.println(" t " + threadClassName );
             if (threadClassName.equals(THREAD_CLASS_NAME)) {
                 ref.println("\t\tThreadStartEvent : " + threadClassName);
+                System.out.println(" - " + "ThreadStartEvent : " + threadClassName);
                 ReferenceType refType = threadStartEvent.thread().referenceType();
                 try {
                     this.debugService.setBreakPoint(refType, BREAKPOINT_LINE);
@@ -67,6 +69,7 @@ public class VMTest01 implements DebuggerTest {
                     e.printStackTrace(ref);
                 }
                 ref.println("\t\tsuspendVM : " + threadClassName);
+                System.out.println(" - " + "suspendVM : " + threadClassName );
                 vmSuspendStart = System.currentTimeMillis();
                 this.debugService.suspendVM(SUSPEND_DURATION);
             }

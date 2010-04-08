@@ -31,7 +31,7 @@ public class FXDComposerModel {
     public FXDComposerModel( FXZDataObject dObj, String cachedEntry) throws FileNotFoundException, IOException {
         assert dObj != null;
         m_selectedEntry = cachedEntry != null ? cachedEntry : FXDContainer.MAIN_CONTENT;
-        //dObj.updateEditorCookie();
+        dObj.updateEditorCookie();
         try {
             m_fxzArchive = new FXZArchive(dObj);
         } catch( Exception e) {

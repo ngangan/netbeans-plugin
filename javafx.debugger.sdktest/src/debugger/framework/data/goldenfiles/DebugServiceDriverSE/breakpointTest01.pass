@@ -1,7 +1,4 @@
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 31
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 32
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 31
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 32
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 31
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 32
-		breakpoint reached in class: j2se_tests.breakpoint.test01.BreakpointTestCase01 on line: 51
+		breakpoint reached in class: testsuite.Main on line: 9
+		breakpoint reached in class: testsuite.Main on line: 10
+		breakpoint reached in class: testsuite.Main on line: 11
+		breakpoint reached in class: testsuite.Main on line: 13

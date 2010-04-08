@@ -66,6 +66,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -96,6 +97,9 @@ import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.parsing.spi.indexing.Context;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
@@ -108,6 +112,7 @@ import org.netbeans.modules.parsing.spi.indexing.support.IndexDocument;
 import org.netbeans.modules.parsing.spi.indexing.support.IndexingSupport;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -120,7 +125,7 @@ public class JavaFXIndexer extends CustomIndexer {
     final public static String NAME = "fx";
     final public static int VERSION = 5;
 
-    static final Convertor<Diagnostic<?>> ERROR_CONVERTOR = new Convertor<Diagnostic<?>>() {
+    static final Convertor<Diagnostic<?>> DIAG_ERROR_CONVERTOR = new Convertor<Diagnostic<?>>() {
         public ErrorKind getKind(Diagnostic<?> t) {
             return t.getKind() == Diagnostic.Kind.ERROR ? ErrorKind.ERROR : ErrorKind.WARNING;
         }
@@ -129,6 +134,30 @@ public class JavaFXIndexer extends CustomIndexer {
         }
         public String getMessage(Diagnostic<?> t) {
             return t.getMessage(null);
+        }
+    };
+
+    static final Convertor<Exception> EXCEPTION_ERROR_CONVERTOR = new Convertor<Exception>() {
+        public ErrorKind getKind(Exception e) {
+            return ErrorKind.ERROR;
+        }
+        public int getLineNumber(Exception t) {
+            return 1;
+        }
+        public String getMessage(Exception e) {
+            return e.getLocalizedMessage();
+        }
+    };
+
+    static final Convertor<String> TEXT_ERROR_CONVERTOR = new Convertor<String>() {
+        public ErrorKind getKind(String e) {
+            return ErrorKind.ERROR;
+        }
+        public int getLineNumber(String t) {
+            return 1;
+        }
+        public String getMessage(String txt) {
+            return txt;
         }
     };
 
@@ -654,21 +683,36 @@ public class JavaFXIndexer extends CustomIndexer {
 
                     public void run(CompilationController cc) throws Exception {
                         Indexable ix = indexables.get(cc.getFileObject());
-                        if (ix != null) {
-                            ErrorsCache.setErrors(cntxt.getRootURI(), ix, getDiagnostics(cc), ERROR_CONVERTOR);
-                        }
-                        if (!cntxt.isSupplementaryFilesIndexing()) {
-                            IndexingSupport support = IndexingSupport.getInstance(cntxt);
-                            IndexDocument document = support.createDocument(cc.getFileObject());
-                            IndexingVisitor visitor = new IndexingVisitor(cc);
-                            visitor.scan(cc.getCompilationUnit(), document);
-                            support.addDocument(document);
-                            for(TypeElement tte : cc.getTopLevelElements()) {
-                                if (cancelled.get()) return;
-                                reindexDependables(
-                                    ci.getResources(ElementHandle.create(tte), EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)),
-                                    cntxt
-                                );
+                        if (cc.toPhase(JavaFXSource.Phase.ANALYZED).lessThan(JavaFXSource.Phase.ANALYZED)) {
+                            Project p = FileOwnerQuery.getOwner(cc.getFileObject());
+                            ErrorsCache.setErrors(
+                                cntxt.getRootURI(), ix,
+                                Collections.singleton(NbBundle.getMessage(JavaFXIndexer.class, "TEXT_BrokenPlatform",
+                                    ProjectUtils.getInformation(p).getDisplayName())
+                                ),
+                                TEXT_ERROR_CONVERTOR
+                            ); // NOI18N
+                        } else {
+                            try {
+                                if (ix != null) {
+                                    ErrorsCache.setErrors(cntxt.getRootURI(), ix, getDiagnostics(cc), DIAG_ERROR_CONVERTOR);
+                                }
+                                if (!cntxt.isSupplementaryFilesIndexing()) {
+                                    IndexingSupport support = IndexingSupport.getInstance(cntxt);
+                                    IndexDocument document = support.createDocument(cc.getFileObject());
+                                    IndexingVisitor visitor = new IndexingVisitor(cc);
+                                    visitor.scan(cc.getCompilationUnit(), document);
+                                    support.addDocument(document);
+                                    for(TypeElement tte : cc.getTopLevelElements()) {
+                                        if (cancelled.get()) return;
+                                        reindexDependables(
+                                            ci.getResources(ElementHandle.create(tte), EnumSet.of(SearchKind.TYPE_REFERENCES), EnumSet.allOf(SearchScope.class)),
+                                            cntxt
+                                        );
+                                    }
+                                }
+                            } catch (Exception e) {
+                                ErrorsCache.setErrors(cntxt.getRootURI(), ix, Collections.singleton(e), EXCEPTION_ERROR_CONVERTOR);
                             }
                         }
                     }
