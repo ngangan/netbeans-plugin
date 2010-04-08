@@ -103,7 +103,6 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        final Document document = FXSourceUtils.getDocument(file);
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -112,6 +111,10 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                final Document document = FXSourceUtils.getDocument(file);
+                if (document == null) {
+                    return;
+                }
                 cancel.set(false);
                 final Map<Element, Tree> elementsToAdd = new HashMap<Element, Tree>();
                 final Map<Tree, String> elementsNames = new HashMap<Tree, String>();
@@ -371,6 +374,9 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
         return new Runnable() {
 
             public void run() {
+                if (document == null) {
+                    return;
+                }
                 for (Position position : positions) {
                     OffsetsBag bag = (OffsetsBag) document.getProperty(SemanticHighlighter.class);
                     if (bag == null) {
