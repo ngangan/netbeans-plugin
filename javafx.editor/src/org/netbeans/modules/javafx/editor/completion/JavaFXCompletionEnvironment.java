@@ -1248,6 +1248,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                 for (Element ee : e.getEnclosedElements()) {
                     if (ee.getKind().isClass() || ee.getKind() == ElementKind.INTERFACE) {
                         String ename = ee.getSimpleName().toString();
+                        if (ename.contains("$")) continue; // Filter out X$X$Script from X's children
                         if (!controller.getTreeUtilities().isAccessible(scope, ee)) {
                             if (LOGGABLE) log("    not accessible " + ename); // NOI18N
                             continue;
