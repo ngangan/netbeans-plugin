@@ -157,8 +157,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
         }
 
         public void edit() {
-            //getBaseSupport().edit();
-            getBaseSupport().editSuper();
+            getEditorSupport().edit();
         }
 
         public void addPropertyChangeListener(PropertyChangeListener arg0) {

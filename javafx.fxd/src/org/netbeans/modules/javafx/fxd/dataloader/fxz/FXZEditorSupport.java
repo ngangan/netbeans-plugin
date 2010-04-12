@@ -77,10 +77,10 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 
     @Override
     public void edit() {
-        ((FXZDataObject)getDataObject()).getBaseSupport().editSuper();
+        ((FXZDataObject)getDataObject()).getEditorSupport().editSuper();
     }
 
-    public void editSuper() {
+    private void editSuper() {
         super.edit();
     }
 
