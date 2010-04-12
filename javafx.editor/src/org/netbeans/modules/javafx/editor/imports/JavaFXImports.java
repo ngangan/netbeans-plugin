@@ -67,6 +67,8 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
     private static JavaFXImports instance;
     public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
 
+    final private RequestProcessor taskQueue = new RequestProcessor(JavaFXImports.class.getName(), 1);
+
     public synchronized static JavaFXImports getInstance() {
         if (instance == null) {
             instance = new JavaFXImports();
@@ -106,7 +108,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
      */
     public void fixImports(final Document document, JTextComponent target) {
         Runnable runnable = prepareTask(document, target);
-        RequestProcessor.getDefault().post(runnable);
+        taskQueue.post(runnable);
     }
 
     private Runnable prepareTask(final Document document, final JTextComponent target) {
