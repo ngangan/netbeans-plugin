@@ -59,8 +59,12 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 
             // attach vetoable change listener to be cancel loosing validity when modified
             env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(  (VetoableChangeListener) allEditors,env));              
+        } else {
+            CloneableTopComponent ctc = (CloneableTopComponent) getFXZDataObject().getMVTC();
+            if (ctc != null) {
+                ctc.setReference(allEditors);
+            }
         }
-        
 //        FXZListener l = new FXZListener((Env) env);
 //        allEditors = l;
 //
@@ -78,31 +82,6 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 
     public void editSuper() {
         super.edit();
-    }
-
-//    @Override
-//    public void open() {
-//        FXZEditorSupport base = getFXZDataObject().getBaseSupport();
-//        if ( base == this) {
-//            super.open();
-//        } else {
-//            System.out.println("Trying to open entry: " + m_entryName);
-//        }
-//    }
-    @Override
-    public void open() {
-        // #183588. Looks more like hack then like fix.
-        // TODO: should be less dependent on CloneableOpenSupport#openCloneableTopComponent() implementation
-        if (allEditors.getArbitraryComponent() == null) {
-            TopComponent tc = ((FXZDataObject) getDataObject()).getMVTC();
-            if (tc instanceof CloneableTopComponent) {
-                CloneableTopComponent ctc = (CloneableTopComponent) tc;
-                if (allEditors != null) {
-                    ctc.setReference(allEditors);
-                }
-            }
-        }
-        super.open();
     }
 
     @Override
