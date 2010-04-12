@@ -1677,7 +1677,8 @@ public class JFXReformatTask implements ReformatTask {
                     members.addAll(localVariables);
                 }
                 if (!members.isEmpty()) {
-                    spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
+//                    spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
+                    spaces(cs.spaceWithinBraces() ? 1 : 0, true);
                     wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
                 }
                 indent = halfIndent;
