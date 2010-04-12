@@ -13,7 +13,11 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TriggerTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javafx.tree.JFXExpression;
+import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXOverrideClassVar;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JFXTypeClass;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +26,6 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
@@ -87,8 +90,18 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
             if (isResolving(nodeName) || variableNames.contains(nodeName)) {
                 return null;
             }
-            Element e = ci.getTrees().getElement(getCurrentPath());
 
+            Element e = ci.getTrees().getElement(getCurrentPath());
+            /**
+             * 183679: javafxc for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
+             * However, this information is available so we'll just grab it (with some null-checks, of course)
+             */
+            if (e == null) {
+                JFXExpression clzName = ((JFXTypeClass)node).getClassName();
+                if (clzName != null) {
+                    e = clzName.type != null ? clzName.type.tsym : null;
+                }
+            }
             processItem(e, nodeName, node, model);
         }
         
