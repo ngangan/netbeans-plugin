@@ -171,7 +171,7 @@ final public class SourceUtils {
         if (string.trim().length() == 0) {
             return string.replace(" ", "&nbsp;").replace("\n", "<br>"); //NOI18N
         }
-        StringBuffer buf = new StringBuffer(string);
+        StringBuilder buf = new StringBuilder(string);
         if (StyleConstants.isBold(set)) {
             buf.insert(0,"<b>"); //NOI18N
             buf.append("</b>"); //NOI18N

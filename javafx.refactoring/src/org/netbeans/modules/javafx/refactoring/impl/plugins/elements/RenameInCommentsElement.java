@@ -50,9 +50,11 @@ public class RenameInCommentsElement extends BaseRefactoringElementImplementatio
                 if (t.id() == JFXTokenId.COMMENT || t.id() == JFXTokenId.DOC_COMMENT) {
                     int locPos = 0;
                     String tt = t.text().toString();
-                    locPos = tt.indexOf(oldName, locPos);
-                    if (locPos != -1) {
-                        transforms.add(new ReplaceTextTransformation(pos + locPos, oldName, newName));
+                    while (locPos > -1) {
+                        locPos = tt.indexOf(oldName, locPos + 1);
+                        if (locPos != -1) {
+                            transforms.add(new ReplaceTextTransformation(pos + locPos, oldName, newName));
+                        }
                     }
                 }
                 pos += t.length();
