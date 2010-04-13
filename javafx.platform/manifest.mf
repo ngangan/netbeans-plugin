@@ -3,6 +3,6 @@ OpenIDE-Module: org.netbeans.modules.javafx.platform
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/platform/Bundle.properties
 OpenIDE-Module-Layer: org/netbeans/modules/javafx/platform/resources/layer.xml
 AutoUpdate-Show-In-Client: false
-OpenIDE-Module-Requires: javafx.sdk.v1_2, org.openide.modules.ModuleFormat2
+OpenIDE-Module-Requires: javafx.sdk.v1_3, org.openide.modules.ModuleFormat2
 OpenIDE-Module-Specification-Version: 1.7.1
 OpenIDE-Module-Hide-Classpath-Packages: com.sun.javadoc.**, com.sun.source.**, javax.lang.model.**, javax.tools.**, com.sun.tools.mjavac.** 
