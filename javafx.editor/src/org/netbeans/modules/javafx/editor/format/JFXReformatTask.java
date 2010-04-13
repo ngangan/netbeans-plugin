@@ -1474,8 +1474,8 @@ public class JFXReformatTask implements ReformatTask {
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
                         col = indent;
-                    } else if (parentTree.getJavaFXKind() == JavaFXKind.FUNCTION_DEFINITION || parentTree.getJavaFXKind() == JavaFXKind.INSTANTIATE_OBJECT_LITERAL) {
-                        spaces(1, true);
+                    } else if (isSimpleBlock(parentTree)) {
+                        spaces(cs.spaceWithinBraces() ? 1 : 0, true);
                     } else {
                         blankLines();
                     }
@@ -1536,12 +1536,12 @@ public class JFXReformatTask implements ReformatTask {
             } else {
                 if (!magicFunc) {
                     indent = halfIndent;
-                    if (parentTree.getJavaFXKind() == JavaFXKind.FUNCTION_DEFINITION || parentTree.getJavaFXKind() == JavaFXKind.INSTANTIATE_OBJECT_LITERAL) {
-                        spaces(1, true);
+                    if (isSimpleBlock(parentTree)) {
+                        spaces(cs.spaceWithinBraces() ? 1 : 0, true);
                     } else {
                         blankLines();
                     }
-                    processWSBeforeRB();
+//                    processWSBeforeRB();
                     accept(JFXTokenId.RBRACE);
                     indent = old;
                 }
@@ -3929,6 +3929,21 @@ public class JFXReformatTask implements ReformatTask {
             if (accept(JFXTokenId.TRANSLATION_KEY) != JFXTokenId.TRANSLATION_KEY) {
                 rollback(index, c, d);
             }
+        }
+
+        /**
+         * Determines whether given tree contains simple for formatting block expression.
+         * All block expression owners except class definition should be here.
+         * 
+         * @param AST tree
+         * @return is given block simple
+         */
+        private static boolean isSimpleBlock(Tree tree) {
+            final JavaFXKind kind = tree.getJavaFXKind();
+            return kind == JavaFXKind.FUNCTION_DEFINITION
+                    || kind == JavaFXKind.INSTANTIATE_OBJECT_LITERAL
+                    || kind == JavaFXKind.INIT_DEFINITION
+                    || kind == JavaFXKind.POSTINIT_DEFINITION;
         }
 
         private static class FakeBlock extends JFXBlock {
