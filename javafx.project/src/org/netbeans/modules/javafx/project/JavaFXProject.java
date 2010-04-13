@@ -121,7 +121,6 @@ import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.Mutex;
 import org.openide.util.NbBundle;
-import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.Lookups;
 import org.w3c.dom.Document;
@@ -217,7 +216,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
                 new ConfigPropertyProvider(baseEval1, "nbproject/configs", helper), // NOI18N
                 helper.getPropertyProvider(AntProjectHelper.PROJECT_PROPERTIES_PATH));
     }
-    private static final class ConfigPropertyProvider extends FilterPropertyProvider implements PropertyChangeListener, Runnable {
+    private static final class ConfigPropertyProvider extends FilterPropertyProvider implements PropertyChangeListener {
         private final PropertyEvaluator baseEval;
         private final String prefix;
         private final AntProjectHelper helper;
@@ -230,14 +229,9 @@ public final class JavaFXProject implements Project, AntProjectListener {
         }
         public void propertyChange(PropertyChangeEvent ev) {
             if (JavaFXConfigurationProvider.PROP_CONFIG.equals(ev.getPropertyName())) {
-                RequestProcessor.getDefault().post(this);
+                setDelegate(computeDelegate(baseEval, prefix, helper));
             }
         }
-
-        public void run() {
-            setDelegate(computeDelegate(baseEval, prefix, helper));
-        }
-
         private static PropertyProvider computeDelegate(PropertyEvaluator baseEval, String prefix, AntProjectHelper helper) {
             String config = baseEval.getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
             if (config != null) {
