@@ -84,6 +84,14 @@ public abstract class FXDToolbar extends JToolBar {
         return button;
     }
 
+    /**
+     * adds comboBox to fxz composer toolbar
+     * @param toolbar Toolbar to add comboBox at
+     * @param comboBox comboBox to add
+     * @param index the position in the container's list at which to insert
+     *  the component; <code>-1</code> means insert at the end component
+     * @param isEditable is comboBox editable
+     */
     public static void addCombo( JToolBar toolbar, JComboBox comboBox, int index, boolean isEditable) {
         GridBagConstraints constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;

@@ -191,21 +191,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
 
         private boolean isOpenedInProject(){
             Project p = FileOwnerQuery.getOwner(getPrimaryFile());
-            return isProjectOpen(p);
-        }
-
-        // TODO: use OpenProjects#isProjectOpen after migration to newer NetBeans version
-        // where this method is available.
-        private boolean isProjectOpen(Project p) {
-            if (p == null) {
-                return false;
-            }
-            for (Project real : OpenProjects.getDefault().getOpenProjects()) {
-                if (p.equals(real) || real.equals(p)) {
-                    return true;
-                }
-            }
-            return false;
+            return OpenProjects.getDefault().isProjectOpen(p);
         }
 
         private boolean isNodeFromTC(TopComponent tc, Node node) {
