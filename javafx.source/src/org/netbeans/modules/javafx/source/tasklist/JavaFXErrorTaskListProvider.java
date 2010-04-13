@@ -78,6 +78,7 @@ import org.openide.util.RequestProcessor;
  *
  * @author Karol Harezlak
  */
+// NEVER CHANGE NAME OF THIS CLASS! binded with tasklist.ui/src/org/netbeans/modules/tasklist/filter/TypesFilter.java
 public class JavaFXErrorTaskListProvider extends PushTaskScanner {
 
     private static final Logger LOG = Logger.getAnonymousLogger(); //NOI18N
@@ -104,12 +105,12 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
 
     @Override
     public void setScope(TaskScanningScope taskScanningScope, final Callback callback) {
-        LOG.info("Callback:  " + callback); //NOI18N
+        //LOG.info("Callback:  " + callback); //NOI18N
         if (callback == null) {
             active.set(false);
             if (majorTask != null) {
                 majorTask.cancel();
-                LOG.info("Major task has been CANCELED " + majorTask.hashCode()); //NOI18N
+                //LOG.info("Major task has been CANCELED " + majorTask.hashCode()); //NOI18N
                 majorTask = null;
             }
             for (FileObject fileObject : projectDirs.keySet()) {
@@ -117,11 +118,11 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             }
             for (RequestProcessor.Task task : waitingTasks.values()) {
                 task.cancel();
-                LOG.info("Waiting task has been CANCELED " + task); //NOI18N
+                //LOG.info("Waiting task has been CANCELED " + task); //NOI18N
             }
             for (Future<Void> future : scannerTasks.values()) {
                 future.cancel(true);
-                LOG.info("Scanner Task has been CANCELED " + future); //NOI18N
+                //LOG.info("Scanner Task has been CANCELED " + future); //NOI18N
             }
             projectDirs.clear();
             waitingTasks.clear();
@@ -151,7 +152,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                     @Override
                     public void fileDataCreated(FileEvent fe) {
                         if (fe.getFile().getExt().equals(FX_EXT) && !active.get()) {
-                            LOG.info("File created: " + fe.getFile().getName());  //NOI18N
+                            //LOG.info("File created: " + fe.getFile().getName());  //NOI18N
                             updateTask(fe.getFile(), callback, 4000);
                         }
                         super.fileDataCreated(fe);
@@ -164,7 +165,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                         }
                         for (FileObject child : fe.getFile().getChildren()) {
                             if (child.getExt().equals(FX_EXT)) {
-                                LOG.info("Folder created and update: " + fe.getFile().getName());  //NOI18N
+                                //LOG.info("Folder created and update: " + fe.getFile().getName());  //NOI18N
                                 updateTask(child, callback, 4000);
                             }
                         }
@@ -177,7 +178,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                             if (!active.get()) {
                                 return;
                             }
-                            LOG.info("File changed: " + fe.getFile().getName());  //NOI18N
+                            //LOG.info("File changed: " + fe.getFile().getName());  //NOI18N
                             callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                             updateTask(fe.getFile(), callback, 4000);
                         }
@@ -192,7 +193,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                         if (fe.getFile() == projectDir) {
                             fe.getFile().removeRecursiveListener(this);
                         } else if (fe.getFile().getExt().equals(FX_EXT)) {
-                            LOG.info("File removed: " + fe.getFile().getName());  //NOI18N
+                            //LOG.info("File removed: " + fe.getFile().getName());  //NOI18N
                             cancelRemoveTasks(fe.getFile());
                             callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                         }
@@ -209,9 +210,9 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
     }
 
     private void createTask(FileObject fileObject, Callback callback) {
-        LOG.info("Number of register scanner tasks: " + scannerTasks.size());
+        //LOG.info("Number of register scanner tasks: " + scannerTasks.size());
         if (scannerTasks.size() > TASKS_LIMIT) {
-            LOG.info("No more scanner tasks can be registered: " + scannerTasks.size());
+            //LOG.info("No more scanner tasks can be registered: " + scannerTasks.size());
             return;
         }
         if (!fileObject.isValid() || !ErrorsCache.isInError(fileObject, false)) {
@@ -224,7 +225,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
         }
         try {
             Future<Void> future = jfxs.runWhenScanFinished(new ScannerTask(callback), true);
-            LOG.info("Scanning task created and scheduled, file: " + fileObject.getName()); //NOI18N
+            //LOG.info("Scanning task created and scheduled, file: " + fileObject.getName()); //NOI18N
             scannerTasks.put(fileObject, future);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
@@ -237,13 +238,13 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
         RequestProcessor.Task waitingTask = waitingTasks.get(fileObject);
         if (waitingTask != null) {
             waitingTask.cancel();
-            LOG.info("Waiting task has been CANCELED and REMOVED, file " + fileObject); //NOI18N
+            //LOG.info("Waiting task has been CANCELED and REMOVED, file " + fileObject); //NOI18N
         }
         waitingTasks.remove(fileObject);
         Future<Void> future = scannerTasks.get(fileObject);
         if (future != null) {
             future.cancel(true);
-            LOG.info("Task Scaner has been CANCELED and REMOVED " + future + " for file " + fileObject); //NOI18N
+            //LOG.info("Task Scaner has been CANCELED and REMOVED " + future + " for file " + fileObject); //NOI18N
         }
         scannerTasks.remove(fileObject);
 
@@ -262,7 +263,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                     if (task != null) {
                         task.schedule(delay);
                     }
-                    LOG.info("Task " + fileObject.getName() + " has to wait " + delay + " ms"); //NOI18N
+                    //LOG.info("Task " + fileObject.getName() + " has to wait " + delay + " ms"); //NOI18N
                 } else {
                     createTask(fileObject, callback);
                 }
@@ -283,7 +284,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                 if (IndexingManager.getDefault().isIndexing()) {
                     if (majorTask != null) {
                         majorTask.schedule(delay);
-                        LOG.info("Major task " + majorTask.hashCode() + " has to wait " + delay + " ms"); //NOI18N
+                        //LOG.info("Major task " + majorTask.hashCode() + " has to wait " + delay + " ms"); //NOI18N
                     } else {
                         return;
                     }
@@ -303,7 +304,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
         }
         majorTask.setPriority(Thread.MIN_PRIORITY);
         majorTask.schedule(delay);
-        LOG.info("Major task has been CREATED " + majorTask.hashCode()); //NOI18N
+        //LOG.info("Major task has been CREATED " + majorTask.hashCode()); //NOI18N
     }
 
     private class ScannerTask
@@ -319,7 +320,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             if (!compilationController.isErrors() || !active.get()) {
                 return;
             }
-            LOG.info("Scanning " + compilationController.getFileObject().getName()); //NOI18N
+            //LOG.info("Scanning " + compilationController.getFileObject().getName()); //NOI18N
             refreshTasks(compilationController);
         }
 
@@ -353,7 +354,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             localTasks.clear();
             waitingTasks.remove(compilationController.getFileObject());
             scannerTasks.remove(compilationController.getFileObject());
-            LOG.info("Scanning task is finished and has been REMOVED from waiting tasks list" + compilationController.getFileObject().getName()); //NOI18N
+            //LOG.info("Scanning task is finished and has been REMOVED from waiting tasks list" + compilationController.getFileObject().getName()); //NOI18N
         }
 
         private List<Task> addTask(List<Task> list, Task task) {
