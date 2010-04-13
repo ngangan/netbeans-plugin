@@ -98,7 +98,9 @@ import org.netbeans.api.javafx.source.ClasspathInfoProvider;
 import org.netbeans.api.javafx.source.CompilationController;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementUtilities;
+import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -200,6 +202,26 @@ final public class SourceUtils {
 
     public static boolean isJavaFXFile(FileObject f) {
         return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
+    }
+
+    public static boolean isAnalyzable(FileObject f) {
+        if (!isJavaFXFile(f)) return false;
+
+        final boolean[] brokenPlatform = new boolean[1];
+        JavaFXSource jfxs = JavaFXSource.forFileObject(f);
+        try {
+            jfxs.runUserActionTask(new Task<CompilationController>() {
+
+                public void run(CompilationController cc) throws Exception {
+                    if (cc.toPhase(JavaFXSource.Phase.ANALYZED).lessThan(JavaFXSource.Phase.ANALYZED)) {
+                        brokenPlatform[0] = true;
+                    }
+                }
+            }, false);
+        } catch (IOException e) {
+            brokenPlatform[0] = true;
+        }
+        return !brokenPlatform[0];
     }
 
     public static boolean isValidPackageName(String name) {
@@ -712,6 +734,6 @@ final public class SourceUtils {
     }
 
     public static boolean isRefactorable(FileObject file) {
-        return isJavaFXFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file);
+        return isJavaFXFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file) && isAnalyzable(file);
     }
 }

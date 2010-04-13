@@ -48,4 +48,5 @@
 	<mapID target="javafx_refactor_rename_function_var" url="refactor/rename_function_var.html"/>
 	<mapID target="javafx_fxz_generating_ui_stub_file" url="fxz_graphics/generating_ui_stub_file.html"/>
 	<mapID target="javafx_fxz_viewing_fxz_files" url="fxz_graphics/viewing_fxz_files.html"/>
+	<mapID target="org.netbeans.modules.javafx.platform.wizard.DetectPanel" url="project/csh/javafx_platform_setup.html"/>
 </map>

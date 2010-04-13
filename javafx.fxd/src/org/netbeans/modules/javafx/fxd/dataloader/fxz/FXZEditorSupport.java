@@ -37,6 +37,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.awt.UndoRedo.Manager;
 import org.openide.util.Task;
 import org.openide.util.UserQuestionException;
+import org.openide.windows.CloneableTopComponent;
 import org.openide.windows.TopComponent;
 
 /**
@@ -58,8 +59,12 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 
             // attach vetoable change listener to be cancel loosing validity when modified
             env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(  (VetoableChangeListener) allEditors,env));              
+        } else if (allEditors.getArbitraryComponent() == null) {
+            CloneableTopComponent ctc = (CloneableTopComponent) getFXZDataObject().getMVTC();
+            if (ctc != null) {
+                ctc.setReference(allEditors);
+            }
         }
-        
 //        FXZListener l = new FXZListener((Env) env);
 //        allEditors = l;
 //
@@ -70,28 +75,14 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //        env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(l, env));        
     }
 
-    /*
     @Override
     public void edit() {
-        ((FXZDataObject)getDataObject()).getBaseSupport().editSuper();
-        //((FXZDataObject)getDataObject()).updateEditorCookie();
+        ((FXZDataObject)getDataObject()).getEditorSupport().editSuper();
     }
 
-    public void editSuper() {
+    private void editSuper() {
         super.edit();
     }
-     * 
-     */
-
-//    @Override
-//    public void open() {
-//        FXZEditorSupport base = getFXZDataObject().getBaseSupport();
-//        if ( base == this) {
-//            super.open();
-//        } else {
-//            System.out.println("Trying to open entry: " + m_entryName);
-//        }
-//    }
 
     @Override
     public StyledDocument openDocument() throws IOException {

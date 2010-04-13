@@ -79,6 +79,7 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.java.project.support.ui.PackageView;
 import org.openide.util.ChangeSupport;
+import org.openide.util.RequestProcessor;
 import org.openide.util.actions.SystemAction;
 import org.openide.util.lookup.Lookups;
 import org.openide.xml.XMLUtil;
@@ -230,7 +231,7 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         }
     }
     
-    private static class PlatformProvider implements PropertyChangeListener {
+    private static class PlatformProvider implements PropertyChangeListener, Runnable {
         
         private final PropertyEvaluator evaluator;
         private final String platformPropName;
@@ -282,9 +283,13 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         
         public void propertyChange(PropertyChangeEvent evt) {
             if (platformPropName.equals (evt.getPropertyName()) || "javafx.profile".equals(evt.getPropertyName())) { // NOI18N
-                platformCache = null;                
-                this.changeSupport.fireChange ();
+                platformCache = null;
+                RequestProcessor.getDefault().post(this);
             }
+        }
+
+        public void run() {
+            changeSupport.fireChange();
         }
         
     }

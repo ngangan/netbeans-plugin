@@ -13,7 +13,11 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.TriggerTree;
 import com.sun.javafx.api.tree.TypeClassTree;
 import com.sun.javafx.api.tree.VariableTree;
+import com.sun.tools.javafx.tree.JFXExpression;
+import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXOverrideClassVar;
+import com.sun.tools.javafx.tree.JFXTree;
+import com.sun.tools.javafx.tree.JFXTypeClass;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -86,8 +90,18 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
             if (isResolving(nodeName) || variableNames.contains(nodeName)) {
                 return null;
             }
-            Element e = ci.getTrees().getElement(getCurrentPath());
 
+            Element e = ci.getTrees().getElement(getCurrentPath());
+            /**
+             * 183679: javafxc for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
+             * However, this information is available so we'll just grab it (with some null-checks, of course)
+             */
+            if (e == null) {
+                JFXExpression clzName = ((JFXTypeClass)node).getClassName();
+                if (clzName != null) {
+                    e = clzName.type != null ? clzName.type.tsym : null;
+                }
+            }
             processItem(e, nodeName, node, model);
         }
         
@@ -185,7 +199,11 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
                     doResolve(nodeName, tree, model);
                 }
             } else {
-                model.addUsage(findTopClass(e).toString());
+                String className = findTopClass(e).toString();
+                if (e.getKind().isField() || e.getKind() == ElementKind.METHOD) {
+                    model.addUsage(className + "." + e.getSimpleName().toString()); // NOI18N
+                }
+                model.addUsage(className);
             }
         } else {
             if (resolve) {

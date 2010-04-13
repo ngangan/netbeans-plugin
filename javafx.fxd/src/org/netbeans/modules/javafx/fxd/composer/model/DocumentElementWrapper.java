@@ -109,7 +109,8 @@ final class DocumentElementWrapper {
         }
 
         private void throwRuntimeExeption(Exception ex) {
-            ex.printStackTrace();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, null, ex);
+            //ex.printStackTrace();
             throw new RuntimeException(ex.getLocalizedMessage(), ex);
         }
 
@@ -184,7 +185,7 @@ final class DocumentElementWrapper {
                 throw new RuntimeException(ex.getLocalizedMessage(), ex);
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
-                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name");
+                        log(Level.INFO, "Exception while parsing \"" + m_de.getName() + "\" node name");
                 ex.printStackTrace();
                 throw new RuntimeException(ex.getLocalizedMessage(), ex);
             }

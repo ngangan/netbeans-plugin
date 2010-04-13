@@ -128,6 +128,10 @@ public class ReportedIssuesTest extends CompletionTestBase {
         checkCCForIssue(178366, "var width = Screen.primary.bounds.^");
     }
 
+    public void testIssue182293() throws Exception {
+        checkCCForIssue(182293, "import javafx.scene.shape.Cir^");
+    }
+    
     private void checkCCForIssue(int issue, String caretLine) throws Exception {
         checkCCForIssue(issue, caretLine, null);
     }

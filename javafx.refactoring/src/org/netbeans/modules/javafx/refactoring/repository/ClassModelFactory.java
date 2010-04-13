@@ -672,7 +672,9 @@ final public class ClassModelFactory {
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
-                    new ClassModelPopulator(cc).scan(cc.getCompilationUnit(), result);
+                    if (!cc.toPhase(JavaFXSource.Phase.ANALYZED).lessThan(JavaFXSource.Phase.ANALYZED)) {
+                        new ClassModelPopulator(cc).scan(cc.getCompilationUnit(), result);
+                    }
                 }
             }, true);
             return result;

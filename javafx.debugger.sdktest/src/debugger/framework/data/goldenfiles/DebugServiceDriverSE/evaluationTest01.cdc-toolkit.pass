@@ -1,0 +1,318 @@
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 17
+			Value of 'intVar' = 0
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 18
+			Value of 'intVar' = 0
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 19
+			Value of 'intVar' = 1
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 2
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 2
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 2
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 3
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 3
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 3
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 3
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 4
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 4
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 4
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 4
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 5
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 5
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 5
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 5
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 6
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 6
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 6
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 6
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 7
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 7
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 7
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 7
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 8
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 8
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 8
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 8
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 9
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 9
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 9
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 9
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 10
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 10
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 10
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 10
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 11
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 11
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 11
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 33
+			Value of 'intVar' = 11
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 23
+			Value of 'intVar' = 11
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 24
+			Value of 'intVar' = 11
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 25
+			Value of 'intVar' = 12
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 13
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 13
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 13
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 14
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 14
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 14
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 14
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 15
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 15
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 15
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 15
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 16
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 16
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 16
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 16
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 17
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 17
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 17
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 17
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 18
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 18
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 18
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 18
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 19
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 19
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 19
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 19
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 20
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 20
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 20
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 20
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 21
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 21
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 21
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 30
+			Value of 'intVar' = 21
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 22
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 31
+			Value of 'intVar' = 22
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 29
+			Value of 'intVar' = 22
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 33
+			Value of 'intVar' = 22
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 26
+			Value of 'intVar' = 22
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 65
+			Value of 'intVar' = 22
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 66
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 60
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 61
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 01
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 01
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 012
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 012
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0123
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0123
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 01234
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 01234
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 012345
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 012345
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0123456
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0123456
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 01234567
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 01234567
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 012345678
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 012345678
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 54
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0123456789
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		breakpoint reached in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 55
+			Value of 'str' = 0123456789
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 53
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 57
+			Value of 'intVar' = 3
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 62
+			Value of 'intVar' = 23
+		stepped in class: j2se_tests.evaluation.test01.EvaluationTestCase01 on line: 67
+			Value of 'intVar' = 23
