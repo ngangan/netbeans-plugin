@@ -66,8 +66,9 @@ public final class PreviewToolbar extends FXDToolbar {
         add(createToolBarSeparator(), constrains);
         addButton( lookup.get(ActionController.GenerateUIStubAction.class));
 
-        add(createToolBarSeparator(), constrains);
-        addCombo(this, createProfileCombo(), -1, true);
+        // #183876
+        //add(createToolBarSeparator(), constrains);
+        //addCombo(this, createProfileCombo(), -1, true);
 
         constrains = new GridBagConstraints();
         constrains.anchor = GridBagConstraints.WEST;
