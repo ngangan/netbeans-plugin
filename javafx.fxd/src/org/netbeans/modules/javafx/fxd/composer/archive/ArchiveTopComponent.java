@@ -9,7 +9,6 @@ import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import javax.swing.Action;
 import javax.swing.JComponent;
 import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
@@ -63,12 +62,6 @@ final class ArchiveTopComponent extends TopComponent implements Runnable {
         return m_lookup;
     }
 
-    @Override
-    public Action[] getActions() {
-        return new Action[0];
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
     @Override
     public void componentOpened() {
         m_dObj.init();

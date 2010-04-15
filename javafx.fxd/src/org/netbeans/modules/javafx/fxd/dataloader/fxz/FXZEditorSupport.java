@@ -27,6 +27,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
 import java.io.OutputStream;
 import java.io.Serializable;
+import javax.swing.Action;
 import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
 import org.netbeans.core.spi.multiview.CloseOperationHandler;
@@ -73,6 +74,16 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //
 //        // attach vetoable change listener to be cancel loosing validity when modified
 //        env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(l, env));        
+    }
+
+    /**
+     * Creates new Actions array by excluding clone action from provided array
+     * 
+     * @param src actions array
+     * @return actions array that contains all elements from src except clone action
+     */
+    public static Action[] removeCloneAction(Action[] src) {
+        return doRemoveCloneAction(src);
     }
 
     @Override
@@ -523,4 +534,33 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //            return obj != null && getClass() == obj.getClass();
 //        }
 //    }
+
+    private static Action[] doRemoveCloneAction(Action[] src) {
+        Action[] result;
+        int idx = -1;
+        // find clone action index
+        for (int i = 0; i < src.length; i++) {
+            if (src[i] == null) {
+                continue;
+            }
+            if (src[i].getClass().getName().endsWith("ActionUtils$CloneDocumentAction")) {
+                idx = i;
+                break;
+            }
+        }
+        // remove clone action
+        if (idx == -1) {
+            result = src;
+        } else {
+            result = new Action[src.length - 1];
+            if (idx > 0) {
+                System.arraycopy(src, 0, result, 0, idx);
+            }
+            if (idx < src.length - 1) {
+                System.arraycopy(src, idx + 1, result, idx, result.length - idx);
+            }
+        }
+        return result;
+    }
+
 }

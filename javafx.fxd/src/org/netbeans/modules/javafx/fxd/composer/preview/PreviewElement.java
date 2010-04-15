@@ -14,6 +14,7 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Lookup;
 
@@ -48,7 +49,8 @@ final class PreviewElement implements MultiViewElement, Serializable {
     }
 
     public Action[] getActions() {
-        return getPreviewTC().getActions();
+        Action[] acts = getPreviewTC().getActions();
+        return FXZEditorSupport.removeCloneAction(acts);
     }
 
     public Lookup getLookup() {

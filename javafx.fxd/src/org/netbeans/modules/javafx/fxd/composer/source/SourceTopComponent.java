@@ -5,7 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.source;
 
-import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
@@ -79,11 +78,6 @@ public final class SourceTopComponent extends CloneableEditor implements Runnabl
         if ( m_entryCombo != null) {
             PreviewToolbar.updateEntryCombo( getDataObject(), m_entryCombo);
         }
-    }
-
-    @Override
-    public Action[] getActions() {
-        return new Action[0];
     }
 
     @Override

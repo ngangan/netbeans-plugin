@@ -5,7 +5,6 @@
 
 package org.netbeans.modules.javafx.fxd.composer.preview;
 
-import com.sun.javafx.tk.swing.SwingScene.SwingScenePanel;
 import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -69,12 +68,6 @@ public final class PreviewTopComponent extends TopComponent implements Runnable 
 
     PreviewStatusBar getStatusBar() {
         return m_statusBar;
-    }
-    
-    @Override
-    public Action[] getActions() {
-        return new Action[0];
-        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

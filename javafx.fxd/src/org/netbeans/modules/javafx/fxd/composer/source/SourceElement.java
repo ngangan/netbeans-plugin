@@ -20,6 +20,7 @@ import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
 import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Lookup;
 
@@ -156,7 +157,8 @@ public final class SourceElement implements MultiViewElement, Serializable {
     }
 
     public Action[] getActions() {
-        return getSourceTC().getActions();
+        Action[] acts = getSourceTC().getActions();
+        return FXZEditorSupport.removeCloneAction(acts);
     }
 
     public Lookup getLookup() {

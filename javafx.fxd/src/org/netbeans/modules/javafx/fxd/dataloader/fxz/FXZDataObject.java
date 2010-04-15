@@ -335,7 +335,7 @@ public final class FXZDataObject extends FXDZDataObject implements Lookup.Provid
     public void setMultiviewElementCallback( MultiViewElementCallback callback) {
         m_callback = callback;
     }
-        
+
     public void selectView( int index) {
         MultiViewHandler handler = MultiViews.findMultiViewHandler( getMVTC());
 
