@@ -110,6 +110,8 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
     /** data lock for tooltip calculations */
     private static final Object TOOLTIP_DATA_LOCK = new Object();
 
+    final private RequestProcessor taskQueue = new RequestProcessor(ToolTipManagerEx.class.getName(), 1);
+
     static interface ToolTipProvider {
         JComponent getComponent();
         
@@ -663,7 +665,8 @@ final class ToolTipManagerEx extends MouseAdapter implements MouseMotionListener
         // start full tooltip calculation in request processor
         TooltipCalculator tc = new TooltipCalculator( tooltipForRect, loc );
         synchronized (TOOLTIP_DATA_LOCK) {
-            tooltipTask = RequestProcessor.getDefault().post(tc);
+//            tooltipTask = RequestProcessor.getDefault().post(tc);
+            tooltipTask = taskQueue.post(tc);
         }
         return WAITING_TEXT;
     }
