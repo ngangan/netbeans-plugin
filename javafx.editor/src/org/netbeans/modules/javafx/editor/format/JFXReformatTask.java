@@ -1272,7 +1272,6 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitFunctionValue(FunctionValueTree node, Void p) {
             accept(JFXTokenId.FUNCTION);
-            space();
 
             int old = indent;
             indent += continuationIndentSize;
