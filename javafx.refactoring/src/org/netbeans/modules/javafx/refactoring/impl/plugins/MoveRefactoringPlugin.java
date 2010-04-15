@@ -243,9 +243,9 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Transformation t;
-                            if (isOldDefault()) {
+                            if (isNewDefault()) {
                                 t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
-                            } else if (isNewDefault()) {
+                            } else if (isOldDefault()) {
                                 t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n"); // NOI18N
                             } else {
                                 t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), getOldPkgName(), getNewPkgName());

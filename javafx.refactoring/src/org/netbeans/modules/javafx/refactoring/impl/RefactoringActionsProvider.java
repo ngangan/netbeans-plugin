@@ -70,10 +70,8 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.RenameRefactoringUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.SafeDeleteUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
-import org.netbeans.modules.progress.spi.RunOffEDTProvider;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
@@ -181,7 +179,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         }
         try {
             isFindUsages = true;
-            task.run();
+            SourceUtils.invokeAfterScanFinished(task, NbBundle.getMessage(RefactoringActionsProvider.class, getActionName(RefactoringActionsFactory.whereUsedAction()))); 
         } finally {
             isFindUsages = false;
         }
@@ -455,7 +453,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 }
             };
         }
-        SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.renameAction()));
+        SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.moveAction()));
     }
 
     @Override

@@ -241,7 +241,8 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         if (e == null || e.asType().getKind() == TypeKind.ERROR) {
             return;
         }
-        for (Element m : FXSourceUtils.getAllMembers(info.getElements(), e)) {
+        final List<? extends Element> allMembers = FXSourceUtils.getAllMembers(info.getElements(), e);
+        for (Element m : allMembers) {
             if (canceled.get()) {
                 return;
             }
@@ -312,7 +313,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
             d.subs = new HashSet<Description>();
             d.htmlHeader = FXSourceUtils.typeElementToString(javafxTypes, (TypeElement) e, isDeprecated, d.isInherited);
         } else if (e instanceof ExecutableElement) {
-            if (!spaceMagic && name.contains("$")) { // NOI18N
+            if (!spaceMagic && name.contains("$") && !name.contains("init")) { // NOI18N
                 return null;
             }
             d.htmlHeader = FXSourceUtils.executableElementToString(javafxTypes, (ExecutableElement) e, isDeprecated, d.isInherited);
