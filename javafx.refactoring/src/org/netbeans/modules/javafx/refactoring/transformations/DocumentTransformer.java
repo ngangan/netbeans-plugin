@@ -44,6 +44,7 @@ package org.netbeans.modules.javafx.refactoring.transformations;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.netbeans.editor.GuardedDocument;
 import org.openide.util.Exceptions;
 
@@ -53,9 +54,9 @@ import org.openide.util.Exceptions;
  */
 public class DocumentTransformer extends Transformer {
     final private static class DocumentModificator implements TransformationTarget {
-        private AbstractDocument doc;
+        private Document doc;
 
-        public DocumentModificator(AbstractDocument doc) {
+        public DocumentModificator(Document doc) {
             this.doc = doc;
         }
         
@@ -78,7 +79,8 @@ public class DocumentTransformer extends Transformer {
 
         public void replaceText(int pos, String oldText, String newText) {
             try {
-                doc.replace(pos, oldText.length(), newText, null);
+                doc.remove(pos, oldText.length());
+                doc.insertString(pos, newText, null);
             } catch (BadLocationException e) {
                 Exceptions.printStackTrace(e);
             }
@@ -86,9 +88,9 @@ public class DocumentTransformer extends Transformer {
         
     }
 
-    final private AbstractDocument doc;
+    final private Document doc;
 
-    public DocumentTransformer(AbstractDocument doc) {
+    public DocumentTransformer(Document doc) {
         super(getText(doc), new DocumentModificator(doc));
         this.doc = doc;
     }
@@ -102,7 +104,7 @@ public class DocumentTransformer extends Transformer {
         }
     }
 
-    private static String getText(AbstractDocument doc) {
+    private static String getText(Document doc) {
         try {
             return doc.getText(0, doc.getLength()).replace("\r\n", "\n");
         } catch (BadLocationException e) {
