@@ -131,6 +131,11 @@ public class ReportedIssuesTest extends CompletionTestBase {
     public void testIssue182293() throws Exception {
         checkCCForIssue(182293, "import javafx.scene.shape.Cir^");
     }
+
+    public void testIssue165928() throws Exception {
+        checkCCForIssue(165928, "    content: for( value in seq) ^", "v");
+        checkCompletion("Iz165928", "    content: for( value in seq) ^", "", "iz165928B.pass");
+    }
     
     private void checkCCForIssue(int issue, String caretLine) throws Exception {
         checkCCForIssue(issue, caretLine, null);
