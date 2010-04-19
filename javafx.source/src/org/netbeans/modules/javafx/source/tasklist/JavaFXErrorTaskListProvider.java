@@ -38,7 +38,6 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.source.tasklist;
 
 import com.sun.tools.mjavac.util.JCDiagnostic;
@@ -179,7 +178,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                                 return;
                             }
                             //LOG.info("File changed: " + fe.getFile().getName());  //NOI18N
-                            callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
+                            //callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                             updateTask(fe.getFile(), callback, 4000);
                         }
                         super.fileChanged(fe);
@@ -256,6 +255,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
 
             public void run() {
                 if (!active.get() || !fileObject.isValid() || !ErrorsCache.isInError(fileObject, false)) {
+                    callback.setTasks(fileObject, Collections.EMPTY_LIST);
                     return;
                 }
                 if (IndexingManager.getDefault().isIndexing()) {
@@ -328,12 +328,16 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             List<Diagnostic> diagnostics = compilationController.getDiagnostics();
             Map<FileObject, List<Task>> localTasks = new HashMap<FileObject, List<Task>>();
             for (Diagnostic diagnostic : diagnostics) {
-                if (diagnostic.getKind() != Diagnostic.Kind.ERROR) {
+                if (diagnostic == null || diagnostic.getKind() != Diagnostic.Kind.ERROR) {
                     continue;
                 }
                 JCDiagnostic jcd = ((JCDiagnostic) diagnostic);
+
                 FileObject currentFileObject = null;
                 try {
+                    if (jcd.getSource() == null || jcd.getSource().toUri() == null) {
+                        continue;
+                    }
                     currentFileObject = URLMapper.findFileObject(jcd.getSource().toUri().toURL());
                 } catch (MalformedURLException ex) {
                     ex.printStackTrace();
