@@ -77,6 +77,13 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
             }
             Element e = ci.getTrees().getElement(getCurrentPath());
 
+            /**
+             * 183679: javafxc for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
+             * However, this information is available so we'll just grab it (with some null-checks, of course)
+             */
+            if (e == null) {
+                e = ((JFXIdent)node).type != null ? ((JFXIdent)node).type.tsym : null;
+            }
             processItem(e, nodeName, node, model);
         }
 
