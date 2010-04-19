@@ -72,6 +72,7 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
+import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
@@ -109,7 +110,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     final private static Logger LOGGER = Logger.getLogger(RefactoringActionsProvider.class.getName());
 
     @Override
-    public boolean canFindUsages(Lookup lkp) {       
+    public boolean canFindUsages(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+        
         FileObject file = lkp.lookup(FileObject.class);
         if (!SourceUtils.isAnalyzable(file)) return false;
         
@@ -187,6 +192,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+        
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
@@ -317,7 +326,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     }
 
     @Override
-    public boolean canMove(Lookup lkp) {        
+    public boolean canMove(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+        
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -458,6 +471,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canCopy(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         if (nodes.size() < 1) {
             return false;
