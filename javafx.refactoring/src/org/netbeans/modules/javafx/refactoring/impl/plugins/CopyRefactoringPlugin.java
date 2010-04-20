@@ -183,24 +183,6 @@ public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
                     protected FileObject getTargetFO() {
                         return CopyRefactoringPlugin.this.getTargetFO(getParentFile());
                     }
-
-                    private void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
-                        int lastRemovePos = -1;
-                        for(ImportEntry ie : is.getUnused()) {
-                            transformations.add(new RemoveTextTransformation(ie.getStartPos(), ie.getEndPos() - ie.getStartPos()));
-                            if (ie.getStartPos() > lastRemovePos) {
-                                lastRemovePos = ie.getStartPos();
-                            }
-                        }
-
-                        int insertionPos = lastRemovePos > cm.getImportPos() ? lastRemovePos : cm.getImportPos();
-
-                        for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
-                            if (isMoving ^ movingDefs.contains(missing.getT1())) {
-                                transformations.add(new InsertTextTransformation(insertionPos, missing.getT2().toString() + ";\n")); // NOI18N
-                            }
-                        }
-                    }
                 };
                 if (fixImports.hasChanges()) {
                     reb.add(refactoring, fixImports);

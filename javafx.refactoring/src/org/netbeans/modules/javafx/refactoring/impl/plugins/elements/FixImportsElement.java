@@ -42,6 +42,12 @@
 package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
 
 import java.util.Set;
+import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
+import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.ImportEntry;
+import org.netbeans.modules.javafx.refactoring.repository.ImportSet;
+import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
+import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.filesystems.FileObject;
@@ -64,5 +70,23 @@ abstract public class FixImportsElement extends BaseRefactoringElementImplementa
     @Override
     final protected String getRefactoringText() {
         return NbBundle.getMessage(FixImportsElement.class, "LBL_FixImports"); // NOI18N
+    }
+
+    final protected void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
+        int lastRemovePos = -1;
+        for(ImportEntry ie : is.getUnused()) {
+            transformations.add(new RemoveTextTransformation(ie.getStartPos(), ie.getEndPos() - ie.getStartPos()));
+            if (ie.getStartPos() > lastRemovePos) {
+                lastRemovePos = ie.getStartPos();
+            }
+        }
+
+        int insertionPos = lastRemovePos > cm.getImportPos() ? lastRemovePos : cm.getImportPos();
+
+        for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
+            if (isMoving ^ movingDefs.contains(missing.getT1())) {
+                transformations.add(new InsertTextTransformation(insertionPos, missing.getT2().toString() + ";\n")); // NOI18N
+            }
+        }
     }
 }
