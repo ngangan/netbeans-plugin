@@ -89,6 +89,7 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataFolder;
+import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.text.CloneableEditorSupport;
@@ -115,10 +116,13 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             return false;
         }
         
-        FileObject file = lkp.lookup(FileObject.class);
-        if (!SourceUtils.isAnalyzable(file)) return false;
-        
-        return file != null && file.getMIMEType().equals("text/x-fx"); //NOI18N
+        Node target = lkp.lookup(Node.class);
+
+        DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        if (dobj == null) return false;
+        if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
+
+        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
     volatile private boolean isFindUsages;
 
@@ -184,7 +188,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         }
         try {
             isFindUsages = true;
-            SourceUtils.invokeAfterScanFinished(task, NbBundle.getMessage(RefactoringActionsProvider.class, getActionName(RefactoringActionsFactory.whereUsedAction()))); 
+            SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.whereUsedAction())); 
         } finally {
             isFindUsages = false;
         }
@@ -199,9 +203,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        if (dobj == null) return false;
         if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
         
-        return dobj != null && SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
+        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
 
     @Override
