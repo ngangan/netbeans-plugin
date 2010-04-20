@@ -111,12 +111,17 @@ public final class FXSourceUtils {
             return "<null>"; // NOI18N
         }
 
-        String suffix = ""; // NOI18N
+        // #180903
+        if (type.toString().startsWith("java.lang.Object&")) { // NOI18N
+            return "java.lang.Object"; // NOI18N
+        }
+
         if (type instanceof FunctionType) {
             MethodType mtype = ((FunctionType) type).asMethodType();
             return "function" + methodToString(types, mtype); // NOI18N
         }
 
+        String suffix = ""; // NOI18N
         if (types.isSequence(type)) {
             suffix = "[ ]"; // NOI18N
             type = types.elementType(type);
