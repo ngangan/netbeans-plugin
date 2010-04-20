@@ -244,9 +244,12 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                             lkpContent.add(srcFo);
                         } else {
                             if (edef.getKind().isClass() || edef.getKind().isInterface()) {
-                                Set<FileObject> defining = cpInfo.getClassIndex().getResources(edef.createHandle(), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
-                                if (!defining.isEmpty()) {
-                                    lkpContent.add(defining.iterator().next());
+                                if (!edef.getNestingKind().isNested()) {
+                                    // only top level classes need renaming of theirs defining files
+                                    Set<FileObject> defining = cpInfo.getClassIndex().getResources(edef.createHandle(), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+                                    if (!defining.isEmpty()) {
+                                        lkpContent.add(defining.iterator().next());
+                                    }
                                 }
                             }
                         }
