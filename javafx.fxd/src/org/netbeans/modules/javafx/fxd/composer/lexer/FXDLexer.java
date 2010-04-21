@@ -403,5 +403,10 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             return m_propProvider;
         }
 
+        @Override
+        public String toString() {
+            return "TokenData<"+m_id.getClass().getSimpleName()+">[id="+m_id+",length="+m_lenght+"]";
+        }
+
     }
 }
