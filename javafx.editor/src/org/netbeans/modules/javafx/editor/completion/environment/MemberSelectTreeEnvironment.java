@@ -53,7 +53,6 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.ClassIndex.NameKind;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -76,8 +75,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         int expEndPos = (int)sourcePositions.getEndPosition(root, fa.getExpression());
         boolean afterDot = false;
         JFXTokenId lastNonWhitespaceTokenId = null;
-        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(expEndPos);
         while (ts.moveNext()) {
             if (ts.offset() >= offset) {

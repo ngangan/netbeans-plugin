@@ -41,7 +41,6 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.tools.javafx.tree.JFXForExpression;
 
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -68,8 +67,7 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
         int start = (int)sourcePositions.getStartPosition(root, foe);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterPipe = false;

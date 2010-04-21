@@ -67,7 +67,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
@@ -77,9 +76,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.settings.EditorStyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.TreeUtilities;
@@ -327,17 +325,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         continue;
                     }
                     TreeUtilities treeUtilities = compilationInfo.getTreeUtilities();
-                    //TODO this is dumb cancelable, need to be replaced with real one
-                    Cancellable cancellable = new Cancellable() {
-
-                        public boolean isCancelled() {
-                            return false;
-                        }
-
-                        public void cancell() {
-                        }
-                    };
-                    SafeTokenSequence<JFXTokenId> tokenSequence = new SafeTokenSequence<JFXTokenId>(treeUtilities.tokensFor(tree), document, cancellable);
+                    TokenSequence<JFXTokenId> tokenSequence = treeUtilities.tokensFor(tree);
                     if (tokenSequence == null) {
                         return;
                     }

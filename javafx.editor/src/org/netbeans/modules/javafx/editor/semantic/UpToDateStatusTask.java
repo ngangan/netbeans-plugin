@@ -73,8 +73,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.type.TypeKind;
 import javax.swing.text.Position;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.lexer.Token;
 import org.openide.cookies.LineCookie;
 import org.openide.loaders.DataObject;
@@ -105,18 +103,8 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     private static final Set<JFXTokenId> WHITESPACE = EnumSet.of(JFXTokenId.COMMENT, JFXTokenId.DOC_COMMENT, JFXTokenId.LINE_COMMENT, JFXTokenId.WS);
     
     private AtomicBoolean cancel = new AtomicBoolean();
-    private Cancellable cancellable;
 
     UpToDateStatusTask(FileObject file) {
-        this.cancellable = new Cancellable() {
-            public boolean isCancelled() {
-                return UpToDateStatusTask.this.isCanceled();
-            }
-
-            public void cancell() {
-                UpToDateStatusTask.this.cancel();
-            }
-        };
     }
     
     private UpToDateStatusTask() {
@@ -255,8 +243,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
         if (UNDERLINE_IDENTIFIER.contains(d.getCode())) {
             int offset = (int) getPrefferedPosition(info, d);
-            TokenSequence<JFXTokenId> ts_ = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
-            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, doc, cancellable);
+            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
 
             int diff = ts.move(offset);
 
@@ -353,8 +340,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private int skipWhiteSpace(CompilationInfo info, int start) {
-        TokenSequence<JFXTokenId> ts_ =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), cancellable);
+        TokenSequence<JFXTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean nonWSFound = false;
         while (ts.moveNext()) {
@@ -379,8 +365,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
     public Token findUnresolvedElementToken(CompilationInfo info, int offset) throws IOException {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), cancellable);
+        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
 
         if (ts == null) {
             return null;

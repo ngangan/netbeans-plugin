@@ -59,8 +59,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.openide.util.NbBundle;
 
 /**
@@ -76,20 +74,9 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
 
     private final FileObject file;
     private final AtomicBoolean canceled = new AtomicBoolean(false);
-    private final Cancellable cancellable;
 
     WrongPackageStatmentTask(FileObject file) {
         this.file = file;
-        this.cancellable = new Cancellable() {
-
-            public boolean isCancelled() {
-                return WrongPackageStatmentTask.this.isCanceled();
-            }
-
-            public void cancell() {
-                WrongPackageStatmentTask.this.cancel();
-            }
-        };
     }
 
     public void cancel() {
@@ -145,7 +132,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                             if (!inDefaultPackage) {
                                 fixes.add(new ReplacePackageNameFix(ci, me, getDoc(file)));
                             } else {
-                                fixes.add(new SetPackageToDefaultFix(ci, getDoc(file), cancellable));
+                                fixes.add(new SetPackageToDefaultFix(ci, getDoc(file)));
                             }
                             fixes.add(new MoveToFolderFix(file, packageName, sourceRoot));
                         }
@@ -227,12 +214,10 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
     private static class SetPackageToDefaultFix implements Fix {
         private final CompilationInfo ci;
         private final JavaFXDocument doc;
-        private final Cancellable cancellable;
 
-        private SetPackageToDefaultFix(CompilationInfo ci, JavaFXDocument doc, Cancellable cancellable) {
+        private SetPackageToDefaultFix(CompilationInfo ci, JavaFXDocument doc) {
             this.ci = ci;
             this.doc = doc;
-            this.cancellable = cancellable;
         }
 
         public String getText() {
@@ -248,8 +233,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             int end = (int) sp.getEndPosition(cu, pn) + 1;
             
             //noinspection unchecked
-            TokenSequence<JFXTokenId> ts_ = (TokenSequence<JFXTokenId>) TokenHierarchy.get(doc).tokenSequence();
-            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, ci.getDocument(), cancellable);
+            TokenSequence<JFXTokenId> ts = ci.getTokenHierarchy().tokenSequence();
             ts.move(start);
             boolean finish = false;
             while (ts.movePrevious() || !finish) {

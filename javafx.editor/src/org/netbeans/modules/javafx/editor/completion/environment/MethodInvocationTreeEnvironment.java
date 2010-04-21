@@ -41,7 +41,7 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 import com.sun.javafx.api.tree.*;
 
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
@@ -63,7 +63,7 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
     protected void inside(FunctionInvocationTree t) throws IOException {
         if (LOGGABLE) log("inside MethodInvocationTree " + t); // NOI18N
         FunctionInvocationTree mi = t;
-        SafeTokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(mi, offset);
+        TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(mi, offset);
         if (ts == null || (ts.token().id() != JFXTokenId.LPAREN && ts.token().id() != JFXTokenId.COMMA)) {
             SourcePositions sp = getSourcePositions();
             int lastTokenEndOffset = ts.offset() + ts.token().length();

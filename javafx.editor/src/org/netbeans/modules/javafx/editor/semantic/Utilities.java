@@ -62,8 +62,6 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  *
@@ -82,8 +80,7 @@ public class Utilities {
     
     private static Token<JFXTokenId> findTokenWithText(CompilationInfo info, String text, int start, int end) {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language()).subSequence(start, end);
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), Cancellable.Dummy.getInstance());
+        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language()).subSequence(start, end);
         
         while (ts.moveNext()) {
             Token<JFXTokenId> t = ts.token();
@@ -155,8 +152,7 @@ public class Utilities {
         String member = tree.getIdentifier().toString();
 
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), Cancellable.Dummy.getInstance());
+        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
 
         if (ts.move(endPosition) == Integer.MAX_VALUE) {
             return null;
@@ -419,8 +415,7 @@ public class Utilities {
         int start = (int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), leaf);
         
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts_ = th.tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, info.getDocument(), Cancellable.Dummy.getInstance());
+        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
         
         if (ts.move(start) == Integer.MAX_VALUE) {
             return null;

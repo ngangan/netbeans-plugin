@@ -52,9 +52,8 @@ import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.editor.ext.java.JavaFoldManager;
-import org.netbeans.api.javafx.editor.Cancellable;
 import org.netbeans.modules.javafx.editor.JavaFXEditorKit;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.semantic.ScanningCancellableTask;
 import org.netbeans.spi.editor.fold.FoldHierarchyTransaction;
 import org.netbeans.spi.editor.fold.FoldOperation;
@@ -340,7 +339,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
     private Fold initialCommentFold;
     private Fold importsFold;
     
-    private final class JavaFXElementFoldVisitor extends CancellableTreePathScanner<Object, Object> implements Cancellable {
+    private final class JavaFXElementFoldVisitor extends CancellableTreePathScanner<Object, Object> {
 
         private List<FoldInfo> folds = new ArrayList<JavaFXElementFoldManager.FoldInfo>();
         private CompilationInfo info;
@@ -355,6 +354,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         }
         
         private void addCommentsFolds() {
+            // A safe TokenHierarchy, based on a snapshot, never throws CME
             TokenHierarchy<?> th = info.getTokenHierarchy();
             if (th == null) {
                 if (LOGGABLE) log("addCommentsFolds returning because of null token hierarchy."); // NOI18N
@@ -366,7 +366,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 return;
             }
 
-            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(th.tokenSequence(JFXTokenId.language()), doc, this);
+            TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
             boolean firstNormalFold = true;
             while (ts.moveNext()) {
                 Token<JFXTokenId> token = ts.token();
@@ -417,9 +417,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             } catch (BadLocationException e) {
                 //the document probably changed, stop
                 stopped = true;
-            } catch (ConcurrentModificationException e) {
-                //from TokenSequence, document probably changed, stop
-                stopped = true;
             }
         }
 
@@ -439,9 +436,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 }
             } catch (BadLocationException e) {
                 //the document probably changed, stop
-                stopped = true;
-            } catch (ConcurrentModificationException e) {
-                //from TokenSequence, document probably changed, stop
                 stopped = true;
             }
             return null;
@@ -471,9 +465,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 }
             } catch (BadLocationException e) {
                 //the document probably changed, stop
-                stopped = true;
-            } catch (ConcurrentModificationException e) {
-                //from TokenSequence, document probably changed, stop
                 stopped = true;
             }
             return null;
@@ -546,15 +537,6 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             }
             return super.visitCompilationUnit(node, p);
         }
-
-        public boolean isCancelled() {
-            return isCanceled() || stopped;
-        }
-
-        public void cancell() {
-            cancel();
-        }
-
     }
     
     protected static final class FoldInfo implements Comparable {

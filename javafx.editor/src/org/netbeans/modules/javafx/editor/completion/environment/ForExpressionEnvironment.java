@@ -51,7 +51,6 @@ import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuer
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.openide.util.NbBundle;
 
 /**
@@ -78,8 +77,7 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
             return;
         }
 
-        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterFor = false;
