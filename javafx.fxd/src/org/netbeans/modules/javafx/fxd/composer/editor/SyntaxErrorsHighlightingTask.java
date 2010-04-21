@@ -72,9 +72,12 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
     @Override
     public void run(Result result, SchedulerEvent event) {
         try {
+            Document document = result.getSnapshot().getSource().getDocument(false);
+            if(document == null){
+                return;
+            }
             FXDParserResult fxdResult = (FXDParserResult) result;
             List<FXDSyntaxErrorException> syntaxErrors = fxdResult.getSyntaxErrors();
-            Document document = result.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
             for (FXDSyntaxErrorException syntaxError : syntaxErrors) {
                 int ErrRow = getRow(syntaxError, (BaseDocument) document);
