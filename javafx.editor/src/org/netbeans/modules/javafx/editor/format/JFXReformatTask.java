@@ -3629,17 +3629,25 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             int alignIndent = -1;
             for (Iterator<? extends TypeTree> it = trees.iterator(); it.hasNext();) {
-                // issue #176906
-                // accept formal parameter name if exist
+                // issues #176906, #184299
                 int index = tokens.index();
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (accept(JFXTokenId.IDENTIFIER) != JFXTokenId.IDENTIFIER) {
-                    rollback(index, c, d);
+                if (accept(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
+                    boolean colon = acceptAndRollback(JFXTokenId.COLON) == JFXTokenId.COLON;
+                    if (colon) {
+                        accept(JFXTokenId.COLON);
+                        spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+                    } else {
+                        rollback(index, c, d);
+                    }
+                } else {
+                    boolean colon = acceptAndRollback(JFXTokenId.COLON) == JFXTokenId.COLON;
+                    if (colon) {
+                        accept(JFXTokenId.COLON);
+                        spaces(cs.spaceAroundAssignOps() ? 1 : 0);
+                    }
                 }
-                
-                accept(JFXTokenId.COLON);
-                spaces(cs.spaceAroundAssignOps() ? 1 : 0); // TODO space around colon in the type definition
 
                 TypeTree param = it.next();
                 if (param.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
@@ -3658,12 +3666,13 @@ public class JFXReformatTask implements ReformatTask {
                         scan(param, null);
                     }
                 } else {
-                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, param);
+                    wrapTree(wrapStyle, alignIndent, 0, param);
                 }
                 first = false;
                 if (it.hasNext()) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
                     accept(JFXTokenId.COMMA);
+                    spaces(cs.spaceAfterComma() ? 1 : 0);
                 }
             }
         }
