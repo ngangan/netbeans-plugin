@@ -42,6 +42,8 @@
 package org.netbeans.modules.javafx.refactoring.transformations;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +66,8 @@ abstract public class Transformer {
     final private static Logger LOGGER = Logger.getLogger(Transformer.class.getName());
     
     private TransformationContext context = new TransformationContext();
-    
+    final private Collection<int[]> removals = new ArrayList<int[]>();
+
     final private static Map<RefactoringSession, Map<FileObject, Transformer>> foTransformers = new WeakHashMap<RefactoringSession, Map<FileObject, Transformer>>();
 
     private String backup;
@@ -104,6 +107,11 @@ abstract public class Transformer {
     }
 
     final synchronized void insertText(int pos, String text) {
+        for(int[] interval : removals) {
+            if (pos >= interval[0] && pos <= interval[1]) {
+                return;
+            }
+        }
         int startPos = context.getRealOffset(pos);
 
         writer.insertText(startPos, text);
@@ -111,6 +119,7 @@ abstract public class Transformer {
     }
 
     final synchronized String removeText(int pos, int len) {
+        removals.add(new int[]{pos, pos + len - 1});
         int startPos = context.getRealOffset(pos);
         int endPos = context.getRealOffset(pos + len - 1);
 
@@ -120,6 +129,11 @@ abstract public class Transformer {
     }
 
     final synchronized void replaceText(int pos, String oldText, String newText) {
+        for(int[] interval : removals) {
+            if (pos >= interval[0] && pos <= interval[1]) {
+                return;
+            }
+        }
         int realPos = context.getRealOffset(pos);
         writer.replaceText(realPos, oldText, newText);
         context.replaceText(pos, oldText.length(), newText.length());

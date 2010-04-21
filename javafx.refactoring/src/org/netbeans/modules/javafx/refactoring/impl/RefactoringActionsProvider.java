@@ -72,6 +72,7 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
+import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
@@ -88,6 +89,7 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataFolder;
+import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.text.CloneableEditorSupport;
@@ -109,11 +111,18 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     final private static Logger LOGGER = Logger.getLogger(RefactoringActionsProvider.class.getName());
 
     @Override
-    public boolean canFindUsages(Lookup lkp) {       
-        FileObject file = lkp.lookup(FileObject.class);
-        if (!SourceUtils.isAnalyzable(file)) return false;
+    public boolean canFindUsages(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
         
-        return file != null && file.getMIMEType().equals("text/x-fx"); //NOI18N
+        Node target = lkp.lookup(Node.class);
+
+        DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        if (dobj == null) return false;
+        if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
+
+        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
     volatile private boolean isFindUsages;
 
@@ -179,7 +188,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         }
         try {
             isFindUsages = true;
-            SourceUtils.invokeAfterScanFinished(task, NbBundle.getMessage(RefactoringActionsProvider.class, getActionName(RefactoringActionsFactory.whereUsedAction()))); 
+            SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.whereUsedAction())); 
         } finally {
             isFindUsages = false;
         }
@@ -187,12 +196,17 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+        
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        if (dobj == null) return false;
         if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
         
-        return dobj != null && SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
+        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
 
     @Override
@@ -230,9 +244,12 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                             lkpContent.add(srcFo);
                         } else {
                             if (edef.getKind().isClass() || edef.getKind().isInterface()) {
-                                Set<FileObject> defining = cpInfo.getClassIndex().getResources(edef.createHandle(), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
-                                if (!defining.isEmpty()) {
-                                    lkpContent.add(defining.iterator().next());
+                                if (!edef.getNestingKind().isNested()) {
+                                    // only top level classes need renaming of theirs defining files
+                                    Set<FileObject> defining = cpInfo.getClassIndex().getResources(edef.createHandle(), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+                                    if (!defining.isEmpty()) {
+                                        lkpContent.add(defining.iterator().next());
+                                    }
                                 }
                             }
                         }
@@ -317,7 +334,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     }
 
     @Override
-    public boolean canMove(Lookup lkp) {        
+    public boolean canMove(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+        
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -458,6 +479,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canCopy(Lookup lkp) {
+        if (SourceUtils.isScanInProgress()) {
+            return false;
+        }
+
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         if (nodes.size() < 1) {
             return false;

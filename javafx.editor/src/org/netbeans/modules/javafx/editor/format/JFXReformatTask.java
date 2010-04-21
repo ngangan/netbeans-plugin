@@ -918,7 +918,8 @@ public class JFXReformatTask implements ReformatTask {
                 }
 
                 boolean emptyClass = true;
-                for (Tree member : node.getClassMembers()) {
+                final List<Tree> classMembers = node.getClassMembers();
+                for (Tree member : classMembers) {
                     if (!isSynthetic((JFXTree) member)) {
                         emptyClass = false;
                         break;
@@ -931,7 +932,7 @@ public class JFXReformatTask implements ReformatTask {
                         indent = old;
                     }
                     blankLines(cs.getBlankLinesAfterClassHeader());
-                    processClassMembers(node.getClassMembers(), p, false, true);
+                    processClassMembers(classMembers, p, false, true);
                     if (lastBlankLinesTokenIndex < 0) {
                         newline();
                     }
@@ -1479,16 +1480,6 @@ public class JFXReformatTask implements ReformatTask {
                         blankLines();
                     }
 
-                    // Missing return statement, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
-                    int index = tokens.index();
-                    int c = col;
-                    Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    if (accept(JFXTokenId.RETURN) != JFXTokenId.RETURN) {
-                        rollback(index, c, d);
-                    } else {
-                        space();
-                    }
-
                     processExpression(expression, p);
                 }
             }
@@ -1691,13 +1682,10 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitReturn(ReturnTree node, Void p) {
-            int index = tokens.index();
-            int c = col;
-            Diff d = diffs.isEmpty() ? null : diffs.getFirst();
             // there is a compiler bug with dissappearing return keyword from the tree
-            boolean accepted = accept(JFXTokenId.RETURN) == JFXTokenId.RETURN;
-            if (!accepted) {
-                rollback(index, c, d);
+            boolean accepted = acceptAndRollback(JFXTokenId.RETURN) == JFXTokenId.RETURN;
+            if (accepted) {
+                accept(JFXTokenId.RETURN);
             }
             int old = indent;
             indent += continuationIndentSize;
@@ -1708,8 +1696,6 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 scan(exp, p);
             }
-            // should be accepted in processExpression()
-//            accept(JFXTokenId.SEMI);
             indent = old;
             return true;
         }

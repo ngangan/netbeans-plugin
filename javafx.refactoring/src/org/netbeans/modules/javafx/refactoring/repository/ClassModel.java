@@ -127,6 +127,8 @@ public class ClassModel {
         }
         
         for(Usage ref : usages) {
+            if (ref.getKind() != Usage.Kind.REFERENCE) continue;
+            
             if (ref.getStartPos() <= pos && ref.getEndPos() >= pos) {
                 return ref.getDef();
             }

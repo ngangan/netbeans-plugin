@@ -43,6 +43,8 @@ package org.netbeans.modules.javafx.refactoring;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.source.CompilationController;
@@ -64,6 +66,9 @@ import org.openide.filesystems.FileObject;
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
 final public class RefactoringSupport {
+    final private static Logger LOGGER = Logger.getLogger(RefactoringSupport.class.getName());
+    final private static boolean DEBUG = LOGGER.isLoggable(Level.FINE);
+    
     public static ClassModelFactory classModelFactory(AbstractRefactoring refactoring) {
         ClassModelFactory cmf = refactoring.getContext().lookup(ClassModelFactory.class);
         if (cmf == null) {
@@ -205,18 +210,24 @@ final public class RefactoringSupport {
         final org.netbeans.api.java.source.ElementHandle ehj = eh.toJava();
 
         JavaSource js = JavaSource.forFileObject(javaFile);
-        try {
-            js.runUserActionTask(new Task<CompilationController>() {
+        if (js != null) {
+            try {
+                js.runUserActionTask(new Task<CompilationController>() {
 
-                public void run(CompilationController cc) throws Exception {
-                    if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
-                        Object e = ehj.getClass().getMethod("resolve", CompilationInfo.class).invoke(ehj, cc); // NOI18N
-                        Class elementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
-                        tph[0] = (TreePathHandle) TreePathHandle.class.getMethod("create", elementClass, CompilationInfo.class).invoke(null, elementClass.cast(e), cc);
+                    public void run(CompilationController cc) throws Exception {
+                        if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                            Object e = ehj.getClass().getMethod("resolve", CompilationInfo.class).invoke(ehj, cc); // NOI18N
+                            Class elementClass = e.getClass().getClassLoader().loadClass("javax.lang.model.element.Element"); // NOI18N
+                            tph[0] = (TreePathHandle) TreePathHandle.class.getMethod("create", elementClass, CompilationInfo.class).invoke(null, elementClass.cast(e), cc);
+                        }
                     }
-                }
-            }, false);
-        } catch (IOException e) {
+                }, false);
+            } catch (IOException e) {
+            }
+        } else {
+            if (DEBUG) {
+                LOGGER.log(Level.FINE, "Can not obtain JavaSource for {0}", javaFile.getPath());
+            }
         }
 
         return tph[0];
