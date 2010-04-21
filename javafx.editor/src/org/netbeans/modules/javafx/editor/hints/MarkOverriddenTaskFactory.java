@@ -71,7 +71,7 @@ import org.openide.util.NbBundle;
 public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
-    private final Map<Document, Collection<OverriddeAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddeAnnotation>>();
+    private final Map<Document, Collection<OverriddenAnnotation>> annotations = new WeakHashMap<Document, Collection<OverriddenAnnotation>>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MarkOverriddenTaskFactory() {
@@ -82,7 +82,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
         final Collection<Element> classes = new HashSet<Element>();
         final Map<Element, List<MethodSymbol>> overriddenMethods = new HashMap<Element, List<MethodSymbol>>();
-        final Collection<OverriddeAnnotation> addedAnotations = new HashSet<OverriddeAnnotation>();
+        final Collection<OverriddenAnnotation> addedAnotations = new HashSet<OverriddenAnnotation>();
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -127,7 +127,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                                     }
                                 }
                                 if (start > 0 && !isInErrorZone) {
-                                    addedAnotations.add(new OverriddeAnnotation(start, fqnString));
+                                    addedAnotations.add(new OverriddenAnnotation(start, fqnString));
                                 }
                             }
                         }
@@ -181,10 +181,10 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                 return fqnType;
             }
 
-            private void updateAnnotationsOverridden(CompilationInfo compilationInfo, Collection<OverriddeAnnotation> addedAnnotations) {
+            private void updateAnnotationsOverridden(CompilationInfo compilationInfo, Collection<OverriddenAnnotation> addedAnnotations) {
                 final StyledDocument document = (StyledDocument) compilationInfo.getDocument();
-                final Collection<OverriddeAnnotation> annotationsToRemoveCopy = annotations.get(document) == null ? null : new HashSet<OverriddeAnnotation>(annotations.get(document));
-                final Collection<OverriddeAnnotation> addedAnnotationsCopy = new HashSet<OverriddeAnnotation>(addedAnnotations);
+                final Collection<OverriddenAnnotation> annotationsToRemoveCopy = annotations.get(document) == null ? null : new HashSet<OverriddenAnnotation>(annotations.get(document));
+                final Collection<OverriddenAnnotation> addedAnnotationsCopy = new HashSet<OverriddenAnnotation>(addedAnnotations);
 
                 Runnable update = new Runnable() {
 
@@ -197,7 +197,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                                 NbDocument.removeAnnotation(document, annotation);
                             }
                         }
-                        for (OverriddeAnnotation annotation : addedAnnotationsCopy) {
+                        for (OverriddenAnnotation annotation : addedAnnotationsCopy) {
                             Position position = null;
                             try {
                                 position = document.createPosition(annotation.getPosition());
@@ -230,12 +230,12 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
         };
     }
 
-    private static class OverriddeAnnotation extends Annotation {
+    private static class OverriddenAnnotation extends Annotation {
 
         private int positon;
         private String superClassFQN;
 
-        public OverriddeAnnotation(int position, String superClassFQN) {
+        public OverriddenAnnotation(int position, String superClassFQN) {
             this.positon = position;
             this.superClassFQN = superClassFQN;
         }
