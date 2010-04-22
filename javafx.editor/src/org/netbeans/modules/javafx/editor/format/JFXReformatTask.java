@@ -2386,28 +2386,31 @@ public class JFXReformatTask implements ReformatTask {
             List<ExpressionTree> partList = node.getPartList();
             if (partList != null && !partList.isEmpty()) {
                 boolean isQuoted = false;
+                boolean quoteFinished = false;
                 for (Iterator<ExpressionTree> it = partList.iterator(); it.hasNext();) {
                     // #178966
                     processTranslationKey();
 
-                    // JFXC-3494
+                    // JFXC-3494, #183894
                     ExpressionTree tree = it.next();
                     if (!isQuoted) {
                         isQuoted = acceptAndRollback(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL) == JFXTokenId.QUOTE_LBRACE_STRING_LITERAL;
                         if (isQuoted) {
                             accept(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL);
+                            spaces(0, true);
                             continue;
                         }
                     } else {
                         if (acceptAndRollback(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) {
-                            accept(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
-                            spaces(0, true);
                             isQuoted = false;
+                            quoteFinished = true;
                         }
                     }
                     scan(tree, p);
-                    if (it.hasNext() && !isQuoted) {
+                    if (quoteFinished) {
                         spaces(0, true);
+                        accept(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+                        quoteFinished = false;
                     }
                 }
             }
@@ -2445,7 +2448,11 @@ public class JFXReformatTask implements ReformatTask {
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
                 boolean insideSE = parent.getJavaFXKind() == JavaFXKind.STRING_EXPRESSION;
                 if (insideSE) {
-                    accept(JFXTokenId.STRING_LITERAL);
+                    JFXTokenId accepted = accept(JFXTokenId.STRING_LITERAL, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL);
+                    // #183894
+                    if (JFXTokenId.RBRACE_LBRACE_STRING_LITERAL == accepted) {
+                        spaces(0, true);
+                    }
                 } else {
                     // JFXC-4061
                     boolean isNextTokenStringLiteral = true;
