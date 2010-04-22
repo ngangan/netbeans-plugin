@@ -49,9 +49,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
@@ -132,7 +134,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             return;
         }
         active.set(true);
-        processor = new RequestProcessor("(5)Error Task List Processor"); //NOI18N
+        processor = new RequestProcessor("Error Task List Processor"); //NOI18N
         Iterator<FileObject> iterator = taskScanningScope.iterator();
         Collection<FileObject> fileObjects = new HashSet<FileObject>();
         while (iterator.hasNext()) {
@@ -140,7 +142,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             if (!fileObject.getExt().equals(FX_EXT)) {
                 continue;
             }
-            //callback.setTasks(fileObject, Collections.EMPTY_LIST);
+            callback.setTasks(fileObject, Collections.EMPTY_LIST);
             fileObjects.add(fileObject);
             final FileObject projectDir = FileOwnerQuery.getOwner(fileObject).getProjectDirectory();
 
@@ -261,7 +263,9 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                     }
                     //LOG.info("(18)Task " + fileObject.getName() + " has to wait " + delay + " ms"); //NOI18N
                 } else {
+                    callback.started();
                     createTask(fileObject, callback);
+                    callback.finished();
                 }
             }
         });
@@ -285,12 +289,14 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                         return;
                     }
                 } else {
+                    callback.started();
                     for (FileObject fileObject : fileObjects) {
                         if (majorTask == null) {
                             return;
                         }
                         createTask(fileObject, callback);
                     }
+                    callback.finished();
                     majorTask = null;
                 }
             }
@@ -321,48 +327,35 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
 
         private void refreshTasks(CompilationController compilationController) {
             List<Diagnostic> diagnostics = compilationController.getDiagnostics();
-            Map<FileObject, List<Task>> localTasks = new HashMap<FileObject, List<Task>>();
+            List<Task> tasks = new ArrayList<Task>();
+            FileObject fileObject = compilationController.getFileObject();
             for (Diagnostic diagnostic : diagnostics) {
                 if (diagnostic == null || diagnostic.getKind() != Diagnostic.Kind.ERROR) {
                     continue;
                 }
                 JCDiagnostic jcd = ((JCDiagnostic) diagnostic);
 
-                FileObject currentFileObject = null;
+                FileObject sourceErrorFileObject = null;
                 try {
                     if (jcd.getSource() == null || jcd.getSource().toUri() == null) {
                         continue;
                     }
-                    currentFileObject = URLMapper.findFileObject(jcd.getSource().toUri().toURL());
+                    sourceErrorFileObject = URLMapper.findFileObject(jcd.getSource().toUri().toURL());
                 } catch (MalformedURLException ex) {
                     ex.printStackTrace();
                 }
-                if (currentFileObject == null) {
+                if (sourceErrorFileObject == null || sourceErrorFileObject != compilationController.getFileObject()) {
                     continue;
                 }
-                Task task = Task.create(currentFileObject, "nb-tasklist-error", diagnostic.getMessage(Locale.getDefault()), (int) diagnostic.getLineNumber()); //NOI18N
-                localTasks.put(currentFileObject, addTask(localTasks.get(currentFileObject), task));
+                Task task = Task.create(fileObject, "nb-tasklist-error", diagnostic.getMessage(Locale.getDefault()), (int) diagnostic.getLineNumber()); //NOI18N
+                tasks.add(task);
+                //LOG.info("TASK -  FILE: " + compilationController.getFileObject().getName() + " SOURCE " +sourceErrorFileObject.getName());
             }
-            for (FileObject file : localTasks.keySet()) {
-                List<Task> list = localTasks.get(file);
-                if (list != null) {
-                    callback.setTasks(file, list);
-                }
-                list.clear();
-            }
-            localTasks.clear();
+            callback.setTasks(fileObject, tasks);
+            //tasks.clear();
             waitingTasks.remove(compilationController.getFileObject());
             //LOG.info("Scanning - Thread " + Thread.currentThread().getId());
             //LOG.info("(20)Scanning task is FINISHED " + compilationController.getFileObject()); //NOI18N
-        }
-
-        private List<Task> addTask(List<Task> list, Task task) {
-            if (list == null) {
-                list = new ArrayList<Task>();
-            }
-            list.add(task);
-
-            return list;
         }
     }
 }
