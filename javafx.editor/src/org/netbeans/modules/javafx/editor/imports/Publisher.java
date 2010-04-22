@@ -41,8 +41,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.util.logging.Logger;
 import javax.swing.text.Caret;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.modules.javafx.editor.imports.ImportsModel.Declared;
 
 /**
@@ -80,7 +78,8 @@ class Publisher implements Runnable {
 
     @SuppressWarnings("empty-statement")
     public void run() {
-        SafeTokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
+        // no need to guard against TS modifications, runs over locked Document
+        TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
 
         // reformat not used for now
         Reformat reformat = null;
@@ -135,7 +134,7 @@ class Publisher implements Runnable {
     }
 
     @SuppressWarnings({"MethodWithMultipleLoops"})
-    private int moveBehindPackage(SafeTokenSequence<JFXTokenId> ts) {
+    private int moveBehindPackage(TokenSequence<JFXTokenId> ts) {
         boolean wasWS = false;
         int lastNonWSOffset = 0;
         while (ts.moveNext()) {
@@ -160,17 +159,16 @@ class Publisher implements Runnable {
         return lastNonWSOffset;
     }
 
-    private void moveTo(SafeTokenSequence<JFXTokenId> ts, JFXTokenId id) {
+    private void moveTo(TokenSequence<JFXTokenId> ts, JFXTokenId id) {
         while (ts.moveNext()) {
             if (ts.token().id() == id) break;
         }
     }
 
     @SuppressWarnings({"unchecked"})
-    private static <JFXTokenId extends TokenId> SafeTokenSequence<JFXTokenId> getTokenSequence(Document doc, int dotPos) {
+    private static <JFXTokenId extends TokenId> TokenSequence<JFXTokenId> getTokenSequence(Document doc, int dotPos) {
         TokenHierarchy<Document> th = TokenHierarchy.get(doc);
-        TokenSequence<JFXTokenId> ts_ = (TokenSequence<JFXTokenId>) th.tokenSequence();
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, doc, Cancellable.Dummy.getInstance());
+        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) th.tokenSequence();
         ts.move(dotPos);
         return ts;
     }

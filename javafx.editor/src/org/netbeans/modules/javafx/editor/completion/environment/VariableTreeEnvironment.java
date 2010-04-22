@@ -50,7 +50,7 @@ import com.sun.tools.javafx.code.JavafxTypes;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 
 import com.sun.tools.javafx.tree.JFXSelect;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.LAZY_KEYWORD;
@@ -94,7 +94,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         }
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos); // NOI18N
         if (offset <= typePos) {
-            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
             if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
@@ -102,7 +102,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             }
             return;
         }
-        SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
+        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
         if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id())); // NOI18N
         if ((last != null) && (last.token().id() == JFXTokenId.EQ ||
                 last.token().id() == JFXTokenId.BIND  ||

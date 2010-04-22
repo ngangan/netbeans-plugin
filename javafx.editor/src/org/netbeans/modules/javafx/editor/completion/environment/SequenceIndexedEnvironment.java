@@ -41,7 +41,7 @@ package org.netbeans.modules.javafx.editor.completion.environment;
 
 
 import com.sun.tools.javafx.tree.JFXSequenceIndexed;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
@@ -64,7 +64,7 @@ public class SequenceIndexedEnvironment extends JavaFXCompletionEnvironment<JFXS
     protected void inside(JFXSequenceIndexed t) throws IOException {
         if (LOGGABLE) {
             logger.fine("inside JFXSequenceIndexed " + t + "  offset == " + offset); // NOI18N
-            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
         localResult(getSmartType(t));

@@ -44,7 +44,7 @@ import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXErroneousType;
 
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
@@ -73,7 +73,7 @@ public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
             int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
             if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos); // NOI18N
             if (offset <= typePos) {
-                SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+                TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
                 if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
                 if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
                     addLocalAndImportedTypes(null, null, null, false, getSmartType());

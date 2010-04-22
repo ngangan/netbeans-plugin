@@ -51,8 +51,6 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.editor.EditorRegistry;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -108,7 +106,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
             ((AbstractDocument)doc).readLock();
         }
         try {
-            SafeTokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
+            TokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
             if (ts == null) {
                 return false;
             }
@@ -138,14 +136,13 @@ public class JavaFXCompletionProvider implements CompletionProvider {
     }
     
     @SuppressWarnings("unchecked")
-    public static SafeTokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
+    public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
         if (hierarchy != null) {
             TokenSequence<?> ts_ = hierarchy.tokenSequence();
             while(ts_ != null && ts_.isValid() && (offset == 0 || ts_.moveNext())) {
                 ts_.move(offset);
                 if (ts_.language() == JFXTokenId.language()) {
-                    SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>((TokenSequence<JFXTokenId>) ts_, doc, Cancellable.Dummy.getInstance());
-                    return ts;
+                    return (TokenSequence<JFXTokenId>)ts_;
                 }
                 if (!ts_.moveNext() && !ts_.movePrevious()) {
                     if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset); // NOI18N

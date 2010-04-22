@@ -47,7 +47,6 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.lexer.TokenHierarchy;
 
 /**
@@ -71,8 +70,7 @@ public class SequenceRangeEnvironment extends JavaFXCompletionEnvironment<JFXSeq
     @Override
     protected void inside(JFXSequenceRange t) throws IOException {
         int start = (int)sourcePositions.getStartPosition(root, t);
-        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(start);
         State state = State.INIT;
         while (ts.moveNext() && ts.offset() <= offset) {
