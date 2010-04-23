@@ -2129,12 +2129,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             indent = old;
 
-            index = tokens.index();
-            c = col;
-            d = diffs.isEmpty() ? null : diffs.getFirst();
-            JFXTokenId accepted = accept(JFXTokenId.THEN);
-            rollback(index, c, d);
-            if (accepted == JFXTokenId.THEN) {
+            if (acceptAndRollback(JFXTokenId.THEN) == JFXTokenId.THEN) {
                 space();
                 accept(JFXTokenId.THEN);
             }
@@ -2149,15 +2144,14 @@ public class JFXReformatTask implements ReformatTask {
 
             boolean insideVar = ReformatUtils.isTreeInsideVar(getCurrentPath());
             boolean tecoeo = ReformatUtils.containsOneExpressionOnly(trueExpr);
-//            boolean fecoeo = ReformatUtils.containsOneExpressionOnly(falseExpr);
+            boolean fecoeo = ReformatUtils.containsOneExpressionOnly(falseExpr);
 
-            // TODO make cs.wrapIfExpression
             final WrapStyle wrapIfStatement = insideVar || tecoeo ? WrapStyle.WRAP_NEVER : cs.wrapIfexpression();
             boolean prevblock = wrapStatement(wrapIfStatement, redundantIfBraces, cs.spaceBeforeIfLeftBrace() ? 1 : 0, trueExpr);
             if (falseExpr != null) {
-                if (!insideVar && (cs.placeElseOnNewLine() || !prevblock)) {
-//                if (!insideVar && !fecoeo && (cs.placeElseOnNewLine() || !prevblock)) {
-                    newline();
+//                if (!insideVar && (cs.placeElseOnNewLine() || !prevblock)) {
+                if (!insideVar && !fecoeo && (cs.placeElseOnNewLine() || !prevblock)) {
+                    spaces(cs.spaceBeforeElse() ? 1 : 0, true);
                 } else {
                     spaces(cs.spaceBeforeElse() ? 1 : 0);
                 }
@@ -3622,12 +3616,13 @@ public class JFXReformatTask implements ReformatTask {
                         accept(JFXTokenId.IDENTIFIER);
                     }
                 } else {
-                    wrapExtendsTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, tree);
+                    wrapExtendsTree(wrapStyle, alignIndent, 0, tree);
                 }
                 first = false;
                 if (it.hasNext()) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
                     accept(JFXTokenId.COMMA);
+                    spaces(cs.spaceAfterComma() ? 1 : 0);
                 }
             }
         }
@@ -3944,7 +3939,13 @@ public class JFXReformatTask implements ReformatTask {
             return kind == JavaFXKind.FUNCTION_DEFINITION
                     || kind == JavaFXKind.INSTANTIATE_OBJECT_LITERAL
                     || kind == JavaFXKind.INIT_DEFINITION
-                    || kind == JavaFXKind.POSTINIT_DEFINITION;
+                    || kind == JavaFXKind.POSTINIT_DEFINITION
+                    || kind == JavaFXKind.EQUAL_TO
+                    || kind == JavaFXKind.LESS_THAN
+                    || kind == JavaFXKind.LESS_THAN_EQUAL
+                    || kind == JavaFXKind.GREATER_THAN
+                    || kind == JavaFXKind.GREATER_THAN_EQUAL
+                    || kind == JavaFXKind.NOT_EQUAL_TO;
         }
 
         private static class FakeBlock extends JFXBlock {
