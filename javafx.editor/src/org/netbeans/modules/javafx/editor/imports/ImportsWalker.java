@@ -207,7 +207,7 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
                 }
             } else {
                 String className = findTopClass(e).toString();
-                if (e.getKind().isField() || e.getKind() == ElementKind.METHOD) {
+                if (e.getKind().isClass() || e.getKind().isInterface()) {
                     model.addUsage(className + "." + e.getSimpleName().toString()); // NOI18N
                 }
                 model.addUsage(className);

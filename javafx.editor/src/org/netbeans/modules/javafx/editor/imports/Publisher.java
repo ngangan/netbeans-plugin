@@ -79,7 +79,7 @@ class Publisher implements Runnable {
     }
 
     @SuppressWarnings("empty-statement")
-    public void run() {
+    synchronized public void run() {
         SafeTokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
 
         // reformat not used for now
