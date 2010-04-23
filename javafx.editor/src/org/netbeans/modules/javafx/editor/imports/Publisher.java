@@ -77,7 +77,7 @@ class Publisher implements Runnable {
     }
 
     @SuppressWarnings("empty-statement")
-    public void run() {
+    synchronized public void run() {
         // no need to guard against TS modifications, runs over locked Document
         TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
 
