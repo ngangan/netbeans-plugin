@@ -48,20 +48,20 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author Michal Skvor
+ * @author Karol Harezlak
  */
+
+//FIXME javafx.scene.chart.part.NumberAxis
 public class LineChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-         String code = NbBundle.getMessage(LineChart.class, "TEMPLATE_LineChart"); //NOI18N
+        String code = NbBundle.getMessage(LineChart.class, "TEMPLATE_LineChart"); //NOI18N
         CodeTemplateManager ctm = CodeTemplateManager.get(targetComponent.getDocument());
         CodeTemplate template = ctm.createTemporary(code);
         template.insert(targetComponent);
 
         // Import
         Imports.addImport(targetComponent, "javafx.scene.chart.LineChart"); // NOI18N
-        Imports.addImport(targetComponent, "javafx.scene.chart.part.NumberAxis"); //NOI18N
-
 
 
         return true;
