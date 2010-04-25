@@ -62,8 +62,7 @@ public class LineChart implements ActiveEditorDrop {
 
         // Import
         Imports.addImport(targetComponent, "javafx.scene.chart.LineChart"); // NOI18N
-
-
+        Imports.addImport(targetComponent, "javafx.scene.chart.part.NumberAxis");
         return true;
     }
 }
