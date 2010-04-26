@@ -44,12 +44,15 @@ package org.netbeans.modules.javafx.fxd.composer.editor.completion;
 import java.net.URL;
 import javax.swing.Action;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author avk
  */
 public class FXDCompletionDocumentation implements CompletionDocumentation{
+
+    private static final String MSG_INFORMATION_ABOUT = "MSG_INFORMATION_ABOUT"; // NOI18N
 
     private FXDCompletionItem m_item;
     private StringBuilder sb;
@@ -59,7 +62,8 @@ public class FXDCompletionDocumentation implements CompletionDocumentation{
     }
 
     public String getText() {
-        sb = new StringBuilder("Information about " + m_item.getDisplayText());
+        sb = new StringBuilder(NbBundle.getMessage(FXDCompletionDocumentation.class,
+                MSG_INFORMATION_ABOUT, m_item.getDisplayText()));
 
         String descr = m_item.getDescription();
         if (descr != null) {
