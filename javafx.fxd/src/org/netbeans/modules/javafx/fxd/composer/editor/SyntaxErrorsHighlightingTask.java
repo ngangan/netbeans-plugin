@@ -90,7 +90,7 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
                 ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
                         NbBundle.getMessage(SyntaxErrorsHighlightingTask.class,
-                                MSG_ERROR, syntaxError.getMessage(), ErrRow, ErrPosition),
+                                MSG_ERROR, syntaxError.getLocalizedMessage(), ErrRow, ErrPosition),
                         document,
                         ErrRow);
                 errors.add(errorDescription);
