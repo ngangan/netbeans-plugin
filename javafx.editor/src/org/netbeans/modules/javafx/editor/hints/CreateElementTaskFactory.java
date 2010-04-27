@@ -45,9 +45,11 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
@@ -57,6 +59,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -129,10 +132,13 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                     if (cancel.get()) {
                         break;
                     }
+                    if (!(diagnostic instanceof JCDiagnostic)) {
+                        continue;
+                    }
                     if (isValidError(diagnostic, document)
                             && (diagnostic instanceof JCDiagnostic)) {
 
-                        Kind kinds[] = getKinds(diagnostic, compilationInfo);
+                        Kind kinds[] = getKinds((JCDiagnostic) diagnostic, compilationInfo);
                         for (Kind kind : kinds) {
                             errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic, kind));
                         }
@@ -167,11 +173,29 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         return errorDescription;
     }
 
-    private Kind[] getKinds(final Diagnostic diagnostic, final CompilationInfo compilationInfo) {
+    private Kind[] getKinds(final JCDiagnostic  diagnostic, final CompilationInfo compilationInfo) {
         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         final ArrayList<Kind> array = new ArrayList<Kind>();
-
+        final String[] classFQN = new String[1];
+        if (diagnostic.getArgs().length >= 6 && diagnostic.getArgs()[5] instanceof String) {
+           classFQN[0] = (String) diagnostic.getArgs()[5];
+        }
         new JavaFXTreePathScanner<Void,Void> () {
+
+            private String currentClassFQN;
+
+            @Override
+            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
+                Element element = compilationInfo.getTrees().getElement(path);
+                if (element instanceof JavafxClassSymbol) {
+                   currentClassFQN = ((JavafxClassSymbol) element).className();
+                   if (!currentClassFQN.equals(classFQN[0])) {
+                       return null;
+                   }
+                }
+                return super.visitClassDeclaration(node, p);
+            }
 
             @Override
             public Void visitInstantiate(InstantiateTree node, Void p) {
@@ -385,7 +409,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
             String space = HintsUtils.calculateSpace(position[0], document);
-            StringBuffer code = new StringBuffer().append("\n").append(space).append("var ").append(varName).append(";\n").append(space); //NOI18N
+            StringBuffer code = new StringBuffer().append(space).append("var ").append(varName).append(";\n").append(space); //NOI18N
             if (position[0] < 0) {
                 position[0] = (int) diagnostic.getStartPosition();
             }
