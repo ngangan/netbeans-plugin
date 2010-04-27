@@ -58,6 +58,7 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -65,6 +66,8 @@ import org.openide.util.Exceptions;
  * @author Andrey Korostelev
  */
 public class SyntaxErrorsHighlightingTask extends ParserResultTask {
+
+    private static final String MSG_ERROR = "MSG_ERROR"; // NOI18N
 
     public SyntaxErrorsHighlightingTask() {
     }
@@ -83,15 +86,17 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
                 int ErrRow = getRow(syntaxError, (BaseDocument) document);
                 int ErrPosition = getPosition(syntaxError, (BaseDocument) document);
 
+                // 174091
                 ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
-                        syntaxError.getMessage() + " at [" + ErrRow + "," + ErrPosition + "]",
+                        NbBundle.getMessage(SyntaxErrorsHighlightingTask.class,
+                                MSG_ERROR, syntaxError.getMessage(), ErrRow, ErrPosition),
                         document,
                         ErrRow);
                 errors.add(errorDescription);
             }
             if (document != null) {
-                HintsController.setErrors(document, "simple-java", errors);
+                HintsController.setErrors(document, "simple-java", errors); //NOI18N
             }
         } catch (BadLocationException ex1) {
             Exceptions.printStackTrace(ex1);

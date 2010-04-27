@@ -25,8 +25,15 @@ public class FXDSchemaHelper {
         "javafx.scene.text.",
         "javafx.scene.effect.",
         "javafx.fxd.",
-        ""
+        "javafx.animation.",
+        "javafx.animation.transition.",
+        "javafx.scene.control.",
+        "javafx.scene.layout.",
+        "",
+        //because of the class com.sun.javafx.tools.fxd.FXD
+        "com.sun.javafx.tools.fxd."
     };
+
     private static Map<String, String> FXD_ELEMENT_TO_SCHEMA_ID = new HashMap<String, String>();
 
 

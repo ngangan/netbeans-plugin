@@ -73,6 +73,12 @@ public final class ReformatUtils {
             JFXTokenId.QUOTE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
             JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
 
+    public static EnumSet<JFXTokenId> VARIABLE_KEYWORDS = EnumSet.of(JFXTokenId.VAR,
+            JFXTokenId.DEF, JFXTokenId.ATTRIBUTE);
+
+    public static EnumSet<JFXTokenId> OPERATOR_KEYWORDS = EnumSet.of(JFXTokenId.AND,
+            JFXTokenId.OR, JFXTokenId.MOD);
+
     public static boolean containsOneExpressionOnly(ExpressionTree tree) {
         if (tree == null) {
             return true;
