@@ -190,16 +190,13 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 Element element = compilationInfo.getTrees().getElement(path);
                 if (element instanceof JavafxClassSymbol) {
                    currentClassFQN = ((JavafxClassSymbol) element).className();
-                   if (!currentClassFQN.equals(classFQN[0])) {
-                       return null;
-                   }
                 }
                 return super.visitClassDeclaration(node, p);
             }
 
             @Override
             public Void visitInstantiate(InstantiateTree node, Void p) {
-                if (checkPosition(node, diagnostic)) {
+                if (checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
                     array.add(Kind.CLASS);
                     array.add(Kind.LOCAL_CLASS);
                     return null;
@@ -209,7 +206,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
 
             @Override
             public Void visitIdentifier(IdentifierTree node, Void p) {
-                if (checkPosition(node, diagnostic)) {
+                if (checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
                     if (getCurrentPath().getParentPath().getLeaf() instanceof JFXBlock) {
                         array.add(Kind.LOCAL_VARIABLE);
                     }
@@ -223,7 +220,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             
             @Override
             public Void visitMethodInvocation(FunctionInvocationTree node, Void p) {
-                if (checkPosition(node, diagnostic)) {
+                if (checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
                     array.add(Kind.FUNCTION);
                     return null;
                 }
