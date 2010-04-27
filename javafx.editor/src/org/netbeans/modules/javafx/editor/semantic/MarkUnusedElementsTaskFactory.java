@@ -70,6 +70,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.SwingUtilities;
 import javax.swing.text.AttributeSet;
@@ -85,6 +86,7 @@ import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.editor.highlighting.HighlightsSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.filesystems.FileObject;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -318,7 +320,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 }
                 SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                 Collection<Position> positions = new HashSet<Position>(elementsToAdd.size());
-                for (Tree tree : elementsToAdd.values()) {
+                for (Element e : elementsToAdd.keySet()) {
+                    Tree tree = elementsToAdd.get(e);
                     long start = sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), tree);
                     if (start < 0 || end < 0) {
@@ -336,7 +339,21 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             end = start + token.length();
                         }
                     }
-                    positions.add(new Position((int) start, (int) end));
+                    
+                    String type = NbBundle.getMessage(MarkUnusedElementsTaskFactory.class, "TOOLTIP_UNUSED_ELEMEN_DEFAULT_NAME"); //NOI18N
+                    if (e.getKind() == ElementKind.CLASS || e.getKind() == ElementKind.INTERFACE) {
+                        type = NbBundle.getMessage(MarkUnusedElementsTaskFactory.class, "TOOLTIP_UNUSED_ELEMEN_TYPE_CLASS"); //NOI18N
+                    } else if (e.getKind() == ElementKind.METHOD) {
+                        type = NbBundle.getMessage(MarkUnusedElementsTaskFactory.class, "TOOLTIP_UNUSED_ELEMEN_TYPE_METHOD"); //NOI18N
+                    } else if (e.getKind() == ElementKind.LOCAL_VARIABLE || e.getKind() == ElementKind.FIELD) {
+                        type = NbBundle.getMessage(MarkUnusedElementsTaskFactory.class, "TOOLTIP_UNUSED_ELEMEN_TYPE_VAR"); //NOI18N
+                    }
+                    String simpleName = ""; //NOI18N
+                    if (e.getSimpleName() != null) {
+                        simpleName = e.getSimpleName().toString();
+                    }
+                    String name = NbBundle.getMessage(MarkUnusedElementsTaskFactory.class, "TOOLTIP_UNUSED_ELEMENT", type, simpleName); //NOI18N
+                    positions.add(new Position(name, (int) start, (int) end));
                 }
                 if (SwingUtilities.isEventDispatchThread()) {
                     updateEditor(positions, document).run();
@@ -371,16 +388,19 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         bag = new OffsetsBag(document);
                         document.putProperty(SemanticHighlighter.class, bag);
                     }
+
                     HighlightsSequence highlightsSequence = bag.getHighlights(position.getStart(), position.getEnd());
                     List<AttributeSet> attributeSet = new ArrayList<AttributeSet>();
                     while (highlightsSequence.moveNext()) {
                         attributeSet.add(highlightsSequence.getAttributes());
                     }
                     attributeSet.add(AttributesUtilities.createImmutable(EditorStyleConstants.WaveUnderlineColor, Color.LIGHT_GRAY));
+                    attributeSet.add(AttributesUtilities.createImmutable(EditorStyleConstants.Tooltip, position.getToolTip()));
                     AttributeSet[] array = attributeSet.toArray(new AttributeSet[attributeSet.size()]);
                     AttributeSet asfinal = AttributesUtilities.createImmutable(array);
                     bag.addHighlight(position.start, position.getEnd(), asfinal);
                 }
+
             }
         };
     }
@@ -389,10 +409,16 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
         private int start;
         private int end;
+        private String name;
 
-        Position(int start, int end) {
+        Position(String name, int start, int end) {
             this.start = start;
             this.end = end;
+            this.name = name;
+        }
+
+        String getToolTip() {
+            return name;
         }
 
         int getStart() {
