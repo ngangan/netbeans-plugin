@@ -85,6 +85,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
     private static final Logger LOG = Logger.getAnonymousLogger(); //NOI18N
     private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXErrorTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
+    private static final int TIME_WAIT = 3000;
     private final Map<FileObject, FileChangeListener> projectDirs;
     private final Map<FileObject, RequestProcessor.Task> waitingTasks;
     private final Map<FileObject, Future<Void>> scannerTasks;
@@ -154,7 +155,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                         if (fe.getFile().getExt().equals(FX_EXT) && !active.get()) {
                             //LOG.info("(6)File created: " + fe.getFile().getName());  //NOI18N
                             //LOG.info("(7)Update task created from fileDataCreated"); //NOI18N
-                            updateTask(fe.getFile(), callback, 4000);
+                            updateTask(fe.getFile(), callback, TIME_WAIT);
                         }
                         super.fileDataCreated(fe);
                     }
@@ -168,7 +169,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                             if (child.getExt().equals(FX_EXT)) {
                                 //LOG.info("(8)Folder created and update: " + fe.getFile().getName());  //NOI18N
                                 //LOG.info("(9)Update task created from fileFolderCreated"); //NOI18N
-                                updateTask(child, callback, 4000);
+                                updateTask(child, callback, TIME_WAIT);
                             }
                         }
                         super.fileFolderCreated(fe);
@@ -183,7 +184,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
                             //LOG.info("(10)File changed: " + fe.getFile().getName());  //NOI18N
                             //callback.setTasks(fe.getFile(), Collections.EMPTY_LIST);
                             //LOG.info("(11)Update task created from fileChanged"); //NOI18N
-                            updateTask(fe.getFile(), callback, 4000);
+                            updateTask(fe.getFile(), callback, TIME_WAIT);
                         }
                         super.fileChanged(fe);
                     }
