@@ -78,7 +78,7 @@ final class HintsUtils {
                 }
                 TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
                 try {
-                    if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)) {
+                    if (ElementUtilities.alreadyDefinedIn(overrriddenName, method, typeOverridden)) {
                         return overriddenMethod;
                     }
                 } catch (NullPointerException ex) {

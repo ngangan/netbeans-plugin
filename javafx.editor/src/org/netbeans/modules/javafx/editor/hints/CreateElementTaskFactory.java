@@ -224,7 +224,6 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                     array.add(Kind.FUNCTION);
                     return null;
                 }
-
                 return super.visitMethodInvocation(node, p);
             }
 
@@ -238,7 +237,6 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 
                 return false;
             }
-            
             
         }.scan(compilationInfo.getCompilationUnit(), null);
 
@@ -406,7 +404,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
             String space = HintsUtils.calculateSpace(position[0], document);
-            StringBuffer code = new StringBuffer().append(space).append("var ").append(varName).append(";\n").append(space); //NOI18N
+            StringBuffer code = new StringBuffer().append("\n").append(space).append("var ").append(varName).append(";\n").append(space); //NOI18N
             if (position[0] < 0) {
                 position[0] = (int) diagnostic.getStartPosition();
             }
@@ -452,7 +450,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         }
 
                         try {
-                            //TODO Line below returns 0 in same cases which means start of the node and end of the node is the same which is not true.
+                            //TODO Line below returns 0 in some cases. It means start of the node and end of the node equals which is not true.
                             //int length = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), currentClass) - start;
                             //TODO Workaround for this problem
 
