@@ -54,11 +54,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import org.netbeans.api.lexer.Token;
+import org.netbeans.modules.javafx.fxd.composer.source.SourceViewDescription;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerInput;
 import org.netbeans.spi.lexer.LexerRestartInfo;
 import org.netbeans.spi.lexer.TokenPropertyProvider;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -66,6 +68,7 @@ import org.openide.util.Exceptions;
  */
 public class FXDLexer implements Lexer<FXDTokenId> {
 
+    private static final String MSG_NOT_SUPPORTED = "MSG_NOT_SUPPORTED"; //NOI18N
     private LexerRestartInfo<FXDTokenId> m_info;
     private int m_tokenIdx;
     private List<TokenData<FXDTokenId>> m_tokensList;
@@ -82,15 +85,26 @@ public class FXDLexer implements Lexer<FXDTokenId> {
         FXDParser parser = null;
 
         try {
-            parser= new FXDParser(reader, contLexer);
+            parser = new FXDParser(reader, contLexer);
             parser.parseObject();
+        } catch (StringIndexOutOfBoundsException ex) {
+            ex.printStackTrace();
+            try {
+                String msg = NbBundle.getMessage(FXDLexer.class, MSG_NOT_SUPPORTED,
+                        ex.getLocalizedMessage());
+                FXDSyntaxErrorException syntaxEx = new FXDSyntaxErrorException(
+                        msg, parser.getPosition());
+                contLexer.markError(syntaxEx);
+            } catch (Exception e) {
+                Exceptions.printStackTrace(e);
+            }
         } catch (FXDSyntaxErrorException syntaxEx) {
-            syntaxEx.printStackTrace();
             try {
                 // workaround for #183149.
                 // TODO: FXDSyntaxErrorException thrown by FXDReference.parse should have offset.
-                if (syntaxEx.getOffset() == -1 && parser!= null){
-                    syntaxEx = new FXDSyntaxErrorException(syntaxEx.getLocalizedMessage(), parser.getPosition());
+                if (syntaxEx.getOffset() == -1 && parser != null) {
+                    syntaxEx = new FXDSyntaxErrorException(
+                            syntaxEx.getLocalizedMessage(), parser.getPosition());
                 }
                 contLexer.markError(syntaxEx);
             } catch (Exception e) {
