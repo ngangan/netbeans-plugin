@@ -669,7 +669,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
                             continue;
                         }
                         String s = child.getPath().replace('/', '.'); // NOI18N
-                        if (s.startsWith(fqnPrefix)) {
+                        if (JavaFXCompletionProvider.startsWith(s, fqnPrefix)) {
                             addResult(JavaFXCompletionItem.createPackageItem(s, query.anchorOffset, false));
                         }
                     }

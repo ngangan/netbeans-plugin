@@ -83,7 +83,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
             return false;
         if (prefix == null || prefix.length() == 0)
             return true;
-        return theString.startsWith(prefix);
+        return theString.toUpperCase().startsWith(prefix.toUpperCase());
     }
     
     public static JavaFXTreePath getPathElementOfKind(Tree.JavaFXKind kind, JavaFXTreePath path) {
