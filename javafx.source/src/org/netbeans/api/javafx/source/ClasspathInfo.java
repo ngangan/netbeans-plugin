@@ -74,6 +74,8 @@ public class ClasspathInfo {
     private ClassPath srcPath, srcPathOrig;
 
     private JavaFileManager fileManager;
+    final private Object usagesQueryLock = new Object();
+    // @GuardedBy usagesQueryLock
     private ClassIndex usagesQuery;
 
     private final ClassPathListener cpListener;
@@ -216,11 +218,13 @@ public class ClasspathInfo {
         listenerList.remove(ChangeListener.class, listener);
     }
 
-    public synchronized ClassIndex getClassIndex() {
-        if (usagesQuery == null) {
-            usagesQuery = ClassIndex.forClasspathInfo(this);
+    public ClassIndex getClassIndex() {
+        synchronized(usagesQueryLock) {
+            if (usagesQuery == null) {
+                usagesQuery = ClassIndex.forClasspathInfo(this);
+            }
+            return usagesQuery;
         }
-        return usagesQuery;
     }
 
     private void fireChangeListenerStateChanged() {
@@ -278,6 +282,8 @@ public class ClasspathInfo {
         } else {
             srcPath = ClassPathSupport.createClassPath(srcUrls.toArray(new URL[srcUrls.size()]));
         }
+
+        getClassIndex().applyClassPaths(srcPath, compilePath, bootPath);
     }
     
     private class ClassPathListener implements PropertyChangeListener {

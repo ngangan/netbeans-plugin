@@ -55,6 +55,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
@@ -83,7 +84,7 @@ import org.openide.util.Exceptions;
 final public class ClassIndex {
 
     final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(ClassIndex.class.getName());
-    final private org.netbeans.api.java.source.ClassIndex javaIndex;
+    private org.netbeans.api.java.source.ClassIndex javaIndex;
 
     private static Set<String> javaSearchKinds = new HashSet<String>() {
         {
@@ -185,6 +186,8 @@ final public class ClassIndex {
         PACKAGES
     };
 
+    final private ReentrantReadWriteLock cpLock = new ReentrantReadWriteLock();
+
     final private Set<FileObject> indexerSrcRoots = new HashSet<FileObject>();
     final private Set<FileObject> indexerDepRoots = new HashSet<FileObject>();
     final private Set<FileObject> indexerDepRevRoots = new HashSet<FileObject>();
@@ -194,17 +197,7 @@ final public class ClassIndex {
         assert classPath != null;
         assert sourcePath != null;
 
-        Set<FileObject> srcRoots = new HashSet();
-        Set<FileObject> depRoots = new HashSet();
-        srcRoots.addAll(Arrays.asList(sourcePath.getRoots()));
-        depRoots.addAll(Arrays.asList(classPath.getRoots()));
-        depRoots.addAll(Arrays.asList(bootPath.getRoots()));
-
-        getSrcRoots().retainAll(srcRoots);
-        getDepRoots().retainAll(depRoots);
-
-        preferSources(getDepRoots());
-        javaIndex = org.netbeans.api.java.source.ClasspathInfo.create(bootPath, classPath, sourcePath).getClassIndex();
+        applyClassPaths(sourcePath, classPath, bootPath);
     }
 
     final public static ClassIndex forClasspathInfo(ClasspathInfo cpi) {
@@ -212,6 +205,25 @@ final public class ClassIndex {
             cpi.getClassPath(ClasspathInfo.PathKind.BOOT),
             cpi.getClassPath(ClasspathInfo.PathKind.COMPILE),
             cpi.getClassPath(ClasspathInfo.PathKind.SOURCE));
+    }
+
+    void applyClassPaths(ClassPath sourcePath, ClassPath compilePath, ClassPath bootPath) {
+        try {
+            cpLock.writeLock().lock();
+            Set<FileObject> srcRoots = new HashSet();
+            Set<FileObject> depRoots = new HashSet();
+            srcRoots.addAll(Arrays.asList(sourcePath.getRoots()));
+            depRoots.addAll(Arrays.asList(compilePath.getRoots()));
+            depRoots.addAll(Arrays.asList(bootPath.getRoots()));
+
+            getSrcRoots().retainAll(srcRoots);
+            getDepRoots().retainAll(depRoots);
+
+            preferSources(getDepRoots());
+            javaIndex = org.netbeans.api.java.source.ClasspathInfo.create(bootPath, compilePath, sourcePath).getClassIndex();
+        } finally {
+            cpLock.writeLock().unlock();
+        }
     }
 
     /**
@@ -231,65 +243,70 @@ final public class ClassIndex {
     public Set<ElementHandle<TypeElement>> getDeclaredTypes(final String name, NameKind kind, Set<SearchScope> scope) {
         assert name != null;
         assert kind != null;
-        final Set<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
-
-        // get the partial result from java support:
-        Set<?> javaEl = javaIndex.getDeclaredTypes(name, toJavaNameKind(kind), toJavaScope(scope));
-        for (Object o : javaEl) {
-            @SuppressWarnings("unchecked")
-            ElementHandle<TypeElement> elem = ElementHandle.fromJava(
-                    (org.netbeans.api.java.source.ElementHandle<TypeElement>) o);
-            result.add(elem);
-        }
-
-        String searchValue = name;
-        QuerySupport.Kind queryKind;
-        JavaFXIndexer.IndexKey indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_SIMPLE;
-
-        switch (kind) {
-            case CAMEL_CASE:
-                queryKind = QuerySupport.Kind.CAMEL_CASE;
-                break;
-            case CAMEL_CASE_INSENSITIVE:
-                queryKind = QuerySupport.Kind.CASE_INSENSITIVE_CAMEL_CASE;
-                break;
-            case CASE_INSENSITIVE_PREFIX:
-                searchValue = searchValue.toLowerCase(); // case-insensitive index uses all-lower case
-                indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_INSENSITIVE;
-                queryKind = QuerySupport.Kind.CASE_INSENSITIVE_PREFIX;
-                break;
-            case CASE_INSENSITIVE_REGEXP:
-                queryKind = QuerySupport.Kind.CASE_INSENSITIVE_REGEXP;
-                break;
-            case PREFIX:
-                queryKind = QuerySupport.Kind.PREFIX;
-                break;
-            case REGEXP:
-                queryKind = QuerySupport.Kind.REGEXP;
-                indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
-                break;
-            case EXACT:
-                indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
-                queryKind = QuerySupport.Kind.EXACT;
-                break;
-            default:
-                queryKind = QuerySupport.Kind.EXACT;
-        }
-
-
         try {
-            QuerySupport query = getQuery(scope);
-            for (IndexResult ir : query.query(indexKey.toString(), searchValue, queryKind, JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
-                for (String fqn : matches(name, queryKind, false, ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString()))) {
-                    ElementHandle<TypeElement> handle = new ElementHandle<TypeElement>(ElementKind.CLASS, new String[]{fqn});
-                    result.add(handle);
-                }
+            cpLock.readLock().lock();
+            final Set<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
+
+            // get the partial result from java support:
+            Set<?> javaEl = javaIndex.getDeclaredTypes(name, toJavaNameKind(kind), toJavaScope(scope));
+            for (Object o : javaEl) {
+                @SuppressWarnings("unchecked")
+                ElementHandle<TypeElement> elem = ElementHandle.fromJava(
+                        (org.netbeans.api.java.source.ElementHandle<TypeElement>) o);
+                result.add(elem);
             }
-        } catch (IOException e) {
-            Exceptions.printStackTrace(e);
+
+            String searchValue = name;
+            QuerySupport.Kind queryKind;
+            JavaFXIndexer.IndexKey indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_SIMPLE;
+
+            switch (kind) {
+                case CAMEL_CASE:
+                    queryKind = QuerySupport.Kind.CAMEL_CASE;
+                    break;
+                case CAMEL_CASE_INSENSITIVE:
+                    queryKind = QuerySupport.Kind.CASE_INSENSITIVE_CAMEL_CASE;
+                    break;
+                case CASE_INSENSITIVE_PREFIX:
+                    searchValue = searchValue.toLowerCase(); // case-insensitive index uses all-lower case
+                    indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_INSENSITIVE;
+                    queryKind = QuerySupport.Kind.CASE_INSENSITIVE_PREFIX;
+                    break;
+                case CASE_INSENSITIVE_REGEXP:
+                    queryKind = QuerySupport.Kind.CASE_INSENSITIVE_REGEXP;
+                    break;
+                case PREFIX:
+                    queryKind = QuerySupport.Kind.PREFIX;
+                    break;
+                case REGEXP:
+                    queryKind = QuerySupport.Kind.REGEXP;
+                    indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
+                    break;
+                case EXACT:
+                    indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
+                    queryKind = QuerySupport.Kind.EXACT;
+                    break;
+                default:
+                    queryKind = QuerySupport.Kind.EXACT;
+            }
+
+
+            try {
+                QuerySupport query = getQuery(scope);
+                for (IndexResult ir : query.query(indexKey.toString(), searchValue, queryKind, JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
+                    for (String fqn : matches(name, queryKind, false, ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString()))) {
+                        ElementHandle<TypeElement> handle = new ElementHandle<TypeElement>(ElementKind.CLASS, new String[]{fqn});
+                        result.add(handle);
+                    }
+                }
+            } catch (IOException e) {
+                Exceptions.printStackTrace(e);
+            }
+            LOG.log(Level.FINER, "ClassIndex.getDeclaredTypes returned {0} elements\n", result.size());
+            return result;
+        } finally {
+            cpLock.readLock().unlock();
         }
-        LOG.log(Level.FINER, "ClassIndex.getDeclaredTypes returned {0} elements\n", result.size());
-        return result;
     }
 
     /**
@@ -304,30 +321,35 @@ final public class ClassIndex {
      */
     public Set<String> getPackageNames(final String prefix, boolean directOnly, final Set<SearchScope> scope) {
         assert prefix != null;
-        final Set<String> result = new HashSet<String>();
-
-        // get the partial result from java support:
-        result.addAll(javaIndex.getPackageNames(prefix, directOnly, toJavaScope(scope)));
-
         try {
-            QuerySupport query = getQuery(scope);
-            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), prefix, QuerySupport.Kind.PREFIX, JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
-                String pkgName = ir.getValue(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString()); // only one package name per indexed document
-                if (pkgName.startsWith(prefix)) {
-                    if (directOnly) {
-                        if (pkgName.indexOf(".", prefix.length()) == -1) {
+            cpLock.readLock().lock();
+            final Set<String> result = new HashSet<String>();
+
+            // get the partial result from java support:
+            result.addAll(javaIndex.getPackageNames(prefix, directOnly, toJavaScope(scope)));
+
+            try {
+                QuerySupport query = getQuery(scope);
+                for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), prefix, QuerySupport.Kind.PREFIX, JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
+                    String pkgName = ir.getValue(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString()); // only one package name per indexed document
+                    if (pkgName.startsWith(prefix)) {
+                        if (directOnly) {
+                            if (pkgName.indexOf(".", prefix.length()) == -1) {
+                                result.add(pkgName);
+                            }
+                        } else {
                             result.add(pkgName);
                         }
-                    } else {
-                        result.add(pkgName);
                     }
                 }
+            } catch (IOException e) {
+                Exceptions.printStackTrace(e);
             }
-        } catch (IOException e) {
-            Exceptions.printStackTrace(e);
-        }
 
-        return result;
+            return result;
+        } finally {
+            cpLock.readLock().unlock();
+        }
     }
 
     /**
@@ -344,76 +366,81 @@ final public class ClassIndex {
         assert handle.getSignatures()[0] != null;
         assert searchKind != null;
 
-        if (!handle.getKind().isClass()  && !handle.getKind().isInterface()) {
-            return Collections.EMPTY_SET;
-        }
-
-        final Set<ElementHandle> result = new HashSet<ElementHandle>();
-        for(org.netbeans.api.java.source.ElementHandle<TypeElement> eh : javaIndex.getElements(handle.toJava(), toJavaSearchKind(searchKind), toJavaScope(scope))) {
-            result.add(ElementHandle.fromJava(eh));
-        }
-
-        final String typeRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
-        final String invocationRegex = ".+?#.+?#" + escapePattern(handle.getQualifiedName())  +"#.+";
-
         try {
-            QuerySupport query = getUsageQuery(scope);
-            for (SearchKind sk : searchKind) {
+            cpLock.readLock().lock();
+            if (!handle.getKind().isClass()  && !handle.getKind().isInterface()) {
+                return Collections.EMPTY_SET;
+            }
 
-                switch (sk) {
-                    case TYPE_REFERENCES: {
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_DEF.toString()})) {
-                            for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString())) {
-                                if (value.contains(handle.getQualifiedName())) {
-                                    result.add(IndexingUtilities.getLocationHandle(value));
+            final Set<ElementHandle> result = new HashSet<ElementHandle>();
+            for(org.netbeans.api.java.source.ElementHandle<TypeElement> eh : javaIndex.getElements(handle.toJava(), toJavaSearchKind(searchKind), toJavaScope(scope))) {
+                result.add(ElementHandle.fromJava(eh));
+            }
+
+            final String typeRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
+            final String invocationRegex = ".+?#.+?#" + escapePattern(handle.getQualifiedName())  +"#.+";
+
+            try {
+                QuerySupport query = getUsageQuery(scope);
+                for (SearchKind sk : searchKind) {
+
+                    switch (sk) {
+                        case TYPE_REFERENCES: {
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_DEF.toString()})) {
+                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString())) {
+                                    if (value.contains(handle.getQualifiedName())) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
+                                }
+                            }
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
+                                    if (value.contains(handle.getQualifiedName())) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
+                                }
+                            }
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
+                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FIELD_DEF.toString())) {
+                                    if (value.contains(handle.getQualifiedName())) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        case METHOD_REFERENCES: {
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
+                                    if (Pattern.matches(invocationRegex, value)) {
+                                        result.add(IndexingUtilities.getLocationHandle(value));
+                                    }
                                 }
                             }
                         }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
-                            for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
-                                if (value.contains(handle.getQualifiedName())) {
-                                    result.add(IndexingUtilities.getLocationHandle(value));
-                                }
+                        case IMPLEMENTORS: {
+                            String indexingVal = IndexingUtilities.getIndexValue(handle);
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                                result.addAll(JavaFXSourceUtils.getClasses(ir.getFile(), handle));
                             }
                         }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
-                            for (String value : ir.getValues(JavaFXIndexer.IndexKey.FIELD_DEF.toString())) {
-                                if (value.contains(handle.getQualifiedName())) {
+                        case PACKAGES: {
+                            String indexingVal = IndexingUtilities.getIndexValue(handle);
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
+                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
                                     result.add(IndexingUtilities.getLocationHandle(value));
                                 }
-                            }
-                        }
-                        break;
-                    }
-                    case METHOD_REFERENCES: {
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
-                            for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
-                                if (Pattern.matches(invocationRegex, value)) {
-                                    result.add(IndexingUtilities.getLocationHandle(value));
-                                }
-                            }
-                        }
-                    }
-                    case IMPLEMENTORS: {
-                        String indexingVal = IndexingUtilities.getIndexValue(handle);
-                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
-                            result.addAll(JavaFXSourceUtils.getClasses(ir.getFile(), handle));
-                        }
-                    }
-                    case PACKAGES: {
-                        String indexingVal = IndexingUtilities.getIndexValue(handle);
-                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
-                            for (String value : ir.getValues(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
-                                result.add(IndexingUtilities.getLocationHandle(value));
                             }
                         }
                     }
                 }
+            } catch (IOException e) {
             }
-        } catch (IOException e) {
-        }
 
-        return result;
+            return result;
+        } finally {
+            cpLock.readLock().unlock();
+        }
     }
 
     /**
@@ -430,72 +457,73 @@ final public class ClassIndex {
         assert handle.getSignatures()[0] != null;
         assert searchKind != null;
 
-//        if (handle.getKind() != ElementKind.CLASS) {
-//            return Collections.EMPTY_SET;
-//        }
-
-        final Set<FileObject> result = new HashSet<FileObject>();
-        for(FileObject fo : javaIndex.getResources(handle.toJava(), toJavaSearchKind(searchKind), toJavaScope(scope))) {
-            result.add(fo);
-        }
-
-        final String typeDef = (handle.getKind().isClass() || handle.getKind().isInterface()) ? handle.getQualifiedName() : "";
-
-//        final String typeRefRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
-        final String indexingVal = IndexingUtilities.getIndexValue(handle);
-
         try {
-            QuerySupport query = getUsageQuery(scope);
-            for (SearchKind sk : searchKind) {
+            cpLock.readLock().lock();
+            final Set<FileObject> result = new HashSet<FileObject>();
+            for(FileObject fo : javaIndex.getResources(handle.toJava(), toJavaSearchKind(searchKind), toJavaScope(scope))) {
+                result.add(fo);
+            }
 
-                switch (sk) {
-                    case TYPE_REFERENCES: {
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), typeDef, Kind.EXACT)) {
-                            result.add(ir.getFile());
+            final String typeDef = (handle.getKind().isClass() || handle.getKind().isInterface()) ? handle.getQualifiedName() : "";
+
+    //        final String typeRefRegexp = ".*?" + escapePattern(handle.getQualifiedName()) + ";" + ".*?"; // NOI18N
+            final String indexingVal = IndexingUtilities.getIndexValue(handle);
+
+            try {
+                QuerySupport query = getUsageQuery(scope);
+                for (SearchKind sk : searchKind) {
+
+                    switch (sk) {
+                        case TYPE_REFERENCES: {
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), typeDef, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case IMPLEMENTORS: {
-                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
-                            result.add(ir.getFile());
+                        case IMPLEMENTORS: {
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case METHOD_REFERENCES: {
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
-                            result.add(ir.getFile());
+                        case METHOD_REFERENCES: {
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), indexingVal, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            break;
                         }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), indexingVal, Kind.EXACT)) {
-                            result.add(ir.getFile());
+                        case FIELD_REFERENCES: {
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), indexingVal, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_REF.toString(), indexingVal, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            break;
                         }
-                        break;
-                    }
-                    case FIELD_REFERENCES: {
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), indexingVal, Kind.EXACT)) {
-                            result.add(ir.getFile());
+                        case TYPE_DEFS: {
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.CLASS_FQN.toString(), typeDef, Kind.EXACT)) {
+                                result.add(ir.getFile());
+                            }
+                            break;
                         }
-                        for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_REF.toString(), indexingVal, Kind.EXACT)) {
-                            result.add(ir.getFile());
-                        }
-                        break;
-                    }
-                    case TYPE_DEFS: {
-                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.CLASS_FQN.toString(), typeDef, Kind.EXACT)) {
-                            result.add(ir.getFile());
-                        }
-                        break;
-                    }
-                    case PACKAGES: {
-                        for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
-                            result.add(ir.getFile());
+                        case PACKAGES: {
+                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
+                                result.add(ir.getFile());
+                            }
                         }
                     }
                 }
+            } catch (IOException e) {
             }
-        } catch (IOException e) {
-        }
 
-        return result;
+            return result;
+        } finally {
+            cpLock.readLock().unlock();
+        }
     }
 
     public Set<FileObject> getDependencyClosure(final ElementHandle<? extends Element> handle) {
@@ -503,6 +531,7 @@ final public class ClassIndex {
         final Deque<ElementHandle<? extends Element>> toProcess = new ArrayDeque<ElementHandle<? extends Element>>();
 
         try {
+            cpLock.readLock().lock();
             toProcess.push(handle);
 
             while (!toProcess.isEmpty()) {
@@ -521,6 +550,8 @@ final public class ClassIndex {
             }
         } catch (IOException iOException) {
             return Collections.EMPTY_SET;
+        } finally {
+            cpLock.readLock().unlock();
         }
         return closure;
     }
@@ -530,6 +561,7 @@ final public class ClassIndex {
         final Deque<ElementHandle<? extends Element>> toProcess = new ArrayDeque<ElementHandle<? extends Element>>();
 
         try {
+            cpLock.readLock().lock();
             toProcess.push(handle);
 
             while (!toProcess.isEmpty()) {
@@ -547,6 +579,8 @@ final public class ClassIndex {
             }
         } catch (IOException iOException) {
             return Collections.EMPTY_SET;
+        } finally {
+            cpLock.readLock().unlock();
         }
         return closure;
     }
