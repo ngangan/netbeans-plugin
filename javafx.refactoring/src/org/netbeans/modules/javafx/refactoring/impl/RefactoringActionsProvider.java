@@ -112,15 +112,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canFindUsages(Lookup lkp) {
-        if (SourceUtils.isScanInProgress()) {
-            return false;
-        }
-        
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
         if (dobj == null) return false;
-        if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
+        if (!SourceUtils.isPlatformOk(dobj.getPrimaryFile())) return false;
 
         return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
@@ -196,15 +192,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canRename(Lookup lkp) {
-        if (SourceUtils.isScanInProgress()) {
-            return false;
-        }
-        
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
         if (dobj == null) return false;
-        if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
+        if (!SourceUtils.isPlatformOk(dobj.getPrimaryFile())) return false;
         
         return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
@@ -335,10 +327,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canMove(Lookup lkp) {
-        if (SourceUtils.isScanInProgress()) {
-            return false;
-        }
-        
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -361,7 +349,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
                     return false;
                 }
-                if (!SourceUtils.isAnalyzable(dob.getPrimaryFile())) {
+                if (!SourceUtils.isPlatformOk(dob.getPrimaryFile())) {
                     return false;
                 }
                 if (dob instanceof DataFolder) {
@@ -398,7 +386,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
                     return false;
                 }
-                if (!SourceUtils.isAnalyzable(dob.getPrimaryFile())) {
+                if (!SourceUtils.isPlatformOk(dob.getPrimaryFile())) {
                     return false;
                 }
                 if (SourceUtils.isJavaFXFile(dob.getPrimaryFile())) {
@@ -479,10 +467,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canCopy(Lookup lkp) {
-        if (SourceUtils.isScanInProgress()) {
-            return false;
-        }
-
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         if (nodes.size() < 1) {
             return false;
@@ -551,9 +535,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canDelete(Lookup lookup) {
-        if (SourceUtils.isScanInProgress()) {
-            return false;
-        }
         Collection<? extends Node> nodes = new HashSet<Node>(lookup.lookupAll(Node.class));
         //We live with a 2 pass validation of the selected nodes for now since
         //the code will become unreadable if we attempt to implement all checks

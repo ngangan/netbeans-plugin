@@ -648,6 +648,8 @@ public class JavaFXIndexer extends CustomIndexer {
 
     @Override
     protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
+        if (!JavaFXSourceUtils.isPlatformOk(cntxt.getRoot())) return; // don't try to index files in a project with broken javafx platform
+        
         final Map<FileObject, Indexable> indexables = new HashMap<FileObject, Indexable>();
 
         cancelled.set(false);
