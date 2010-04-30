@@ -3674,8 +3674,14 @@ public class JFXReformatTask implements ReformatTask {
                 String text = null;
                 while (tokens.movePrevious()) {
                     Token<JFXTokenId> token = tokens.token();
+                    // JavaFX diffenerce
                     if (token.id() == JFXTokenId.WS) {
-                        text = token.text().toString();
+                        StringBuilder t1 = new StringBuilder();
+                        do {
+                            t1.append(tokens.token().text().toString());
+                        } while (tokens.movePrevious() && tokens.token().id() == JFXTokenId.WS);
+//                        text = token.text().toString();
+                        text = t1.toString();
                         int idx = text.lastIndexOf(NEWLINE);
                         if (idx >= 0) {
                             text = text.substring(idx + 1);
