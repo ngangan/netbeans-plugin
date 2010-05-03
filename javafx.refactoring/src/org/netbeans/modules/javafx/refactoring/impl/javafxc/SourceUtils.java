@@ -85,6 +85,7 @@ import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.java.source.ClasspathInfo.PathKind;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.platform.JavaFXPlatform;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.ClasspathInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
@@ -129,8 +130,6 @@ import org.openide.util.Utilities;
 final public class SourceUtils {
     final private static Logger LOG = Logger.getLogger(SourceUtils.class.getName());
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
-    
-    public static final String JAVAFX_MIME_TYPE = "text/x-fx"; // NOI18N
 
     public static String htmlize(String input) {
         String temp = input.replace("<", "&lt;"); // NOI18N
@@ -145,7 +144,7 @@ final public class SourceUtils {
     public static String getHtml(String text, int hilite) {
         StringBuffer buf = new StringBuffer();
         TokenHierarchy tokenH = TokenHierarchy.create(text, JFXTokenId.language());
-        Lookup lookup = MimeLookup.getLookup(MimePath.get(JAVAFX_MIME_TYPE));
+        Lookup lookup = MimeLookup.getLookup(MimePath.get(JavaFXSourceUtils.JAVAFX_MIME_TYPE));
         FontColorSettings settings = lookup.lookup(FontColorSettings.class);
         TokenSequence tok = tokenH.tokenSequence();
         while (tok.moveNext()) {
@@ -201,27 +200,11 @@ final public class SourceUtils {
     }
 
     public static boolean isJavaFXFile(FileObject f) {
-        return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
+        return JavaFXSourceUtils.isJavaFXFile(f);
     }
 
-    public static boolean isAnalyzable(FileObject f) {
-        if (!isJavaFXFile(f)) return false;
-
-        final boolean[] brokenPlatform = new boolean[1];
-        JavaFXSource jfxs = JavaFXSource.forFileObject(f);
-        try {
-            jfxs.runUserActionTask(new Task<CompilationController>() {
-
-                public void run(CompilationController cc) throws Exception {
-                    if (cc.toPhase(JavaFXSource.Phase.ANALYZED).lessThan(JavaFXSource.Phase.ANALYZED)) {
-                        brokenPlatform[0] = true;
-                    }
-                }
-            }, false);
-        } catch (IOException e) {
-            brokenPlatform[0] = true;
-        }
-        return !brokenPlatform[0];
+    public static boolean isPlatformOk(FileObject f) {
+        return JavaFXSourceUtils.isPlatformOk(f);
     }
 
     public static boolean isValidPackageName(String name) {
@@ -568,7 +551,7 @@ final public class SourceUtils {
      * Waits for the end of the initial scan, this helper method 
      * is designed for tests which require to wait for end of initial scan.
      * @throws InterruptedException is thrown when the waiting thread is interrupted.
-     * @deprecated use {@link JavaSource#runWhenScanFinished}
+     * @deprecated use {@link JavaFXSource#runWhenScanFinished}
      */
     public static void waitScanFinished () throws InterruptedException {
         try {
@@ -584,7 +567,7 @@ final public class SourceUtils {
                     return cpinfo;
                 }
             }
-            Future<Void> f = ParserManager.parseWhenScanFinished(JAVAFX_MIME_TYPE, new T());
+            Future<Void> f = ParserManager.parseWhenScanFinished(JavaFXSourceUtils.JAVAFX_MIME_TYPE, new T());
             if (!f.isDone()) {
                 f.get();
             }
@@ -734,6 +717,6 @@ final public class SourceUtils {
     }
 
     public static boolean isRefactorable(FileObject file) {
-        return isJavaFXFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file) && isAnalyzable(file);
+        return isJavaFXFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file) && isPlatformOk(file);
     }
 }
