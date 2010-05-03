@@ -444,7 +444,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         if (firstVar != null) {
                             position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), firstVar);
                             String space = HintsUtils.calculateSpace(position[0], document);
-                            code.append("\nvar ").append(varName).append(";\n").append(space); //NOI18N
+                            code.append("\n"+space).append("var ").append(varName).append(";\n").append(space); //NOI18N
 
                             return null;
                         }
