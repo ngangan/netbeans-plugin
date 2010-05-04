@@ -157,7 +157,7 @@ public class JavaFXSourceUtils {
      * @return Returns true if the containing project is using a valid and usable JavaFX SDK platform
      */
     public static boolean isPlatformOk(FileObject f) {
-        if (!isJavaFXFile(f)) return false;
+        if (!isJavaFXFile(f) && !f.isFolder()) return false; // a valid javafx file or a package folder
 
         ClasspathInfo cpi = ClasspathInfo.create(f);
         ClassPath cp = cpi.getClassPath(ClasspathInfo.PathKind.BOOT);
