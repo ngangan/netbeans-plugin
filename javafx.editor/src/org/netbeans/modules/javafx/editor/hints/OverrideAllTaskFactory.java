@@ -55,7 +55,6 @@ import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.*;
@@ -83,6 +82,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
+    private Collection<Fix> fixes = new HashSet<Fix>();
     //private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     //private final static Logger LOG = Logger.getAnonymousLogger();
 
@@ -100,15 +100,19 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                fixes.clear();
                 cancel.set(false);
-                if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
-                    return;
+                JavaFXDocument fxdocument = null;
+                if (compilationInfo.getDocument() instanceof JavaFXDocument) {
+                    fxdocument = (JavaFXDocument) compilationInfo.getDocument();
                 }
-
-                JavaFXDocument document = (JavaFXDocument) compilationInfo.getDocument();
+                
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (!isValidError(diagnostic, compilationInfo) || cancel.get() || document.isPosGuarded((int) diagnostic.getPosition())) {
+                    if (fxdocument != null && fxdocument.isPosGuarded((int) diagnostic.getPosition())) {
+                        continue;
+                    }
+                    if (!isValidError(diagnostic, compilationInfo) || cancel.get()) {
                         continue;
                     }
                     int position = findPosition(compilationInfo, (int) diagnostic.getStartPosition(), (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition()));
@@ -124,7 +128,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         };
     }
 
-    public boolean isMixin(Diagnostic diagnostic, final CompilationInfo compilationInfo) {
+    private static boolean isMixin(Diagnostic diagnostic, final CompilationInfo compilationInfo) {
         final ClassSymbol classSymbol = getClassSymbol(diagnostic);
 
         final boolean[] active = new boolean[1];
@@ -145,7 +149,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return active[0];
     }
 
-    private boolean isValidError(Diagnostic diagnostic, CompilationInfo compilationInfo) {
+    private static boolean isValidError(Diagnostic diagnostic, CompilationInfo compilationInfo) {
         if (diagnostic.getCode().equals(ERROR_CODE1) || diagnostic.getCode().equals(ERROR_CODE2)) {
             for (Diagnostic d : compilationInfo.getDiagnostics()) {
                 if (d != diagnostic && d.getLineNumber() == diagnostic.getLineNumber()) {
@@ -157,7 +161,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return false;
     }
 
-    private int findPosition(CompilationInfo compilationInfo, int start, int lenght) {
+    private static int findPosition(CompilationInfo compilationInfo, int start, int lenght) {
         Document document = compilationInfo.getDocument();
         try {
             String text = document.getText(start, lenght);
@@ -197,7 +201,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return -1;
     }
 
-    private ClassSymbol getClassSymbol(Diagnostic diagnostic) {
+    private static ClassSymbol getClassSymbol(Diagnostic diagnostic) {
         JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
         ClassSymbol classSymbol = null;
         for (Object arg : jcDiagnostic.getArgs()) {
@@ -381,12 +385,16 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         if (diagnostic.getStartPosition() < 0) {
             return null;
         }
+        fixes.add(fix);
         ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
         return ed;
     }
 
-    private String removeBetween(String symbols, String name) {
+    Collection<Fix> getFixes() {
+        return Collections.unmodifiableCollection(fixes);
+    }
+    private static String removeBetween(String symbols, String name) {
         int firstIndex = name.indexOf(symbols.substring(0, 1));
         int lastIndex = name.indexOf(symbols.substring(1, 2));
         if (firstIndex < 0 || lastIndex < 0) {
@@ -397,7 +405,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return name;
     }
 
-    private Type erasureType(Type type, JavafxTypes types) {
+    private static Type erasureType(Type type, JavafxTypes types) {
         if (types.isSequence(type)) {
             return type;
         }
@@ -405,7 +413,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return types.erasure(type);
     }
 
-    private String getTypeString(Type type, JavafxTypes types) {
+    private static String getTypeString(Type type, JavafxTypes types) {
         type = erasureType(type, types);
         String typeString = types.toJavaFXString(type);
         if (types.isArray(type)) {
@@ -422,7 +430,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
         return typeString;
     }
 
-    private Collection<? extends Element> getAllMembers(CompilationInfo compilationInfo, Element element) {
+    private static Collection<? extends Element> getAllMembers(CompilationInfo compilationInfo, Element element) {
 //        JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(position);
 //        Element element = compilationInfo.getTrees().getElement(path);
 //        ClassSymbol classSymbol = null;
