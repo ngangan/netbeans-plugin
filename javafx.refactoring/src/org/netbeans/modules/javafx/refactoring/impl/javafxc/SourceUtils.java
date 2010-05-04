@@ -44,12 +44,15 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -110,7 +113,6 @@ import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
-import org.netbeans.modules.parsing.impl.indexing.friendapi.IndexingController;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -130,6 +132,21 @@ import org.openide.util.Utilities;
 final public class SourceUtils {
     final private static Logger LOG = Logger.getLogger(SourceUtils.class.getName());
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
+
+    static private Object indexingController;
+    static private Method dependentRoots;
+    static {
+        try {
+            Class icClazz = Class.forName("org.netbeans.modules.parsing.impl.indexing.friendapi.IndexingController"); // NOI18N
+            Method instanceCrtr = icClazz.getMethod("getDefault");
+            dependentRoots = icClazz.getMethod("getRootDependencies");
+            indexingController = instanceCrtr.invoke(null);
+        } catch (Exception e) {
+            indexingController = null;
+            dependentRoots = null;
+        }
+    }
+
 
     public static String htmlize(String input) {
         String temp = input.replace("<", "&lt;"); // NOI18N
@@ -494,8 +511,16 @@ final public class SourceUtils {
      * @since 0.10
      */
     public static Set<URL> getDependentRoots (final URL root) {
-        final Map<URL, List<URL>> deps = IndexingController.getDefault().getRootDependencies();
-        return getDependentRootsImpl (root, deps);
+        if (indexingController == null) return Collections.EMPTY_SET;
+
+        try {
+            final Map<URL, List<URL>> deps = (Map<URL, List<URL>>) dependentRoots.invoke(indexingController);
+            return getDependentRootsImpl(root, deps);
+        } catch (IllegalAccessException illegalAccessException) {
+        } catch (IllegalArgumentException illegalArgumentException) {
+        } catch (InvocationTargetException invocationTargetException) {
+        }
+        return Collections.EMPTY_SET;
     }
 
 
