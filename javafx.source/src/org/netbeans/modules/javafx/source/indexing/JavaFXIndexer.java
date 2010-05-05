@@ -101,6 +101,7 @@ import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
 import org.netbeans.modules.parsing.spi.indexing.Context;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
@@ -601,6 +602,13 @@ public class JavaFXIndexer extends CustomIndexer {
     // <editor-fold defaultstate="collapsed" desc="Indexer Factory">
     @PathRecognizerRegistration(sourcePathIds={ClasspathInfo.FX_SOURCE}, mimeTypes={"text/x-fx"})
     public static class Factory extends CustomIndexerFactory {
+        private static AtomicBoolean javafxTaskFactoriesInitialized = new AtomicBoolean(false);
+
+        public Factory() {
+            if (!javafxTaskFactoriesInitialized.getAndSet(true)) {
+                ApiSourcePackageAccessor.get().registerSourceTaskFactoryManager();
+            }
+        }
 
         @Override
         public CustomIndexer createIndexer() {
