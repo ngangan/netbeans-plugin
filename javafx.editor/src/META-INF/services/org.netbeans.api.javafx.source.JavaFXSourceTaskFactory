@@ -12,7 +12,6 @@ org.netbeans.modules.javafx.editor.hints.MarkOverriddenTaskFactory
 org.netbeans.modules.javafx.editor.hints.AddImportTaskFactory
 org.netbeans.modules.javafx.editor.hints.CreateElementTaskFactory
 org.netbeans.modules.javafx.editor.hints.ExtImportWarningTaskFactory
-#org.netbeans.modules.javafx.editor.hints.TestTaskFactory
 
 
 #org.netbeans.modules.javafx.preview.JavaFXSourcePreviewTaskFactory

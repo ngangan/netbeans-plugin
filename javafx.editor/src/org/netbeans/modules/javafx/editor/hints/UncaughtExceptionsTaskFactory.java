@@ -46,7 +46,6 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.spi.editor.hints.HintsController;
 import com.sun.javafx.api.tree.SourcePositions;
@@ -56,8 +55,8 @@ import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import javax.swing.text.Document;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -70,9 +69,10 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
 
     private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
+    private final Collection<Fix> fixes = new HashSet<Fix>();
 
     public UncaughtExceptionsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -88,31 +88,33 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
 
             @Override
             public void run(CompilationInfo compilationInfo) throws Exception {
-                if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
-                    return;
-                }
-                final JavaFXDocument document = (JavaFXDocument) compilationInfo.getDocument();
+                fixes.clear();
+                final Document document = compilationInfo.getDocument();
                 if (!compilationInfo.getDiagnostics().isEmpty()) {
                     if (document != null) {
                         HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     }
                     return;
                 }
-                final UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
-                final HintsModel model = new HintsModel(compilationInfo);
+                UncaughtExceptionsVisitor tcw = new UncaughtExceptionsVisitor(compilationInfo);
+                HintsModel model = new HintsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
                 Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
                 for (Hint hint : model.getHints()) {
-                    if (!document.isPosGuarded(hint.getStartPosition())) {    
+                    if (!HintsUtils.isInGuardedBlocks(compilationInfo.getDocument(), hint.getStartPosition())) {
                         errors.add(getErrorDescription(file, hint, compilationInfo));
                     }
                 }
                 if (document != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors); 
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
                 }
             }
         };
+    }
+
+    Collection<Fix> getFixes() {
+        return fixes;
     }
 
     private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
@@ -125,6 +127,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
             }
         }
         Fix fix = new UncaughtExceptionsFix(compilationInfo.getDocument(), hint, compilationInfo);
+        fixes.add(fix);
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());
@@ -134,7 +137,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
         return ed;
     }
 
-    private class UncaughtExceptionsVisitorResolver extends JavaFXTreePathScanner<Void, HintsModel> {
+    private static class UncaughtExceptionsVisitorResolver extends JavaFXTreePathScanner<Void, HintsModel> {
 
         @Override
         public Void visitTry(TryTree node, HintsModel model) {
@@ -166,7 +169,7 @@ public class UncaughtExceptionsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                     }
                 }
             }
-            
+
             return super.visitTry(node, model);
         }
     }

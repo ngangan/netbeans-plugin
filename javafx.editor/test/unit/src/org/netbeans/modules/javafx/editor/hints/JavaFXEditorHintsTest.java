@@ -41,7 +41,6 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import java.io.File;
-import java.util.Collection;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.editor.TestUtilities;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
@@ -50,13 +49,13 @@ import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.SourceTestBase;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Language;
-import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.spi.editor.hints.Fix;
 import org.openide.LifecycleManager;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -67,13 +66,76 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
     public JavaFXEditorHintsTest(String testName) {
         super(testName);
     }
+
+    /**
+     * Test Implement all abstract methods - OverrideAllTaskFactory;
+     */
+    public void testImplementApp() {
+        String code = "import java.lang.Runnable; class Test extends Runnable {}";
+        String pattern = "\n    override public function run () : Void { \n        throw new UnsupportedOperationException('Not implemented yet');\n    }";
+        try {
+            doTest(new OverrideAllTaskFactory(), code, pattern);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    /**
+     * Test Generation try-catch - UncaughtExceptionsTaskFactory;
+     */
+    public void testTryCatchGeneration() {
+        String code = "class Test {function tryCatchTest(){this.wait();}}";
+        String pattern = "try {\n    this.wait();}\n} catch(ex : InterruptedException) {\n    ex.printStackTrace();\n}";
+        try {
+            doTest(new UncaughtExceptionsTaskFactory(), code, pattern);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
     
     /**
-     * Test Implement all abstract methods using OverrideAllTaskFactory();
+     * Test Add imports - AddImportTaskFactory;
      */
-    public void testImplementAllAbstract() throws Exception {
-        final String code = "import java.lang.Runnable; class Test extends Runnable {}";
-        final String pattern = "\n    override public function run () : Void { \n        throw new UnsupportedOperationException('Not implemented yet');\n    }";
+    public void testAddImports() {
+        String code = "class Test extends Action {}";
+        String pattern = "import javax.swing.Action;";
+        try {
+            doTest(new AddImportTaskFactory(), code, pattern);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    /**
+     * Test Add imports - ExtImportWarningTaskFactory;
+     */
+    public void testExtImportAlert() {
+        String code = "import javafx.ext.swing.SwingButton; class Test {}";
+        String pattern = ""; //NOT used in this case
+        try {
+            int i = doTest(new AddImportTaskFactory(), code, pattern);
+            assert i == 1;
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    //TODO Unfinished test
+    /**
+     * Test Generate var - CreateElementTaskFactory;
+     */
+    public void DisabledtestVar() {
+        String code = "class Test { function testIt() {testVar} }";
+        String pattern = ""; //NOT used in this case
+        try {
+            int i = doTest(new AddImportTaskFactory(), code, pattern);
+            assert i == 1;
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    protected int doTest(final JavaFXAbstractEditorHint hint, String code, String pattern) throws Exception {
         JavaFXSource fXSource = fXSource = getJavaFXSource(code);
         assertNotNull(fXSource);
         int i = 0;
@@ -81,26 +143,27 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         //TODO For some reason at the beginning compiler returns wrong number of diagnostics in controller so it's neccessary
         // to run Task for some time to get relayable diagnostics. Possible env is not ready yet. Just in case it's run it 100 times to make sure
         // env is ready.
-        while (i < 100) {
-            final int j = i;
+        final int[] fixesNumber = new int[1];
+        while (i < 50) {
             fXSource.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController controller) throws Exception {
-                    OverrideAllTaskFactory overrideAllTaskFactory = new OverrideAllTaskFactory();
-                    overrideAllTaskFactory.createTask(controller.getFileObject()).run(controller);
-                    Collection<Fix> fixes = overrideAllTaskFactory.getFixes();
+                    hint.createTask(controller.getFileObject()).run(controller);
                     //FIXME At the begining compiler returns wrong number of diganostics. In this case number of fixes is wrong
                     //assert fixes.size() == 1 : "Fixes: " + fixes.size() + " Diagnostics: " +  controller.getDiagnostics().size() + " Iteration: " + j;
-                    for (Fix fix : fixes) {
+                    fixesNumber[0] = hint.getFixes().size();
+                    for (Fix fix : hint.getFixes()) {
                         fix.implement();
+                        Document document = controller.getDocument();
+                        result[0] = document.getText(0, document.getLength());
+                        return;
                     }
-                    Document document = controller.getDocument();
-                    result[0] = document.getText(0, document.getLength());
                 }
             }, true);
             i++;
         }
         assert result[0].contains(pattern);
+        return fixesNumber.length;
     }
 
     protected JavaFXSource getJavaFXSource(String code) throws Exception {
@@ -122,5 +185,4 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
 
         return JavaFXSource.forDocument(document);
     }
-
 }

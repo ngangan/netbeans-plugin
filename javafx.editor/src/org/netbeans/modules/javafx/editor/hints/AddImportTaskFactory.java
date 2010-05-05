@@ -62,7 +62,6 @@ import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
 import org.netbeans.api.javafx.source.Imports;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -71,7 +70,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     private static final String HINTS_IDENT = "addimportjavafx"; //NOI18N
@@ -79,7 +78,8 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String MESSAGE = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
     private static final Comparator IMPORT_COMPERATOR = new ImportComperator();
-
+    
+    private final List<Fix> fixes = new ArrayList<Fix>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
@@ -99,6 +99,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
 
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                fixes.clear();
                 cancel.set(false);
                 if (compilationInfo.getDocument() == null) {
                     return;
@@ -189,7 +190,7 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                         options = classIndex.getDeclaredTypes(potentialClassSimpleName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
                         optionsCache.put(potentialClassSimpleName, options);
                     }
-                    List<Fix> fixList = new ArrayList<Fix>();
+                    //List<Fix> fixList = new ArrayList<Fix>();
                     
                     boolean exists = false;
                     for (ElementHandle<TypeElement> elementHandle : options) {
@@ -205,15 +206,15 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
                             }
                         }
                         if (!exists) {
-                            fixList.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
+                            fixes.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
                         }
                     }
 
-                    if (fixList.isEmpty()) {
+                    if (fixes.isEmpty()) {
                         continue;
                     }
-                    Collections.sort(fixList, IMPORT_COMPERATOR);
-                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixList, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
+                    Collections.sort(fixes, IMPORT_COMPERATOR);
+                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixes, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
@@ -249,7 +250,12 @@ public final class AddImportTaskFactory extends EditorAwareJavaFXSourceTaskFacto
         };
     }
 
-    private class FixImport implements Fix {
+    @Override
+    Collection<Fix> getFixes() {
+        return fixes;
+    }
+
+    private static class FixImport implements Fix {
 
         private String fqn;
         private Document document;
