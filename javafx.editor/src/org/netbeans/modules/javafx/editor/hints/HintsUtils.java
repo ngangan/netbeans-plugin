@@ -90,6 +90,7 @@ final class HintsUtils {
         return null;
     }
     //TODO Should be replaced with proper formating ASAP
+
     static String calculateSpace(int startPosition, Document document) {
         String text = null;
         try {
@@ -158,7 +159,19 @@ final class HintsUtils {
                 return (JTextComponent) d.getEditor();
             }
         }
-        
+
         return null;
+    }
+
+    static boolean isInGuardedBlocks(Document document, int position) {
+        JavaFXDocument fxdocument = null;
+        if (document instanceof JavaFXDocument) {
+            fxdocument = (JavaFXDocument) document;
+        }
+        if (fxdocument != null && fxdocument.isPosGuarded(position)) {
+            return true;
+        }
+        
+        return false;
     }
 }
