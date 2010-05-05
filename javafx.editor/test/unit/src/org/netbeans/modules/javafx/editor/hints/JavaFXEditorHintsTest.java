@@ -70,8 +70,8 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
     /**
      * Test Implement all abstract methods - OverrideAllTaskFactory;
      */
-    public void testImplementApp() {
-        String code = "import java.lang.Runnable; class Test extends Runnable {}";
+    public void testImplementAllAbstract() {
+        String code = "import java.lang.Runnable; class Test extends Runnable{}";
         String pattern = "\n    override public function run () : Void { \n        throw new UnsupportedOperationException('Not implemented yet');\n    }";
         try {
             doTest(new OverrideAllTaskFactory(), code, pattern);
@@ -92,13 +92,13 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
             Exceptions.printStackTrace(ex);
         }
     }
-    
+
     /**
      * Test Add imports - AddImportTaskFactory;
      */
-    public void testAddImports() {
-        String code = "class Test extends Action {}";
-        String pattern = "import javax.swing.Action;";
+    public void DISABLEDtestAddImports() {
+        String code = "class Test extends List{}";
+        String pattern = "import java.util.List;";
         try {
             doTest(new AddImportTaskFactory(), code, pattern);
         } catch (Exception ex) {
@@ -109,26 +109,37 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
     /**
      * Test Add imports - ExtImportWarningTaskFactory;
      */
-    public void testExtImportAlert() {
-        String code = "import javafx.ext.swing.SwingButton; class Test {}";
-        String pattern = ""; //NOT used in this case
-        try {
-            int i = doTest(new AddImportTaskFactory(), code, pattern);
-            assert i == 1;
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
+    public void DISABLEDtestExtImportAlert() {
+//        String code = "import javafx.ext.swing.SwingButton; class Test{}";
+//        String pattern = ""; //NOT used in this test
+//        try {
+//           // int i = doTest(new ExtImportWarningTaskFactory(), code, pattern);
+//            assert i == 1;
+//        } catch (Exception ex) {
+//            Exceptions.printStackTrace(ex);
+//        }
     }
 
     //TODO Unfinished test
     /**
      * Test Generate var - CreateElementTaskFactory;
      */
-    public void DisabledtestVar() {
-        String code = "class Test { function testIt() {testVar} }";
-        String pattern = ""; //NOT used in this case
+    public void DISABLEDtestVarGeneration() {
+        String code = "class Test {function testIt() {testVar}}";
+        String pattern = "\n    var testVar;";
         try {
-            int i = doTest(new AddImportTaskFactory(), code, pattern);
+            int i = doTest(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.VARIABLE);
+            assert i == 1;
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    public void DISABLEDtestLocalVarGeneration() {
+        String code = "class Test {function testIt() {testVar}}";
+        String pattern = "\nvar tes tV ar;";
+        try {
+            int i = doTest(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.LOCAL_VARIABLE);
             assert i == 1;
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
@@ -136,6 +147,10 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
     }
 
     protected int doTest(final JavaFXAbstractEditorHint hint, String code, String pattern) throws Exception {
+        return doTest(hint, code, pattern, null);
+    }
+
+    protected int doTest(final JavaFXAbstractEditorHint hint, String code, String pattern, final CreateElementTaskFactory.Kind kind) throws Exception {
         JavaFXSource fXSource = fXSource = getJavaFXSource(code);
         assertNotNull(fXSource);
         int i = 0;
@@ -153,7 +168,13 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
                     //assert fixes.size() == 1 : "Fixes: " + fixes.size() + " Diagnostics: " +  controller.getDiagnostics().size() + " Iteration: " + j;
                     fixesNumber[0] = hint.getFixes().size();
                     for (Fix fix : hint.getFixes()) {
-                        fix.implement();
+                        if (kind == null) {
+                            fix.implement();
+                        } else if (kind != null && fix.toString().contains(kind.name())) {
+                            fix.implement();
+                        } else {
+                            continue;
+                        }
                         Document document = controller.getDocument();
                         result[0] = document.getText(0, document.getLength());
                         return;
@@ -162,6 +183,7 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
             }, true);
             i++;
         }
+        assertNotNull(result[0]);
         assert result[0].contains(pattern);
         return fixesNumber.length;
     }
@@ -182,7 +204,6 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         document.putProperty(Language.class, JFXTokenId.language());
         document.putProperty("mimeType", "text/x-fx");
         LifecycleManager.getDefault().saveAll();
-
         return JavaFXSource.forDocument(document);
     }
 }

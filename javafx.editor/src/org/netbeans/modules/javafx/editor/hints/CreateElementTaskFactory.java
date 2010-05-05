@@ -101,7 +101,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
-    private enum Kind {
+    enum Kind {
 
         LOCAL_CLASS,
         CLASS,

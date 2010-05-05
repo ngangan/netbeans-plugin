@@ -109,7 +109,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                     return;
                 }
                 Collection<Diagnostic> diagnostics = getValidDiagnostics(compilationInfo.getDiagnostics());
-
                 if (diagnostics.isEmpty()) {
                     HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, Collections.EMPTY_LIST);
                     return;
@@ -188,7 +187,9 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                     Collection<ElementHandle<TypeElement>> options = optionsCache.get(potentialClassSimpleName);
                     if (options == null) {
                         options = classIndex.getDeclaredTypes(potentialClassSimpleName, ClassIndex.NameKind.SIMPLE_NAME, SCOPE);
-                        optionsCache.put(potentialClassSimpleName, options);
+                        if (!options.isEmpty()) {
+                            optionsCache.put(potentialClassSimpleName, options);
+                        }
                     }
                     //List<Fix> fixList = new ArrayList<Fix>();
                     
