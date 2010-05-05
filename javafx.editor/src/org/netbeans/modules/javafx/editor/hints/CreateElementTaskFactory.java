@@ -122,9 +122,6 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 fixes.clear();
                 cancel.set(false);
-                if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
-                    return;
-                }
                 Document document = compilationInfo.getDocument();
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
@@ -305,7 +302,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             if (generatedCode[0] == null) {
                 return null;
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            Runnable runnable = new Runnable() {
 
                 public void run() {
                     try {
@@ -329,14 +326,19 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                         ex.printStackTrace();
                     }
                 }
-            });
+            };
+            if (SwingUtilities.isEventDispatchThread()) {
+                runnable.run();
+            } else {
+                SwingUtilities.invokeLater(runnable);
+            }
 
             return null;
         }
 
         @Override
         public String toString() {
-            return super.toString() +" " + kind;
+            return super.toString() +" " + kind +" ";
         }
 
         private static GeneratedCode createFunction(final CompilationInfo compilationInfo, final JCDiagnostic diagnostic) {
@@ -551,6 +553,11 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
 
         public int getPositon() {
             return positon;
+        }
+
+        @Override
+        public String toString() {
+            return code;
         }
     }
 }
