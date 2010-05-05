@@ -62,6 +62,7 @@ import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -658,7 +659,8 @@ public class JavaFXIndexer extends CustomIndexer {
         while(iterator.hasNext()) {
             try {
                 Indexable ix = iterator.next();
-                File f = new File(ix.getURL().toURI());
+                URI uri = ix.getURL().toURI();
+                File f = new File(uri.normalize());
                 FileObject fo = FileUtil.toFileObject(f);
                 indexables.put(fo, ix);
             } catch (URISyntaxException e) {
