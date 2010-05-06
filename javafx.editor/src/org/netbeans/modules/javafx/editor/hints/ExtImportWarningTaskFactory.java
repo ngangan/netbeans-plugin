@@ -48,7 +48,6 @@ import javax.swing.text.Position;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -57,10 +56,11 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class ExtImportWarningTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class ExtImportWarningTaskFactory extends JavaFXAbstractEditorHint {
 
     private static final String HINTS_IDENT = "extimportjavafx"; //NOI18N
     private static final String IMPORT_NAME_EXT = "javafx.ext."; //NOI18N
+    private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public ExtImportWarningTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -77,12 +77,12 @@ public final class ExtImportWarningTaskFactory extends EditorAwareJavaFXSourceTa
 
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
+                errorDescriptions.clear();
                 if (compilationInfo.getDocument() == null) {
                     return;
                 }
 
                 final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                final List<ErrorDescription> extWarnings = new ArrayList<ErrorDescription>();
                 new JavaFXTreePathScanner<Void, Void>() {
 
                     @Override
@@ -94,7 +94,7 @@ public final class ExtImportWarningTaskFactory extends EditorAwareJavaFXSourceTa
                                 final ImportPosition end = new ImportPosition((int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), node));
                                 String message = NbBundle.getMessage(ExtImportWarningTaskFactory.class, "TIP_IMPORT_WARNING", fqn); //NOI18N
                                 ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.WARNING, message, compilationInfo.getDocument(), start, end);
-                                extWarnings.add(er);
+                                errorDescriptions.add(er);
                             }
                         }
                         return super.visitImport(node, p);
@@ -114,8 +114,15 @@ public final class ExtImportWarningTaskFactory extends EditorAwareJavaFXSourceTa
                     }
                 }.scan(compilationInfo.getCompilationUnit(), null);
 
-                HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, extWarnings);
+                HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errorDescriptions);
             }
         };
     }
+
+    @Override
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.unmodifiableCollection(errorDescriptions);
+    }
+
+    
 }

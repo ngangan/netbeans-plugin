@@ -72,7 +72,7 @@ import org.openide.util.NbBundle;
 public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
 
     private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
-    private final Collection<Fix> fixes = new HashSet<Fix>();
+    private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public UncaughtExceptionsTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
@@ -88,7 +88,7 @@ public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
 
             @Override
             public void run(CompilationInfo compilationInfo) throws Exception {
-                fixes.clear();
+                errorDescriptions.clear();
                 final Document document = compilationInfo.getDocument();
                 if (!compilationInfo.getDiagnostics().isEmpty()) {
                     if (document != null) {
@@ -100,21 +100,16 @@ public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
                 HintsModel model = new HintsModel(compilationInfo);
                 tcw.scan(compilationInfo.getCompilationUnit(), model);
                 new UncaughtExceptionsVisitorResolver().scan(compilationInfo.getCompilationUnit(), model);
-                Collection<ErrorDescription> errors = new HashSet<ErrorDescription>();
                 for (Hint hint : model.getHints()) {
-                    if (!HintsUtils.isInGuardedBlocks(compilationInfo.getDocument(), hint.getStartPosition())) {
-                        errors.add(getErrorDescription(file, hint, compilationInfo));
+                    if (!HintsUtils.isInGuardedBlock(compilationInfo.getDocument(), hint.getStartPosition())) {
+                        errorDescriptions.add(getErrorDescription(file, hint, compilationInfo));
                     }
                 }
                 if (document != null) {
-                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
+                    HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errorDescriptions);
                 }
             }
         };
-    }
-
-    Collection<Fix> getFixes() {
-        return fixes;
     }
 
     private ErrorDescription getErrorDescription(FileObject file, Hint hint, CompilationInfo compilationInfo) {
@@ -127,7 +122,6 @@ public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
             }
         }
         Fix fix = new UncaughtExceptionsFix(compilationInfo.getDocument(), hint, compilationInfo);
-        fixes.add(fix);
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         int start = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), hint.getTree());
         int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getTree());
@@ -172,5 +166,10 @@ public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
 
             return super.visitTry(node, model);
         }
+    }
+
+    @Override
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.unmodifiableCollection(errorDescriptions);
     }
 }

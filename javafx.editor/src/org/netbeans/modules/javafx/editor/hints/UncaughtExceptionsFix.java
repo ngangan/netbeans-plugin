@@ -43,12 +43,9 @@ package org.netbeans.modules.javafx.editor.hints;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.mjavac.code.Type;
 import java.util.Iterator;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.Fix;
@@ -65,6 +62,8 @@ final class UncaughtExceptionsFix implements Fix {
     private Hint hint;
     private CompilationInfo compilationInfo;
     private static final String TAB = "    "; //NOI18N
+    //TODO Unique ex var name
+    private static final String exceptionName = "ex"; //NOI18N
 
     public UncaughtExceptionsFix(Document document, Hint hint, CompilationInfo compilationInfo) {
         assert document != null;
@@ -81,8 +80,6 @@ final class UncaughtExceptionsFix implements Fix {
 
     @Override
     public ChangeInfo implement() throws Exception {
-        //TODO Unique ex var name
-        String exceptionName = "ex"; //NOI18N
         SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         Iterator<Type> iterator = hint.getExceptions().iterator();
         final StringBuilder block = new StringBuilder();
@@ -94,7 +91,7 @@ final class UncaughtExceptionsFix implements Fix {
                     .append(space).append("}"); //NOI18N
 
             addCatch(iterator, block, exceptionName, space);
-            SwingUtilities.invokeLater(new Runnable() {
+            Runnable runnable = new Runnable() {
 
                 public void run() {
                     try {
@@ -103,17 +100,17 @@ final class UncaughtExceptionsFix implements Fix {
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    JTextComponent target = HintsUtils.getEditorComponent(document);
                     Iterator<Type> iterator = hint.getExceptions().iterator();
                     while (iterator.hasNext()) {
-                        Imports.addImport(target, iterator.next().toString());
+                        HintsUtils.addImport(document, iterator.next().toString());
                     }
                 }
-            });
+            };
+            HintsUtils.runInAWT(runnable);
         } else {
             final int end = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), hint.getCatchTree());
             addCatch(iterator, block, exceptionName, space);
-            SwingUtilities.invokeLater(new Runnable() {
+            Runnable runnable = new Runnable() {
 
                 public void run() {
                     try {
@@ -121,18 +118,15 @@ final class UncaughtExceptionsFix implements Fix {
                     } catch (BadLocationException ex) {
                         Exceptions.printStackTrace(ex);
                     }
-                    JTextComponent target = HintsUtils.getEditorComponent(document);
-                    if (target == null) {
-                        return;
-                    }
                     Iterator<Type> iterator = hint.getExceptions().iterator();
                     while (iterator.hasNext()) {
-                        Imports.addImport(target, iterator.next().toString());
+                        HintsUtils.addImport(document, iterator.next().toString());
                     }
                 }
-            });
+            };
+            HintsUtils.runInAWT(runnable);
         }
-        
+
         return null;
     }
 
