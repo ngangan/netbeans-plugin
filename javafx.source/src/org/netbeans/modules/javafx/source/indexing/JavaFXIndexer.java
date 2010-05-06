@@ -689,6 +689,7 @@ public class JavaFXIndexer extends CustomIndexer {
             ClasspathInfo cpInfo = ClasspathInfo.create(cntxt.getRoot());
             final ClassIndex ci = cpInfo.getClassIndex();
             JavaFXSource jfxs = JavaFXSource.create(cpInfo, indexables.keySet());
+            if (jfxs == null) return; // #185591: Can happen when indexing kicks in in the middle of deleting a project
             try {
                 jfxs.runUserActionTask(new CancellableTask<CompilationController>() {
                     private List<Diagnostic<? extends JavaFileObject>> getDiagnostics(CompilationController cc) {
