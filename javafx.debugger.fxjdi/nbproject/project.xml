@@ -11,8 +11,6 @@
                 <package>com.sun.javafx.jdi.connect</package>
                 <package>com.sun.javafx.jdi.event</package>
                 <package>com.sun.javafx.jdi.request</package>
-                <package>com.sun.javafx.tools.debug.expr</package>
-                <package>com.sun.javafx.tools.debug.tty</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/fxjdi.jar</runtime-relative-path>
