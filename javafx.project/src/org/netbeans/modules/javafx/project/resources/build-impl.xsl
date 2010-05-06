@@ -335,7 +335,7 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger">
-            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" connector="com.sun.javafx.jdi.connect.FXSocketAttachingConnector" transport="dt_socket">
+            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" connector="com.sun.javafx.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
@@ -351,7 +351,7 @@ is divided into following sections:
             </nbjpdastart>
         </target>
         <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger-stepinto">
-            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" stopclassname="${{main.class}}" connector="com.sun.javafx.jdi.connect.FXSocketAttachingConnector" transport="dt_socket">
+            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" stopclassname="${{main.class}}" connector="com.sun.javafx.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
