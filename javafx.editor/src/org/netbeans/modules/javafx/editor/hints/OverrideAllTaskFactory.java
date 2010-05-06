@@ -57,14 +57,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.*;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -80,8 +77,7 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
-    private final Collection<Fix> fixes = new HashSet<Fix>();
-    //private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
+    private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
     //private final static Logger LOG = Logger.getAnonymousLogger();
 
     public OverrideAllTaskFactory() {
@@ -90,7 +86,6 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
 
     @Override
     public CancellableTask<CompilationInfo> createTask(final FileObject file) {
-
         return new CancellableTask<CompilationInfo>() {
 
             public void cancel() {
@@ -98,12 +93,10 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                fixes.clear();
+                errorDescriptions.clear();
                 cancel.set(false);
-
-                final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (HintsUtils.isInGuardedBlocks(compilationInfo.getDocument(), (int) diagnostic.getPosition())
+                    if (HintsUtils.isInGuardedBlock(compilationInfo.getDocument(), (int) diagnostic.getPosition())
                             || !isValidError(diagnostic, compilationInfo)
                             || cancel.get()) {
                         continue;
@@ -119,6 +112,11 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
                 HintsController.setErrors(compilationInfo.getDocument(), HINT_IDENT, errorDescriptions);
             }
         };
+    }
+
+    @Override
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.unmodifiableCollection(errorDescriptions);
     }
 
     private static boolean isMixin(Diagnostic diagnostic, final CompilationInfo compilationInfo) {
@@ -263,47 +261,38 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
                 if (positon < 0) {
                     return null;
                 }
-                SwingUtilities.invokeLater(new Runnable() {
+                Runnable runnable = new Runnable() {
 
                     public void run() {
                         try {
                             document.insertString(positon, methods.toString(), null);
-                            final JTextComponent target = HintsUtils.getEditorComponent(document);
-                            if (target == null) {
-                                return;
-                            }
-                            SwingUtilities.invokeLater(new Runnable() {
-
-                                public void run() {
-                                    Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
-                                }
-                            });
-
+                            HintsUtils.addImport(document, HintsUtils.EXCEPTION_UOE);
                             for (MethodSymbol method : abstractMethods) {
-                                addImport(target, method.asType());
+                                addImport(method.asType());
                                 for (VarSymbol var : method.getParameters()) {
-                                    scanImport(target, var.asType());
+                                    scanImport(var.asType());
                                 }
                             }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
                     }
-                });
+                };
+                HintsUtils.runInAWT(runnable);
 
                 return null;
             }
 
-            private void scanImport(JTextComponent target, Type type) {
+            private void scanImport(Type type) {
                 if (type.getParameterTypes() != null && !type.getParameterTypes().isEmpty()) {
                     for (Type t : type.getParameterTypes()) {
-                        scanImport(target, t);
+                        scanImport(t);
                     }
                 }
-                addImport(target, type);
+                addImport(type);
             }
 
-            private void addImport(final JTextComponent target, Type type) {
+            private void addImport(Type type) {
                 if (type == null) {
                     return;
                 }
@@ -318,12 +307,13 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
                     }
                     final String processedImportName = importName;
                     if (importName.contains(".") && !importName.equals("java.lang.Object")) { //NOI18N
-                        SwingUtilities.invokeLater(new Runnable() {
+                        Runnable runnable = new Runnable() {
 
                             public void run() {
-                                Imports.addImport(target, processedImportName);
+                                HintsUtils.addImport(document, processedImportName);
                             }
-                        });
+                        };
+                        HintsUtils.runInAWT(runnable);
                     }
                 }
             }
@@ -378,14 +368,10 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
         if (diagnostic.getStartPosition() < 0) {
             return null;
         }
-        fixes.add(fix);
+        
         ErrorDescription ed = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, NbBundle.getMessage(OverrideAllTaskFactory.class, "TITLE_IMPLEMENT_ABSTRACT"), Collections.singletonList(fix), file, (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
         return ed;
-    }
-
-    Collection<Fix> getFixes() {
-        return Collections.unmodifiableCollection(fixes);
     }
 
     private static String removeBetween(String symbols, String name) {

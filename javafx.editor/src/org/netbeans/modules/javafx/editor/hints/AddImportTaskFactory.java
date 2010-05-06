@@ -53,7 +53,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.JavaFXSource;
@@ -61,7 +60,6 @@ import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.ClassIndex;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -78,7 +76,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String MESSAGE = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
     private static final Comparator IMPORT_COMPERATOR = new ImportComperator();
-    
     private final List<Fix> fixes = new ArrayList<Fix>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
@@ -86,10 +83,9 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
     }
 
-
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
-        
+
         return new CancellableTask<CompilationInfo>() {
 
             @Override
@@ -191,8 +187,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                             optionsCache.put(potentialClassSimpleName, options);
                         }
                     }
-                    //List<Fix> fixList = new ArrayList<Fix>();
-                    
                     boolean exists = false;
                     for (ElementHandle<TypeElement> elementHandle : options) {
                         potentialClassSimpleName = elementHandle.getQualifiedName();
@@ -220,8 +214,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
             }
-
-           
 
             private Collection<Diagnostic> getValidDiagnostics(Collection<Diagnostic> diagnostics) {
                 Collection<Diagnostic> validDiagnostics = new HashSet<Diagnostic>();
@@ -251,11 +243,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
         };
     }
 
-    @Override
-    Collection<Fix> getFixes() {
-        return fixes;
-    }
-
     private static class FixImport implements Fix {
 
         private String fqn;
@@ -275,18 +262,13 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
         }
 
         public ChangeInfo implement() throws Exception {
-            final JTextComponent target = HintsUtils.getEditorComponent(document);
-            if (target == null) {
-                return null;
-            }
-            document = null;
-            SwingUtilities.invokeLater(new Runnable() {
+            Runnable runnable = new Runnable() {
 
                 public void run() {
-                    Imports.addImport(target, fqn);
+                    HintsUtils.addImport(document, fqn);
                 }
-            });
-            
+            };
+            HintsUtils.runInAWT(runnable);
 
             return null;
         }

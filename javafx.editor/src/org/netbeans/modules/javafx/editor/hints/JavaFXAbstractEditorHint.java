@@ -41,12 +41,10 @@
 
 package org.netbeans.modules.javafx.editor.hints;
 
-import java.util.Collection;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import java.util.*;
+import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
-import org.netbeans.spi.editor.hints.Fix;
+import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -59,10 +57,14 @@ abstract class JavaFXAbstractEditorHint extends EditorAwareJavaFXSourceTaskFacto
         super(phase, priority);
     }
 
-    abstract Collection<Fix> getFixes();
-
+     /**
+     * Used for testing only
+     * @return Collection of Generated Errors Descriptors
+     */
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.EMPTY_SET;
+    }
+    
     protected abstract CancellableTask<CompilationInfo> createTask(FileObject file);
-
-
 
 }

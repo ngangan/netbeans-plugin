@@ -60,16 +60,12 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
-import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -95,7 +91,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
     private static final String JAVAFX_RUN = "public static synthetic function javafx$run$"; //NOI18N
-    private final Collection<Fix> fixes = new HashSet<Fix>();
+    private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public CreateElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
@@ -120,11 +116,9 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                fixes.clear();
+                errorDescriptions.clear();
                 cancel.set(false);
                 Document document = compilationInfo.getDocument();
-                final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
-
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (cancel.get()) {
                         break;
@@ -133,7 +127,6 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                         continue;
                     }
                     if (isValidError(diagnostic, document) && (diagnostic instanceof JCDiagnostic)) {
-
                         Kind kinds[] = getKinds((JCDiagnostic) diagnostic, compilationInfo);
                         for (Kind kind : kinds) {
                             errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic, kind));
@@ -145,17 +138,17 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
         };
     }
 
+    @Override
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.unmodifiableCollection(errorDescriptions);
+    }
+
     private boolean isValidError(Diagnostic diagnostic, Document document) {
-        if (diagnostic.getCode().equals(ERROR_CODE) && !HintsUtils.isInGuardedBlocks(document, (int) diagnostic.getPosition())) {
+        if (diagnostic.getCode().equals(ERROR_CODE) && !HintsUtils.isInGuardedBlock(document, (int) diagnostic.getPosition())) {
             return true;
         }
 
         return false;
-    }
-
-    @Override
-    Collection<Fix> getFixes() {
-        return fixes;
     }
 
     private ErrorDescription getErrorDescription(Document document,
@@ -169,7 +162,6 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
         }
         String message = getMessage(kind, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString(), compilationInfo.getCompilationUnit().getPackageName());
         Fix fix = new ElementFix(kind, document, diagnostic, compilationInfo, message);
-        fixes.add(fix);
         ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, message, Collections.singletonList(fix), compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getStartPosition());
 
         return errorDescription;
@@ -310,35 +302,20 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                         if (kind != Kind.FUNCTION) {
                             return;
                         }
-                        final JTextComponent target = HintsUtils.getEditorComponent(document);
-                        if (target == null) {
-                            LOGGER.severe("No GUI component for editor document " + document); //NOI18N
-                            return;
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            public void run() {
-                                Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
-                            }
-                        });
-
+                        HintsUtils.addImport(document, HintsUtils.EXCEPTION_UOE);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
             };
-            if (SwingUtilities.isEventDispatchThread()) {
-                runnable.run();
-            } else {
-                SwingUtilities.invokeLater(runnable);
-            }
+            HintsUtils.runInAWT(runnable);
 
             return null;
         }
 
         @Override
         public String toString() {
-            return super.toString() +" " + kind +" ";
+            return super.toString() + " " + kind + " ";
         }
 
         private static GeneratedCode createFunction(final CompilationInfo compilationInfo, final JCDiagnostic diagnostic) {

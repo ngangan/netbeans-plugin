@@ -46,14 +46,12 @@ import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
 import javax.lang.model.element.ExecutableElement;
 import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.swing.SwingUtilities;
 import javax.swing.text.*;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
@@ -67,7 +65,7 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
 
     private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private Collection<OverriddenAnnotation> annotations = new HashSet<OverriddenAnnotation>();
@@ -175,15 +173,7 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
                         annotations = new HashSet<OverriddenAnnotation>(addedAnnotationsCopy);
                     }
                 };
-                runRunnable(update);
-            }
-
-            private void runRunnable(Runnable task) {
-                if (SwingUtilities.isEventDispatchThread()) {
-                    task.run();
-                } else {
-                    SwingUtilities.invokeLater(task);
-                }
+                HintsUtils.runInAWT(update);
             }
         };
     }
@@ -208,8 +198,12 @@ public final class MarkOverriddenTaskFactory extends EditorAwareJavaFXSourceTask
             return NbBundle.getMessage(MarkOverriddenTaskFactory.class, "LABEL_OVERRIDES") + superClassFQN; //NOI18N
         }
 
-        int getPosition() {
+        private int getPosition() {
             return positon;
         }
+    }
+
+    Collection<? extends Annotation> getAnnotations() {
+        return Collections.unmodifiableCollection(annotations);
     }
 }
