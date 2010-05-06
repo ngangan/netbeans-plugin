@@ -60,6 +60,7 @@ import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.tools.mjavac.util.Abort;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -125,6 +126,8 @@ public class JavaFXIndexer extends CustomIndexer {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
     final public static String NAME = "fx";
     final public static int VERSION = 5;
+
+    final private static String SYNTHETIC_CLASS_POO = "$ObjLit$";
 
     static final Convertor<Diagnostic<?>> DIAG_ERROR_CONVERTOR = new Convertor<Diagnostic<?>>() {
         public ErrorKind getKind(Diagnostic<?> t) {
@@ -219,6 +222,11 @@ public class JavaFXIndexer extends CustomIndexer {
                     }
                     return super.visitClassDeclaration(node, document);
                 }
+                if (e.getSimpleName().toString().contains(SYNTHETIC_CLASS_POO)) {
+                    // don't even try to index synthetically generated classes -
+                    //   they throw exceptions on you when trying to access their inner workings
+                    return super.visitClassDeclaration(node, document);
+                }
 
                 TypeElement type = (TypeElement) e;
                 if (DEBUG) {
@@ -226,6 +234,7 @@ public class JavaFXIndexer extends CustomIndexer {
                     LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
                     LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
                 }
+                String fqn = type.getQualifiedName().toString();
 
                 List<ExpressionTree> superTypes = node.getSupertypeList();
                 if (superTypes != null) {
@@ -245,7 +254,6 @@ public class JavaFXIndexer extends CustomIndexer {
                 }
                 index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
                 index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
-                String fqn = type.getQualifiedName().toString();
                 index(document, IndexKey.CLASS_FQN, fqn);
                 try {
                     if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
@@ -259,6 +267,8 @@ public class JavaFXIndexer extends CustomIndexer {
                 } catch (NullPointerException npe) {
                     // #183260: javafxc throwing a NPE for certaing uncompilable sources
                     LOG.log(Level.FINE, fqn, npe);
+                } catch (Abort a) {
+                    LOG.log(Level.FINE, fo.getPath() + " : " + fqn, a);
                 }
             }
             return super.visitClassDeclaration(node, document);
