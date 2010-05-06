@@ -179,6 +179,10 @@ public final class JavaFXParserResult extends Result {
             return new TreeUtilities(resultImpl);
         }
 
+        @Override
+        public void registerSourceTaskFactoryManager() {
+            JavaFXSourceTaskFactoryManager.register();
+        }
 
     }
 }

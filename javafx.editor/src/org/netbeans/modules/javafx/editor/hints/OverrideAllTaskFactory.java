@@ -44,7 +44,6 @@ import com.sun.javafx.api.tree.ClassDeclarationTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
 import org.netbeans.api.javafx.source.JavaFXSource;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.code.JavafxTypes;
@@ -66,7 +65,6 @@ import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.Imports;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -75,14 +73,14 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
 
     private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
     private static final String HINT_IDENT = "overridejavafx"; //NOI18N
     private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
-    private Collection<Fix> fixes = new HashSet<Fix>();
+    private final Collection<Fix> fixes = new HashSet<Fix>();
     //private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
     //private final static Logger LOG = Logger.getAnonymousLogger();
 
@@ -102,17 +100,12 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 fixes.clear();
                 cancel.set(false);
-                JavaFXDocument fxdocument = null;
-                if (compilationInfo.getDocument() instanceof JavaFXDocument) {
-                    fxdocument = (JavaFXDocument) compilationInfo.getDocument();
-                }
-                
+
                 final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
-                    if (fxdocument != null && fxdocument.isPosGuarded((int) diagnostic.getPosition())) {
-                        continue;
-                    }
-                    if (!isValidError(diagnostic, compilationInfo) || cancel.get()) {
+                    if (HintsUtils.isInGuardedBlocks(compilationInfo.getDocument(), (int) diagnostic.getPosition())
+                            || !isValidError(diagnostic, compilationInfo)
+                            || cancel.get()) {
                         continue;
                     }
                     int position = findPosition(compilationInfo, (int) diagnostic.getStartPosition(), (int) (diagnostic.getEndPosition() - diagnostic.getStartPosition()));
@@ -394,6 +387,7 @@ public final class OverrideAllTaskFactory extends EditorAwareJavaFXSourceTaskFac
     Collection<Fix> getFixes() {
         return Collections.unmodifiableCollection(fixes);
     }
+
     private static String removeBetween(String symbols, String name) {
         int firstIndex = name.indexOf(symbols.substring(0, 1));
         int lastIndex = name.indexOf(symbols.substring(1, 2));

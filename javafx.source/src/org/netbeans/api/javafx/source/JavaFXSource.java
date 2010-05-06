@@ -81,8 +81,7 @@ import org.netbeans.modules.parsing.api.Source;
 public final class JavaFXSource {
 
     static {
-        JavaFXSourceTaskFactoryManager.register();
-	hackCompilersLexer();
+        hackCompilersLexer();
     }
 
     public static enum Phase {

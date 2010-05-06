@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -39,50 +39,30 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.source;
+package org.netbeans.modules.javafx.editor.hints;
 
-import com.sun.tools.javafx.api.JavafxcTool;
-import javax.tools.JavaFileManager;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
-import org.netbeans.api.javafx.source.TreeUtilities;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import java.util.Collection;
+import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.spi.editor.hints.Fix;
+import org.openide.filesystems.FileObject;
 
 /**
- * Accessor for the package-private functionality.
  *
- * @author Miloslav Metelka
+ * @author karol harezlak
  */
+abstract class JavaFXAbstractEditorHint extends EditorAwareJavaFXSourceTaskFactory {
 
-public abstract class ApiSourcePackageAccessor {
-    
-    private static ApiSourcePackageAccessor INSTANCE;
-    
-    public static ApiSourcePackageAccessor get() {
-        if (INSTANCE == null) {
-            // Enforce the static initializer in Context class to be run
-            try {
-                Class.forName(JavaFXParserResult.class.getName(), true, JavaFXParserResult.class.getClassLoader());
-            } catch (ClassNotFoundException e) { }
-        }
-        return INSTANCE;
+    public JavaFXAbstractEditorHint(JavaFXSource.Phase phase, JavaFXSource.Priority priority) {
+        super(phase, priority);
     }
 
-    public static void set(ApiSourcePackageAccessor accessor) {
-        if (INSTANCE != null) {
-            throw new IllegalStateException("Already registered"); // NOI18N
-        }
-        INSTANCE = accessor;
-    }
+    abstract Collection<Fix> getFixes();
 
-    public abstract JavaFXParserResult createResult(JavaFXParserResultImpl impl);
-    
-    public abstract JavaFileManager getFileManager(ClasspathInfo cpInfo, JavafxcTool tool);
+    protected abstract CancellableTask<CompilationInfo> createTask(FileObject file);
 
-    public abstract ElementUtilities createElementUtilities(JavaFXParserResultImpl resultImpl);
 
-    public abstract TreeUtilities createTreeUtilities(JavaFXParserResultImpl resultImpl);
 
-    public abstract void registerSourceTaskFactoryManager();
 }

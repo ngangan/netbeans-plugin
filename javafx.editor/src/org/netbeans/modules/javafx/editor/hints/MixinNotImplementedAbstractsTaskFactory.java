@@ -72,6 +72,8 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
+
+//TODO Not in use anymore
 public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
 
     private static final String HINTS_IDENT = "abstractmixinjavafx"; //NOI18N
