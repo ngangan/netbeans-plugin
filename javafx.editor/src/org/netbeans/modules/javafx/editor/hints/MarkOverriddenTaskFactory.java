@@ -67,7 +67,7 @@ import org.openide.util.NbBundle;
  */
 public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
 
-    private static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
+    static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
     private Collection<OverriddenAnnotation> annotations = new HashSet<OverriddenAnnotation>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 

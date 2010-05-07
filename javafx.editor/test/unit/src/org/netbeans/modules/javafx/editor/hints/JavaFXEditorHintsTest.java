@@ -41,6 +41,8 @@
 package org.netbeans.modules.javafx.editor.hints;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 import org.netbeans.spi.editor.hints.Severity;
 import javax.swing.text.Document;
 import org.netbeans.api.javafx.editor.TestUtilities;
@@ -57,6 +59,7 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
+import org.openide.text.Annotation;
 import org.openide.util.Exceptions;
 
 /**
@@ -98,7 +101,7 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
     }
 
     /**
-     * Test Add imports - ExtImportWarningTaskFactory;
+     * Test warnings - ExtImportWarningTaskFactory;
      */
     public void testExtImportAlert() {
         String code = "import javafx.ext.swing.SwingButton; class Test{}";
@@ -119,15 +122,73 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
      * Test Generate var - CreateElementTaskFactory;
      */
     public void DISABLEDtestVarGeneration() {
-        String code = "class Test {function testIt() {testVar}}";
+        String code = "class Test {function testFunction() {testVar}}";
         String pattern = "\n    var testVar;";
         defaultTestCall(new CreateElementTaskFactory(), code, pattern);
     }
 
+    /**
+     * Test Generate var Local - CreateElementTaskFactory;
+     */
     public void testLocalVarGeneration() {
-        String code = "class Test {function testIt() {testVar}}";
+        String code = "class Test {function testFunction() {testVar}}";
         String pattern = "\nvar testVar;";
         defaultTestCall(new CreateElementTaskFactory(), code, pattern);
+    }
+
+    /**
+     * Test Generate function - CreateElementTaskFactory;
+     */
+    public void testFunctionGeneration() {
+        String code = "class Test {function testFunction() {testMethod()}}";
+        String pattern = "\nfunction testMethod() {\n    throw new UnsupportedOperationException('Not implemented yet');\n}";
+        defaultTestCall(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.FUNCTION);
+    }
+
+    /**
+     * Test Generate class - CreateElementTaskFactory;
+     */
+    public void testLocalClassGeneration() {
+        String code = "class Test {function testFunction() {TestClass{}}}";
+        String pattern = "\nclass TestClass {\n    //TODO Not implemented yet.\n}";
+        defaultTestCall(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.LOCAL_CLASS);
+    }
+
+    //FIXME JavaFX templates not avialiable in test env.
+    /**
+     * Test Generate class - CreateElementTaskFactory;
+     */
+    public void DISABLEDtestClassGeneration() {
+        String code = "class Test {function testFunction() {TestClass{}}}";
+        JavaFXAbstractEditorHint hint = new CreateElementTaskFactory();
+        try {
+            doTest(hint, code, CreateElementTaskFactory.Kind.CLASS);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        try {
+            File file = getWorkDir();
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    /**
+     * Test Mark Override annotations - MarkOverriddenTaskFactory;
+     */
+    public void testMarkOverride() {
+        String code = "import java.lang.Runnable;import java.lang.UnsupportedOperationException;class Test extends Runnable {override public function run () : Void { throw new UnsupportedOperationException('Not implemented yet');} function method() {}}";
+        MarkOverriddenTaskFactory hint = new MarkOverriddenTaskFactory();
+        try {
+            doTest(hint, code, null);
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        Collection<? extends Annotation> annotations = hint.getAnnotations();
+        assert annotations.size() == 1;
+        for (Annotation annotation : annotations) {
+            assert annotation.getAnnotationType().equals(MarkOverriddenTaskFactory.ANNOTATION_TYPE);
+        }
     }
 
     public void defaultTestCall(JavaFXAbstractEditorHint hint, String code, String pattern) {
