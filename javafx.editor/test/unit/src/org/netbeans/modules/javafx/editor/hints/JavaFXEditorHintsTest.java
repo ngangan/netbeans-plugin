@@ -144,7 +144,7 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         String pattern = "\nfunction testMethod() {\n    throw new UnsupportedOperationException('Not implemented yet');\n}";
         defaultTestCall(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.FUNCTION);
     }
-
+    //FIXME partly disabled
     /**
      * Test Generate class - CreateElementTaskFactory;
      */
@@ -152,6 +152,24 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         String code = "class Test {function testFunction() {TestClass{}}}";
         String pattern = "\nclass TestClass {\n    //TODO Not implemented yet.\n}";
         defaultTestCall(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.LOCAL_CLASS);
+//        JavaFXAbstractEditorHint hint = new CreateElementTaskFactory();
+//        String codeExtends = "class Test extends NewClass {}";
+//        try {
+//            doTest(hint, codeExtends, null, false);
+//        } catch (Exception ex) {
+//            Exceptions.printStackTrace(ex);
+//        }
+//        assert hint.getErrorDescriptions().size() == 2;
+//        for (ErrorDescription errorDescription : hint.getErrorDescriptions()) {
+//            assert errorDescription.getDescription().contains("NewClass");
+//            for (Fix fix : errorDescription.getFixes().getFixes()) {
+//                boolean b1 = fix.toString().contains(CreateElementTaskFactory.Kind.LOCAL_CLASS.name());
+//                boolean b2 = fix.toString().contains(CreateElementTaskFactory.Kind.CLASS.name());
+//                if (b1 == false && b2 == false) {
+//                    assert false;
+//                }
+//            }
+//        }
     }
 
     //FIXME JavaFX templates not avialiable in test env.
@@ -164,11 +182,6 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         try {
             doTest(hint, code, CreateElementTaskFactory.Kind.CLASS);
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        try {
-            File file = getWorkDir();
-        } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
     }
@@ -206,6 +219,11 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
     }
 
     protected String doTest(final JavaFXAbstractEditorHint hint, String code, final CreateElementTaskFactory.Kind kind) throws Exception {
+        return doTest(hint, code, kind, true);
+    }
+
+
+    protected String doTest(final JavaFXAbstractEditorHint hint, String code, final CreateElementTaskFactory.Kind kind, final boolean executeFixes) throws Exception {
         JavaFXSource fXSource = getJavaFXSource(code);
         assertNotNull(fXSource);
 
@@ -221,6 +239,9 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
                             Runnable runnable = new Runnable() {
 
                                 public void run() {
+                                    if (!executeFixes) {
+                                        return;
+                                    }
                                     try {
                                         fix.implement();
                                     } catch (Exception e) {

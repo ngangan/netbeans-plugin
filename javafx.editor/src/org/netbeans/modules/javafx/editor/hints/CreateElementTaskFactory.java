@@ -54,6 +54,7 @@ import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JFXVarInit;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.util.*;
@@ -183,7 +184,16 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                 JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                 Element element = compilationInfo.getTrees().getElement(path);
                 if (element instanceof JavafxClassSymbol) {
-                    currentClassFQN = ((JavafxClassSymbol) element).className();
+                    JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
+                    classSymbol.getInterfaces();
+                    currentClassFQN = classSymbol.className();
+                    for (Tree tree : node.getExtends()) {
+                        if (currentClassFQN != null && checkPosition(tree, diagnostic) && currentClassFQN.equals(classFQN[0])) {
+                            array.add(Kind.CLASS);
+                            array.add(Kind.LOCAL_CLASS);
+                            return null;
+                        }
+                    }
                 }
                 return super.visitClassDeclaration(node, p);
             }
@@ -207,7 +217,6 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                     array.add(Kind.VARIABLE);
                     return null;
                 }
-
                 return super.visitIdentifier(node, p);
             }
 
