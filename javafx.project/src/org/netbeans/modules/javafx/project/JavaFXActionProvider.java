@@ -387,7 +387,7 @@ class JavaFXActionProvider implements ActionProvider {
         }
         String[] targetNames = commands.get(command);
         if (targetNames == null) throw new IllegalArgumentException(command);
-        if (command.equals (COMMAND_RUN) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_STEP_INTO)) {
+        if (command.equals (COMMAND_RUN) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_STEP_INTO) || command.equals(COMMAND_BUILD) || command.equals(COMMAND_REBUILD) || command.equals(JavaProjectConstants.COMMAND_JAVADOC)) {
             String config = project.evaluator().getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
             String path;
             if (config == null || config.length() == 0) {

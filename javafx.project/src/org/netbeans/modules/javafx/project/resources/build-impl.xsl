@@ -199,6 +199,11 @@ is divided into following sections:
             <fail unless="build.dir">Must set build.dir</fail>
             <fail unless="dist.dir">Must set dist.dir</fail>
             <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
+            <fail message="Must set application main class">
+                <condition>
+                    <length string="${{main.class}}" length="0"/>
+                </condition>
+            </fail>
         </target>
         <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check" name="init"/>
     <xsl:comment>
