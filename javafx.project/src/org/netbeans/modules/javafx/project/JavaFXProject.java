@@ -113,6 +113,7 @@ import org.netbeans.spi.project.ui.support.UILookupMergerSupport;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
+import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileSystem;
 import org.openide.filesystems.FileUtil;
@@ -159,8 +160,10 @@ public final class JavaFXProject implements Project, AntProjectListener {
     private final JavaFXProjectClassPathModifier cpMod;
 
     private AntBuildExtender buildExtender;
+    private final ThreadLocal<Boolean> projectPropertiesSave;
 
     public JavaFXProject(AntProjectHelper helper) throws IOException {
+        this.projectPropertiesSave = new ThreadLocal<Boolean>();
         this.helper = helper;
         eval = createEvaluator();
         aux = helper.createAuxiliaryConfiguration();
@@ -183,6 +186,15 @@ public final class JavaFXProject implements Project, AntProjectListener {
         lookup = createLookup(aux, actionProvider);
         actionProvider.startFSListener();
         helper.addAntProjectListener(this);
+    }
+
+    /**
+     * JavaFXProjectProperties helper method to notify ProjectXmlSavedHookImpl about customizer save
+     * @see JavaFXProjectProperties.ProjectXmlSavedHookImpl#projectXmlSaved()
+     * @param value true = active
+     */
+    public void setProjectPropertiesSave(boolean value) {
+        this.projectPropertiesSave.set(value);
     }
 
     /**
@@ -461,6 +473,31 @@ public final class JavaFXProject implements Project, AntProjectListener {
             //which didn't affect the j2seproject 
             if (updateHelper.isCurrent()) {
                 //Refresh build-impl.xml only for j2seproject/2
+                final Boolean projectPropertiesSave = JavaFXProject.this.projectPropertiesSave.get();
+                if (projectPropertiesSave != null &&
+                    projectPropertiesSave.booleanValue() &&
+                    (genFilesHelper.getBuildScriptState(GeneratedFilesHelper.BUILD_IMPL_XML_PATH,JavaFXProject.class.getResource("resources/build-impl.xsl")) & GeneratedFilesHelper.FLAG_MODIFIED) == GeneratedFilesHelper.FLAG_MODIFIED) {  //NOI18N
+                    //When the project.xml was changed from the customizer and the build-impl.xml was modified
+                    //move build-impl.xml into the build-impl.xml~ to force regeneration of new build-impl.xml.
+                    //Never do this if it's not a customizer otherwise user modification of build-impl.xml will be deleted
+                    //when the project is opened.
+                    final FileObject projectDir = updateHelper.getAntProjectHelper().getProjectDirectory();
+                    final FileObject buildImpl = projectDir.getFileObject(GeneratedFilesHelper.BUILD_IMPL_XML_PATH);
+                    if (buildImpl  != null) {
+                        final String name = buildImpl.getName();
+                        final String backupext = String.format("%s~",buildImpl.getExt());   //NOI18N
+                        final FileObject oldBackup = buildImpl.getParent().getFileObject(name, backupext);
+                        if (oldBackup != null) {
+                            oldBackup.delete();
+                        }
+                        FileLock lock = buildImpl.lock();
+                        try {
+                            buildImpl.rename(lock, name, backupext);
+                        } finally {
+                            lock.releaseLock();
+                        }
+                    }
+                }
                 genFilesHelper.refreshBuildScript(
                     GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
                     JavaFXProject.class.getResource("resources/build-impl.xsl"), // NOI18N

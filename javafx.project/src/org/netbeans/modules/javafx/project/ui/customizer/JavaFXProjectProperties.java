@@ -426,26 +426,13 @@ public class JavaFXProjectProperties {
             boolean result = ProjectManager.mutex().writeAccess(new Mutex.ExceptionAction<Boolean>() {
                 final FileObject projectDir = updateHelper.getAntProjectHelper().getProjectDirectory();
                 public Boolean run() throws IOException {
-                    if ((genFileHelper.getBuildScriptState(GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
-                        JavaFXProject.class.getResource("resources/build-impl.xsl")) //NOI18N
-                        & GeneratedFilesHelper.FLAG_MODIFIED) == GeneratedFilesHelper.FLAG_MODIFIED) {
-                        if (showModifiedMessage (NbBundle.getMessage(JavaFXProjectProperties.class,"TXT_ModifiedTitle"))) { // NOI18N
-                            //Delete user modified build-impl.xml
-                            FileObject fo = projectDir.getFileObject(GeneratedFilesHelper.BUILD_IMPL_XML_PATH);
-                            if (fo != null) {
-                                fo.delete();
-                            }
-                        }
-                        else {
-                            return false;
-                        }
-                    }
                     storeProperties();
                     return true;
                 }
             });
             // and save the project
             if (result) {
+                project.setProjectPropertiesSave(true);
                 ProjectManager.getDefault().saveProject(project);
             }
         } 
@@ -454,6 +441,8 @@ public class JavaFXProjectProperties {
         }
         catch ( IOException ex ) {
             ErrorManager.getDefault().notify( ex );
+        } finally {
+            project.setProjectPropertiesSave(false);
         }
     }
     
