@@ -185,13 +185,14 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                 Element element = compilationInfo.getTrees().getElement(path);
                 if (element instanceof JavafxClassSymbol) {
                     JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
-                    classSymbol.getInterfaces();
                     currentClassFQN = classSymbol.className();
-                    for (Tree tree : node.getExtends()) {
-                        if (currentClassFQN != null && checkPosition(tree, diagnostic) && currentClassFQN.equals(classFQN[0])) {
-                            array.add(Kind.CLASS);
-                            array.add(Kind.LOCAL_CLASS);
-                            return null;
+                    if (node.getExtends() != null) {
+                        for (Tree tree : node.getExtends()) {
+                            if (currentClassFQN != null && checkPosition(tree, diagnostic) && currentClassFQN.equals(classFQN[0])) {
+                                array.add(Kind.CLASS);
+                                array.add(Kind.LOCAL_CLASS);
+                                return null;
+                            }
                         }
                     }
                 }
