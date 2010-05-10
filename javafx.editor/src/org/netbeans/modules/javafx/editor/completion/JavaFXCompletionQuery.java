@@ -45,12 +45,9 @@ import com.sun.javafx.api.tree.Tree.JavaFXKind;
 import com.sun.tools.javafx.tree.*;
 
 import org.netbeans.api.editor.completion.Completion;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.*;
 import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.javafx.editor.JavaCompletionDoc;
 import org.netbeans.modules.javafx.editor.completion.environment.*;
@@ -171,23 +168,12 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     private String filterPrefix;
     private ElementHandle element;
     private boolean hasTask;
-    private Cancellable cancellable;
 
     public JavaFXCompletionQuery(int queryType, int caretOffset, boolean hasTask) {
         super();
         this.queryType = queryType;
         this.caretOffset = caretOffset;
         this.hasTask = hasTask;
-
-        this.cancellable = new Cancellable() {
-            public boolean isCancelled() {
-                return isTaskCancelled0();
-            }
-
-            public void cancell() {
-                // do nothing for now
-            }
-        };
     }
 
     boolean isTaskCancelled0() {
@@ -453,8 +439,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
         controller.toPhase(Phase.ANALYZED);
         String prefix = null;
         if (offset > 0) {
-            TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
+            TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
             // When right at the token end move to previous token; otherwise move to the token that "contains" the offset
             if (ts.move(offset) == 0 || !ts.moveNext()) {
                 ts.movePrevious();
@@ -576,8 +561,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 if (LOGGABLE) log("   (2) s == " + s + "  e == " + e + "  offset == " + offset); // NOI18N
                 return e == offset;
             }
-            TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-            SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), cancellable);
+            TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
             ts.move((int)e);
             ts = JavaFXCompletionEnvironment.previousNonWhitespaceToken(ts);
             if (ts == null || ts.offset() < s) {

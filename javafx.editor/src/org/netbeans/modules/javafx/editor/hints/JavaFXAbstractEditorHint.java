@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -39,32 +39,32 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.api.javafx.editor;
+package org.netbeans.modules.javafx.editor.hints;
+
+import java.util.*;
+import org.netbeans.api.javafx.source.*;
+import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.spi.editor.hints.ErrorDescription;
+import org.openide.filesystems.FileObject;
 
 /**
  *
- * @author Anton Chechel
+ * @author karol harezlak
  */
-public interface Cancellable {
-    public boolean isCancelled();
-    public void cancell();
+abstract class JavaFXAbstractEditorHint extends EditorAwareJavaFXSourceTaskFactory {
 
-    public static class Dummy implements Cancellable {
-        private static Dummy instance;
-
-        public static synchronized Dummy getInstance() {
-            if (instance == null) {
-                instance = new Dummy();
-            }
-            return instance;
-        }
-
-        public boolean isCancelled() {
-            return false;
-        }
-
-        public void cancell() {
-        }
-
+    public JavaFXAbstractEditorHint(JavaFXSource.Phase phase, JavaFXSource.Priority priority) {
+        super(phase, priority);
     }
+
+     /**
+     * Used for testing only
+     * @return Collection of Generated Errors Descriptors
+     */
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.EMPTY_SET;
+    }
+    
+    protected abstract CancellableTask<CompilationInfo> createTask(FileObject file);
+
 }

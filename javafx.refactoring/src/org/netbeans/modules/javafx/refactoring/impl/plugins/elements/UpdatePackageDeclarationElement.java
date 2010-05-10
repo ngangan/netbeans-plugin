@@ -82,9 +82,9 @@ abstract public class UpdatePackageDeclarationElement extends BaseRefactoringEle
 
     @Override
     protected String getRefactoringText() {
-        if (isOldDefault()) {
+        if (isNewDefault()) {
             return NbBundle.getMessage(UpdatePackageDeclarationElement.class, "LBL_RemovePackage", oldPkgName); // NOI18N
-        } else if (isNewDefault()) {
+        } else if (isOldDefault()) {
             return NbBundle.getMessage(UpdatePackageDeclarationElement.class, "LBL_AddPackage", newPkgName); // NOI18N
         } else {
             return NbBundle.getMessage(UpdatePackageDeclarationElement.class, "LBL_RenamePackage", oldPkgName, newPkgName); // NOI18N

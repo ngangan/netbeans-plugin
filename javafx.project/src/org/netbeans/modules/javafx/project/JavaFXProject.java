@@ -666,7 +666,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             "java-forms",           // NOI18N
             "gui-java-application", // NOI18N
             "java-beans",           // NOI18N
-            "persistence",          // NOI18N
+            //"persistence",        // NOI18N //TODO: implement JavaFXPersistenceProvider
             "oasis-XML-catalogs",   // NOI18N
             "XML",                  // NOI18N
             "ant-script",           // NOI18N
@@ -687,7 +687,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             "java-forms",           // NOI18N
             //"gui-java-application", // NOI18N
             "java-beans",           // NOI18N
-            "persistence",          // NOI18N
+            //"persistence",        // NOI18N //TODO: implement JavaFXPersistenceProvider
             "oasis-XML-catalogs",   // NOI18N
             "XML",                  // NOI18N
             "ant-script",           // NOI18N
@@ -710,8 +710,8 @@ public final class JavaFXProject implements Project, AntProjectListener {
             "Templates/Classes/Interface.java", // NOI18N
             "Templates/GUIForms/JPanel.java", // NOI18N
             "Templates/GUIForms/JFrame.java", // NOI18N
-            "Templates/Persistence/Entity.java", // NOI18N
-            "Templates/Persistence/RelatedCMP", // NOI18N                    
+            //"Templates/Persistence/Entity.java", // NOI18N //TODO: implement JavaFXPersistenceProvider
+            //"Templates/Persistence/RelatedCMP", // NOI18N //TODO: implement JavaFXPersistenceProvider
             "Templates/WebServices/WebServiceClient"   // NOI18N                    
         };
         

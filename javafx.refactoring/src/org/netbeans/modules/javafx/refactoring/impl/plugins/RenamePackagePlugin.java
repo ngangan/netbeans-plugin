@@ -92,8 +92,8 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
     }
 
     public Problem fastCheckParameters() {
-        FileObject f = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
-        if (f!=null) {
+        FileObject f = getFolder();
+        if (f != null) {
             String newName = refactoring.getNewName();
             if (!SourceUtils.isValidPackageName(newName)) {
                 String msg = new MessageFormat(NbBundle.getMessage(RenamePackagePlugin.class, "ERR_InvalidPackage")).format( // NOI18N
@@ -114,8 +114,8 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
 
     public Problem preCheck() {
         Problem preCheckProblem = null;
-        FileObject file = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
-        if (!SourceUtils.isFileInOpenProject(file)) {
+        FileObject file = getFolder();
+        if (file != null && !SourceUtils.isFileInOpenProject(file)) {
             preCheckProblem = chainProblems(preCheckProblem, new Problem(true, NbBundle.getMessage(
                     RenamePackagePlugin.class,
                     NbBundle.getMessage(RenamePackagePlugin.class, "ERR_ProjectNotOpened", FileUtil.getFileDisplayName(file)))) // NOI18N
@@ -125,7 +125,9 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
     }
 
     public Problem prepare(RefactoringElementsBag reb) {
-        FileObject packageFolder = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class).getFolder();
+        FileObject packageFolder = getFolder();
+        if (packageFolder == null) return null; // shouldn't get here but if we do then we just leave politely
+
         final String targetPkgName = getTargetPackageName(packageFolder);
         final String sourcePkgName = getSourcePackageName(packageFolder);
 
@@ -265,5 +267,17 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
             result += ("".equals(result)? "" : ".") + s3; // NOI18N
         }
         return result;
+    }
+
+    private FileObject getFolder() {
+        NonRecursiveFolder nrf = refactoring.getRefactoringSource().lookup(NonRecursiveFolder.class);
+        if (nrf != null) {
+            return nrf.getFolder();
+        }
+        FileObject file = refactoring.getRefactoringSource().lookup(FileObject.class);
+        if (file != null) {
+            return file.getParent();
+        }
+        return null;
     }
 }

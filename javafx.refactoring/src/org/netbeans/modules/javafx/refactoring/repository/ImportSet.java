@@ -140,6 +140,9 @@ public class ImportSet {
                 String typeOrigFQN = typeFQN;
                 if (renames.containsKey(typeFQN)) {
                     typeFQN = renames.get(typeFQN);
+                    if (typeFQN.startsWith(".")) { // moving class to default package; the renamed type starts with "."
+                        typeFQN = typeFQN.substring(1);
+                    }
                 }
                 String typeSimple = usg.getDef().getName();
 
@@ -165,8 +168,9 @@ public class ImportSet {
                             if (decl.contains(tie)) continue OUTER;
                         }
                     }
-
-                    missing.add(new Touple<ElementDef, ImportEntry>(usg.getDef(), tie));
+                    if (!fqnPkg.equals(pkgName)) {
+                        missing.add(new Touple<ElementDef, ImportEntry>(usg.getDef(), tie));
+                    }
                 }
             }
         }

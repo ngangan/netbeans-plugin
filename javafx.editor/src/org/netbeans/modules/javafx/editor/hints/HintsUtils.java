@@ -6,18 +6,21 @@ package org.netbeans.modules.javafx.editor.hints;
 
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.javafx.code.JavafxClassSymbol;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import org.netbeans.api.javafx.source.CompilationInfo;
 import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.editor.Utilities;
 import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -42,6 +45,144 @@ final class HintsUtils {
         }
 
         return methodName.trim();
+    }
+
+    /**
+     * Add imports for provided document. Based on Imports.addImport from module JavaFX Source
+     *
+     * @param document
+     * @param im - import string
+     */
+    public static void addImport(final Document document, final String im) {
+        class Import {
+
+            public boolean pkg = false;
+            public long start;
+            public long end;
+            public String value;
+        }
+        if (im.indexOf('.') < 0) {
+            return;
+        }
+
+        String doc = null;
+        try {
+            doc = document.getText(0, document.getEndPosition().getOffset());
+        } catch (BadLocationException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        if (doc == null) {
+            return;
+        }
+
+        Pattern packagePattern = Pattern.compile("package [a-zA-Z0-9_.]+;"); // NOI18N
+        Pattern importPattern = Pattern.compile("import [a-zA-Z0-9_.*]+;"); // NOI18N
+
+        List<Import> imports = new ArrayList<Import>();
+        int position = 0;
+        try {
+            BufferedReader in = new BufferedReader(new StringReader(doc));
+            String line = "";
+            while (line != null) {
+                char c;
+                line = null;
+                for (;;) {
+                    c = (char) in.read();
+                    position++;
+                    if (c == 65535) {
+                        line = null;
+                        break;
+                    }
+                    if (c == '\n' || c == '\r') {
+                        line = line == null ? "" : line;
+                        break;
+                    } // NOI18N
+                    if (line == null) {
+                        line = "" + c; // NOI18N
+                    } else {
+                        line += c;
+                    }
+                }
+                if (line == null) {
+                    continue;
+                }
+
+                if (packagePattern.matcher(line).matches()) {
+                    // Package
+                    Import i = new Import();
+                    i.pkg = true;
+                    i.end = position;
+                    i.value = line.trim();
+                    imports.add(i);
+                }
+                if (importPattern.matcher(line).matches()) {
+                    // Import
+                    Import i = new Import();
+                    i.end = position;
+                    i.value = line.trim();
+                    imports.add(i);
+                }
+            }
+            in.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        final String pkgImport = im.substring(0, im.lastIndexOf('.')) + ".*"; // NOI18N
+        // Check whether the import is in there
+        boolean found = false;
+        Import lastImport = null;
+        for (Import i : imports) {
+            if (lastImport == null) {
+                lastImport = i;
+            } else if (lastImport.end < i.end) {
+                lastImport = i;
+            }
+
+            if (("import " + im + ";").equals(i.value) || ("import " + pkgImport + ";").equals(i.value)) { // NOI18N
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            if (lastImport == null) {
+                try {
+                    document.insertString(0, "import " + im + ";\r\n", null); // NOI18N
+                } catch (BadLocationException e) {
+                    throw new IllegalStateException(e);
+                }
+            } else {
+                if (lastImport.pkg) {
+                    try {
+                        document.insertString((int) lastImport.end, "\r\nimport " + im + ";\r\n", null); // NOI18N
+                    } catch (BadLocationException e) {
+                        throw new IllegalStateException(e);
+                    }
+                } else {
+                    try {
+                        document.insertString((int) lastImport.end, "import " + im + ";\r\n", null); // NOI18N
+                    } catch (BadLocationException e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
+        }
+    }
+
+    static void runInAWT(Runnable runnable) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeLater(runnable);
+        }
+    }
+
+    static void runInAWTandWait(Runnable runnable) throws Exception {
+        if (SwingUtilities.isEventDispatchThread()) {
+            runnable.run();
+        } else {
+            SwingUtilities.invokeAndWait(runnable);
+        }
     }
 
     static String getPackageName(String fqn) {
@@ -78,7 +219,7 @@ final class HintsUtils {
                 }
                 TypeElement typeOverridden = ElementUtilities.enclosingTypeElement(overriddenMethod);
                 try {
-                    if (compilationInfo.getElementUtilities().alreadyDefinedIn(overrriddenName, method, typeOverridden)) {
+                    if (ElementUtilities.alreadyDefinedIn(overrriddenName, method, typeOverridden)) {
                         return overriddenMethod;
                     }
                 } catch (NullPointerException ex) {
@@ -90,6 +231,7 @@ final class HintsUtils {
         return null;
     }
     //TODO Should be replaced with proper formating ASAP
+
     static String calculateSpace(int startPosition, Document document) {
         String text = null;
         try {
@@ -147,18 +289,15 @@ final class HintsUtils {
         return true;
     }
 
-    static JTextComponent getEditorComponent(Document document) {
-        JTextComponent target = Utilities.getFocusedComponent();
-        if (target != null) {
-            return target;
-        }
+    static boolean isInGuardedBlock(Document document, int position) {
+        JavaFXDocument fxdocument = null;
         if (document instanceof JavaFXDocument) {
-            JavaFXDocument d = (JavaFXDocument) document;
-            if (d.getEditor() instanceof JTextComponent) {
-                return (JTextComponent) d.getEditor();
-            }
+            fxdocument = (JavaFXDocument) document;
         }
-        
-        return null;
+        if (fxdocument != null && fxdocument.isPosGuarded(position)) {
+            return true;
+        }
+
+        return false;
     }
 }

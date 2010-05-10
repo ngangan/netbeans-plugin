@@ -82,6 +82,8 @@ import org.openide.util.Exceptions;
 public class JavaFXSourceUtils {
     final private static Logger LOG = Logger.getLogger(JavaFXSourceUtils.class.getName());
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
+
+    public static final String JAVAFX_MIME_TYPE = "text/x-fx"; // NOI18N
     
     public static TokenSequence<JFXTokenId> getJavaTokenSequence(final TokenHierarchy hierarchy, final int offset) {
         if (hierarchy != null) {
@@ -146,6 +148,27 @@ public class JavaFXSourceUtils {
         }
         return result[0];
 
+    }
+
+    /**
+     * Checks whether the JavaFX platform used for a project
+     * containing the given file is valid - ie. all essential jars existing etc.
+     * @param f The file object which containing project to check for platform validity
+     * @return Returns true if the containing project is using a valid and usable JavaFX SDK platform
+     */
+    public static boolean isPlatformOk(FileObject f) {
+        if (!isJavaFXFile(f) && !f.isFolder()) return false; // a valid javafx file or a package folder
+
+        ClasspathInfo cpi = ClasspathInfo.create(f);
+        ClassPath cp = cpi.getClassPath(ClasspathInfo.PathKind.BOOT);
+        for(ClassPath.Entry e : cp.entries()) {
+            if (!e.isValid()) return false;
+        }
+        return true;
+    }
+
+    public static boolean isJavaFXFile(FileObject f) {
+        return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
     }
 
     public static TypeElement getEnclosingTypeElement(Element element) throws IllegalArgumentException {

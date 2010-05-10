@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2008 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -64,12 +64,15 @@ import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author avk
  */
 public class FXDCompletionItem implements CompletionItem {
+
+    private static final String MSG_TOOLTIP = "MSG_TOOLTIP"; // NOI18N
 
     private static final char[] CODE_COMPL_SUBST_BREAKERS =
         {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', // NOI18N
@@ -178,9 +181,11 @@ public class FXDCompletionItem implements CompletionItem {
     public CompletionTask createToolTipTask() {
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
 
+            // 174091
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\""); //NOI18N
+                toolTip.setTipText(NbBundle.getMessage(FXDCompletionItem.class,
+                        MSG_TOOLTIP, getText()));
                 completionResultSet.setToolTip(toolTip);
                 completionResultSet.finish();
             }

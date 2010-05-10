@@ -1,8 +1,43 @@
 /*
- *  Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common
+ * Development and Distribution License("CDDL") (collectively, the
+ * "License"). You may not use this file except in compliance with the
+ * License. You can obtain a copy of the License at
+ * http://www.netbeans.org/cddl-gplv2.html
+ * or nbbuild/licenses/CDDL-GPL-2-CP. See the License for the
+ * specific language governing permissions and limitations under the
+ * License.  When distributing the software, include this License Header
+ * Notice in each file and include the License file at
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code. If applicable, add the following below the
+ * License Header, with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * The Original Software is NetBeans. The Initial Developer of the Original
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
+ * Microsystems, Inc. All Rights Reserved.
+ *
+ * If you wish your version of this file to be governed by only the CDDL
+ * or only the GPL Version 2, indicate your decision by adding
+ * "[Contributor] elects to include this software in this distribution
+ * under the [CDDL or GPL Version 2] license." If you do not indicate a
+ * single choice of license, a recipient has the option to distribute
+ * your version of this file under either the CDDL, the GPL Version 2 or
+ * to extend the choice of license to its licensees as provided above.
+ * However, if you add GPL Version 2 code and therefore, elected the GPL
+ * Version 2 license, then the option applies only if the new code is
+ * made subject to such option by the copyright holder.
  */
-
 package org.netbeans.modules.javafx.fxd.dataloader.fxz;
 
 import java.io.IOException;
@@ -27,6 +62,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
 import java.io.OutputStream;
 import java.io.Serializable;
+import javax.swing.Action;
 import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
 import org.netbeans.core.spi.multiview.CloseOperationHandler;
@@ -73,6 +109,16 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //
 //        // attach vetoable change listener to be cancel loosing validity when modified
 //        env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(l, env));        
+    }
+
+    /**
+     * Creates new Actions array by excluding clone action from provided array
+     * 
+     * @param src actions array
+     * @return actions array that contains all elements from src except clone action
+     */
+    public static Action[] removeCloneAction(Action[] src) {
+        return doRemoveCloneAction(src);
     }
 
     @Override
@@ -523,4 +569,33 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 //            return obj != null && getClass() == obj.getClass();
 //        }
 //    }
+
+    private static Action[] doRemoveCloneAction(Action[] src) {
+        Action[] result;
+        int idx = -1;
+        // find clone action index
+        for (int i = 0; i < src.length; i++) {
+            if (src[i] == null) {
+                continue;
+            }
+            if (src[i].getClass().getName().endsWith("ActionUtils$CloneDocumentAction")) {
+                idx = i;
+                break;
+            }
+        }
+        // remove clone action
+        if (idx == -1) {
+            result = src;
+        } else {
+            result = new Action[src.length - 1];
+            if (idx > 0) {
+                System.arraycopy(src, 0, result, 0, idx);
+            }
+            if (idx < src.length - 1) {
+                System.arraycopy(src, idx + 1, result, idx, result.length - idx);
+            }
+        }
+        return result;
+    }
+
 }

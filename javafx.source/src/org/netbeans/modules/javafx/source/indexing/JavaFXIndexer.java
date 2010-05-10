@@ -60,8 +60,10 @@ import com.sun.tools.javafx.api.JavafxcTrees;
 import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.tools.mjavac.util.Abort;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -100,6 +102,7 @@ import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
 import org.netbeans.modules.parsing.spi.indexing.Context;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
@@ -124,6 +127,8 @@ public class JavaFXIndexer extends CustomIndexer {
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
     final public static String NAME = "fx";
     final public static int VERSION = 5;
+
+    final private static String SYNTHETIC_CLASS_POO = "$ObjLit$";
 
     static final Convertor<Diagnostic<?>> DIAG_ERROR_CONVERTOR = new Convertor<Diagnostic<?>>() {
         public ErrorKind getKind(Diagnostic<?> t) {
@@ -218,6 +223,11 @@ public class JavaFXIndexer extends CustomIndexer {
                     }
                     return super.visitClassDeclaration(node, document);
                 }
+                if (e.getSimpleName().toString().contains(SYNTHETIC_CLASS_POO)) {
+                    // don't even try to index synthetically generated classes -
+                    //   they throw exceptions on you when trying to access their inner workings
+                    return super.visitClassDeclaration(node, document);
+                }
 
                 TypeElement type = (TypeElement) e;
                 if (DEBUG) {
@@ -225,6 +235,7 @@ public class JavaFXIndexer extends CustomIndexer {
                     LOG.log(Level.FINEST, "  Simple: {0}", node.getSimpleName());
                     LOG.log(Level.FINEST, "  Case insensitive: {0}", node.getSimpleName().toString().toLowerCase());
                 }
+                String fqn = type.getQualifiedName().toString();
 
                 List<ExpressionTree> superTypes = node.getSupertypeList();
                 if (superTypes != null) {
@@ -244,7 +255,6 @@ public class JavaFXIndexer extends CustomIndexer {
                 }
                 index(document, IndexKey.CLASS_NAME_SIMPLE, node.getSimpleName().toString());
                 index(document, IndexKey.CLASS_NAME_INSENSITIVE, node.getSimpleName().toString().toLowerCase());
-                String fqn = type.getQualifiedName().toString();
                 index(document, IndexKey.CLASS_FQN, fqn);
                 try {
                     if (type.getNestingKind() == NestingKind.TOP_LEVEL) {
@@ -258,6 +268,8 @@ public class JavaFXIndexer extends CustomIndexer {
                 } catch (NullPointerException npe) {
                     // #183260: javafxc throwing a NPE for certaing uncompilable sources
                     LOG.log(Level.FINE, fqn, npe);
+                } catch (Abort a) {
+                    LOG.log(Level.FINE, fo.getPath() + " : " + fqn, a);
                 }
             }
             return super.visitClassDeclaration(node, document);
@@ -600,6 +612,13 @@ public class JavaFXIndexer extends CustomIndexer {
     // <editor-fold defaultstate="collapsed" desc="Indexer Factory">
     @PathRecognizerRegistration(sourcePathIds={ClasspathInfo.FX_SOURCE}, mimeTypes={"text/x-fx"})
     public static class Factory extends CustomIndexerFactory {
+        private static AtomicBoolean javafxTaskFactoriesInitialized = new AtomicBoolean(false);
+
+        public Factory() {
+            if (!javafxTaskFactoriesInitialized.getAndSet(true)) {
+                ApiSourcePackageAccessor.get().registerSourceTaskFactoryManager();
+            }
+        }
 
         @Override
         public CustomIndexer createIndexer() {
@@ -648,6 +667,8 @@ public class JavaFXIndexer extends CustomIndexer {
 
     @Override
     protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
+        if (!JavaFXSourceUtils.isPlatformOk(cntxt.getRoot())) return; // don't try to index files in a project with broken javafx platform
+        
         final Map<FileObject, Indexable> indexables = new HashMap<FileObject, Indexable>();
 
         cancelled.set(false);
@@ -656,7 +677,8 @@ public class JavaFXIndexer extends CustomIndexer {
         while(iterator.hasNext()) {
             try {
                 Indexable ix = iterator.next();
-                File f = new File(ix.getURL().toURI());
+                URI uri = ix.getURL().toURI();
+                File f = new File(uri.normalize());
                 FileObject fo = FileUtil.toFileObject(f);
                 indexables.put(fo, ix);
             } catch (URISyntaxException e) {
@@ -667,6 +689,7 @@ public class JavaFXIndexer extends CustomIndexer {
             ClasspathInfo cpInfo = ClasspathInfo.create(cntxt.getRoot());
             final ClassIndex ci = cpInfo.getClassIndex();
             JavaFXSource jfxs = JavaFXSource.create(cpInfo, indexables.keySet());
+            if (jfxs == null) return; // #185591: Can happen when indexing kicks in in the middle of deleting a project
             try {
                 jfxs.runUserActionTask(new CancellableTask<CompilationController>() {
                     private List<Diagnostic<? extends JavaFileObject>> getDiagnostics(CompilationController cc) {

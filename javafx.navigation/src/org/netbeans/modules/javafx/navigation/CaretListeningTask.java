@@ -51,7 +51,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.swing.SwingUtilities;
-import javax.swing.text.Document;
 import org.netbeans.api.javafx.editor.ElementJavadoc;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
@@ -62,10 +61,8 @@ import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.javafx.source.JavaFXSourceUtils;
 import org.netbeans.api.javafx.source.Task;
 import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.source.JavaFXParserResult;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
@@ -117,19 +114,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
         int lastPosition = CaretListeningFactory.getLastPosition(fileObject);
 
-        TokenHierarchy tokens = compilationInfo.getTokenHierarchy();
-        Cancellable cancellable = new Cancellable() {
-            public boolean isCancelled() {
-                return CaretListeningTask.this.isCancelled();
-            }
-
-            public void cancell() {
-                CaretListeningTask.this.cancel();
-            }
-        };
-        Document doc = compilationInfo.getDocument();
-
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(tokens.tokenSequence(), doc, cancellable);
+        TokenSequence<JFXTokenId> ts = compilationInfo.getTokenHierarchy().tokenSequence();
         boolean inJavadoc = false;
         int offset = ts.move(lastPosition);
         if (ts.moveNext() && ts.token() != null) {
@@ -552,7 +537,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         return e;
     }
 
-    private void skipTokens(SafeTokenSequence<JFXTokenId> ts, Set<? extends TokenId> typesToSkip) {
+    private void skipTokens(TokenSequence<JFXTokenId> ts, Set<? extends TokenId> typesToSkip) {
         while (ts.moveNext()) {
             if (!typesToSkip.contains(ts.token().id())) {
                 return;

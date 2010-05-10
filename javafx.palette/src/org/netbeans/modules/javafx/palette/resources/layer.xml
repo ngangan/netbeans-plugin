@@ -461,6 +461,15 @@
             <file name="ScrollView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScrollView.xml">
                 <attr name="position" intvalue="1500"/>
             </file>
+            <file name="Tooltip.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Tooltip.xml">
+                <attr name="position" intvalue="1600"/>
+            </file>
+            <file name="ChoiceBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ChoiceBox.xml">
+                <attr name="position" intvalue="1700"/>
+            </file>
+            <file name="Separator.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Separator.xml">
+                <attr name="position" intvalue="1800"/>
+            </file>
         </folder>
         <folder name="Layouts">
             <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>

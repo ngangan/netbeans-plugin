@@ -83,5 +83,6 @@ public abstract class ApiSourcePackageAccessor {
     public abstract ElementUtilities createElementUtilities(JavaFXParserResultImpl resultImpl);
 
     public abstract TreeUtilities createTreeUtilities(JavaFXParserResultImpl resultImpl);
-    
+
+    public abstract void registerSourceTaskFactoryManager();
 }

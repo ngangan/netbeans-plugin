@@ -70,10 +70,9 @@ import org.netbeans.modules.javafx.refactoring.impl.ui.RenameRefactoringUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.SafeDeleteUI;
 import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
 import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
-import org.netbeans.modules.progress.spi.RunOffEDTProvider;
+import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
@@ -90,6 +89,7 @@ import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataFolder;
+import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.text.CloneableEditorSupport;
@@ -111,11 +111,14 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     final private static Logger LOGGER = Logger.getLogger(RefactoringActionsProvider.class.getName());
 
     @Override
-    public boolean canFindUsages(Lookup lkp) {       
-        FileObject file = lkp.lookup(FileObject.class);
-        if (!SourceUtils.isAnalyzable(file)) return false;
-        
-        return file != null && file.getMIMEType().equals("text/x-fx"); //NOI18N
+    public boolean canFindUsages(Lookup lkp) {
+        Node target = lkp.lookup(Node.class);
+
+        DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
+        if (dobj == null) return false;
+        if (!SourceUtils.isPlatformOk(dobj.getPrimaryFile())) return false;
+
+        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
     volatile private boolean isFindUsages;
 
@@ -181,7 +184,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         }
         try {
             isFindUsages = true;
-            task.run();
+            SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.whereUsedAction())); 
         } finally {
             isFindUsages = false;
         }
@@ -192,9 +195,10 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         Node target = lkp.lookup(Node.class);
 
         DataObject dobj = (target != null ? target.getCookie(DataObject.class) : null);
-        if (!SourceUtils.isAnalyzable(dobj.getPrimaryFile())) return false;
+        if (dobj == null) return false;
+        if (!SourceUtils.isPlatformOk(dobj.getPrimaryFile())) return false;
         
-        return dobj != null && SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
+        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
     }
 
     @Override
@@ -232,9 +236,12 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                             lkpContent.add(srcFo);
                         } else {
                             if (edef.getKind().isClass() || edef.getKind().isInterface()) {
-                                Set<FileObject> defining = cpInfo.getClassIndex().getResources(edef.createHandle(), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
-                                if (!defining.isEmpty()) {
-                                    lkpContent.add(defining.iterator().next());
+                                if (!edef.getNestingKind().isNested()) {
+                                    // only top level classes need renaming of theirs defining files
+                                    Set<FileObject> defining = cpInfo.getClassIndex().getResources(edef.createHandle(), EnumSet.of(SearchKind.TYPE_DEFS), EnumSet.allOf(SearchScope.class));
+                                    if (!defining.isEmpty()) {
+                                        lkpContent.add(defining.iterator().next());
+                                    }
                                 }
                             }
                         }
@@ -319,7 +326,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
     }
 
     @Override
-    public boolean canMove(Lookup lkp) {        
+    public boolean canMove(Lookup lkp) {
         Collection<? extends Node> nodes = new HashSet<Node>(lkp.lookupAll(Node.class));
         ExplorerContext drop = lkp.lookup(ExplorerContext.class);
         FileObject fo = getTarget(lkp);
@@ -342,7 +349,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
                     return false;
                 }
-                if (!SourceUtils.isAnalyzable(dob.getPrimaryFile())) {
+                if (!SourceUtils.isPlatformOk(dob.getPrimaryFile())) {
                     return false;
                 }
                 if (dob instanceof DataFolder) {
@@ -379,7 +386,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 if (!SourceUtils.isOnSourceClasspath(dob.getPrimaryFile())) {
                     return false;
                 }
-                if (!SourceUtils.isAnalyzable(dob.getPrimaryFile())) {
+                if (!SourceUtils.isPlatformOk(dob.getPrimaryFile())) {
                     return false;
                 }
                 if (SourceUtils.isJavaFXFile(dob.getPrimaryFile())) {
@@ -455,7 +462,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 }
             };
         }
-        SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.renameAction()));
+        SourceUtils.invokeAfterScanFinished(task, getActionName(RefactoringActionsFactory.moveAction()));
     }
 
     @Override
@@ -528,9 +535,6 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 
     @Override
     public boolean canDelete(Lookup lookup) {
-        if (SourceUtils.isScanInProgress()) {
-            return false;
-        }
         Collection<? extends Node> nodes = new HashSet<Node>(lookup.lookupAll(Node.class));
         //We live with a 2 pass validation of the selected nodes for now since
         //the code will become unreadable if we attempt to implement all checks

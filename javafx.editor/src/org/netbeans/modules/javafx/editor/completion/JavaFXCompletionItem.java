@@ -79,8 +79,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.editor.Cancellable;
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
 
 /**
  *
@@ -265,7 +263,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             if (i > 0)
                 toAdd = toAdd.substring(i);
-            SafeTokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+            TokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
             if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                 text.append(toAdd);
                 toAdd = null;
@@ -428,7 +426,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             if (semiPos > -2)
                 toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
             if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
-                SafeTokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+                TokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text.append(toAdd);
                     toAdd = null;
@@ -930,9 +928,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 if (semiPos > -2)
                     add = add.length() > 1 ? add.substring(0, add.length() - 1) : null;
                 JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
-                TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-                ts_ = ts_.subSequence(offset + len);
-                SafeTokenSequence<JFXTokenId> sequence = new SafeTokenSequence<JFXTokenId>(ts_, doc, Cancellable.Dummy.getInstance());
+                TokenSequence<JFXTokenId> sequence = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+                sequence = sequence.subSequence(offset + len);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text += add;
                     add = null;
@@ -1175,9 +1172,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
             if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
                 JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
-                TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-                ts_ = ts_.subSequence(offset + len);
-                SafeTokenSequence<JFXTokenId> sequence = new SafeTokenSequence<JFXTokenId>(ts_, doc, Cancellable.Dummy.getInstance());
+                TokenSequence<JFXTokenId> sequence = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+                sequence = sequence.subSequence(offset + len);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text.append(toAdd);
                     toAdd = null;
@@ -1473,7 +1469,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 final int semiPos = add.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
                 if (semiPos > -2)
                     add = add.length() > 1 ? add.substring(0, add.length() - 1) : null;
-                SafeTokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+                TokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text += add;
                     add = null;
@@ -1738,13 +1734,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     if (t != null) {
                         SourcePositions sp = controller.getTrees().getSourcePositions();
                         int endPos = (int)sp.getEndPosition(tp.getCompilationUnit(), t);
-                        SafeTokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(controller, offset, endPos);
+                        TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(controller, offset, endPos);
                         if (ts != null) {
                             ret[0] = ts.token().id() == JFXTokenId.SEMI ? -1 : ts.offset() + ts.token().length();
                         }
                     } else {
-                        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-                        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), Cancellable.Dummy.getInstance());
+                        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
                         ts.move(offset);
                         if (ts.moveNext() &&  ts.token().id() == JFXTokenId.SEMI)
                             ret[0] = -1;
@@ -1756,9 +1751,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return ret[0];
     }
     
-    private static SafeTokenSequence<JFXTokenId> findLastNonWhitespaceToken(CompilationController controller, int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts_ = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
-        SafeTokenSequence<JFXTokenId> ts = new SafeTokenSequence<JFXTokenId>(ts_, controller.getDocument(), Cancellable.Dummy.getInstance());
+    private static TokenSequence<JFXTokenId> findLastNonWhitespaceToken(CompilationController controller, int startPos, int endPos) {
+        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
         ts.move(endPos);
         while(ts.movePrevious()) {
             int offset = ts.offset();

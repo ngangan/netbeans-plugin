@@ -47,18 +47,14 @@ import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
 import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
 
 /**
@@ -85,7 +81,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
         if (offset <= sourcePositions.getStartPosition(root, pkg)) {
             addPackages(getPrefix());
         } else {
-            SafeTokenSequence<JFXTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
+            TokenSequence<JFXTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
             if (first != null && first.token().id() == JFXTokenId.SEMI) {
                 addKeywordsForCU(ut);
                 if (!hasPublicDecls) {

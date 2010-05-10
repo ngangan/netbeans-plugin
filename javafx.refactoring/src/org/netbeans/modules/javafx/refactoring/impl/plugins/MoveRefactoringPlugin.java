@@ -149,6 +149,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
     }
 
     public Problem fastCheckParameters() {
+        Problem p = null;
         try {
             for (FileObject f: refactoring.getRefactoringSource().lookupAll(FileObject.class)) {
                 if (!SourceUtils.isJavaFXFile(f))
@@ -159,14 +160,19 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                     String msg = new MessageFormat(s).format(
                             new Object[] {targetPackageName}
                     );
-                    return new Problem(true, msg);
+                    p = createProblem(p, true, msg);
                 }
+
+                if (targetPackageName == null || targetPackageName.isEmpty()) {
+                    p = createProblem(p, false, NbBundle.getMessage(MoveRefactoringPlugin.class, "ERR_MovingClassToDefaultPackage")); // NOI18N
+                }
+
                 FileObject targetRoot = SourceUtils.getClassPathRoot(((MoveRefactoring)refactoring).getTarget().lookup(URL.class));
                 FileObject targetF = targetRoot.getFileObject(targetPackageName.replace('.', '/'));
 
                 String pkgName = null;
                 if ((targetF!=null && !targetF.canWrite())) {
-                    return new Problem(true, new MessageFormat(NbBundle.getMessage(MoveRefactoringPlugin.class,"ERR_PackageIsReadOnly")).format( // NOI18N
+                    p = createProblem(p, true, new MessageFormat(NbBundle.getMessage(MoveRefactoringPlugin.class,"ERR_PackageIsReadOnly")).format( // NOI18N
                             new Object[] {targetPackageName}
                     ));
                 }
@@ -183,7 +189,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                     FileObject[] children = targetF.getChildren();
                     for (int x = 0; x < children.length; x++) {
                         if (children[x].getName().equals(fileName) && "java".equals(children[x].getExt()) && !children[x].equals(f) && !children[x].isVirtual()) { //NOI18N
-                            return new Problem(true, new MessageFormat(
+                            p = createProblem(p, true, new MessageFormat(
                                     NbBundle.getMessage(MoveRefactoringPlugin.class,"ERR_ClassToMoveClashes")).format(new Object[] {fileName} // NOI18N
                             ));
                         }
@@ -193,7 +199,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         } catch (IOException ioe) {
             //do nothing
         }
-        return null;
+        return p;
     }
 
     public Problem preCheck() {
@@ -243,9 +249,9 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                         @Override
                         protected Set<Transformation> prepareTransformations(FileObject fo) {
                             Transformation t;
-                            if (isOldDefault()) {
+                            if (isNewDefault()) {
                                 t = new RemoveTextTransformation(cm.getPackageDef().getStartPos(), cm.getPackageDef().getEndPos() - cm.getPackageDef().getStartPos());
-                            } else if (isNewDefault()) {
+                            } else if (isOldDefault()) {
                                 t = new InsertTextTransformation(cm.getPackagePos(), "package " + newPkgName + ";\n"); // NOI18N
                             } else {
                                 t = new ReplaceTextTransformation(cm.getPackageDef().getStartFQN(), getOldPkgName(), getNewPkgName());
@@ -295,24 +301,6 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
     private String getNewPackageName() {
         // XXX cache it !!!
         return SourceUtils.getPackageName(((MoveRefactoring) refactoring).getTarget().lookup(URL.class));
-    }
-
-    private void fixImports(Set<ElementDef> movingDefs, ImportSet is, ClassModel cm, boolean isMoving, Set<Transformation> transformations) {
-        int lastRemovePos = -1;
-        for(ImportEntry ie : is.getUnused()) {
-            transformations.add(new RemoveTextTransformation(ie.getStartPos(), ie.getEndPos() - ie.getStartPos()));
-            if (ie.getStartPos() > lastRemovePos) {
-                lastRemovePos = ie.getStartPos();
-            }
-        }
-        
-        int insertionPos = lastRemovePos > cm.getImportPos() ? lastRemovePos : cm.getImportPos();
-        
-        for(ImportSet.Touple<ElementDef, ImportEntry> missing : is.getMissing()) {
-            if (isMoving ^ movingDefs.contains(missing.getT1())) {
-                transformations.add(new InsertTextTransformation(insertionPos, missing.getT2().toString() + ";\n")); // NOI18N
-            }
-        }
     }
 
     synchronized private void collectMovingData(ClassIndex ci) {
@@ -372,7 +360,13 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                 org.netbeans.api.javafx.source.ElementHandle eh = edef.createHandle();
                 Set<FileObject> fileRelated = ci.getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
                 String fqn = eh.getQualifiedName();
-                renames.put(fqn, fqn.replace(edef.getPackageName(), newPkgName));
+                String newFqn = null;
+                if (edef.getPackageName().isEmpty()) {
+                    newFqn = newPkgName.isEmpty() ? fqn : newPkgName + "." + fqn;
+                } else {
+                    newFqn = fqn.replace(edef.getPackageName() + (newPkgName.isEmpty() ? "." : ""), newPkgName);
+                }
+                renames.put(fqn, newFqn);
                 pkgRenames.put(edef.getPackageName(), newPkgName);
                 Set<FileObject> rppkg = relatedPerPkg.get(edef.getPackageName());
                 if (rppkg == null) {
@@ -391,7 +385,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
     }
 
     private Collection<BaseRefactoringElementImplementation> getRenameOccurencesInRelated(final String newName, final Set<ElementDef> movingElDefs, RefactoringSession session) {
-        Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
+        Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();        
         for(final Map.Entry<String, Set<FileObject>> entry : relatedPerPkg.entrySet()) {
             fireProgressListenerStep();
             for(FileObject refFo : entry.getValue()) {
@@ -408,7 +402,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                             // a small hack
                             ElementDef typeDef = refCm.getDefForPos(usg.getEndPos() + 2); // move 1 character past the "." delimiter
                             if (typeDef != null && movingElDefs.contains(typeDef)) {
-                                transformations.add(new ReplaceTextTransformation(usg.getStartPos(), getOldName(), getNewName()));
+                                transformations.add(new ReplaceTextTransformation(usg.getStartPos(), getOldName() + (getNewName().isEmpty() ? "." : ""), getNewName()));
                             }
                         }
                         return transformations;

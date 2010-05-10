@@ -80,12 +80,8 @@ import org.netbeans.modules.parsing.api.Source;
  */
 public final class JavaFXSource {
 
-    // Already logged warning about running in AWT
-    private static final Set<StackTraceElement> WARNED_ABOUT_RUN_IN_EQ = new HashSet<StackTraceElement>();
-
     static {
-        JavaFXSourceTaskFactoryManager.register();
-	hackCompilersLexer();
+        hackCompilersLexer();
     }
 
     public static enum Phase {
@@ -230,19 +226,6 @@ public final class JavaFXSource {
     public void runUserActionTask( final Task<? super CompilationController> task, final boolean shared) throws IOException {
         if (task == null) {
             throw new IllegalArgumentException ("Task cannot be null");     //NOI18N
-        }
-
-        boolean a = false;
-        assert a = true;
-        if (a && javax.swing.SwingUtilities.isEventDispatchThread()) {
-            StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[2];
-            if (stackTraceElement != null && WARNED_ABOUT_RUN_IN_EQ.add(stackTraceElement)) {
-                LOGGER.warning("ParserManager.parse called in AWT event thread by: " + stackTraceElement); // NOI18N
-                LOGGER.warning("  - thread dump follows:"); // NOI18N
-                if (LOGGER.isLoggable(Level.WARNING)) {
-                    Thread.dumpStack();
-                }
-            }
         }
 
         if (this.files.size()>=1) {

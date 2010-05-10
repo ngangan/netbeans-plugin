@@ -46,7 +46,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 
-import org.netbeans.api.javafx.editor.SafeTokenSequence;
+import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
 
@@ -69,7 +69,7 @@ public class BinaryTreeEnvironment extends JavaFXCompletionEnvironment<BinaryTre
         }
         pos = (int) sourcePositions.getEndPosition(root, bi.getLeftOperand());
         if (pos != Diagnostic.NOPOS) {
-            SafeTokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
+            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
             if (last != null) {
                 localResult(null);
                 addValueKeywords();

@@ -45,29 +45,28 @@ import com.sun.javafx.api.tree.ExpressionTree;
 import com.sun.javafx.api.tree.FunctionInvocationTree;
 import com.sun.javafx.api.tree.IdentifierTree;
 import com.sun.javafx.api.tree.InstantiateTree;
+import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
+import com.sun.tools.javafx.code.JavafxClassSymbol;
 import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JFXVarInit;
+import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
+import javax.lang.model.element.Element;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import javax.tools.Diagnostic;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -84,21 +83,22 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author karol
+ * @author karol harezlak
  */
-public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
 
     private final AtomicBoolean cancel = new AtomicBoolean();
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
     private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
     private static final String JAVAFX_RUN = "public static synthetic function javafx$run$"; //NOI18N
+    private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public CreateElementTaskFactory() {
         super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
     }
 
-    private enum Kind {
+    enum Kind {
 
         LOCAL_CLASS,
         CLASS,
@@ -108,7 +108,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
     };
 
     @Override
-    public CancellableTask<CompilationInfo> createTask(final FileObject file) {
+    protected CancellableTask<CompilationInfo> createTask(final FileObject file) {
 
         return new CancellableTask<CompilationInfo>() {
 
@@ -117,41 +117,42 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-
+                errorDescriptions.clear();
                 cancel.set(false);
-                if (!(compilationInfo.getDocument() instanceof JavaFXDocument)) {
-                    return;
-                }
-                JavaFXDocument document = (JavaFXDocument) compilationInfo.getDocument();
-                final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
-
+                Document document = compilationInfo.getDocument();
                 for (final Diagnostic diagnostic : compilationInfo.getDiagnostics()) {
                     if (cancel.get()) {
                         break;
                     }
-                    if (isValidError(diagnostic, document)
-                            && (diagnostic instanceof JCDiagnostic)) {
-
-                        Kind kinds[] = getKinds(diagnostic, compilationInfo);
+                    if (!(diagnostic instanceof JCDiagnostic)) {
+                        continue;
+                    }
+                    if (isValidError(diagnostic, document) && (diagnostic instanceof JCDiagnostic)) {
+                        Kind kinds[] = getKinds((JCDiagnostic) diagnostic, compilationInfo);
                         for (Kind kind : kinds) {
                             errorDescriptions.add(getErrorDescription(document, compilationInfo, (JCDiagnostic) diagnostic, kind));
                         }
                     }
                 }
-                HintsController.setErrors(compilationInfo.getDocument(), "", errorDescriptions);
+                HintsController.setErrors(compilationInfo.getDocument(), "", errorDescriptions); //NOI18N
             }
         };
     }
 
-    private boolean isValidError(Diagnostic diagnostic, JavaFXDocument document) {
-        if (diagnostic.getCode().equals(ERROR_CODE) && !document.isPosGuarded((int) diagnostic.getPosition())) {
+    @Override
+    Collection<ErrorDescription> getErrorDescriptions() {
+        return Collections.unmodifiableCollection(errorDescriptions);
+    }
+
+    private boolean isValidError(Diagnostic diagnostic, Document document) {
+        if (diagnostic.getCode().equals(ERROR_CODE) && !HintsUtils.isInGuardedBlock(document, (int) diagnostic.getPosition())) {
             return true;
         }
 
         return false;
     }
 
-    private ErrorDescription getErrorDescription(JavaFXDocument document,
+    private ErrorDescription getErrorDescription(Document document,
             final CompilationInfo compilationInfo,
             final JCDiagnostic diagnostic,
             final Kind kind) {
@@ -167,15 +168,40 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         return errorDescription;
     }
 
-    private Kind[] getKinds(final Diagnostic diagnostic, final CompilationInfo compilationInfo) {
+    private Kind[] getKinds(final JCDiagnostic diagnostic, final CompilationInfo compilationInfo) {
         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
         final ArrayList<Kind> array = new ArrayList<Kind>();
+        final String[] classFQN = new String[1];
+        if (diagnostic.getArgs().length >= 6 && diagnostic.getArgs()[5] instanceof String) {
+            classFQN[0] = (String) diagnostic.getArgs()[5];
+        }
+        new JavaFXTreePathScanner<Void, Void>() {
 
-        new JavaFXTreePathScanner<Void,Void> () {
+            private String currentClassFQN;
+
+            @Override
+            public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
+                JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
+                Element element = compilationInfo.getTrees().getElement(path);
+                if (element instanceof JavafxClassSymbol) {
+                    JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
+                    currentClassFQN = classSymbol.className();
+                    if (node.getExtends() != null) {
+                        for (Tree tree : node.getExtends()) {
+                            if (currentClassFQN != null && checkPosition(tree, diagnostic) && currentClassFQN.equals(classFQN[0])) {
+                                array.add(Kind.CLASS);
+                                array.add(Kind.LOCAL_CLASS);
+                                return null;
+                            }
+                        }
+                    }
+                }
+                return super.visitClassDeclaration(node, p);
+            }
 
             @Override
             public Void visitInstantiate(InstantiateTree node, Void p) {
-                if (checkPosition(node, diagnostic)) {
+                if (currentClassFQN != null && checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
                     array.add(Kind.CLASS);
                     array.add(Kind.LOCAL_CLASS);
                     return null;
@@ -185,25 +211,22 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
 
             @Override
             public Void visitIdentifier(IdentifierTree node, Void p) {
-                if (checkPosition(node, diagnostic)) {
+                if (currentClassFQN != null && checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
                     if (getCurrentPath().getParentPath().getLeaf() instanceof JFXBlock) {
                         array.add(Kind.LOCAL_VARIABLE);
                     }
                     array.add(Kind.VARIABLE);
                     return null;
                 }
-
                 return super.visitIdentifier(node, p);
             }
 
-            
             @Override
             public Void visitMethodInvocation(FunctionInvocationTree node, Void p) {
-                if (checkPosition(node, diagnostic)) {
+                if (currentClassFQN != null && checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
                     array.add(Kind.FUNCTION);
                     return null;
                 }
-
                 return super.visitMethodInvocation(node, p);
             }
 
@@ -214,14 +237,12 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 if (start == diagnostic.getStartPosition()) {
                     return true;
                 }
-                
+
                 return false;
             }
-            
-            
         }.scan(compilationInfo.getCompilationUnit(), null);
 
-        return  array.toArray(new Kind[array.size()]);
+        return array.toArray(new Kind[array.size()]);
     }
 
     private static String getMessage(Kind kind, String elementName, String classFullName, ExpressionTree packageName) {
@@ -243,7 +264,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         //return NbBundle.getMessage(CreateNewElementTaskFactory.class, message, diagnostic.getArgs()[1].toString(), diagnostic.getArgs()[5].toString());
     }
 
-    private class ElementFix implements Fix {
+    private static class ElementFix implements Fix {
 
         private final Kind kind;
         private final Document document;
@@ -271,19 +292,19 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         public ChangeInfo implement() throws Exception {
             final GeneratedCode[] generatedCode = new GeneratedCode[1];
             if (kind == Kind.FUNCTION) {
-                generatedCode[0] = createFunction();
+                generatedCode[0] = createFunction(compilationInfo, diagnostic);
             } else if (kind == Kind.LOCAL_VARIABLE || kind == Kind.VARIABLE) {
-                generatedCode[0] = createVariable(diagnostic, kind);
+                generatedCode[0] = createVariable(compilationInfo, diagnostic, kind);
             } else if (kind == Kind.LOCAL_CLASS) {
-                generatedCode[0] = createLocalClass();
+                generatedCode[0] = createLocalClass(compilationInfo, diagnostic);
             } else if (kind == Kind.CLASS) {
                 //Does not insert any code in current class, creates new class and open it in editor
-                createClass();
+                createClass(compilationInfo, diagnostic);
             }
             if (generatedCode[0] == null) {
                 return null;
             }
-            SwingUtilities.invokeLater(new Runnable() {
+            Runnable runnable = new Runnable() {
 
                 public void run() {
                     try {
@@ -291,28 +312,23 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                         if (kind != Kind.FUNCTION) {
                             return;
                         }
-                        final JTextComponent target = HintsUtils.getEditorComponent(document);
-                        if (target == null) {
-                            LOGGER.severe("No GUI component for editor document " + document); //NOI18N
-                            return;
-                        }
-                        SwingUtilities.invokeLater(new Runnable() {
-
-                            public void run() {
-                                Imports.addImport(target, HintsUtils.EXCEPTION_UOE);
-                            }
-                        });
-                        
+                        HintsUtils.addImport(document, HintsUtils.EXCEPTION_UOE);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
-            });
+            };
+            HintsUtils.runInAWT(runnable);
 
             return null;
         }
 
-        private GeneratedCode createFunction() {
+        @Override
+        public String toString() {
+            return super.toString() + " " + kind + " ";
+        }
+
+        private static GeneratedCode createFunction(final CompilationInfo compilationInfo, final JCDiagnostic diagnostic) {
             StringBuffer code = new StringBuffer();
             Object name = diagnostic.getArgs()[1];
 
@@ -342,7 +358,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
 
-            String space = HintsUtils.calculateSpace(position[0], document);
+            String space = HintsUtils.calculateSpace(position[0], compilationInfo.getDocument());
             if (space.length() > 0) {
                 space = space.substring(0, space.length() - 1);
             }
@@ -354,19 +370,19 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             return new GeneratedCode(position[0], code.toString());
         }
 
-        private GeneratedCode createVariable(final JCDiagnostic diagnostic, Kind kind) {
+        private static GeneratedCode createVariable(CompilationInfo compilationInfo, JCDiagnostic diagnostic, Kind kind) {
             Object varName = diagnostic.getArgs()[1];
             GeneratedCode generatedCode = null;
             if (kind == Kind.LOCAL_VARIABLE) {
-                generatedCode = generateLocalVar(varName.toString());
+                generatedCode = generateLocalVar(compilationInfo, diagnostic, varName.toString());
             } else if (kind == Kind.VARIABLE) {
-                generatedCode = generateVar(varName.toString());
+                generatedCode = generateVar(compilationInfo, diagnostic, varName.toString());
             }
 
             return generatedCode;
         }
 
-        private GeneratedCode generateLocalVar(String varName) {
+        private static GeneratedCode generateLocalVar(final CompilationInfo compilationInfo, final JCDiagnostic diagnostic, String varName) {
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
             position[0] = -1;
@@ -384,7 +400,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                     return super.visitIdentifier(node, p);
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
-            String space = HintsUtils.calculateSpace(position[0], document);
+            String space = HintsUtils.calculateSpace(position[0], compilationInfo.getDocument());
             StringBuffer code = new StringBuffer().append("\n").append(space).append("var ").append(varName).append(";\n").append(space); //NOI18N
             if (position[0] < 0) {
                 position[0] = (int) diagnostic.getStartPosition();
@@ -393,7 +409,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             return new GeneratedCode(position[0], code.toString());
         }
 
-        private GeneratedCode generateVar(final String varName) {
+        private static GeneratedCode generateVar(final CompilationInfo compilationInfo, final JCDiagnostic diagnostic, final String varName) {
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
             final StringBuffer code = new StringBuffer();
@@ -422,16 +438,17 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                                 firstVar = tree;
                             }
                         }
+                        final Document document = compilationInfo.getDocument();
                         if (firstVar != null) {
                             position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), firstVar);
                             String space = HintsUtils.calculateSpace(position[0], document);
-                            code.append("\nvar ").append(varName).append(";\n").append(space); //NOI18N
+                            code.append("\n" + space).append("var ").append(varName).append(";\n").append(space); //NOI18N
 
                             return null;
                         }
 
                         try {
-                            //TODO Line below returns 0 in same cases which means start of the node and end of the node is the same which is not true.
+                            //TODO Line below returns 0 in some cases. It means start of the node and end of the node equals which is not true.
                             //int length = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), currentClass) - start;
                             //TODO Workaround for this problem
 
@@ -449,7 +466,6 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                                             code.append("\n"); //NOI18N
                                             position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(), treeForPosition);
                                         }
-
                                     }
 
                                     return null;
@@ -472,13 +488,13 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
                 }
             }.scan(compilationInfo.getCompilationUnit(), null);
             if (position[0] < 0) {
-                return generateLocalVar(varName);
+                return generateLocalVar(compilationInfo, diagnostic, varName);
             }
 
-            return diagnostic.getStartPosition() < position[0] ? generateLocalVar(varName) : new GeneratedCode(position[0], code.toString());
+            return diagnostic.getStartPosition() < position[0] ? generateLocalVar(compilationInfo, diagnostic, varName) : new GeneratedCode(position[0], code.toString());
         }
 
-        private GeneratedCode createLocalClass() {
+        private static GeneratedCode createLocalClass(final CompilationInfo compilationInfo, JCDiagnostic diagnostic) {
             StringBuffer code = new StringBuffer();
             Object name = diagnostic.getArgs()[1];
             final int position[] = new int[1];
@@ -499,7 +515,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
             return new GeneratedCode(position[0], code.toString());
         }
 
-        private void createClass() throws DataObjectNotFoundException, IOException {
+        private static void createClass(CompilationInfo compilationInfo, JCDiagnostic diagnostic) throws DataObjectNotFoundException, IOException {
             FileObject classTemplate = FileUtil.getConfigFile(TEMPLATE_JAVAFX); //NOI18N
             DataObject classTemplateDO = DataObject.find(classTemplate);
             DataObject od = classTemplateDO.createFromTemplate(DataFolder.findFolder(compilationInfo.getFileObject().getParent()), diagnostic.getArgs()[1].toString());
@@ -508,7 +524,7 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
         }
     }
 
-    private class GeneratedCode {
+    private static class GeneratedCode {
 
         private int positon;
         private String code;
@@ -524,6 +540,11 @@ public final class CreateElementTaskFactory extends EditorAwareJavaFXSourceTaskF
 
         public int getPositon() {
             return positon;
+        }
+
+        @Override
+        public String toString() {
+            return code;
         }
     }
 }

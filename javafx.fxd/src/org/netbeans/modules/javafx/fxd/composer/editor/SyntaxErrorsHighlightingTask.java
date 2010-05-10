@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -24,7 +24,7 @@
  * Contributor(s):
  *
  * The Original Software is NetBeans. The Initial Developer of the Original
- * Software is Sun Microsystems, Inc. Portions Copyright 1997-2007 Sun
+ * Software is Sun Microsystems, Inc. Portions Copyright 1997-2006 Sun
  * Microsystems, Inc. All Rights Reserved.
  *
  * If you wish your version of this file to be governed by only the CDDL
@@ -58,6 +58,7 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 
 /**
@@ -66,29 +67,36 @@ import org.openide.util.Exceptions;
  */
 public class SyntaxErrorsHighlightingTask extends ParserResultTask {
 
+    private static final String MSG_ERROR = "MSG_ERROR"; // NOI18N
+
     public SyntaxErrorsHighlightingTask() {
     }
 
     @Override
     public void run(Result result, SchedulerEvent event) {
         try {
+            Document document = result.getSnapshot().getSource().getDocument(false);
+            if(document == null){
+                return;
+            }
             FXDParserResult fxdResult = (FXDParserResult) result;
             List<FXDSyntaxErrorException> syntaxErrors = fxdResult.getSyntaxErrors();
-            Document document = result.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
             for (FXDSyntaxErrorException syntaxError : syntaxErrors) {
                 int ErrRow = getRow(syntaxError, (BaseDocument) document);
                 int ErrPosition = getPosition(syntaxError, (BaseDocument) document);
 
+                // 174091
                 ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
-                        syntaxError.getMessage() + " at [" + ErrRow + "," + ErrPosition + "]",
+                        NbBundle.getMessage(SyntaxErrorsHighlightingTask.class,
+                                MSG_ERROR, syntaxError.getLocalizedMessage(), ErrRow, ErrPosition),
                         document,
                         ErrRow);
                 errors.add(errorDescription);
             }
             if (document != null) {
-                HintsController.setErrors(document, "simple-java", errors);
+                HintsController.setErrors(document, "simple-java", errors); //NOI18N
             }
         } catch (BadLocationException ex1) {
             Exceptions.printStackTrace(ex1);
