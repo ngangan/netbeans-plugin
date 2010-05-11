@@ -188,6 +188,7 @@ is divided into following sections:
                 </not>
             </condition>
             <property name="run.jvmargs" value=""/>
+            <property name="packager.options" value=""/>
             <available property="emulator.available" file="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}"/>
             <available property="tvemulator.available" file="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}"/>
         </target>
@@ -256,6 +257,7 @@ is divided into following sections:
                 <arg value="${{sign.arg}}"/>
                 <arg value="-updatecheck"/>
                 <arg value="${{jnlp.update.model}}"/>
+                <arg line="${{packager.options}}"/>
                 <arg value="-cp"/>
                 <arg path="${{javac.classpath}}"/>
             </exec>
