@@ -718,7 +718,13 @@ public class JavaFXIndexer extends CustomIndexer {
                         } else {
                             try {
                                 if (ix != null) {
-                                    ErrorsCache.setErrors(cntxt.getRootURI(), ix, getDiagnostics(cc), DIAG_ERROR_CONVERTOR);
+                                    List<Diagnostic<? extends FileObject>> filtered = new ArrayList<Diagnostic<? extends FileObject>>();
+                                    for(Diagnostic d : getDiagnostics(cc)) {
+                                        if (d.toString().endsWith(ix.getRelativePath())) {
+                                            filtered.add(d);
+                                        }
+                                    }
+                                    ErrorsCache.setErrors(cntxt.getRootURI(), ix, filtered, DIAG_ERROR_CONVERTOR);
                                 }
                                 if (!cntxt.isSupplementaryFilesIndexing()) {
                                     IndexingSupport support = IndexingSupport.getInstance(cntxt);
