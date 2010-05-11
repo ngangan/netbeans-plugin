@@ -162,9 +162,11 @@ public class JavaFXSourceUtils {
         ClasspathInfo cpi = ClasspathInfo.create(f);
         ClassPath cp = cpi.getClassPath(ClasspathInfo.PathKind.BOOT);
         for(ClassPath.Entry e : cp.entries()) {
-            if (!e.isValid()) return false;
+            if (e.getURL().toString().endsWith("javafxrt.jar!/")) { // NOI18N
+                return  e.isValid();
+            }
         }
-        return true;
+        return false;
     }
 
     public static boolean isJavaFXFile(FileObject f) {
