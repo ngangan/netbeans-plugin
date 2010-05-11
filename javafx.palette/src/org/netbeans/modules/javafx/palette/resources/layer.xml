@@ -115,6 +115,9 @@
             <file name="OnKeyTyped.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyTyped.xml">
                 <attr name="position" intvalue="1200"/>
             </file>
+            <file name="At.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/At.xml">
+                <attr name="position" intvalue="1300"/>
+            </file>
         </folder>
         
         <folder name="Shapes">
