@@ -115,9 +115,6 @@
             <file name="OnKeyTyped.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyTyped.xml">
                 <attr name="position" intvalue="1200"/>
             </file>
-            <file name="At.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/At.xml">
-                <attr name="position" intvalue="1300"/>
-            </file>
         </folder>
         
         <folder name="Shapes">
@@ -344,6 +341,9 @@
             </file>
             <file name="EaseBoth.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseBoth.xml">
                 <attr name="position" intvalue="900"/>
+            </file>
+             <file name="At.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/At.xml">
+                <attr name="position" intvalue="1000"/>
             </file>
         </folder>
         <folder name="Transitions">
