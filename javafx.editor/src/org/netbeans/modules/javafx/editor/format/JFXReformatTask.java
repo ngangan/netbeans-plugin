@@ -2277,7 +2277,7 @@ public class JFXReformatTask implements ReformatTask {
                 accept(JFXTokenId.EQ);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                 if (acceptAndRollback(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
-                    acceptAndRollback(JFXTokenId.IDENTIFIER);
+                    accept(JFXTokenId.IDENTIFIER);
                 }
             }
             scan(node.getBody(), p);
