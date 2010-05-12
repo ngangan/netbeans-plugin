@@ -39,11 +39,8 @@
 package org.netbeans.modules.javafx.palette.items.transition;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.Imports;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -52,13 +49,6 @@ import org.openide.util.NbBundle;
 public class RotateTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage(RotateTransition.class, "TEMPLATE_RotateTransition"); // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get(targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary(code);
-        template.insert(targetComponent);
-
-        Imports.addImport(targetComponent, "javafx.animation.transition.RotateTransition"); //NOI18N
-
-        return true;
+        return JavaFXPaletteUtilities.updateCode(RotateTransition.class, "TEMPLATE_RotateTransition", targetComponent, "javafx.animation.transition.RotateTransition"); //NOI18N;
     }
 }

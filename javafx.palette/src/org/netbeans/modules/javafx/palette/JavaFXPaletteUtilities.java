@@ -43,15 +43,48 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import org.netbeans.api.javafx.source.Imports;
 import org.netbeans.editor.BaseDocument;
+import org.netbeans.editor.GuardedDocument;
+import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
+import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
 import org.netbeans.modules.editor.indent.api.Indent;
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  *
  * @author Michal Skvor
  */
-public class JavaFXPaletteUtilities {
+public final class JavaFXPaletteUtilities {
+
+    private static boolean  updateCode(String code, Class c, String templateName, JTextComponent targetComponent, String... imp) {
+        Document document = targetComponent.getDocument();
+        if (document instanceof GuardedDocument) {
+            GuardedDocument d = (GuardedDocument) document;
+            if (d.isPosGuarded(targetComponent.getCaretPosition())){
+                return false;
+            }
+        }
+        if (code == null) {
+            code = NbBundle.getMessage( c, templateName );
+        }
+        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
+        CodeTemplate template = ctm.createTemporary( code );
+        template.insert( targetComponent );
+        for (String i : imp) {
+            Imports.addImport( targetComponent, i ); 
+        }
+        return true;
+    }
+    
+    public static boolean  updateCode(Class c, String templateName, JTextComponent targetComponent, String... imp) {
+        return updateCode(null, c, templateName, targetComponent, imp);
+    }
+
+    public static boolean  updateCode(String code, JTextComponent targetComponent, String... imp) {
+        return updateCode(code, null, null, targetComponent, imp);
+    }
 
     public static String CARET = "&CARET&"; // NOI18N
     

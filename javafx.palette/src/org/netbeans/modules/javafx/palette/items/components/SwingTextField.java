@@ -40,11 +40,8 @@
 package org.netbeans.modules.javafx.palette.items.components;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,14 +50,6 @@ import org.openide.util.NbBundle;
 public class SwingTextField implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( SwingTextField.class, "TEMPLATE_SwingTextField" ); // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-        
-        // Imports
-        Imports.addImport( targetComponent, "javafx.ext.swing.SwingTextField" ); // NOI18N
-        
-        return true;
+        return  JavaFXPaletteUtilities.updateCode( SwingTextField.class, "TEMPLATE_SwingTextField", targetComponent, "javafx.ext.swing.SwingTextField"); //NOI18N;
     }    
 }

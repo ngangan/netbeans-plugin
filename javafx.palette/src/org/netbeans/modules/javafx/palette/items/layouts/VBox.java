@@ -44,7 +44,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  * @author karol harezlak
  */
 
-public final class VBox extends Layout{
+public final class VBox extends AbstractLayout{
 
     public VBox() {
         templateName = "TEMPLATE_VBox"; // NOI18N

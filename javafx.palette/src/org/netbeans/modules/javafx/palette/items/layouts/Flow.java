@@ -43,7 +43,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  *
  * @author karol harezlak
  */
-public final class Flow extends Layout{
+public final class Flow extends AbstractLayout{
 
     public Flow() {
         templateName = "TEMPLATE_Flow"; // NOI18N

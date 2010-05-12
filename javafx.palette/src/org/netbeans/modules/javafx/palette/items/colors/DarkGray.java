@@ -39,27 +39,14 @@
 
 package org.netbeans.modules.javafx.palette.items.colors;
 
-import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
-import org.openide.text.ActiveEditorDrop;
-
 /**
  *
  * @author Michal Skvor
  */
-public class DarkGray implements ActiveEditorDrop {
+public class DarkGray extends  AbstractColor {
 
-    public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = "Color.DARKGRAY"; // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-        
-        // Import
-        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
-        
-        return true;
+    public DarkGray() {
+        super("Color.DARKGRAY"); //NOI18N
     }
+
 }

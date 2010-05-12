@@ -36,15 +36,11 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.palette.items.applications;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,16 +49,6 @@ import org.openide.util.NbBundle;
 public class CustomNode implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( CustomNode.class, "TEMPLATE_CustomNode" ); // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-        
-        //
-        Imports.addImport( targetComponent, "javafx.scene.CustomNode" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.Group" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.Node" ); // NOI18N
-        
-        return true;
+        return JavaFXPaletteUtilities.updateCode(CustomNode.class, "TEMPLATE_CustomNode", targetComponent, "javafx.scene.CustomNode", "javafx.scene.Group", "javafx.scene.Node"); //NOI18N;
     }
 }
