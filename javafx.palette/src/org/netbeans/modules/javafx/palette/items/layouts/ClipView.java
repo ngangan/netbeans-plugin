@@ -43,7 +43,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  *
  * @author karol harezlak
  */
-public final class ClipView extends Layout{
+public final class ClipView extends AbstractLayout{
 
     public ClipView() {
         templateName = "TEMPLATE_ClipView"; // NOI18N

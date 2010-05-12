@@ -44,7 +44,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  * @author karol harezlak
  */
 
-public final class Panel extends Layout{
+public final class Panel extends AbstractLayout{
 
     public Panel() {
         templateName = "TEMPLATE_Panel"; // NOI18N
