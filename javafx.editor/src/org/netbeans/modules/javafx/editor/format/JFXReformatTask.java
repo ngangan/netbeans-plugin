@@ -2236,8 +2236,11 @@ public class JFXReformatTask implements ReformatTask {
 
             final JavafxBindStatus bindStatus = node.getBindStatus();
             if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
-                accept(JFXTokenId.BIND);
-                space();
+                JFXTokenId accepted = accept(JFXTokenId.BIND);
+                // #186032
+                if (accepted == JFXTokenId.BIND) {
+                    space();
+                }
             }
             scan(node.getExpression(), p);
             if (bindStatus.isBidiBind()) {
