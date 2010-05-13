@@ -94,7 +94,9 @@ public class CompilerIndependentJFXIndentTask implements IndentTask {
     }
 
     public ExtraLock indentLock() {
-        return JavaFXReformatExtraLock.getInstance();
+        // #183791
+//        return JavaFXReformatExtraLock.getInstance();
+        return null;
     }
 
 }
