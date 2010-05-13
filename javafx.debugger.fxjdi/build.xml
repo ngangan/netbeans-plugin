@@ -6,7 +6,7 @@
     <description>Builds, tests, and runs the project org.netbeans.modules.javafx.fxjdi.</description>
     <import file="nbproject/build-impl.xml"/>
 
-    <property name="fxjdi.url" value="http://openjfx.java.sun.com/hudson/job/openjfx-debug/lastSuccessfulBuild/artifact/fxjdi/dist/fxjdi.jar"/>
+    <property name="fxjdi.url" value="http://openjfx.java.sun.com/hudson/job/openjfx-jdi/lastSuccessfulBuild/artifact/fxjdi/dist/fxjdi.jar"/>
     
     <target name="release">
         <echo message="Downloading fxjdi library"/>
