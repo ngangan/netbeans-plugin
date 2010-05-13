@@ -100,7 +100,9 @@ public final class JavaFXSourceCancelableTask extends ParserResultTask<JavaFXPar
         final CompilationController compilationController = CompilationController.create(result);
         assert compilationController != null;
         try {
-            this.task.run(compilationController);
+            if (!result.toPhase(phase).lessThan(phase)) { // #186081: Sanity check
+                this.task.run(compilationController);
+            }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
