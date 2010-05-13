@@ -2236,8 +2236,11 @@ public class JFXReformatTask implements ReformatTask {
 
             final JavafxBindStatus bindStatus = node.getBindStatus();
             if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
-                accept(JFXTokenId.BIND);
-                space();
+                JFXTokenId accepted = accept(JFXTokenId.BIND);
+                // #186032
+                if (accepted == JFXTokenId.BIND) {
+                    space();
+                }
             }
             scan(node.getExpression(), p);
             if (bindStatus.isBidiBind()) {
@@ -2567,6 +2570,8 @@ public class JFXReformatTask implements ReformatTask {
 
             // JavaFX Non-reserved keywords feature, see v4Parser.g
             if (tokenIds.contains(JFXTokenId.IDENTIFIER)) {
+                // #186035
+                tokenIds.addAll(ReformatUtils.RESERVED_KEYWORDS);
                 tokenIds.addAll(ReformatUtils.NON_RESERVED_KEYWORDS);
             }
 
