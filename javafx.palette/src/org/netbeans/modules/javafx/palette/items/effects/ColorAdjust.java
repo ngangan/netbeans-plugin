@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ColorAdjust implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( Bloom.class, "TEMPLATE_ColorAdjust", targetComponent, "javafx.scene.effect.ColorAdjust"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( Bloom.class, "TEMPLATE_ColorAdjust", targetComponent, "javafx.scene.effect.ColorAdjust"); //NOI18N;
     }
 }

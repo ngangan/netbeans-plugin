@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Action implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( Action.class, "TEMPLATE_Action", targetComponent ); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( Action.class, "TEMPLATE_Action", targetComponent ); //NOI18N;
     }
 }

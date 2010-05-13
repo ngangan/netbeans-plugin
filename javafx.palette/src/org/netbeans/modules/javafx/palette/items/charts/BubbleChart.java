@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class BubbleChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(BubbleChart.class, "TEMPLATE_BubbleChart", targetComponent, "javafx.scene.chart.BubbleChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(BubbleChart.class, "TEMPLATE_BubbleChart", targetComponent, "javafx.scene.chart.BubbleChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

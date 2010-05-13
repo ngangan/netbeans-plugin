@@ -23,7 +23,7 @@ abstract class AbstractColor implements ActiveEditorDrop {
     }
     
     public final boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(code, targetComponent, "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(code, targetComponent, "javafx.scene.paint.Color"); //NOI18N;
     }
 
 }

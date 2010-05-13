@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class MotionBlur implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(MotionBlur.class, "TEMPLATE_MotionBlur", targetComponent, "javafx.scene.effect.MotionBlur"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(MotionBlur.class, "TEMPLATE_MotionBlur", targetComponent, "javafx.scene.effect.MotionBlur"); //NOI18N;
     }
 }

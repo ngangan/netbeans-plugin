@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Rotate implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Rotate.class, "TEMPLATE_Rotate", targetComponent, "javafx.scene.transform.Rotate"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Rotate.class, "TEMPLATE_Rotate", targetComponent, "javafx.scene.transform.Rotate"); //NOI18N;
     }
 }

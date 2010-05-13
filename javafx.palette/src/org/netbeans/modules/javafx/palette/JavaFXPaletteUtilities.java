@@ -58,7 +58,7 @@ import org.openide.util.NbBundle;
  */
 public final class JavaFXPaletteUtilities {
 
-    private static boolean  updateCode(String code, Class c, String templateName, JTextComponent targetComponent, String... imp) {
+    private static boolean  insertSnippet(String code, Class c, String templateName, JTextComponent targetComponent, String... imp) {
         Document document = targetComponent.getDocument();
         if (document instanceof GuardedDocument) {
             GuardedDocument d = (GuardedDocument) document;
@@ -78,12 +78,12 @@ public final class JavaFXPaletteUtilities {
         return true;
     }
     
-    public static boolean  updateCode(Class c, String templateName, JTextComponent targetComponent, String... imp) {
-        return updateCode(null, c, templateName, targetComponent, imp);
+    public static boolean  insertSnippet(Class c, String templateName, JTextComponent targetComponent, String... imp) {
+        return insertSnippet(null, c, templateName, targetComponent, imp);
     }
 
-    public static boolean  updateCode(String code, JTextComponent targetComponent, String... imp) {
-        return updateCode(code, null, null, targetComponent, imp);
+    public static boolean  insertSnippet(String code, JTextComponent targetComponent, String... imp) {
+        return insertSnippet(code, null, null, targetComponent, imp);
     }
 
     public static String CARET = "&CARET&"; // NOI18N

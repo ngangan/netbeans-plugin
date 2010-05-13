@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ArcTo implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ArcTo.class, "TEMPLATE_ArcTo", targetComponent, "javafx.scene.shape.ArcTo"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ArcTo.class, "TEMPLATE_ArcTo", targetComponent, "javafx.scene.shape.ArcTo"); //NOI18N;
     }
 }

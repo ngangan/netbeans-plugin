@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ScaleTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ScaleTransition.class, "TEMPLATE_ScaleTransition", targetComponent, "javafx.animation.transition.ScaleTransition"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ScaleTransition.class, "TEMPLATE_ScaleTransition", targetComponent, "javafx.animation.transition.ScaleTransition"); //NOI18N;
     }
 }

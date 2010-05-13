@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class LineTo implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode(LineTo.class, "TEMPLATE_LineTo" , targetComponent, "javafx.scene.shape.LineTo"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet(LineTo.class, "TEMPLATE_LineTo" , targetComponent, "javafx.scene.shape.LineTo"); //NOI18N;
     }
 }

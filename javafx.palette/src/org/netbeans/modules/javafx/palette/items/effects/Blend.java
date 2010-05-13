@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Blend implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Bloom.class, "TEMPLATE_Blend", targetComponent, "javafx.scene.effect.Blend", "javafx.scene.effect.BlendMode"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Bloom.class, "TEMPLATE_Blend", targetComponent, "javafx.scene.effect.Blend", "javafx.scene.effect.BlendMode"); //NOI18N;
     }
 }

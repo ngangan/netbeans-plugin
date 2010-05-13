@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class LineChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(LineChart.class, "TEMPLATE_LineChart", targetComponent, "javafx.scene.chart.LineChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(LineChart.class, "TEMPLATE_LineChart", targetComponent, "javafx.scene.chart.LineChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

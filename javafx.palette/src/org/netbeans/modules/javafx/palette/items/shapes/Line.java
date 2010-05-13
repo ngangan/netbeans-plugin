@@ -50,7 +50,7 @@ import org.openide.text.ActiveEditorDrop;
 public class Line implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( Circle.class, "TEMPLATE_Line", targetComponent,"javafx.scene.shape.Line","javafx.scene.paint.Color" ); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( Circle.class, "TEMPLATE_Line", targetComponent,"javafx.scene.shape.Line","javafx.scene.paint.Color" ); //NOI18N;
     }
     
 }

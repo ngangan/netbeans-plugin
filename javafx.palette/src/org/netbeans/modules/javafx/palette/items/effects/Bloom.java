@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Bloom implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Bloom.class, "TEMPLATE_Bloom", targetComponent, "javafx.scene.effect.Bloom"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Bloom.class, "TEMPLATE_Bloom", targetComponent, "javafx.scene.effect.Bloom"); //NOI18N;
     }
 }

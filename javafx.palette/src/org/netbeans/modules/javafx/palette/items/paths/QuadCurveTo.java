@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class QuadCurveTo implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( QuadCurveTo.class, "TEMPLATE_QuadCurveTo", targetComponent, "javafx.scene.shape.QuadCurveTo"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( QuadCurveTo.class, "TEMPLATE_QuadCurveTo", targetComponent, "javafx.scene.shape.QuadCurveTo"); //NOI18N;
     }
 }

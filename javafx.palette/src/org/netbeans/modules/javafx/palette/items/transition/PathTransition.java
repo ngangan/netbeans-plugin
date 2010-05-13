@@ -49,7 +49,7 @@ import org.openide.text.ActiveEditorDrop;
 public class PathTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(PathTransition.class, "TEMPLATE_PathTransition", targetComponent,
+        return JavaFXPaletteUtilities.insertSnippet(PathTransition.class, "TEMPLATE_PathTransition", targetComponent,
                 "javafx.animation.transition.PathTransition",//NOI18N
                 "javafx.animation.transition.AnimationPath",//NOI18N
                 "javafx.scene.shape.Path",//NOI18N

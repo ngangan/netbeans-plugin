@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingLabel implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SwingLabel.class, "TEMPLATE_SwingLabel", targetComponent, "javafx.ext.swing.SwingLabel"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SwingLabel.class, "TEMPLATE_SwingLabel", targetComponent, "javafx.ext.swing.SwingLabel"); //NOI18N;
     }
 }

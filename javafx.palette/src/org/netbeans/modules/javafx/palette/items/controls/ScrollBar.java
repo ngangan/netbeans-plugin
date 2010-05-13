@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ScrollBar implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ScrollBar.class, "TEMPLATE_ScrollBar", targetComponent, "javafx.scene.control.ScrollBar");
+        return JavaFXPaletteUtilities.insertSnippet(ScrollBar.class, "TEMPLATE_ScrollBar", targetComponent, "javafx.scene.control.ScrollBar");
     }
 }

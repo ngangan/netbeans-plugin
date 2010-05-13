@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SepiaTone implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SepiaTone.class, "TEMPLATE_SepiaTone", targetComponent, "javafx.scene.effect.SepiaTone"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SepiaTone.class, "TEMPLATE_SepiaTone", targetComponent, "javafx.scene.effect.SepiaTone"); //NOI18N;
     }
 }

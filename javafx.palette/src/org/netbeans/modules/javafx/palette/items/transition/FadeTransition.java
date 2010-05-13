@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class FadeTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(FadeTransition.class, "TEMPLATE_FadeTransition", targetComponent, "javafx.animation.transition.FadeTransition"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(FadeTransition.class, "TEMPLATE_FadeTransition", targetComponent, "javafx.animation.transition.FadeTransition"); //NOI18N;
     }
 }

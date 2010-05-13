@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class TranslateTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(TranslateTransition.class, "TEMPLATE_TranslateTransition", targetComponent, "javafx.animation.transition.TranslateTransition"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(TranslateTransition.class, "TEMPLATE_TranslateTransition", targetComponent, "javafx.animation.transition.TranslateTransition"); //NOI18N;
     }
 }

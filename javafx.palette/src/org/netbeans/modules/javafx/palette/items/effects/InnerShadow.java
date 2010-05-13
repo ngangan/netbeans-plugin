@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class InnerShadow implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(InnerShadow.class, "TEMPLATE_InnerShadow", targetComponent, "javafx.scene.effect.InnerShadow", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(InnerShadow.class, "TEMPLATE_InnerShadow", targetComponent, "javafx.scene.effect.InnerShadow", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

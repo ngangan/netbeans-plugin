@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Polyline implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Polyline.class, "TEMPLATE_Polyline", targetComponent, "javafx.scene.shape.Polyline", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Polyline.class, "TEMPLATE_Polyline", targetComponent, "javafx.scene.shape.Polyline", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

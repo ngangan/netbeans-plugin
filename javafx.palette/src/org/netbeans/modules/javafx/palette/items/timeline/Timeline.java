@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Timeline implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Timeline.class, "TEMPLATE_Timeline", targetComponent, "javafx.animation.Timeline", "javafx.animation.Interpolator"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Timeline.class, "TEMPLATE_Timeline", targetComponent, "javafx.animation.Timeline", "javafx.animation.Interpolator"); //NOI18N;
     }
 }

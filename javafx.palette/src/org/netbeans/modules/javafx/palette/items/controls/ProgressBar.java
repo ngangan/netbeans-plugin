@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ProgressBar implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ProgressBar.class, "TEMPLATE_ProgressBar", targetComponent, "javafx.scene.control.ProgressBar"); //NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(ProgressBar.class, "TEMPLATE_ProgressBar", targetComponent, "javafx.scene.control.ProgressBar"); //NOI18N
     }
 }

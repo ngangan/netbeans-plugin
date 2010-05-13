@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SequentialTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SequentialTransition.class, "TEMPLATE_SequentialTransition", targetComponent, "javafx.animation.transition.SequentialTransition"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SequentialTransition.class, "TEMPLATE_SequentialTransition", targetComponent, "javafx.animation.transition.SequentialTransition"); //NOI18N;
     }
 }

@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Reflection implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Reflection.class, "TEMPLATE_Reflection", targetComponent, "javafx.scene.effect.Reflection"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Reflection.class, "TEMPLATE_Reflection", targetComponent, "javafx.scene.effect.Reflection"); //NOI18N;
     }
 }

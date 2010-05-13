@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Polygon implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Circle.class, "TEMPLATE_Polygon", targetComponent, "javafx.scene.shape.Polygon", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Polygon", targetComponent, "javafx.scene.shape.Polygon", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

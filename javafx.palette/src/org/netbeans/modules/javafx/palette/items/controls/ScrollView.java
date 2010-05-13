@@ -54,6 +54,6 @@ import org.openide.util.NbBundle;
 public class ScrollView implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.updateCode(ScrollView.class, "TEMPLATE_ScrollView", targetComponent, "javafx.scene.control.ScrollView" );//NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(ScrollView.class, "TEMPLATE_ScrollView", targetComponent, "javafx.scene.control.ScrollView" );//NOI18N
     }
 }

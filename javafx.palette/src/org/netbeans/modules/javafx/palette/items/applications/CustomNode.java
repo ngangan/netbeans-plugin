@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class CustomNode implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(CustomNode.class, "TEMPLATE_CustomNode", targetComponent, "javafx.scene.CustomNode", "javafx.scene.Group", "javafx.scene.Node"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(CustomNode.class, "TEMPLATE_CustomNode", targetComponent, "javafx.scene.CustomNode", "javafx.scene.Group", "javafx.scene.Node"); //NOI18N;
     }
 }

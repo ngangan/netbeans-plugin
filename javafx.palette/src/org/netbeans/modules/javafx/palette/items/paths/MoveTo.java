@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class MoveTo implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(MoveTo.class, "TEMPLATE_MoveTo", targetComponent, "javafx.scene.shape.MoveTo"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(MoveTo.class, "TEMPLATE_MoveTo", targetComponent, "javafx.scene.shape.MoveTo"); //NOI18N;
     }
 }

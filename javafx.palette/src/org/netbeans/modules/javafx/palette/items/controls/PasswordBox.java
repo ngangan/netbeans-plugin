@@ -13,6 +13,6 @@ import org.openide.text.ActiveEditorDrop;
 public class PasswordBox implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.updateCode(PasswordBox.class, "TEMPLATE_PasswordBox" , targetComponent, "javafx.scene.control.PasswordBox"); //NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(PasswordBox.class, "TEMPLATE_PasswordBox" , targetComponent, "javafx.scene.control.PasswordBox"); //NOI18N
     }
 }

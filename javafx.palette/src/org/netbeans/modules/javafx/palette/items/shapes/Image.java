@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Image implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode(Circle.class, "TEMPLATE_Image" , targetComponent,"javafx.scene.image.ImageView", "javafx.scene.image.Image"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Image" , targetComponent,"javafx.scene.image.ImageView", "javafx.scene.image.Image"); //NOI18N;
     }
 }

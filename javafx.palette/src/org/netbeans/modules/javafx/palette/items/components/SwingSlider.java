@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingSlider implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SwingSlider.class, "TEMPLATE_SwingSlider", targetComponent, "javafx.ext.swing.SwingSlider"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SwingSlider.class, "TEMPLATE_SwingSlider", targetComponent, "javafx.ext.swing.SwingSlider"); //NOI18N;
     }
 }

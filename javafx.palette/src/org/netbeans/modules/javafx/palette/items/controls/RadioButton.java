@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class RadioButton implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(RadioButton.class, "TEMPLATE_RadioButton", targetComponent, "javafx.scene.control.RadioButton"); //NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(RadioButton.class, "TEMPLATE_RadioButton", targetComponent, "javafx.scene.control.RadioButton"); //NOI18N
     }
 }

@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ClosePath implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ClosePath.class, "TEMPLATE_ClosePath", targetComponent, "javafx.scene.shape.ClosePath"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ClosePath.class, "TEMPLATE_ClosePath", targetComponent, "javafx.scene.shape.ClosePath"); //NOI18N;
     }
 }

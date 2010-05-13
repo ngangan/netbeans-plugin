@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Tooltip implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Tooltip.class, "TEMPLATE_Tooltip", targetComponent, "javafx.scene.control.Tooltip"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Tooltip.class, "TEMPLATE_Tooltip", targetComponent, "javafx.scene.control.Tooltip"); //NOI18N;
     }
 }

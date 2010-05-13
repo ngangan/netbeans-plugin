@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class DropShadow implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(DropShadow.class, "TEMPLATE_DropShadow", targetComponent, "javafx.scene.effect.DropShadow", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(DropShadow.class, "TEMPLATE_DropShadow", targetComponent, "javafx.scene.effect.DropShadow", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ParallelTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ParallelTransition.class, "TEMPLATE_ParallelTransition", targetComponent, "javafx.animation.transition.ParallelTransition"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ParallelTransition.class, "TEMPLATE_ParallelTransition", targetComponent, "javafx.animation.transition.ParallelTransition"); //NOI18N;
     }
 }

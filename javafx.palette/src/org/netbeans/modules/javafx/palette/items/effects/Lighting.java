@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Lighting implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Lighting.class, "TEMPLATE_Lighting", targetComponent, "javafx.scene.effect.Lighting"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Lighting.class, "TEMPLATE_Lighting", targetComponent, "javafx.scene.effect.Lighting"); //NOI18N;
     }
 }

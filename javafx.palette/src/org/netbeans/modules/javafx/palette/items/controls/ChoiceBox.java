@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ChoiceBox implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ChoiceBox.class, "TEMPLATE_ChoiceBox", targetComponent, "javafx.scene.control.ChoiceBox"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ChoiceBox.class, "TEMPLATE_ChoiceBox", targetComponent, "javafx.scene.control.ChoiceBox"); //NOI18N;
     }
 }

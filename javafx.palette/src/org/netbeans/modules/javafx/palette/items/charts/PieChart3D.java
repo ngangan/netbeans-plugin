@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class PieChart3D implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(PieChart3D.class, "TEMPLATE_PieChart3D", targetComponent, "javafx.scene.chart.PieChart3D"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(PieChart3D.class, "TEMPLATE_PieChart3D", targetComponent, "javafx.scene.chart.PieChart3D"); //NOI18N;
     }
 }

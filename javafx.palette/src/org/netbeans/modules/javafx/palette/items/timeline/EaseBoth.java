@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class EaseBoth implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(EaseBoth.class, "TEMPLATE_EaseBoth", targetComponent, "javafx.animation.Interpolator"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(EaseBoth.class, "TEMPLATE_EaseBoth", targetComponent, "javafx.animation.Interpolator"); //NOI18N;
     }
 }

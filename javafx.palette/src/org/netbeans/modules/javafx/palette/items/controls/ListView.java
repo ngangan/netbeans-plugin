@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ListView implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ListView.class, "TEMPLATE_ListView", targetComponent, "javafx.scene.control.ListView");//NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(ListView.class, "TEMPLATE_ListView", targetComponent, "javafx.scene.control.ListView");//NOI18N
     }
 }

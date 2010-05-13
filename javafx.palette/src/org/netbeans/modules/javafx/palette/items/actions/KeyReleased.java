@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class KeyReleased implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(KeyReleased.class, "TEMPLATE_KeyReleased", targetComponent, "javafx.scene.input.KeyEvent"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(KeyReleased.class, "TEMPLATE_KeyReleased", targetComponent, "javafx.scene.input.KeyEvent"); //NOI18N;
     }
 }

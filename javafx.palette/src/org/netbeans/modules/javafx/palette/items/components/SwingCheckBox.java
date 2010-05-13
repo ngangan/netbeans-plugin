@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingCheckBox implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SwingCheckBox.class, "TEMPLATE_SwingCheckBox", targetComponent, "javafx.ext.swing.SwingCheckBox"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SwingCheckBox.class, "TEMPLATE_SwingCheckBox", targetComponent, "javafx.ext.swing.SwingCheckBox"); //NOI18N;
     }
 }

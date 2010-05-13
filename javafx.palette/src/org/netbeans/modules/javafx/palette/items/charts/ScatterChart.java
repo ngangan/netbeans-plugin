@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ScatterChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ScatterChart.class, "TEMPLATE_ScatterChart", targetComponent, "javafx.scene.chart.ScatterChart", "javafx.scene.chart.part.NumberAxis", "java.util.Random"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ScatterChart.class, "TEMPLATE_ScatterChart", targetComponent, "javafx.scene.chart.ScatterChart", "javafx.scene.chart.part.NumberAxis", "java.util.Random"); //NOI18N;
     }
 }

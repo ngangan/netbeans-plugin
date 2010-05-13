@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class KeyFrame implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(KeyFrame.class, "TEMPLATE_KeyFrame", targetComponent, "javafx.animation.KeyFrame"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(KeyFrame.class, "TEMPLATE_KeyFrame", targetComponent, "javafx.animation.KeyFrame"); //NOI18N;
     }
 }

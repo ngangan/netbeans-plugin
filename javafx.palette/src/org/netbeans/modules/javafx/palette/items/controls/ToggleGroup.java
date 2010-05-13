@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ToggleGroup implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ToggleGroup.class, "TEMPLATE_ToggleGroup", targetComponent, "javafx.scene.control.ToggleGroup"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(ToggleGroup.class, "TEMPLATE_ToggleGroup", targetComponent, "javafx.scene.control.ToggleGroup"); //NOI18N;
     }
 }

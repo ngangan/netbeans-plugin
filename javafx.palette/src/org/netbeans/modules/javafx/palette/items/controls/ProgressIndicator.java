@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ProgressIndicator implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(ProgressIndicator.class, "TEMPLATE_ProgressIndicator", targetComponent, "javafx.scene.control.ProgressIndicator"); //NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(ProgressIndicator.class, "TEMPLATE_ProgressIndicator", targetComponent, "javafx.scene.control.ProgressIndicator"); //NOI18N
     }
 }

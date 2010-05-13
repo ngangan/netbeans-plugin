@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Hyperlink implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Hyperlink.class, "TEMPLATE_Hyperlink", targetComponent, "javafx.scene.control.Hyperlink"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Hyperlink.class, "TEMPLATE_Hyperlink", targetComponent, "javafx.scene.control.Hyperlink"); //NOI18N;
     }
 }

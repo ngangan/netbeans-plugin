@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Label implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Label.class, "TEMPLATE_Label", targetComponent, "javafx.scene.control.Label");//NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(Label.class, "TEMPLATE_Label", targetComponent, "javafx.scene.control.Label");//NOI18N
     }
 }

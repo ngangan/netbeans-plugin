@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class VLineTo implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(VLineTo.class, "TEMPLATE_VLineTo", targetComponent, "javafx.scene.shape.VLineTo"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(VLineTo.class, "TEMPLATE_VLineTo", targetComponent, "javafx.scene.shape.VLineTo"); //NOI18N;
     }
 }

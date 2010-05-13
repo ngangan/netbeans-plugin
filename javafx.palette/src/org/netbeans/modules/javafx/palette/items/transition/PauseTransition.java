@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class PauseTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(PauseTransition.class, "TEMPLATE_PauseTransition", targetComponent, "javafx.animation.transition.PauseTransition"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(PauseTransition.class, "TEMPLATE_PauseTransition", targetComponent, "javafx.animation.transition.PauseTransition"); //NOI18N;
     }
 }

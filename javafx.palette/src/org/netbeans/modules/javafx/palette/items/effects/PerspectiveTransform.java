@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class PerspectiveTransform implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(PerspectiveTransform.class, "TEMPLATE_PerspectiveTransform", targetComponent, "javafx.scene.effect.PerspectiveTransform"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(PerspectiveTransform.class, "TEMPLATE_PerspectiveTransform", targetComponent, "javafx.scene.effect.PerspectiveTransform"); //NOI18N;
     }
 }

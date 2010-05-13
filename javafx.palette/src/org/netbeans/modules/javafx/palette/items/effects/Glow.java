@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Glow implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Glow.class, "TEMPLATE_Glow", targetComponent, "javafx.scene.effect.Glow"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Glow.class, "TEMPLATE_Glow", targetComponent, "javafx.scene.effect.Glow"); //NOI18N;
     }
 }

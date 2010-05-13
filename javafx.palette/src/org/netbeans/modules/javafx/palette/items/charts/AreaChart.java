@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class AreaChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(AreaChart.class, "TEMPLATE_AreaChart", targetComponent, "javafx.scene.chart.AreaChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(AreaChart.class, "TEMPLATE_AreaChart", targetComponent, "javafx.scene.chart.AreaChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

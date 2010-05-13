@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Circle implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Circle.class, "TEMPLATE_Circle", targetComponent, "javafx.scene.shape.Circle", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Circle", targetComponent, "javafx.scene.shape.Circle", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

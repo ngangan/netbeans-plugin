@@ -52,6 +52,6 @@ abstract class AbstractLayout implements ActiveEditorDrop {
     protected String importString;
 
     public final boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(AbstractLayout.class, templateName, targetComponent, importString);
+        return JavaFXPaletteUtilities.insertSnippet(AbstractLayout.class, templateName, targetComponent, importString);
     }
 }

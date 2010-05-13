@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class At implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(At.class, "TEMPLATE_At", targetComponent, "javafx.animation.Interpolator"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(At.class, "TEMPLATE_At", targetComponent, "javafx.animation.Interpolator"); //NOI18N;
     }
 }

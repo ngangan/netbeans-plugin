@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingComboBox implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode(SwingComboBox.class, "TEMPLATE_SwingComboBox" , targetComponent, "javafx.ext.swing.SwingComboBox", "javafx.ext.swing.SwingComboBoxItem"  ); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet(SwingComboBox.class, "TEMPLATE_SwingComboBox" , targetComponent, "javafx.ext.swing.SwingComboBox", "javafx.ext.swing.SwingComboBoxItem"  ); //NOI18N;
     }    
 }

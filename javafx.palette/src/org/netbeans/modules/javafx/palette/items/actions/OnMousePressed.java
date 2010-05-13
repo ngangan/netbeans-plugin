@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class OnMousePressed implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(OnMousePressed.class, "TEMPLATE_OnMousePressed", targetComponent, "javafx.scene.input.MouseEvent"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(OnMousePressed.class, "TEMPLATE_OnMousePressed", targetComponent, "javafx.scene.input.MouseEvent"); //NOI18N;
     }
 }

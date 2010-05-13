@@ -45,6 +45,6 @@ import org.openide.text.ActiveEditorDrop;
 public class CubicCurve implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(CubicCurve.class, "TEMPLATE_CubicCurve", targetComponent, "javafx.scene.shape.CubicCurve"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(CubicCurve.class, "TEMPLATE_CubicCurve", targetComponent, "javafx.scene.shape.CubicCurve"); //NOI18N;
     }
 }

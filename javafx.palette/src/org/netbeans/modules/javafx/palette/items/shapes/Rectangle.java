@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Rectangle implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode(Rectangle.class, "TEMPLATE_Rectangle" , targetComponent, "javafx.scene.shape.Rectangle", "javafx.scene.paint.Color" ); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet(Rectangle.class, "TEMPLATE_Rectangle" , targetComponent, "javafx.scene.shape.Rectangle", "javafx.scene.paint.Color" ); //NOI18N;
     }
 }

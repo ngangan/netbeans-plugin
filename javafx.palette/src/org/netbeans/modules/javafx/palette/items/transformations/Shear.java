@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Shear implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Scale.class, "TEMPLATE_Shear", targetComponent, "javafx.scene.transform.Shear"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Scale.class, "TEMPLATE_Shear", targetComponent, "javafx.scene.transform.Shear"); //NOI18N;
     }
 }

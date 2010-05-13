@@ -275,8 +275,14 @@
             <file name="Bloom.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Bloom.xml">
                 <attr name="position" intvalue="200"/>
             </file>
+            <file name="BoxBlur.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BoxBlur.xml">
+                <attr name="position" intvalue="250"/>
+            </file>
             <file name="ColorAdjust.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ColorAdjust.xml">
                 <attr name="position" intvalue="300"/>
+            </file>
+            <file name="DisplacementMap.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DisplacementMap.xml">
+                <attr name="position" intvalue="350"/>
             </file>
             <file name="DropShadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DropShadow.xml">
                 <attr name="position" intvalue="400"/>
@@ -290,8 +296,14 @@
             <file name="Glow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Glow.xml">
                 <attr name="position" intvalue="700"/>
             </file>
+            <file name="Identity.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Identity.xml">
+                <attr name="position" intvalue="750"/>
+            </file>
             <file name="InnerShadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/InnerShadow.xml">
                 <attr name="position" intvalue="800"/>
+            </file>
+            <file name="InvertMask.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/InvertMask.xml">
+                <attr name="position" intvalue="850"/>
             </file>
             <file name="Lighting.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Lighting.xml">
                 <attr name="position" intvalue="900"/>

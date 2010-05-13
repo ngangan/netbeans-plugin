@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Arc implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Circle.class, "TEMPLATE_Arc", targetComponent, "javafx.scene.shape.Arc", "javafx.scene.shape.ArcType", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Arc", targetComponent, "javafx.scene.shape.Arc", "javafx.scene.shape.ArcType", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

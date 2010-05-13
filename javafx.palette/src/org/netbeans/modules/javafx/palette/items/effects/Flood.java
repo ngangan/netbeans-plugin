@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Flood implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( Flood.class, "TEMPLATE_Flood", targetComponent,"javafx.scene.effect.Flood", "javafx.scene.paint.Color"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( Flood.class, "TEMPLATE_Flood", targetComponent,"javafx.scene.effect.Flood", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

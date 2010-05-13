@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class GaussianBlur implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( GaussianBlur.class, "TEMPLATE_GaussianBlur", targetComponent, "javafx.scene.effect.GaussianBlur"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( GaussianBlur.class, "TEMPLATE_GaussianBlur", targetComponent, "javafx.scene.effect.GaussianBlur"); //NOI18N;
     }
 }

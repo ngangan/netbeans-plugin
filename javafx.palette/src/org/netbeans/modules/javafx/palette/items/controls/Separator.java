@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Separator implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.updateCode(Separator.class, "TEMPLATE_Separator", targetComponent, "javafx.scene.control.Separator");//NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(Separator.class, "TEMPLATE_Separator", targetComponent, "javafx.scene.control.Separator");//NOI18N
     }
 }

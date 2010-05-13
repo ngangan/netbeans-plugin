@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingRadioButton implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SwingRadioButton.class, "TEMPLATE_SwingRadioButton", targetComponent, "javafx.ext.swing.SwingRadioButton"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SwingRadioButton.class, "TEMPLATE_SwingRadioButton", targetComponent, "javafx.ext.swing.SwingRadioButton"); //NOI18N;
     }
 }

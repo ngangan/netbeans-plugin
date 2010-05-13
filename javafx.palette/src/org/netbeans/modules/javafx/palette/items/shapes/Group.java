@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Group implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Group.class, "TEMPLATE_Group", targetComponent, "javafx.scene.Group"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Group.class, "TEMPLATE_Group", targetComponent, "javafx.scene.Group"); //NOI18N;
     }
 }

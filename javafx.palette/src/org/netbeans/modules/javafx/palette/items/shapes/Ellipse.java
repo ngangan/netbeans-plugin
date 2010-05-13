@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Ellipse implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(Circle.class, "TEMPLATE_Ellipse", targetComponent, "javafx.scene.shape.Ellipse", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Ellipse", targetComponent, "javafx.scene.shape.Ellipse", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class MediaPlayer implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(MediaPlayer.class, "TEMPLATE_MediaPlayer", targetComponent, "javafx.scene.media.Media", "javafx.scene.media.MediaPlayer"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(MediaPlayer.class, "TEMPLATE_MediaPlayer", targetComponent, "javafx.scene.media.Media", "javafx.scene.media.MediaPlayer"); //NOI18N;
     }
 }

@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class DisplacementMap implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( DisplacementMap.class, "TEMPLATE_DisplacementMap", targetComponent,"javafx.scene.effect.DisplacementMap" ); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( DisplacementMap.class, "TEMPLATE_DisplacementMap", targetComponent,"javafx.scene.effect.DisplacementMap", "javafx.scene.effect.FloatMap" ); //NOI18N;
     }
 }

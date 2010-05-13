@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class CheckBox implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.updateCode(CheckBox.class, "TEMPLATE_CheckBox", targetComponent, "javafx.scene.control.CheckBox"); //NOI18N
+        return JavaFXPaletteUtilities.insertSnippet(CheckBox.class, "TEMPLATE_CheckBox", targetComponent, "javafx.scene.control.CheckBox"); //NOI18N
     }
 }

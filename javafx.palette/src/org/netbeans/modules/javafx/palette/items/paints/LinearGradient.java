@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class LinearGradient implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(LinearGradient.class, "TEMPLATE_LinearGradient", targetComponent, "javafx.scene.paint.LinearGradient", "javafx.scene.paint.Stop", "javafx.scene.paint.Color"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(LinearGradient.class, "TEMPLATE_LinearGradient", targetComponent, "javafx.scene.paint.LinearGradient", "javafx.scene.paint.Stop", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

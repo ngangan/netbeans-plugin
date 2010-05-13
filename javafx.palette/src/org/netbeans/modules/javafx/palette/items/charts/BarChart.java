@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class BarChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(BarChart.class, "TEMPLATE_BarChart", targetComponent, "javafx.scene.chart.BarChart", "javafx.scene.chart.part.CategoryAxis", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(BarChart.class, "TEMPLATE_BarChart", targetComponent, "javafx.scene.chart.BarChart", "javafx.scene.chart.part.CategoryAxis", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

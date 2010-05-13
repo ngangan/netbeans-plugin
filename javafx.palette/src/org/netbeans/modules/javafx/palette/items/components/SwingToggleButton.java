@@ -49,6 +49,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingToggleButton implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.updateCode(SwingToggleButton.class, "TEMPLATE_SwingToggleButton", targetComponent, "javafx.ext.swing.SwingToggleButton"); //NOI18N;
+        return JavaFXPaletteUtilities.insertSnippet(SwingToggleButton.class, "TEMPLATE_SwingToggleButton", targetComponent, "javafx.ext.swing.SwingToggleButton"); //NOI18N;
     }
 }

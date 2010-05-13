@@ -50,6 +50,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingTextField implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.updateCode( SwingTextField.class, "TEMPLATE_SwingTextField", targetComponent, "javafx.ext.swing.SwingTextField"); //NOI18N;
+        return  JavaFXPaletteUtilities.insertSnippet( SwingTextField.class, "TEMPLATE_SwingTextField", targetComponent, "javafx.ext.swing.SwingTextField"); //NOI18N;
     }    
 }
