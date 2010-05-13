@@ -2570,6 +2570,8 @@ public class JFXReformatTask implements ReformatTask {
 
             // JavaFX Non-reserved keywords feature, see v4Parser.g
             if (tokenIds.contains(JFXTokenId.IDENTIFIER)) {
+                // #186035
+                tokenIds.addAll(ReformatUtils.RESERVED_KEYWORDS);
                 tokenIds.addAll(ReformatUtils.NON_RESERVED_KEYWORDS);
             }
 
