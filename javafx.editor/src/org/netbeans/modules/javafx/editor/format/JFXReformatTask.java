@@ -2411,7 +2411,7 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitSequenceEmpty(SequenceEmptyTree node, Void p) {
             accept(JFXTokenId.LBRACKET);
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+//            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             accept(JFXTokenId.RBRACKET);
             return true;
         }
@@ -2420,14 +2420,14 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
             List<ExpressionTree> itemList = node.getItemList();
             accept(JFXTokenId.LBRACKET);
-            int old = indent;
-            indent += indentSize;
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             if (itemList != null) {
+                int old = indent;
+                indent += indentSize;
+                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
                 wrapList(cs.wrapSequenceInit(), cs.alignSequenceInit(), false, itemList);
+                indent = old;
+                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             }
-            indent = old;
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             accept(JFXTokenId.RBRACKET);
             return true;
         }
