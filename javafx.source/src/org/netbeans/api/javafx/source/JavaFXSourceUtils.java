@@ -402,26 +402,30 @@ public class JavaFXSourceUtils {
         return result;
     }
 
-    public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, CompilationInfo info) {
-        return getOverridenMethods(e, ElementUtilities.enclosingTypeElement(e), info);
+    public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, Elements elements) {
+        return getOverridenMethods(e, ElementUtilities.enclosingTypeElement(e), elements);
     }
 
-    private static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, TypeElement parent, CompilationInfo info) {
+    public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, CompilationInfo info) {
+        return getOverridenMethods(e, ElementUtilities.enclosingTypeElement(e), info.getElements());
+    }
+
+    private static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, TypeElement parent, Elements elements) {
         ArrayList<ExecutableElement> result = new ArrayList<ExecutableElement>();
 
         TypeMirror sup = parent.getSuperclass();
         if (sup.getKind() == TypeKind.DECLARED) {
             TypeElement next = (TypeElement) ((DeclaredType)sup).asElement();
-            ExecutableElement overriden = getMethod(e, next, info);
-                result.addAll(getOverridenMethods(e,next, info));
+            ExecutableElement overriden = getMethod(e, next, elements);
+                result.addAll(getOverridenMethods(e,next, elements));
             if (overriden!=null) {
                 result.add(overriden);
             }
         }
         for (TypeMirror tm:parent.getInterfaces()) {
             TypeElement next = (TypeElement) ((DeclaredType)tm).asElement();
-            ExecutableElement overriden2 = getMethod(e, next, info);
-            result.addAll(getOverridenMethods(e,next, info));
+            ExecutableElement overriden2 = getMethod(e, next, elements);
+            result.addAll(getOverridenMethods(e,next, elements));
             if (overriden2!=null) {
                 result.add(overriden2);
             }
@@ -429,9 +433,9 @@ public class JavaFXSourceUtils {
         return result;
     }
 
-    private static ExecutableElement getMethod(ExecutableElement method, TypeElement type, CompilationInfo info) {
+    private static ExecutableElement getMethod(ExecutableElement method, TypeElement type, Elements elements) {
         for (ExecutableElement met: ElementFilter.methodsIn(type.getEnclosedElements())){
-            if (info.getElements().overrides(method, met, type)) {
+            if (elements.overrides(method, met, type)) {
                 return met;
             }
         }
