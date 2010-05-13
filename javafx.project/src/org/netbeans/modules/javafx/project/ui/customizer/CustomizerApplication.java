@@ -60,6 +60,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         initComponents();
         titleTextField.setDocument(props.APPLICATION_TITLE_DOC);
         vendorTextField.setDocument(props.APPLICATION_VENDOR_DOC);
+        packagerOptionsTextField.setDocument(props.PACKAGER_OPTIONS_DOC);
     }
     
     /** This method is called from within the constructor to
@@ -78,11 +79,14 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         vendorTextField = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
+        packagerLabel = new javax.swing.JLabel();
+        packagerOptionsTextField = new javax.swing.JTextField();
+        exampleLabel = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        panelDescLabel.setText(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.panelDescLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(panelDescLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.panelDescLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -148,7 +152,35 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
         add(jPanel2, gridBagConstraints);
+
+        packagerLabel.setLabelFor(packagerOptionsTextField);
+        org.openide.awt.Mnemonics.setLocalizedText(packagerLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.packagerLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(18, 0, 0, 0);
+        add(packagerLabel, gridBagConstraints);
+        packagerLabel.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.packagerLabel.AccessibleContext.accessibleDescription")); // NOI18N
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(16, 6, 0, 0);
+        add(packagerOptionsTextField, gridBagConstraints);
+
+        org.openide.awt.Mnemonics.setLocalizedText(exampleLabel, org.openide.util.NbBundle.getMessage(CustomizerApplication.class, "CustomizerApplication.exampleLabel.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
+        add(exampleLabel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.weighty = 1.0;
         add(jPanel3, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
@@ -178,9 +210,12 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel exampleLabel;
     javax.swing.JPanel jPanel1;
     javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JLabel packagerLabel;
+    private javax.swing.JTextField packagerOptionsTextField;
     private javax.swing.JLabel panelDescLabel;
     private javax.swing.JLabel titleLabel;
     private javax.swing.JTextField titleTextField;

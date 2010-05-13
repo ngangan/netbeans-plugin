@@ -36,36 +36,19 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
-package org.netbeans.modules.javafx.palette.items.layouts;
+package org.netbeans.modules.javafx.palette.items.effects;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
  * @author Karol Harezlak
  */
-abstract class Layout implements ActiveEditorDrop {
+public class InvertMask implements ActiveEditorDrop {
 
-    protected String templateName;
-    protected String importString;
-
-    
-    public final boolean handleTransfer( JTextComponent targetComponent ) {
-        String code = NbBundle.getMessage( Layout.class, templateName );
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-
-        // Imports
-        Imports.addImport( targetComponent, importString );
-
-        return true;
+    public boolean handleTransfer(JTextComponent targetComponent) {
+        return JavaFXPaletteUtilities.insertSnippet(Bloom.class, "TEMPLATE_InvertMask", targetComponent, "javafx.scene.effect.InvertMask"); //NOI18N;
     }
-
 }

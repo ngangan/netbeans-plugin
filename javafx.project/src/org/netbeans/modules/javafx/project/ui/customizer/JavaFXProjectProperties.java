@@ -169,6 +169,8 @@ public class JavaFXProjectProperties {
     public static final String APPLICATION_DESC ="application.desc"; // NOI18N
     public static final String APPLICATION_HOMEPAGE ="application.homepage"; // NOI18N
     public static final String APPLICATION_SPLASH ="application.splash"; // NOI18N
+
+    public static final String PACKAGER_OPTIONS ="packager.options"; // NOI18N
 /*    
     public static final String WEBSTART_ENABLE = "webstart.enable"; // NOI18N
     public static final String WEBSTART_ICON = "webstart.icon"; // NOI18N
@@ -261,6 +263,7 @@ public class JavaFXProjectProperties {
     Document APPLICATION_DESC_DOC;
     Document APPLICATION_HOMEPAGE_DOC;
     Document APPLICATION_SPLASH_DOC;
+    Document PACKAGER_OPTIONS_DOC;
     
     // CustomizerWebStart
     /*
@@ -400,6 +403,7 @@ public class JavaFXProjectProperties {
         APPLICATION_DESC_DOC = projectGroup.createStringDocument(evaluator, APPLICATION_DESC);
         APPLICATION_HOMEPAGE_DOC = projectGroup.createStringDocument(evaluator, APPLICATION_HOMEPAGE);
         APPLICATION_SPLASH_DOC = projectGroup.createStringDocument(evaluator, APPLICATION_SPLASH);
+        PACKAGER_OPTIONS_DOC = projectGroup.createStringDocument(evaluator, PACKAGER_OPTIONS);
         /*
         // CustomizerWebStart
         WEBSTART_ENABLE_MODEL = projectGroup.createToggleButtonModel(evaluator, WEBSTART_ENABLE);

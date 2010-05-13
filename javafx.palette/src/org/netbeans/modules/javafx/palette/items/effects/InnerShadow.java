@@ -36,15 +36,11 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.palette.items.effects;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,15 +49,6 @@ import org.openide.util.NbBundle;
 public class InnerShadow implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( InnerShadow.class, "TEMPLATE_InnerShadow" );
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-
-        // Imports
-        Imports.addImport( targetComponent, "javafx.scene.effect.InnerShadow" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); //NOI18N
-
-        return true;
+        return JavaFXPaletteUtilities.insertSnippet(InnerShadow.class, "TEMPLATE_InnerShadow", targetComponent, "javafx.scene.effect.InnerShadow", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

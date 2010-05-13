@@ -40,11 +40,8 @@
 package org.netbeans.modules.javafx.palette.items.shapes;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,15 +50,6 @@ import org.openide.util.NbBundle;
 public class Image implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Image" ); // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-        
-        // Imports
-        Imports.addImport( targetComponent, "javafx.scene.image.ImageView" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.image.Image" ); // NOI18N
-        
-        return true;
+        return  JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Image" , targetComponent,"javafx.scene.image.ImageView", "javafx.scene.image.Image"); //NOI18N;
     }
 }

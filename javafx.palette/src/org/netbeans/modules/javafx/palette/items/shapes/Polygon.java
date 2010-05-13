@@ -36,15 +36,11 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.palette.items.shapes;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,15 +49,6 @@ import org.openide.util.NbBundle;
 public class Polygon implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Circle.class, "TEMPLATE_Polygon" ); // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-        
-        // Imports
-        Imports.addImport( targetComponent, "javafx.scene.shape.Polygon" ); // NOI18N
-        Imports.addImport( targetComponent, "javafx.scene.paint.Color" ); // NOI18N
-        
-        return true;
+        return JavaFXPaletteUtilities.insertSnippet(Circle.class, "TEMPLATE_Polygon", targetComponent, "javafx.scene.shape.Polygon", "javafx.scene.paint.Color"); //NOI18N;
     }
 }

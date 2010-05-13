@@ -36,15 +36,11 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.palette.items.media;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.Imports;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
-import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
+import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
-import org.openide.util.NbBundle;
 
 /**
  *
@@ -53,14 +49,6 @@ import org.openide.util.NbBundle;
 public class Media implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        String code = NbBundle.getMessage( Media.class, "TEMPLATE_Media" ); // NOI18N
-        CodeTemplateManager ctm = CodeTemplateManager.get( targetComponent.getDocument());
-        CodeTemplate template = ctm.createTemporary( code );
-        template.insert( targetComponent );
-
-        // Import
-        Imports.addImport( targetComponent, "javafx.scene.media.Media" ); // NOI18N
-
-        return true;
+        return JavaFXPaletteUtilities.insertSnippet(Media.class, "TEMPLATE_Media", targetComponent, "javafx.scene.media.Media"); //NOI18N;
     }
 }

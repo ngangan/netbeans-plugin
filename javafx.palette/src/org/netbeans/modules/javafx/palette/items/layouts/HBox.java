@@ -44,7 +44,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  * @author karol harezlak
  */
 
-public final class HBox extends Layout {
+public final class HBox extends AbstractLayout {
 
     public HBox() {
         templateName = "TEMPLATE_HBox"; // NOI18N

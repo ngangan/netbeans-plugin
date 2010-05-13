@@ -44,7 +44,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  * @author karol harezlak
  */
 
-public final class Stack extends Layout{
+public final class Stack extends AbstractLayout{
 
     public Stack() {
         templateName = "TEMPLATE_Stack"; // NOI18N

@@ -53,7 +53,7 @@ public class JavaFXPaletteFactory {
     
     static private PaletteController palette = null;
 
-    public static PaletteController getPalette() throws IOException {
+    public static synchronized PaletteController getPalette() throws IOException {
         if( palette == null ) {
             palette = PaletteFactory.createPalette( JAVAFX_PALETTE_FOLDER, 
                     new JavaFXPaletteActions());

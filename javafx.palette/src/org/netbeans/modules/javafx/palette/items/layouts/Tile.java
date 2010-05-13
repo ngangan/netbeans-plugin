@@ -44,7 +44,7 @@ package org.netbeans.modules.javafx.palette.items.layouts;
  * @author karol harezlak
  */
 
-public final class Tile extends Layout{
+public final class Tile extends AbstractLayout{
 
     public Tile() {
         templateName = "TEMPLATE_Tile"; // NOI18N
