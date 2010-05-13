@@ -128,7 +128,8 @@ final public class RefactoringSupport {
             case FIELD:
             case LOCAL_VARIABLE:
             case PARAMETER:
-            case METHOD: {
+            case METHOD:
+            case ENUM_CONSTANT: {
                 return eeh.getSignatures()[0] + "#" + eeh.getSignatures()[1] + "#" + eeh.getSignatures()[2];
             }
             default: {
