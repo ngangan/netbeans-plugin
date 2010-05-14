@@ -52,6 +52,22 @@ import org.netbeans.api.javafx.lexer.JFXTokenId;
  */
 public final class ReformatUtils {
 
+    public static EnumSet<JFXTokenId> RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.ABSTRACT,
+            JFXTokenId.AFTER, JFXTokenId.AND, JFXTokenId.AS, JFXTokenId.ASSERT,
+            JFXTokenId.AT, JFXTokenId.ATTRIBUTE, JFXTokenId.BEFORE, JFXTokenId.BIND,
+            JFXTokenId.BOUND, JFXTokenId.BREAK, JFXTokenId.CATCH, JFXTokenId.CLASS,
+            JFXTokenId.CONTINUE, JFXTokenId.DEF, JFXTokenId.DELETE, JFXTokenId.ELSE,
+            JFXTokenId.EXCLUSIVE, JFXTokenId.EXTENDS, JFXTokenId.FALSE, JFXTokenId.FINALLY,
+            JFXTokenId.FOR, JFXTokenId.FROM, JFXTokenId.FUNCTION, JFXTokenId.IF,
+            JFXTokenId.IMPORT, JFXTokenId.INDEXOF, JFXTokenId.INSERT, JFXTokenId.INSTANCEOF,
+            JFXTokenId.LAZY, JFXTokenId.MIXIN, JFXTokenId.MOD, JFXTokenId.NATIVEARRAY,
+            JFXTokenId.NEW, JFXTokenId.NOT, JFXTokenId.NULL, JFXTokenId.OR,
+            JFXTokenId.OVERRIDE, JFXTokenId.PACKAGE, JFXTokenId.PRIVATE, JFXTokenId.PROTECTED,
+            JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_INIT, JFXTokenId.PUBLIC_READ, JFXTokenId.RETURN,
+            JFXTokenId.REVERSE, JFXTokenId.SIZEOF, JFXTokenId.STATIC, JFXTokenId.SUPER,
+            JFXTokenId.THEN, JFXTokenId.THIS, JFXTokenId.THROW, JFXTokenId.TRUE,
+            JFXTokenId.TRY, JFXTokenId.TYPEOF, JFXTokenId.VAR, JFXTokenId.WHILE);
+
     public static EnumSet<JFXTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.FIRST,
             JFXTokenId.IN, JFXTokenId.INIT, JFXTokenId.INTO, JFXTokenId.INVERSE,
             JFXTokenId.LAST, JFXTokenId.ON, JFXTokenId.POSTINIT, JFXTokenId.REPLACE,

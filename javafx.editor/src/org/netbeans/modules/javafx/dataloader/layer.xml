@@ -285,7 +285,7 @@ made subject to such option by the copyright holder.
                 </folder>
             </folder>
         </folder>
-         <folder name="AnnotationTypes">
+        <folder name="AnnotationTypes">
             <file name="org-netbeans-modules-javafx-editor-hints-overrides.xml" url="overrides-annotation.xml"/>
         </folder>
     </folder>
@@ -307,47 +307,47 @@ made subject to such option by the copyright holder.
                     </folder>
                 </folder>
             </folder>
-          <folder name="Formatting">
-              <folder name="text">
-                  <folder name="x-fx">
-                      <file name="TabsAndIndents.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtTabsIndents.getController"/>
-                          <attr name="position" intvalue="100"/>
-                      </file>
-                      <file name="Alignment.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtAlignment.getController"/>
-                          <attr name="position" intvalue="200"/>
-                      </file>
-                      <file name="Braces.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBraces.getController"/>
-                          <attr name="position" intvalue="300"/>
-                      </file>
-                      <file name="Wrapping.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtWrapping.getController"/>
-                          <attr name="position" intvalue="400"/>
-                      </file>
-                      <file name="BlankLines.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines.getController"/>
-                          <attr name="position" intvalue="500"/>
-                      </file>
-                      <file name="BlankLines2.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines2.getController"/>
-                          <attr name="position" intvalue="600"/>
-                      </file>
-                      <file name="Spaces.instance">
-                          <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                          <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtSpaces.getController"/>
-                          <attr name="position" intvalue="700"/>
-                      </file>
-                  </folder>
-              </folder>
-          </folder>
+            <folder name="Formatting">
+                <folder name="text">
+                    <folder name="x-fx">
+                        <file name="TabsAndIndents.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtTabsIndents.getController"/>
+                            <attr name="position" intvalue="100"/>
+                        </file>
+                        <file name="Alignment.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtAlignment.getController"/>
+                            <attr name="position" intvalue="200"/>
+                        </file>
+                        <file name="Braces.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBraces.getController"/>
+                            <attr name="position" intvalue="300"/>
+                        </file>
+                        <file name="Wrapping.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtWrapping.getController"/>
+                            <attr name="position" intvalue="400"/>
+                        </file>
+                        <file name="BlankLines.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines.getController"/>
+                            <attr name="position" intvalue="500"/>
+                        </file>
+                        <file name="BlankLines2.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines2.getController"/>
+                            <attr name="position" intvalue="600"/>
+                        </file>
+                        <file name="Spaces.instance">
+                            <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtSpaces.getController"/>
+                            <attr name="position" intvalue="700"/>
+                        </file>
+                    </folder>
+                </folder>
+            </folder>
         </folder>
     </folder>
 
@@ -500,8 +500,37 @@ made subject to such option by the copyright holder.
                       urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
 
+            <file name="JavaFXCustomNode.fx" url="JavaFXCustomNode.fx_">
+                <attr name="position" intvalue="400"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="templateWizardURL"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXCustomNode.html"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="templateCategory" stringvalue="javafx, java-classes"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+                <attr name="instantiatingIterator"
+                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                <attr name="SystemFileSystem.icon"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+            </file>
+
+
+            <file name="JavaFXCascadeStyleSheet.css" url="JavaFXCascadeStyleSheet.css_">
+                <attr name="position" intvalue="500"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="templateWizardURL"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXCSS.html"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="templateCategory" stringvalue="simple-files"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/css/resources/style_sheet_16.png"/>
+            </file>
+
         </folder>
     </folder>
 
 </filesystem>
 
+    
