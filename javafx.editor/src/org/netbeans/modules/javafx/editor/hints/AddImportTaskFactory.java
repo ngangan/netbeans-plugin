@@ -188,6 +188,7 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                         }
                     }
                     boolean exists = false;
+                    List<Fix> fixesPerDiagnostic = new ArrayList<Fix>();
                     for (ElementHandle<TypeElement> elementHandle : options) {
                         potentialClassSimpleName = elementHandle.getQualifiedName();
                         String packageName = HintsUtils.getPackageName(potentialClassSimpleName);
@@ -201,16 +202,16 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                             }
                         }
                         if (!exists) {
-                            fixes.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
+                            fixesPerDiagnostic.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
                         }
                     }
-
-                    if (fixes.isEmpty()) {
+                    if (fixesPerDiagnostic.isEmpty()) {
                         continue;
                     }
-                    Collections.sort(fixes, IMPORT_COMPERATOR);
-                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixes, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
+                    Collections.sort(fixesPerDiagnostic, IMPORT_COMPERATOR);
+                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixesPerDiagnostic, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
+                    fixes.addAll(fixesPerDiagnostic);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
             }
