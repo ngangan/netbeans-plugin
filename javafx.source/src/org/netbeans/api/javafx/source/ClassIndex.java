@@ -655,11 +655,14 @@ final public class ClassIndex {
                         for(FileObject fo : srcs) {
                             for(Map.Entry<URL, List<URL>> entry : rootDeps) {
                                 try {
-                                    if (entry.getValue().contains(fo.getURL())) {
-                                        FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
-                                        if (!indexerDepRevRoots.contains(src)) {
-                                            indexerDepRevRoots.add(src);
-                                            newSrcs.add(src);
+                                    if (entry != null) {
+                                        List<URL> urls = entry.getValue();
+                                        if (urls != null && urls.contains(fo.getURL())) {
+                                            FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
+                                            if (!indexerDepRevRoots.contains(src)) {
+                                                indexerDepRevRoots.add(src);
+                                                newSrcs.add(src);
+                                            }
                                         }
                                     }
                                 } catch (FileStateInvalidException e) {
