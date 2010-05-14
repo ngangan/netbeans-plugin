@@ -500,12 +500,28 @@ made subject to such option by the copyright holder.
                       urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
             </file>
 
-            <file name="JavaFXCascadeStyleSheet.css" url="JavaFXCascadeStyleSheet.css_">
+            <file name="JavaFXCustomNode.fx" url="JavaFXCustomNode.fx_">
                 <attr name="position" intvalue="400"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
                 <attr name="templateWizardURL"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/JavaFXCSS.html"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXCustomNode.html"/>
+                <attr name="template" boolvalue="true"/>
+                <attr name="templateCategory" stringvalue="javafx, java-classes"/>
+                <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
+                <attr name="instantiatingIterator"
+                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                <attr name="SystemFileSystem.icon"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+            </file>
+
+
+            <file name="JavaFXCascadeStyleSheet.css" url="JavaFXCascadeStyleSheet.css_">
+                <attr name="position" intvalue="500"/>
+                <attr name="SystemFileSystem.localizingBundle"
+                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                <attr name="templateWizardURL"
+                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXCSS.html"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateCategory" stringvalue="simple-files"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
