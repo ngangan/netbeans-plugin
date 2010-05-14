@@ -841,7 +841,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                         if (tree.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) {
                             JavaFXTreePath parentPath = tp.getParentPath();
                             if (parentPath != null &&
-                                parentPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION)
+                                parentPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION
+                                || parentPath.getLeaf().getJavaFXKind() == Tree.JavaFXKind.METHOD_INVOCATION)
                             {
                                 // happens for unclosed class decl: "class A { |"
                             } else {

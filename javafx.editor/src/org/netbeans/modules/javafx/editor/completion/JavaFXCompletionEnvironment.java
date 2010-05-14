@@ -1590,6 +1590,23 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
         return null;
     }
 
+    protected boolean tryToUseSanitizedSource2() {
+        try {
+            Document d = controller.getDocument();
+            String start = d.getText(0, offset);
+            if (LOGGABLE) { log("  start = " + start); } // NOI18N
+            String end = d.getText(offset, d.getLength() - offset);
+            if (LOGGABLE) { log("  end = " + end); } // NOI18N
+            useSanitizedSource(start + "x" + end, offset); // NOI18N
+            return true;
+        } catch (BadLocationException ble) {
+            if (LOGGABLE) {
+                logger.log(Level.FINER, "ble", ble); // NOI18N
+            }
+            return false;
+        }
+    }
+
     protected boolean tryToUseSanitizedSource() {
         try {
             Document d = controller.getDocument();

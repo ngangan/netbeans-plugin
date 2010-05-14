@@ -74,6 +74,9 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
                     break;
                 }
                 if (offset <= pos) {
+                    if (arg.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) {
+                        tryToUseSanitizedSource2();
+                    }
                     break;
                 }
             }
