@@ -76,7 +76,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String MESSAGE = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
     private static final Comparator IMPORT_COMPERATOR = new ImportComperator();
-    private final List<Fix> fixes = new ArrayList<Fix>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
@@ -95,7 +94,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
 
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                fixes.clear();
                 cancel.set(false);
                 if (compilationInfo.getDocument() == null) {
                     return;
@@ -211,7 +209,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                     Collections.sort(fixesPerDiagnostic, IMPORT_COMPERATOR);
                     ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixesPerDiagnostic, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
-                    fixes.addAll(fixesPerDiagnostic);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);
             }

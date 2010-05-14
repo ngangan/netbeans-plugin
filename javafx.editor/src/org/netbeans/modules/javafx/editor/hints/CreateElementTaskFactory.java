@@ -54,7 +54,6 @@ import com.sun.tools.javafx.tree.JFXBlock;
 import com.sun.tools.javafx.tree.JFXFunctionDefinition;
 import com.sun.tools.javafx.tree.JFXVar;
 import com.sun.tools.javafx.tree.JFXVarInit;
-import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.util.*;

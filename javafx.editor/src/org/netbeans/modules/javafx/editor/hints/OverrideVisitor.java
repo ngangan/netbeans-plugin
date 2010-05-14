@@ -10,8 +10,6 @@ import com.sun.javafx.api.tree.JavaFXTreePathScanner;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
