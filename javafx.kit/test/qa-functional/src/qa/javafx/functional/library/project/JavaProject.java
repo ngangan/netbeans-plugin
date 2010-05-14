@@ -346,7 +346,9 @@ public class JavaProject extends Project {
     public Output getOutput() {
         
         //new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
-        return new Output(getName() + " (jar) ");
+        String output = getName() + " (jar) ";
+        System.out.println("*** Wait for output: '" + output + "'");
+        return new Output(output);
     }
     public Output getRunOutput() {
 

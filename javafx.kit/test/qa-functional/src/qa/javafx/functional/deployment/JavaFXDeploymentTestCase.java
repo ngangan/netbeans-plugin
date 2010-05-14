@@ -81,16 +81,18 @@ public class JavaFXDeploymentTestCase extends JavaFXTestCase {
 
 
         try{
+            project.openOutput();
             project.deploy();
             project.build();
             
-            //String output = project.getOutput().getText();
+
             //System.out.println("OUTPUT:");
             //System.out.println(output);
 
             assertTrue("Deployment " + type + " failed!", project.isDeployPass());
 
         }catch(Exception e){
+            e.printStackTrace();
             fail(e.getMessage());
         }
 
