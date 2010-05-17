@@ -58,6 +58,7 @@ import java.util.NoSuchElementException;
 
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.container.ContainerEntry;
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
@@ -151,7 +152,7 @@ final class DocumentElementWrapper {
         }
 
         private Object resolvePropertyValue(String strValue)
-                throws FXDSyntaxErrorException, IOException {
+                throws FXDSyntaxErrorException, IOException, FXDException {
             FXDReference reference = FXDReference.parse(strValue, this);
             final Object[] property = new Object[1];
             reference.setResolutionListener(new FXDReference.ResolutionListener() {
@@ -166,14 +167,10 @@ final class DocumentElementWrapper {
                     m_info.rmUnresolved(m_de);
                 }
             });
-            if (reference.isLocal(m_info.getEntry())) {
-                m_info.addUnresolved(m_de);
-                if (reference.resolveRerefence(m_info.getRoot()) == false) {
-                    throw new FXDSyntaxErrorException("The reference '" + reference.getText() + "' at " + reference.getContext() + " cannot be resolved");
-                }
-            }
+            resolveReference(reference, m_info, m_de);
             return property[0];
         }
+
     }
 
     private static final Enumeration ID_ELEM = new Enumeration() {
@@ -208,12 +205,7 @@ final class DocumentElementWrapper {
                         m_info.rmUnresolved(m_de);
                     }
                 });
-                if (m_reference.isLocal(m_info.getEntry())) {
-                    m_info.addUnresolved(m_de);
-                    if (m_reference.resolveRerefence(m_info.getRoot()) == false) {
-                        throw new FXDSyntaxErrorException("The reference '" + m_reference.getText() + "' at " + m_reference.getContext() + " cannot be resolved");
-                    }
-                }
+                resolveReference(m_reference, m_info, m_de);
             } catch (IOException ex) {
                 Logger.getLogger(this.getClass().getName()).
                         log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name");
@@ -222,6 +214,11 @@ final class DocumentElementWrapper {
             } catch (FXDSyntaxErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).
                         log(Level.INFO, "Exception while parsing \"" + m_de.getName() + "\" node name");
+                ex.printStackTrace();
+                throw new RuntimeException(ex.getLocalizedMessage(), ex);
+            } catch (FXDException ex) {
+                Logger.getLogger(this.getClass().getName()).
+                        log(Level.WARNING, "Exception while parsing \"" + m_de.getName() + "\" node name");
                 ex.printStackTrace();
                 throw new RuntimeException(ex.getLocalizedMessage(), ex);
             }
@@ -630,6 +627,40 @@ final class DocumentElementWrapper {
             }
         }
         return false;
+    }
+
+    private static void resolveReference(FXDReference reference, WrappingInfo info,
+            DocumentElement de) throws IOException, FXDSyntaxErrorException, FXDException {
+
+        if (reference.isLocal(info.getEntry())) {
+            info.addUnresolved(de);
+            if (reference.resolveRerefence(info.getRoot()) == false) {
+                throw new FXDSyntaxErrorException("The reference '" + reference.getText() + "' at " + reference.getContext() + " cannot be resolved");
+            }
+        } else {
+            String entry = getReferenceEntry(reference.getText());
+            if (entry != null) {
+                FXZArchive archive = (FXZArchive)info.getFXZArchive();
+                if ( archive.getEntryIndex(entry) == -1){
+                    throw new FXDSyntaxErrorException("The reference '" + reference.getText() + "' at " + reference.getContext() + " cannot be resolved");
+                }
+                FXDRootElement root = archive.getRoot(entry, null);
+                
+                // todo: store root somehow?
+                info.addUnresolved(de);
+                if (reference.resolveRerefence(root) == false) {
+                    throw new FXDSyntaxErrorException("The reference '" + reference.getText() + "' at " + reference.getContext() + " cannot be resolved");
+                }
+            }
+        }
+    }
+
+    private static String getReferenceEntry(String refStr) {
+        int idx = refStr.indexOf(FXDReference.REF_SEPARATOR);
+        if (idx > 0) {
+            return refStr.substring(0, idx);
+        }
+        return null;
     }
 
     private static class FakeReader extends Reader {
