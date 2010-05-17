@@ -16,7 +16,6 @@ import com.sun.javafx.api.tree.VariableTree;
 import com.sun.tools.javafx.tree.JFXExpression;
 import com.sun.tools.javafx.tree.JFXIdent;
 import com.sun.tools.javafx.tree.JFXOverrideClassVar;
-import com.sun.tools.javafx.tree.JFXTree;
 import com.sun.tools.javafx.tree.JFXTypeClass;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -207,7 +206,7 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
                 }
             } else {
                 String className = findTopClass(e).toString();
-                if (e.getKind().isClass() || e.getKind().isInterface()) {
+                if (!(e.getKind().isClass() || e.getKind().isInterface())) {
                     model.addUsage(className + "." + e.getSimpleName().toString()); // NOI18N
                 }
                 model.addUsage(className);

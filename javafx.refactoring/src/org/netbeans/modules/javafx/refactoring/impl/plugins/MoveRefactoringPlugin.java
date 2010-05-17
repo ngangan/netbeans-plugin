@@ -333,21 +333,23 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                 } else {
                     JavaSource js = JavaSource.forFileObject(file);
                     try {
-                        js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
+                        if (js != null) {
+                            js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
 
-                            public void run(final org.netbeans.api.java.source.CompilationController cc) throws Exception {
-                                if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
-                                    Object elements = cc.getClass().getMethod("getTopLevelElements").invoke(cc); // NOI18N
-                                    Iterator iter = (Iterator)List.class.getMethod("iterator").invoke(elements); // NOI18N
+                                public void run(final org.netbeans.api.java.source.CompilationController cc) throws Exception {
+                                    if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                                        Object elements = cc.getClass().getMethod("getTopLevelElements").invoke(cc); // NOI18N
+                                        Iterator iter = (Iterator)List.class.getMethod("iterator").invoke(elements); // NOI18N
 
-                                    while (iter.hasNext()) {
-                                        Object te = iter.next();
-                                        ElementDef edef = RefactoringSupport.fromJava(te, cc);
-                                        edefs.add(edef);
+                                        while (iter.hasNext()) {
+                                            Object te = iter.next();
+                                            ElementDef edef = RefactoringSupport.fromJava(te, cc);
+                                            edefs.add(edef);
+                                        }
                                     }
                                 }
-                            }
-                        }, true);
+                            }, true);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
