@@ -42,6 +42,7 @@ package org.netbeans.modules.javafx.fxd.composer.model;
 
 import com.sun.javafx.tools.fxd.FXDRootElement;
 import com.sun.javafx.tools.fxd.container.ContainerEntry;
+import com.sun.javafx.tools.fxd.container.FXDContainer;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
@@ -88,6 +89,14 @@ public class WrappingInfo {
      */
     public FXDRootElement getRoot() {
         return m_root;
+    }
+
+    /**
+     * returns stored fxz archive
+     * @return stored fxz archive
+     */
+    public FXDContainer getFXZArchive(){
+        return m_entry.getContainer();
     }
 
     protected void setRoot(FXDRootElement root){
