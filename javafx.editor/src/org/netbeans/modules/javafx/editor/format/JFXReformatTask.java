@@ -1138,7 +1138,7 @@ public class JFXReformatTask implements ReformatTask {
                     accept(JFXTokenId.BIND);
                 }
 
-                wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, initTree);
+                wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, false, initTree);
 
                 if (bindStatus.isBidiBind()) {
                     space();
@@ -1232,7 +1232,7 @@ public class JFXReformatTask implements ReformatTask {
                     }
                     accept(JFXTokenId.RBRACKET);
                 } else {
-                    wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
+                    wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, false, params);
                 }
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
             }
@@ -1268,7 +1268,7 @@ public class JFXReformatTask implements ReformatTask {
             List<? extends VariableTree> params = node.getParameters();
             if (params != null && !params.isEmpty()) {
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0, true);
-                wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, params);
+                wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, false, params);
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
             }
             accept(JFXTokenId.RPAREN);
@@ -1567,7 +1567,7 @@ public class JFXReformatTask implements ReformatTask {
             List<? extends ExpressionTree> args = node.getArguments();
             if (args != null && !args.isEmpty()) {
                 spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
-                wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
+                wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, false, args);
                 spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0);
             }
             accept(JFXTokenId.RPAREN);
@@ -1591,7 +1591,7 @@ public class JFXReformatTask implements ReformatTask {
                 List<? extends ExpressionTree> args = node.getArguments();
                 if (args != null && !args.isEmpty()) {
                     spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
-                    wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, args);
+                    wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, false, args);
                     spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0);
                 }
                 accept(JFXTokenId.RPAREN);
@@ -1642,7 +1642,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 if (!members.isEmpty()) {
                     spaces(cs.spaceWithinBraces() ? 1 : 0, true);
-                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), members);
+                    wrapLiteralList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), true, members);
                 }
                 indent = halfIndent;
                 spaces(cs.spaceWithinBraces() && !members.isEmpty() ? 1 : 0, true);
@@ -1864,7 +1864,7 @@ public class JFXReformatTask implements ReformatTask {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                 accept(JFXTokenId.EQ);
                 ExpressionTree expr = node.getExpression();
-                wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, expr);
+                wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, false, expr);
             } else {
                 scan(node.getExpression(), p);
             }
@@ -1884,7 +1884,7 @@ public class JFXReformatTask implements ReformatTask {
                 lastBlankLinesDiff = null;
                 tokens.moveNext();
             }
-            wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, node.getExpression());
+            wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, false, node.getExpression());
             return true;
         }
 
@@ -2220,7 +2220,7 @@ public class JFXReformatTask implements ReformatTask {
                 spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
                 // TODO cs.alignMultipleInterpolationValues
 //                wrapList(cs.wrapMethodCallArgs(), cs.alignMultipleInterpolationValues(), members);
-                wrapLiteralList(cs.wrapMethodCallArgs(), false, members);
+                wrapLiteralList(cs.wrapMethodCallArgs(), false, false, members);
             }
             indent = old;
             spaces(0, true);
@@ -2439,8 +2439,13 @@ public class JFXReformatTask implements ReformatTask {
             if (itemList != null) {
                 int old = indent;
                 indent += indentSize;
-                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
-                wrapList(cs.wrapSequenceInit(), cs.alignSequenceInit(), false, itemList);
+                int count = getNewLinesCount();
+                if (count > 1) {
+                    blankLines(1);
+                } else {
+                    spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
+                }
+                wrapList(cs.wrapSequenceInit(), cs.alignSequenceInit(), false, true, itemList);
                 indent = old;
                 spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             }
@@ -3243,7 +3248,7 @@ public class JFXReformatTask implements ReformatTask {
             return ret;
         }
 
-        private int wrapTree(CodeStyle.WrapStyle wrapStyle, int alignIndent, int spacesCnt, Tree tree) {
+        private int wrapTree(CodeStyle.WrapStyle wrapStyle, int alignIndent, int spacesCnt, boolean keepBlankLines, Tree tree) {
             int ret = -1;
             switch (wrapStyle) {
                 case WRAP_ALWAYS:
@@ -3264,7 +3269,12 @@ public class JFXReformatTask implements ReformatTask {
                     if (alignIndent >= 0) {
                         indent = alignIndent;
                     }
-                    spaces(spacesCnt, true);
+                    int count = getNewLinesCount();
+                    if (count > 1) {
+                        blankLines(1);
+                    } else {
+                        spaces(spacesCnt, true);
+                    }
                     indent = old;
                     ret = col;
                     wrapDepth++;
@@ -3287,7 +3297,12 @@ public class JFXReformatTask implements ReformatTask {
                     if (alignIndent >= 0) {
                         indent = alignIndent;
                     }
-                    spaces(spacesCnt, true);
+                    count = getNewLinesCount();
+                    if (count > 1) {
+                        blankLines(1);
+                    } else {
+                        spaces(spacesCnt, true);
+                    }
                     indent = old;
                     ret = col;
                     scan(tree, null);
@@ -3445,7 +3460,7 @@ public class JFXReformatTask implements ReformatTask {
                             addDiff(new Diff(start, tokens.offset(), null));
                             int old = indent;
                             indent += indentSize;
-                            wrapTree(wrapStyle, -1, spacesCnt, stat);
+                            wrapTree(wrapStyle, -1, spacesCnt, false, stat);
                             indent = old;
                             start = tokens.offset();
                             accept(JFXTokenId.RBRACE);
@@ -3467,12 +3482,13 @@ public class JFXReformatTask implements ReformatTask {
 //            }
             int old = indent;
             indent += indentSize;
-            wrapTree(wrapStyle, -1, spacesCnt, tree);
+            wrapTree(wrapStyle, -1, spacesCnt, false, tree);
             indent = old;
             return false;
         }
 
-        private void wrapList(CodeStyle.WrapStyle wrapStyle, boolean align, boolean prependSpace, List<? extends Tree> trees) {
+        private void wrapList(CodeStyle.WrapStyle wrapStyle, boolean align, boolean prependSpace,
+                boolean keepBlankLines, List<? extends Tree> trees) {
             boolean first = true;
             int alignIndent = -1;
             for (Iterator<? extends Tree> it = trees.iterator(); it.hasNext();) {
@@ -3496,7 +3512,7 @@ public class JFXReformatTask implements ReformatTask {
                         scan(tree, null);
                     }
                 } else {
-                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, tree);
+                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, keepBlankLines, tree);
                 }
                 first = false;
 
@@ -3583,7 +3599,7 @@ public class JFXReformatTask implements ReformatTask {
                         scan(param, null);
                     }
                 } else {
-                    wrapTree(wrapStyle, alignIndent, 0, param);
+                    wrapTree(wrapStyle, alignIndent, 0, false, param);
                 }
                 first = false;
                 if (it.hasNext()) {
@@ -3594,7 +3610,7 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, Set<Tree> trees) {
+        private void wrapLiteralList(CodeStyle.WrapStyle wrapStyle, boolean align, boolean keepBlankLines, Set<Tree> trees) {
             boolean first = true;
             int alignIndent = -1;
             for (Iterator<Tree> it = trees.iterator(); it.hasNext();) {
@@ -3615,7 +3631,7 @@ public class JFXReformatTask implements ReformatTask {
                         scan(part, null);
                     }
                 } else {
-                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, part);
+                    wrapTree(wrapStyle, alignIndent, cs.spaceAfterComma() ? 1 : 0, keepBlankLines, part);
                 }
                 first = false;
 
