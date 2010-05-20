@@ -1447,7 +1447,12 @@ public class JFXReformatTask implements ReformatTask {
                         appendToDiff(getNewlines(1) + getIndent());
                         col = indent;
                     } else if (isSimpleBlock(parentTree)) {
-                        spaces(cs.spaceWithinBraces() ? 1 : 0, true);
+                        int count = getNewLinesCount();
+                        if (count > 1) {
+                            blankLines(1);
+                        } else {
+                            spaces(cs.spaceWithinBraces() ? 1 : 0, true);
+                        }
                     } else {
                         blankLines();
                     }
@@ -1499,7 +1504,12 @@ public class JFXReformatTask implements ReformatTask {
                 if (!magicFunc) {
                     indent = halfIndent;
                     if (isSimpleBlock(parentTree)) {
-                        spaces(cs.spaceWithinBraces() ? 1 : 0, true);
+                        int count = getNewLinesCount();
+                        if (count > 1) {
+                            blankLines(1);
+                        } else {
+                            spaces(cs.spaceWithinBraces() ? 1 : 0, true);
+                        }
                     } else {
                         blankLines();
                     }
@@ -2752,6 +2762,25 @@ public class JFXReformatTask implements ReformatTask {
             spaces(count, false);
         }
 
+        private int getNewLinesCount() {
+            final int index = tokens.index();
+            int count = 0;
+            do {
+                final JFXTokenId id = tokens.token().id();
+                if (id == JFXTokenId.WS) {
+                    String text = tokens.token().text().toString();
+                    if (text.lastIndexOf(NEWLINE) >= 0) {
+                        count++;
+                    }
+                } else {
+                    break;
+                }
+            } while (tokens.moveNext());
+            tokens.moveIndex(index);
+            tokens.moveNext();
+            return count;
+        }
+
         private void spaces(int count, boolean preserveNewline) {
             // javafx lexer generates one token for each WS
             // java - one for all
@@ -3837,6 +3866,12 @@ public class JFXReformatTask implements ReformatTask {
                     || kind == JavaFXKind.INSTANTIATE_OBJECT_LITERAL
                     || kind == JavaFXKind.INIT_DEFINITION
                     || kind == JavaFXKind.POSTINIT_DEFINITION
+                    || kind == JavaFXKind.CONDITIONAL_EXPRESSION
+                    || kind == JavaFXKind.FOR_EXPRESSION_FOR
+                    || kind == JavaFXKind.WHILE_LOOP
+                    || kind == JavaFXKind.ON_REPLACE
+                    || kind == JavaFXKind.TRY
+                    || kind == JavaFXKind.CATCH
                     || kind == JavaFXKind.EQUAL_TO
                     || kind == JavaFXKind.LESS_THAN
                     || kind == JavaFXKind.LESS_THAN_EQUAL
