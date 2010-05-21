@@ -96,16 +96,18 @@ public final class ClassPathProviderImpl implements ClassPathProvider, PropertyC
         evaluator.addPropertyChangeListener(WeakListeners.propertyChange(this, evaluator));
     }
 
-    private synchronized FileObject getDir(String propname) {
-        FileObject fo = (FileObject) this.dirCache.get (propname);
-        if (fo == null ||  !fo.isValid()) {
-            String prop = evaluator.getProperty(propname);
-            if (prop != null) {
-                fo = helper.resolveFileObject(prop);
-                this.dirCache.put (propname, fo);
+    private FileObject getDir(String propname) {
+        synchronized (dirCache) {
+            FileObject fo = (FileObject) this.dirCache.get (propname);
+            if (fo == null ||  !fo.isValid()) {
+                String prop = evaluator.getProperty(propname);
+                if (prop != null) {
+                    fo = helper.resolveFileObject(prop);
+                    this.dirCache.put (propname, fo);
+                }
             }
+            return fo;
         }
-        return fo;
     }
 
     
@@ -323,8 +325,10 @@ public final class ClassPathProviderImpl implements ClassPathProvider, PropertyC
         return null;
     }
 
-    public synchronized void propertyChange(PropertyChangeEvent evt) {
-        dirCache.remove(evt.getPropertyName());
+    public void propertyChange(PropertyChangeEvent evt) {
+        synchronized (dirCache) {
+            dirCache.remove(evt.getPropertyName());
+        }
     }
     
     public String getPropertyName (SourceGroup sg, String type) {
