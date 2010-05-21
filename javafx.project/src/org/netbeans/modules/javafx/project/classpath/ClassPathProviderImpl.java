@@ -44,7 +44,6 @@ package org.netbeans.modules.javafx.project.classpath;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -81,7 +80,7 @@ public final class ClassPathProviderImpl implements ClassPathProvider, PropertyC
     private final SourceRoots testSourceRoots;
     private final ClassPath[] cache = new ClassPath[8];
 
-    private final Map<String,FileObject> dirCache = Collections.synchronizedMap(new HashMap<String,FileObject>());
+    private final Map<String,FileObject> dirCache = new HashMap<String,FileObject>();
 
     public ClassPathProviderImpl(AntProjectHelper helper, PropertyEvaluator evaluator, SourceRoots sourceRoots,
                                  SourceRoots testSourceRoots) {
@@ -94,7 +93,7 @@ public final class ClassPathProviderImpl implements ClassPathProvider, PropertyC
         evaluator.addPropertyChangeListener(WeakListeners.propertyChange(this, evaluator));
     }
 
-    private FileObject getDir(String propname) {
+    private synchronized FileObject getDir(String propname) {
         FileObject fo = (FileObject) this.dirCache.get (propname);
         if (fo == null ||  !fo.isValid()) {
             String prop = evaluator.getProperty(propname);
@@ -321,7 +320,7 @@ public final class ClassPathProviderImpl implements ClassPathProvider, PropertyC
         return null;
     }
 
-    public void propertyChange(PropertyChangeEvent evt) {
+    public synchronized void propertyChange(PropertyChangeEvent evt) {
         dirCache.remove(evt.getPropertyName());
     }
     
