@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -2236,8 +2239,11 @@ public class JFXReformatTask implements ReformatTask {
 
             final JavafxBindStatus bindStatus = node.getBindStatus();
             if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
-                accept(JFXTokenId.BIND);
-                space();
+                JFXTokenId accepted = accept(JFXTokenId.BIND);
+                // #186032
+                if (accepted == JFXTokenId.BIND) {
+                    space();
+                }
             }
             scan(node.getExpression(), p);
             if (bindStatus.isBidiBind()) {
@@ -2411,7 +2417,7 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitSequenceEmpty(SequenceEmptyTree node, Void p) {
             accept(JFXTokenId.LBRACKET);
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
+//            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             accept(JFXTokenId.RBRACKET);
             return true;
         }
@@ -2420,14 +2426,14 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
             List<ExpressionTree> itemList = node.getItemList();
             accept(JFXTokenId.LBRACKET);
-            int old = indent;
-            indent += indentSize;
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             if (itemList != null) {
+                int old = indent;
+                indent += indentSize;
+                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
                 wrapList(cs.wrapSequenceInit(), cs.alignSequenceInit(), false, itemList);
+                indent = old;
+                spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             }
-            indent = old;
-            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             accept(JFXTokenId.RBRACKET);
             return true;
         }
@@ -2567,6 +2573,8 @@ public class JFXReformatTask implements ReformatTask {
 
             // JavaFX Non-reserved keywords feature, see v4Parser.g
             if (tokenIds.contains(JFXTokenId.IDENTIFIER)) {
+                // #186035
+                tokenIds.addAll(ReformatUtils.RESERVED_KEYWORDS);
                 tokenIds.addAll(ReformatUtils.NON_RESERVED_KEYWORDS);
             }
 

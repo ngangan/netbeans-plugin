@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -76,7 +79,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String MESSAGE = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
     private static final Comparator IMPORT_COMPERATOR = new ImportComperator();
-    private final List<Fix> fixes = new ArrayList<Fix>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
@@ -95,7 +97,6 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
 
             @Override
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                fixes.clear();
                 cancel.set(false);
                 if (compilationInfo.getDocument() == null) {
                     return;
@@ -188,6 +189,7 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                         }
                     }
                     boolean exists = false;
+                    List<Fix> fixesPerDiagnostic = new ArrayList<Fix>();
                     for (ElementHandle<TypeElement> elementHandle : options) {
                         potentialClassSimpleName = elementHandle.getQualifiedName();
                         String packageName = HintsUtils.getPackageName(potentialClassSimpleName);
@@ -201,15 +203,14 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                             }
                         }
                         if (!exists) {
-                            fixes.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
+                            fixesPerDiagnostic.add(new FixImport(potentialClassSimpleName, compilationInfo.getDocument()));
                         }
                     }
-
-                    if (fixes.isEmpty()) {
+                    if (fixesPerDiagnostic.isEmpty()) {
                         continue;
                     }
-                    Collections.sort(fixes, IMPORT_COMPERATOR);
-                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixes, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
+                    Collections.sort(fixesPerDiagnostic, IMPORT_COMPERATOR);
+                    ErrorDescription er = ErrorDescriptionFactory.createErrorDescription(Severity.HINT, "", fixesPerDiagnostic, compilationInfo.getFileObject(), (int) diagnostic.getStartPosition(), (int) diagnostic.getEndPosition());//NOI18N
                     errors.add(er);
                 }
                 HintsController.setErrors(compilationInfo.getDocument(), HINTS_IDENT, errors);

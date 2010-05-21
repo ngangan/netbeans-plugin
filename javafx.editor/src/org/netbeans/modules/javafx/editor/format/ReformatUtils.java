@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -51,6 +54,22 @@ import org.netbeans.api.javafx.lexer.JFXTokenId;
  * @author Anton Chechel
  */
 public final class ReformatUtils {
+
+    public static EnumSet<JFXTokenId> RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.ABSTRACT,
+            JFXTokenId.AFTER, JFXTokenId.AND, JFXTokenId.AS, JFXTokenId.ASSERT,
+            JFXTokenId.AT, JFXTokenId.ATTRIBUTE, JFXTokenId.BEFORE, JFXTokenId.BIND,
+            JFXTokenId.BOUND, JFXTokenId.BREAK, JFXTokenId.CATCH, JFXTokenId.CLASS,
+            JFXTokenId.CONTINUE, JFXTokenId.DEF, JFXTokenId.DELETE, JFXTokenId.ELSE,
+            JFXTokenId.EXCLUSIVE, JFXTokenId.EXTENDS, JFXTokenId.FALSE, JFXTokenId.FINALLY,
+            JFXTokenId.FOR, JFXTokenId.FROM, JFXTokenId.FUNCTION, JFXTokenId.IF,
+            JFXTokenId.IMPORT, JFXTokenId.INDEXOF, JFXTokenId.INSERT, JFXTokenId.INSTANCEOF,
+            JFXTokenId.LAZY, JFXTokenId.MIXIN, JFXTokenId.MOD, JFXTokenId.NATIVEARRAY,
+            JFXTokenId.NEW, JFXTokenId.NOT, JFXTokenId.NULL, JFXTokenId.OR,
+            JFXTokenId.OVERRIDE, JFXTokenId.PACKAGE, JFXTokenId.PRIVATE, JFXTokenId.PROTECTED,
+            JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_INIT, JFXTokenId.PUBLIC_READ, JFXTokenId.RETURN,
+            JFXTokenId.REVERSE, JFXTokenId.SIZEOF, JFXTokenId.STATIC, JFXTokenId.SUPER,
+            JFXTokenId.THEN, JFXTokenId.THIS, JFXTokenId.THROW, JFXTokenId.TRUE,
+            JFXTokenId.TRY, JFXTokenId.TYPEOF, JFXTokenId.VAR, JFXTokenId.WHILE);
 
     public static EnumSet<JFXTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.FIRST,
             JFXTokenId.IN, JFXTokenId.INIT, JFXTokenId.INTO, JFXTokenId.INVERSE,
