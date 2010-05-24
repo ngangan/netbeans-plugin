@@ -165,13 +165,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
         
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                //ProjectTypeInfo projectTypeInfo = ProjectTypeInfo.getProjectTypeInfoFor (IOSupport.getDataObjectContext (dataObject).getProjectType ());
-                //tc.setIcon (projectTypeInfo != null ? ImageUtilities.loadImage (projectTypeInfo.getIconResource ()) : null);
-
-                String displayName = messageName();
-                if (! displayName.equals(tc.getDisplayName()))
-                    tc.setDisplayName(displayName);
-                tc.setToolTipText(getDataObject().getPrimaryFile().getPath());
+                getFXZDataObject().updateTCName();
             }
         });
     }
@@ -203,7 +197,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
         th.start();
         return reloadTask;
     }
-    
+
     @Override
     protected boolean notifyModified() {
         //System.out.println("Modified " + m_entryName);
@@ -215,7 +209,7 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
             return false; //still unmodified
         }
     }
-    
+
 //    @Override
 //    protected CloneableTopComponent createCloneableTopComponent() {
 //        return super.createCloneableTopComponent();
