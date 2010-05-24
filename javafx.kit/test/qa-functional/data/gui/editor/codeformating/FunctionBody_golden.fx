@@ -1,3 +1,3 @@
-function a(){
+function a() {
     println("Hello World!");
 }

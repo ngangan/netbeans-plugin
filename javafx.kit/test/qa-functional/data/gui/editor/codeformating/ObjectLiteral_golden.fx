@@ -7,7 +7,7 @@ import javafx.scene.input.*;
 import javafx.scene.control.*;
 
 Stage {
-   title : "MyApp"
+   title: "MyApp"
    scene: Scene {
    width: 200
    height: 200
