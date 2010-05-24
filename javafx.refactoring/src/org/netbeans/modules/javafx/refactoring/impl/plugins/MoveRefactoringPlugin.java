@@ -1,7 +1,10 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -333,21 +336,23 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                 } else {
                     JavaSource js = JavaSource.forFileObject(file);
                     try {
-                        js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
+                        if (js != null) {
+                            js.runUserActionTask(new org.netbeans.api.java.source.Task<org.netbeans.api.java.source.CompilationController>() {
 
-                            public void run(final org.netbeans.api.java.source.CompilationController cc) throws Exception {
-                                if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
-                                    Object elements = cc.getClass().getMethod("getTopLevelElements").invoke(cc); // NOI18N
-                                    Iterator iter = (Iterator)List.class.getMethod("iterator").invoke(elements); // NOI18N
+                                public void run(final org.netbeans.api.java.source.CompilationController cc) throws Exception {
+                                    if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
+                                        Object elements = cc.getClass().getMethod("getTopLevelElements").invoke(cc); // NOI18N
+                                        Iterator iter = (Iterator)List.class.getMethod("iterator").invoke(elements); // NOI18N
 
-                                    while (iter.hasNext()) {
-                                        Object te = iter.next();
-                                        ElementDef edef = RefactoringSupport.fromJava(te, cc);
-                                        edefs.add(edef);
+                                        while (iter.hasNext()) {
+                                            Object te = iter.next();
+                                            ElementDef edef = RefactoringSupport.fromJava(te, cc);
+                                            edefs.add(edef);
+                                        }
                                     }
                                 }
-                            }
-                        }, true);
+                            }, true);
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

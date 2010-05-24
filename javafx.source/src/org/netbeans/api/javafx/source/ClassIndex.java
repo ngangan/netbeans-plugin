@@ -1,8 +1,11 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright 2008 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
+ * Copyright 2010 Oracle and/or its affiliates. All rights reserved.
+ *
+ * Oracle and Java are registered trademarks of Oracle and/or its affiliates.
+ * Other names may be trademarks of their respective owners.
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common
  * Development and Distribution License("CDDL") (collectively, the
@@ -13,9 +16,9 @@
  * specific language governing permissions and limitations under the
  * License.  When distributing the software, include this License Header
  * Notice in each file and include the License file at
- * nbbuild/licenses/CDDL-GPL-2-CP.  Sun designates this
+ * nbbuild/licenses/CDDL-GPL-2-CP.  Oracle designates this
  * particular file as subject to the "Classpath" exception as provided
- * by Sun in the GPL Version 2 section of the License file that
+ * by Oracle in the GPL Version 2 section of the License file that
  * accompanied this code. If applicable, add the following below the
  * License Header, with the fields enclosed by brackets [] replaced by
  * your own identifying information:
@@ -216,8 +219,11 @@ final public class ClassIndex {
             depRoots.addAll(Arrays.asList(compilePath.getRoots()));
             depRoots.addAll(Arrays.asList(bootPath.getRoots()));
 
-            getSrcRoots().retainAll(srcRoots);
-            getDepRoots().retainAll(depRoots);
+            // #186163: need to add the new srcRoots before removing the unused ones
+            getSrcRoots(true).retainAll(srcRoots);
+
+            // #186163: need to add the new srcRoots before removing the unused ones
+            getDepRoots(true).retainAll(depRoots);
 
             preferSources(getDepRoots());
             javaIndex = org.netbeans.api.java.source.ClasspathInfo.create(bootPath, compilePath, sourcePath).getClassIndex();
@@ -616,8 +622,15 @@ final public class ClassIndex {
     }
 
     private Set<FileObject> getSrcRoots() {
+        return getSrcRoots(false);
+    }
+    
+    private Set<FileObject> getSrcRoots(boolean refresh) {
         synchronized(indexerSrcRoots) {
-            if (indexerSrcRoots.isEmpty()) {
+            if (indexerSrcRoots.isEmpty() || refresh) {
+                if (refresh) {
+                    indexerSrcRoots.clear();
+                }
                 for (String classpathId : PathRecognizerRegistry.getDefault().getSourceIds()) {
                     collectRoots(classpathId, indexerSrcRoots);
                 }
@@ -627,51 +640,62 @@ final public class ClassIndex {
     }
 
     private Set<FileObject> getDepRoots() {
+        return getDepRoots(false);
+    }
+
+    private Set<FileObject> getDepRoots(boolean refresh) {
         synchronized(indexerDepRoots) {
-            if (indexerDepRoots.isEmpty()) {
-                if (indexerDepRoots.isEmpty()) {
-                    for (String classpathId : PathRecognizerRegistry.getDefault().getLibraryIds()) {
-                        collectRoots(classpathId, indexerDepRoots);
-                    }
-                    for (String classpathId : PathRecognizerRegistry.getDefault().getBinaryLibraryIds()) {
-                        collectRoots(classpathId, indexerDepRoots);
-                    }
+            if (indexerDepRoots.isEmpty() || refresh) {
+                if (refresh) {
+                    indexerDepRoots.clear();
+                }
+                for (String classpathId : PathRecognizerRegistry.getDefault().getLibraryIds()) {
+                    collectRoots(classpathId, indexerDepRoots);
+                }
+                for (String classpathId : PathRecognizerRegistry.getDefault().getBinaryLibraryIds()) {
+                    collectRoots(classpathId, indexerDepRoots);
                 }
             }
         }
         return indexerDepRoots;
     }
+
     private Set<FileObject> getDepRevRoots() {
+        return getDepRevRoots(false);
+    }
+
+    private Set<FileObject> getDepRevRoots(boolean refresh) {
         synchronized(indexerDepRevRoots) {
-            if (indexerDepRevRoots.isEmpty()) {
-                if (indexerDepRevRoots.isEmpty()) {
-                    Set<Map.Entry<URL, List<URL>>> rootDeps = IndexingController.getDefault().getRootDependencies().entrySet();
-                    Set<FileObject> srcs = new HashSet<FileObject>();
-                    Set<FileObject> newSrcs = new HashSet<FileObject>(getSrcRoots());
-                    do {
-                        srcs.clear();
-                        srcs.addAll(newSrcs);
-                        newSrcs.clear();
-                        for(FileObject fo : srcs) {
-                            for(Map.Entry<URL, List<URL>> entry : rootDeps) {
-                                try {
-                                    if (entry != null) {
-                                        List<URL> urls = entry.getValue();
-                                        if (urls != null && urls.contains(fo.getURL())) {
-                                            FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
-                                            if (!indexerDepRevRoots.contains(src)) {
-                                                indexerDepRevRoots.add(src);
-                                                newSrcs.add(src);
-                                            }
+            if (indexerDepRevRoots.isEmpty() || refresh) {
+                if (refresh) {
+                    indexerDepRevRoots.clear();
+                }
+                Set<Map.Entry<URL, List<URL>>> rootDeps = IndexingController.getDefault().getRootDependencies().entrySet();
+                Set<FileObject> srcs = new HashSet<FileObject>();
+                Set<FileObject> newSrcs = new HashSet<FileObject>(getSrcRoots());
+                do {
+                    srcs.clear();
+                    srcs.addAll(newSrcs);
+                    newSrcs.clear();
+                    for(FileObject fo : srcs) {
+                        for(Map.Entry<URL, List<URL>> entry : rootDeps) {
+                            try {
+                                if (entry != null) {
+                                    List<URL> urls = entry.getValue();
+                                    if (urls != null && urls.contains(fo.getURL())) {
+                                        FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
+                                        if (!indexerDepRevRoots.contains(src)) {
+                                            indexerDepRevRoots.add(src);
+                                            newSrcs.add(src);
                                         }
                                     }
-                                } catch (FileStateInvalidException e) {
-                                    LOG.log(Level.SEVERE, null, e);
                                 }
+                            } catch (FileStateInvalidException e) {
+                                LOG.log(Level.SEVERE, null, e);
                             }
                         }
-                    } while (!newSrcs.isEmpty());
-                }
+                    }
+                } while (!newSrcs.isEmpty());
             }
         }
         return indexerDepRevRoots;
@@ -810,5 +834,9 @@ final public class ClassIndex {
 
     private static org.netbeans.api.java.source.ClassIndex.NameKind toJavaNameKind(NameKind kind) {
         return kind == NameKind.EXACT ? org.netbeans.api.java.source.ClassIndex.NameKind.SIMPLE_NAME : org.netbeans.api.java.source.ClassIndex.NameKind.valueOf(kind.name());
+    }
+
+    private static <T> void addAndRemove(Collection<T> target, Collection<T> newCol) {
+        target.addAll(newCol);
     }
 }
