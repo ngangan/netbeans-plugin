@@ -89,9 +89,17 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         statements.add(node.getBlock().getValue());
         Map<Tree, Collection<Type>> throwsMap = getThrowns(statements);
         Map<Tree, Tree> catchMap = new HashMap<Tree, Tree>();
-
+        if (node == null || node.getCatches() == null) {
+            return super.visitTry(node, model);
+        }
         for (CatchTree catchTree : node.getCatches()) {
+            if (catchTree == null) {
+                continue;
+            }
             JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), catchTree.getParameter());
+            if (path == null) {
+                continue;
+            }
             Element catchVarElement = compilationInfo.getTrees().getElement(path);
             Type catchType = null;
             if (catchVarElement != null) {
