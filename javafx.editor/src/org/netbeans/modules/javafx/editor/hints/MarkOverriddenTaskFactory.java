@@ -118,7 +118,15 @@ public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
                             for (ClassSymbol cs : allElements.keySet()) {
                                 Collection<? extends Element> list = allElements.get(cs);
                                 for (Element e : list) {
-                                    if (e instanceof MethodSymbol && compilationInfo.getElements().overrides((ExecutableElement) element, (ExecutableElement) e, classSymbol)) {
+                                    boolean overrides = false;
+                                    if (element instanceof ExecutableElement && e instanceof ExecutableElement) {;
+                                        try {
+                                            overrides = compilationInfo.getElements().overrides((ExecutableElement) element, (ExecutableElement) e, classSymbol);
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                        }
+                                    }
+                                    if (e instanceof MethodSymbol && overrides) {
                                         fqnString = cs.getQualifiedName().toString();
                                         break;
                                     }
