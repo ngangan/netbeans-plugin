@@ -1062,6 +1062,15 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitVariable(VariableTree node, Void p) {
+            return _visitVariable(node, p);
+        }
+
+        @Override
+        public Boolean visitOverrideClassVar(OverrideClassVarTree node, Void p) {
+            return _visitVariable(node, p);
+        }
+
+        private Boolean _visitVariable(VariableTree node, Void p) {
             if (isSynthetic((JFXTree) node)) {
                 return false;
             }
@@ -1087,7 +1096,7 @@ public class JFXReformatTask implements ReformatTask {
             if (indent == old && !insideFor) {
                 indent += continuationIndentSize;
             }
-            
+
             JFXTokenId accepted = acceptAndRollback(ReformatUtils.VARIABLE_KEYWORDS);
             // put space if this VAR is not parameter
             if (ReformatUtils.VARIABLE_KEYWORDS.contains(accepted)) {
@@ -1108,13 +1117,13 @@ public class JFXReformatTask implements ReformatTask {
                         if (acceptAndRollback(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
                             accept(JFXTokenId.NATIVEARRAY);
                             space();
-//                        accept(JFXTokenId.OF);
+                            //                        accept(JFXTokenId.OF);
                             accept(JFXTokenId.IDENTIFIER); // lexer bug?
                             space();
                         }
-//                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
-//                    accept(JFXTokenId.FUNCTION);
-//                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
+                        //                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
+                        //                    accept(JFXTokenId.FUNCTION);
+                        //                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
                     }
                     scan(type, p);
                 }
@@ -1147,7 +1156,6 @@ public class JFXReformatTask implements ReformatTask {
                     accept(JFXTokenId.INVERSE);
                 }
             }
-
             indent = old;
 
             OnReplaceTree onReplaceTree = node.getOnReplaceTree();
@@ -2540,17 +2548,6 @@ public class JFXReformatTask implements ReformatTask {
                 scan(tree, p);
             }
 
-            do {
-                col += tokens.token().length();
-            } while (tokens.moveNext() && tokens.offset() < endPos);
-            lastBlankLines = -1;
-            lastBlankLinesTokenIndex = -1;
-            lastBlankLinesDiff = null;
-            return true;
-        }
-
-        @Override
-        public Boolean visitOverrideClassVar(OverrideClassVarTree node, Void p) {
             do {
                 col += tokens.token().length();
             } while (tokens.moveNext() && tokens.offset() < endPos);
