@@ -1227,9 +1227,9 @@ public class JFXReformatTask implements ReformatTask {
                     processColon();
                     accept(JFXTokenId.IDENTIFIER);
                     accept(JFXTokenId.LBRACKET);
-                    if (cs.spaceWithinArrayInitBrackets()) {
-                        space();
-                    }
+//                    if (cs.spaceWithinArrayInitBrackets()) {
+//                        space();
+//                    }
                     accept(JFXTokenId.RBRACKET);
                 } else {
                     wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, false, params);
@@ -1939,9 +1939,9 @@ public class JFXReformatTask implements ReformatTask {
             // sequence type
             if (acceptAndRollback(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
                 accept(JFXTokenId.LBRACKET);
-                if (cs.spaceWithinArrayInitBrackets()) {
-                    space();
-                }
+//                if (cs.spaceWithinArrayInitBrackets()) {
+//                    space();
+//                }
                 accept(JFXTokenId.RBRACKET);
             }
             return true;
