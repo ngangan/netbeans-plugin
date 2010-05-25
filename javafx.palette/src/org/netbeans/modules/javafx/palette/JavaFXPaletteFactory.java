@@ -39,28 +39,73 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-
 package org.netbeans.modules.javafx.palette;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
 import java.io.IOException;
+import org.netbeans.spi.palette.DragAndDropHandler;
 import org.netbeans.spi.palette.PaletteController;
 import org.netbeans.spi.palette.PaletteFactory;
+import org.netbeans.spi.palette.PaletteFilter;
+import org.openide.util.Lookup;
+import org.openide.util.datatransfer.ExTransferable;
 
 /**
  *
  * @author Michal Skvor
  */
 public class JavaFXPaletteFactory {
-    
+
     public static final String JAVAFX_PALETTE_FOLDER = "JavaFXPalette"; // NOI18N
-    
     static private PaletteController palette = null;
 
     public static synchronized PaletteController getPalette() throws IOException {
-        if( palette == null ) {
-            palette = PaletteFactory.createPalette( JAVAFX_PALETTE_FOLDER, 
-                    new JavaFXPaletteActions());
+
+        if (palette == null) {
+            //palette = PaletteFactory.createPalette(JAVAFX_PALETTE_FOLDER, new JavaFXPaletteActions());
+            PaletteFilter pf = new PaletteFilter() {
+
+                @Override
+                public boolean isValidCategory(Lookup lkp) {
+                    return true;
+                }
+
+                @Override
+                public boolean isValidItem(Lookup lkp) {
+                    return true;
+                }
+            };
+
+            DragAndDropHandler dndh = new DragAndDropHandler() {
+
+                @Override
+                public void customize(ExTransferable et, Lookup lkp) {
+                }
+
+                @Override
+                public boolean canDrop(Lookup lkp, DataFlavor[] dfs, int i) {
+                    return false;
+                }
+
+                @Override
+                public boolean doDrop(Lookup lkp, Transferable t, int i, int i1) {
+                    return false;
+                }
+
+                @Override
+                public boolean canReorderCategories(Lookup lkp) {
+                    return false;
+                }
+
+                @Override
+                public boolean moveCategory(Lookup lkp, int i) {
+                    return false;
+                }
+            };
+
+            palette = PaletteFactory.createPalette(JAVAFX_PALETTE_FOLDER, new JavaFXPaletteActions(), pf, dndh);
         }
         return palette;
-    } 
+    }
 }
