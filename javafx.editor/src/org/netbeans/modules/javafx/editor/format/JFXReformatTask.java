@@ -1156,7 +1156,6 @@ public class JFXReformatTask implements ReformatTask {
                     accept(JFXTokenId.INVERSE);
                 }
             }
-            indent = old;
 
             OnReplaceTree onReplaceTree = node.getOnReplaceTree();
             if (onReplaceTree != null) {
@@ -1164,6 +1163,7 @@ public class JFXReformatTask implements ReformatTask {
                 scan(onReplaceTree, p);
             }
             processSemicolon();
+            indent = old;
             return true;
         }
 
