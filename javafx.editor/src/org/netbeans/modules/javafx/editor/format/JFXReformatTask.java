@@ -3756,7 +3756,8 @@ public class JFXReformatTask implements ReformatTask {
             if (lastTree != null && path != null) {
                 switch (path.getLeaf().getJavaFXKind()) {
                     case CLASS_DECLARATION:
-                        for (Tree tree : ((ClassDeclarationTree) path.getLeaf()).getClassMembers()) {
+                        final ClassDeclarationTree classTree = (ClassDeclarationTree) path.getLeaf();
+                        for (Tree tree : classTree.getClassMembers()) {
                             if (tree == lastTree) {
                                 _indent += tabSize;
                                 break;
@@ -3765,6 +3766,15 @@ public class JFXReformatTask implements ReformatTask {
                         break;
                     case BLOCK_EXPRESSION:
                         for (Tree tree : getBlockMembers((BlockExpressionTree) path.getLeaf())) {
+                            if (tree == lastTree) {
+                                _indent += tabSize;
+                                break;
+                            }
+                        }
+                        break;
+                    case INSTANTIATE_OBJECT_LITERAL:
+                        final InstantiateTree insTree = (InstantiateTree) path.getLeaf();
+                        for (Tree tree : insTree.getLiteralParts()) {
                             if (tree == lastTree) {
                                 _indent += tabSize;
                                 break;
