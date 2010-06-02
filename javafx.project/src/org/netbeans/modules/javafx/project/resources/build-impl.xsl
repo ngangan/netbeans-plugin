@@ -308,7 +308,7 @@ is divided into following sections:
                 <arg value="tv"/>
                 <arg value="-classpath"/>
                 <arg value="${{jar.file}}"/>
-                <arg value="${{run.jvmargs}}"/>
+                <arg line="${{run.jvmargs}}"/>
                 <arg value="${{main.class}}"/>
             </exec>
         </target>
@@ -421,7 +421,7 @@ is divided into following sections:
                 <arg value="tv"/>
                 <arg value="-classpath"/>
                 <arg value="${{jar.file}}"/>
-                <arg value="${{run.jvmargs}}"/>
+                <arg line="${{run.jvmargs}}"/>
                 <arg value="${{main.class}}"/>
             </exec>
         </target>
