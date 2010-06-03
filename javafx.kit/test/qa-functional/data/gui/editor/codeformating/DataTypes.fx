@@ -17,12 +17,8 @@ var date = 3h;
 
 var str = "Hello!";
 
+var seq = ["1", "2", "3" ];
+
 class A{}
 
 var a = A{};
-
-var f = function(a:Number, b:String):Boolean { true };
-var seqf = function(a:A[], b:String[]):Boolean[] { [] };
-
-
-var seq = ["1", "2", "3" ];
