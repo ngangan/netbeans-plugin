@@ -66,24 +66,24 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
         // === Init  ===
         "testCreateProject",
 
-        // === Variables ===
-        "testCFVariables",
-        "testCFVariablesSpaces",
-        "testCFVariablesNegativeValue",
-
-        "testCFDataTypes",
-        "testCFVariableTrigger",
-        "testCFVariablesBinding",
-
-
-
-        // === Function ===
-
-        "testCFFunction",
-        "testCFFunctionBody",
-
-        // === Class ===
-        "testCFClass",
+//        // === Variables ===
+//        "testCFVariables",
+//        "testCFVariablesSpaces",
+//        "testCFVariablesNegativeValue",
+//
+//        "testCFDataTypes",
+//        "testCFVariableTrigger",
+//        "testCFVariablesBinding",
+//
+//
+//
+//        // === Function ===
+//
+//        "testCFFunction",
+//        "testCFFunctionBody",
+//
+//        // === Class ===
+//        "testCFClass",
 
         // === Object Literal ===
         "testCFObjectLiteral",
