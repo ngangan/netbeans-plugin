@@ -1505,7 +1505,7 @@ public class JavaFXCompletionEnvironment<T extends Tree> {
 
     protected void addAllTypes(EnumSet<ElementKind> kinds, boolean insideNew, String myPrefix) {
         if (LOGGABLE) log(" addAllTypes "); // NOI18N
-        for (ElementHandle<TypeElement> name : getTypes(myPrefix, NameKind.PREFIX)) {
+        for (ElementHandle<TypeElement> name : getTypes(myPrefix, NameKind.CASE_INSENSITIVE_PREFIX)) {
             String[] sigs = name.getSignatures();
             if ((sigs == null) || (sigs.length == 0)) {
                 continue;

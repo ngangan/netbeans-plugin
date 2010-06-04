@@ -50,8 +50,10 @@ import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.ElementKind;
 
 /**
  *
@@ -88,8 +90,11 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
         if (prefix == null || prefix.length() == 0) {
             addMethodArguments(mi);
         }
-        addLocalMembersAndVars(getSmartType(mi));
+        TypeMirror smt = getSmartType(mi);
+        addLocalMembersAndVars(smt);
         addValueKeywords();
+
+        addLocalAndImportedTypes(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM), null, null, false, smt);
     }
 
     private TypeMirror getSmartType(FunctionInvocationTree mi) throws IOException {
