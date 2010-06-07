@@ -36,7 +36,6 @@ import com.sun.javafx.api.tree.UnitTree;
 import org.netbeans.api.javafx.lexer.JFXTokenId;
 import org.netbeans.api.javafx.source.CancellableTask;
 import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
@@ -69,12 +68,12 @@ import org.openide.util.NbBundle;
  * @todo documentation
  */
 class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
+
     private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/task/Bundle"); // NOI18N
     private static final String WRONG_PROJECT = "wrong-project"; // NOI18N
     private static final String WRONG_PACKAGE = "wrong-package"; // NOI18N
     private static final String EDITOR_WRONG_PROJECT = "Editor.wrongProject"; // NOI18N
     private static final String EDITOR_WRONG_PACKAGE_PACKAGE = "Editor.wrongPackage.package"; // NOI18N
-
     private final FileObject file;
     private final AtomicBoolean canceled = new AtomicBoolean(false);
 
@@ -94,15 +93,13 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
         if (!file.isValid()) {
             return;
         }
-
         ExpressionTree packageTree = ci.getCompilationUnit().getPackageName();
         String packageName = packageTree == null ? null : packageTree.toString();
         Project project = FileOwnerQuery.getOwner(file);
-        
+
         if (project == null) {
             return;
         }
-
         int sp = packageTree == null ? 0 : (int) ci.getTrees().getSourcePositions().getStartPosition(ci.getCompilationUnit(), packageTree);
         int ep = packageTree == null ? 0 : (int) ci.getTrees().getSourcePositions().getEndPosition(ci.getCompilationUnit(), packageTree);
 
@@ -119,7 +116,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                 if (isCanceled()) {
                     return;
                 }
-                
+
                 if (FileUtil.isParentOf(sourceRoot, file)) {
                     String path = sourceRoot.getPath();
                     String me = file.getParent().getPath();
@@ -130,6 +127,8 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                             me = me.replace("/", ".");        // NOI18N
                         }
                         if (me.equals(packageName) || (inDefaultPackage && packageName == null)) {
+                            //BUGFIX  Bug 181768 -  Incorrect error hint with package
+                            HintsController.setErrors(file, WRONG_PACKAGE, Collections.EMPTY_LIST);
                             return;
                         } else {
                             if (!inDefaultPackage) {
@@ -144,10 +143,9 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             }
             HintsController.setErrors(file, WRONG_PACKAGE, Collections.<ErrorDescription>singletonList(
                     ErrorDescriptionFactory.createErrorDescription(
-                            Severity.ERROR,
-                            MessageFormat.format(BUNDLE.getString(EDITOR_WRONG_PACKAGE_PACKAGE), packageName),
-                            fixes, file, sp, ep)
-            ));
+                    Severity.ERROR,
+                    MessageFormat.format(BUNDLE.getString(EDITOR_WRONG_PACKAGE_PACKAGE), packageName),
+                    fixes, file, sp, ep)));
         } else {
 // [pnejedly] disabling the error temporarily to allow comfortabe editing of real JavaFX sources under an NBM project type.
             // solving compilation error under J5
@@ -162,7 +160,9 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
     }
 
     private JavaFXDocument getDoc(FileObject file) {
-        if (file == null || !file.isValid()) return null;
+        if (file == null || !file.isValid()) {
+            return null;
+        }
         DataObject od = null;
         try {
             od = DataObject.find(file);
@@ -180,8 +180,8 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
         return null;
     }
 
-
     private static class ReplacePackageNameFix implements Fix {
+
         private CompilationInfo ci;
         private String newName;
         private JavaFXDocument doc;
@@ -197,7 +197,9 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
         }
 
         public ChangeInfo implement() throws Exception {
-            if (doc == null) return new ChangeInfo();
+            if (doc == null) {
+                return new ChangeInfo();
+            }
             UnitTree cu = ci.getCompilationUnit();
             ExpressionTree pn = cu.getPackageName();
             SourcePositions sp = ci.getTrees().getSourcePositions();
@@ -215,6 +217,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
     }
 
     private static class SetPackageToDefaultFix implements Fix {
+
         private final CompilationInfo ci;
         private final JavaFXDocument doc;
 
@@ -228,13 +231,15 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
         }
 
         public ChangeInfo implement() throws Exception {
-            if (doc == null) return new ChangeInfo();
+            if (doc == null) {
+                return new ChangeInfo();
+            }
             UnitTree cu = ci.getCompilationUnit();
             ExpressionTree pn = cu.getPackageName();
             SourcePositions sp = ci.getTrees().getSourcePositions();
             int start = (int) sp.getStartPosition(cu, pn);
             int end = (int) sp.getEndPosition(cu, pn) + 1;
-            
+
             //noinspection unchecked
             TokenSequence<JFXTokenId> ts = ci.getTokenHierarchy().tokenSequence();
             ts.move(start);
@@ -246,7 +251,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                         start = ts.offset();
                         finish = true;
                         break;
-                    }                    
+                    }
                 }
             }
 
@@ -256,6 +261,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
     }
 
     private static class MoveToFolderFix implements Fix {
+
         private final FileObject file;
         private final String packageName;
         private final FileObject root;
@@ -272,7 +278,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
 
         public ChangeInfo implement() throws Exception {
             try {
-                String path = packageName == null? "" : packageName.replace('.', '/'); // NOI18N
+                String path = packageName == null ? "" : packageName.replace('.', '/'); // NOI18N
 
                 FileObject packFile = root.getFileObject(path);
 
@@ -282,7 +288,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                     return null;
                 }
 
-                if (packageName != null ) {
+                if (packageName != null) {
                     packFile = FileUtil.createFolder(root, packageName.replace('.', '/'));   // NOI18N
                 } else {
                     packFile = root;
