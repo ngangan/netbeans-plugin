@@ -68,7 +68,8 @@ public class ArrayElemCompletionProvider extends AbstractCompletionProvider {
             Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
             if (ts.offset() + prevT.length() == caretOffset) {
                 // at the end of id
-                processArrElemId(resultSet, el, caretOffset);
+                processAttrArrayValue(resultSet, el.getParentElement(), caretOffset, ts);
+                //processArrElemId(resultSet, el, caretOffset);
             }
             // after id. nothing to suggest?
         }
@@ -77,7 +78,12 @@ public class ArrayElemCompletionProvider extends AbstractCompletionProvider {
 
     private void processArrElemId(final CompletionResultSet resultSet,
             DocumentElement el, int caretOffset) {
-        String nameStart = el.getName().substring(0, caretOffset - el.getStartOffset());
+        int len = caretOffset - el.getStartOffset();
+        String name = el.getName();
+        if (len > name.length()){
+            len = name.length();
+        }
+        String nameStart = name.substring(0, len);
 
         // get array attr containgng this elem
         DocumentElement parent = el.getParentElement();
