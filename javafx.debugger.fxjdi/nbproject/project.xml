@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.apisupport.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
+            <code-name-base>org.netbeans.modules.javafx.fxjdi</code-name-base>
+            <suite-component/>
+            <module-dependencies/>
+            <public-packages>
+                <package>com.sun.javafx.jdi</package>
+                <package>com.sun.javafx.jdi.connect</package>
+                <package>com.sun.javafx.jdi.event</package>
+                <package>com.sun.javafx.jdi.request</package>
+            </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/fxjdi.jar</runtime-relative-path>
+                <binary-origin>external/modules/ext/fxjdi.jar</binary-origin>
+            </class-path-extension>
+        </data>
+    </configuration>
+</project>
