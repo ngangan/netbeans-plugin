@@ -67,8 +67,9 @@ public class JavaFXPaletteEffectsTest extends JavaFXPaletteTestCase {
     static final String[] TESTS = {
         "testPalette",
     };
-
+    
     public void testPalette() {
+            filter = new String[] { "Identity" };
             testItems(CATEGORY);
     }
 
