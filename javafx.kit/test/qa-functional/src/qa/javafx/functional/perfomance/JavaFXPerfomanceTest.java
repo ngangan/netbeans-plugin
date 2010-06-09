@@ -93,14 +93,19 @@ public class JavaFXPerfomanceTest extends JavaFXTestCase {
         URL url = new File(src).toURI().toURL();
         
         Util.unzipFile(url.toString(), dst + File.separator);
+        Util.sleep(3000);
+        Util.waitScanFinished();
 
         String projectPath = dst + "/BigJavaFXProject";
         Project.openProject(projectPath);
 
         JavaFXProject bigProject  = new JavaFXProject("BigJavaFXProject");
+        Util.sleep(3000);
+        Util.waitScanFinished();
         bigProject.build();
-
-
+        Util.sleep(3000);
+        Util.waitScanFinished();
+        bigProject.openOutput();
         boolean isCompiled = bigProject.getOutput().isCompiled();
         System.out.println("Otput:");
         System.out.println(bigProject.getOutput().getText());
