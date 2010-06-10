@@ -708,6 +708,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case POSTINIT_DEFINITION:
                 break;
             case SEQUENCE_DELETE:
+                result = new SequenceDeleteEnvironment();
                 break;
             case SEQUENCE_EMPTY:
                 result = new SequenceEmptyEnvironment();
@@ -719,6 +720,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new SequenceIndexedEnvironment();
                 break;
             case SEQUENCE_INSERT:
+                result = new SequenceInsertEnvironment();
                 break;
             case SEQUENCE_RANGE:
                 result = new SequenceRangeEnvironment();
