@@ -187,13 +187,13 @@
     <target name="-pre-build" depends="-init-build-properties">
         <delete dir="build"/>
         <mkdir dir="build"/>
-        <parallel failonany="true">
+<!--        <parallel failonany="true">-->
             <antcall target="get-netbeans"/>
             <antcall target="get-sdk-win" />
             <antcall target="get-sdk-mac" />
             <antcall target="get-sdk-lin" />
             <antcall target="get-sdk-sol" />
-        </parallel>
+<!--        </parallel>-->
         <concat>
            <filelist dir="build/netbeans/javafx/javafx-sdk" files="timestamp"/>
         </concat>
