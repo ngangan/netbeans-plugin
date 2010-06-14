@@ -119,11 +119,12 @@ public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
                                 Collection<? extends Element> list = allElements.get(cs);
                                 for (Element e : list) {
                                     boolean overrides = false;
-                                    if (element instanceof ExecutableElement && e instanceof ExecutableElement) {;
+                                    if (element instanceof ExecutableElement && e instanceof ExecutableElement) {
                                         try {
                                             overrides = compilationInfo.getElements().overrides((ExecutableElement) element, (ExecutableElement) e, classSymbol);
                                         } catch (Exception ex) {
-                                            ex.printStackTrace();
+                                            System.out.println("Workaround for issue: JFXC-4386"); //NOI18N
+                                            System.out.println(ex.getMessage());
                                         }
                                     }
                                     if (e instanceof MethodSymbol && overrides) {

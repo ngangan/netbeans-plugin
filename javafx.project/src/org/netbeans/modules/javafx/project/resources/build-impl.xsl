@@ -308,8 +308,8 @@ is divided into following sections:
                 <arg value="tv"/>
                 <arg value="-classpath"/>
                 <arg value="${{jar.file}}"/>
+                <arg line="${{run.jvmargs}}"/>
                 <arg value="${{main.class}}"/>
-                <arg value="${{run.jvmargs}}"/>
             </exec>
         </target>
         <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
@@ -421,8 +421,8 @@ is divided into following sections:
                 <arg value="tv"/>
                 <arg value="-classpath"/>
                 <arg value="${{jar.file}}"/>
+                <arg line="${{run.jvmargs}}"/>
                 <arg value="${{main.class}}"/>
-                <arg value="${{run.jvmargs}}"/>
             </exec>
         </target>
         <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">

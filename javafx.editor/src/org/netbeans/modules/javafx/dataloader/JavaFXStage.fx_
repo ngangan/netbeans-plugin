@@ -23,8 +23,8 @@ Stage {
         height: 80
         content: [
             Text {
-                font : Font {
-                    size : 16
+                font: Font {
+                    size: 16
                 }
                 x: 10
                 y: 30

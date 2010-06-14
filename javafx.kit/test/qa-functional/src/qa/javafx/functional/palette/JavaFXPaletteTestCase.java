@@ -61,17 +61,7 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
     public static String PROJECT_NAME = "TestPalette";
 
 
-//    static final String CATEGORY_APPLICATIONS = "Applications";
-//    static final String CATEGORY_BASIC_SHAPES = "Basic Shapes";
-//    static final String CATEGORY_CONTROLS = "Controls";
-//    static final String CATEGORY_TRANSFORMATIONS = "Transformations";
-//    static final String CATEGORY_COLORS  = "Colors";
-//    static final String CATEGORY_GRADIENTS = "Gradients";
-//    static final String CATEGORY_EFFECTS = "Effects";
-//    static final String CATEGORY_ANIMATION = "Animation";
-//    static final String CATEGORY_MEDIA = "Media";
-//    static final String CATEGORY_SWING_COMPONENTS = "Swing Components";
-
+    public String[] filter = {};
 
     public boolean pass = true;
     public String failComponents = "";
@@ -139,11 +129,22 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
             Util.sleep(2000);
 
             if(!project.getOutput().isCompiled()){
-                pass = false;
-                failComponents += "[" + category + ":" + item + "]";
                 System.out.println("---  Failed Component ---");
                 System.out.println(editor.getText());
                 System.out.println("-------------------------");
+                boolean filtered = false;
+                for(String f: filter){
+                    if(f.equals(item.toString())){
+                        filtered = true;
+                        break;
+                    }
+                }
+                if(! filtered){
+                    pass = false;
+                    failComponents += "[" + category + ":" + item + "]";
+                }else{
+                    System.out.println("   Filtered!!!");
+                }
             }
             
         }
