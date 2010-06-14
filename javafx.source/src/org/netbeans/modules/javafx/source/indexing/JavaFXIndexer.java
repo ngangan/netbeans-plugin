@@ -679,6 +679,7 @@ public class JavaFXIndexer extends CustomIndexer {
     @SuppressWarnings("unchecked")
     @Override
     protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
+        if (cntxt == null || cntxt.getRoot() == null) return; // #187177: No idea why but this can happen
         if (!JavaFXSourceUtils.isPlatformOk(cntxt.getRoot())) return; // don't try to index files in a project with broken javafx platform
 
         cancelled.set(false);
