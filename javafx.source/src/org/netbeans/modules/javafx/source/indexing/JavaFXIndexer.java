@@ -697,7 +697,9 @@ public class JavaFXIndexer extends CustomIndexer {
                     URI uri = ix.getURL().toURI();
                     File f = new File(uri.normalize());
                     FileObject fo = FileUtil.toFileObject(f);
-                    indexables.put(SourceFileObject.create(fo, null), ix);
+                    if (fo != null) { // #187413: Don't try to create SourceFileObject for NULL; not sure when this happens but it does
+                        indexables.put(SourceFileObject.create(fo, null), ix);
+                    }
                 } catch (URISyntaxException e) {
                 }
             }
