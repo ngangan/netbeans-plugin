@@ -215,9 +215,9 @@ final public class ClassIndex {
             cpLock.writeLock().lock();
             Set<FileObject> srcRoots = new HashSet();
             Set<FileObject> depRoots = new HashSet();
-            srcRoots.addAll(Arrays.asList(sourcePath.getRoots()));
-            depRoots.addAll(Arrays.asList(compilePath.getRoots()));
-            depRoots.addAll(Arrays.asList(bootPath.getRoots()));
+            srcRoots.addAll(sourcePath != null ? Arrays.asList(sourcePath.getRoots()) : Collections.EMPTY_SET);
+            depRoots.addAll(compilePath != null ? Arrays.asList(compilePath.getRoots()) : Collections.EMPTY_SET);
+            depRoots.addAll(bootPath != null ? Arrays.asList(bootPath.getRoots()) : Collections.EMPTY_SET);
 
             // #186163: need to add the new srcRoots before removing the unused ones
             getSrcRoots(true).retainAll(srcRoots);
