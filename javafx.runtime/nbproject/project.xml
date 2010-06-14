@@ -26,6 +26,10 @@
                 <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/fxdtools.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>../javafx-sdk/lib/shared/fxjdi.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/fxjdi.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-io.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-io.jar</binary-origin>
             </class-path-extension>
