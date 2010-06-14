@@ -45,12 +45,21 @@
 
 package org.netbeans.modules.javafx.debugger.variablesfiltering;
 
+import com.sun.javafx.jdi.FXField;
+import com.sun.javafx.jdi.FXSequenceReference;
+import com.sun.javafx.jdi.FXValue;
+import com.sun.jdi.AbsentInformationException;
+import com.sun.jdi.Value;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.api.debugger.jpda.ClassVariable;
 import org.netbeans.api.debugger.jpda.Field;
+import org.netbeans.api.debugger.jpda.InvalidExpressionException;
+import org.netbeans.api.debugger.jpda.JDIVariable;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.api.debugger.jpda.LocalVariable;
+import org.netbeans.api.debugger.jpda.ObjectVariable;
+import org.netbeans.api.debugger.jpda.Super;
 import org.netbeans.api.debugger.jpda.This;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -100,41 +109,55 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
     //                        vc.add( obj );
                         } else if( obj instanceof Field ) {
                             Field f = (Field)obj;
-                            if( f.getName().startsWith( "$" )) {
-                                vc.add( obj );
-                            }
+                            vc.add( obj );
                         }
-
                     }
                 } else if( child instanceof LocalVariable ) {
                     LocalVariable local = (LocalVariable)child;
                     // Helper Sequences out
-                    if( local.getDeclaredType().startsWith( "com.sun.javafx.runtime." )) continue;
-                    if( local.getName().endsWith( "$ind" )) continue;
-                    if( local.getName().endsWith( "$limit" )) continue;
-                    // Skip all internal jfx$ variables
-                    if( local.getName().startsWith( "jfx$" )) continue;
+//                    if( local.getDeclaredType().startsWith( "com.sun.javafx.runtime." )) continue;
+//                    if( local.getName().endsWith( "$ind" )) continue;
+//                    if( local.getName().endsWith( "$limit" )) continue;
+//                    // Skip all internal jfx$ variables
+//                    if( local.getName().startsWith( "jfx$" )) continue;
                     vc.add( child );
                 }
             }
             List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
             for( Object o : vvv ) {
-                System.out.println(" - " + o );
+//                System.out.println(" - " + o );
             }
             return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {
             // Root static class
-            Object[] children = original.getChildren( parent, from, to );
+            boolean seqType = false;
             List vc = new ArrayList();
-            for( int i = 0; i < children.length; i++ ) {
-                Object child = children[i];
-                if( child instanceof Field ) {
-                    Field f = (Field)child;
-                    if( f.getName().startsWith( "$" )) {
-                        vc.add( child );
+            if( parent instanceof ObjectVariable ) {
+                ObjectVariable ov = (ObjectVariable)parent;
+
+                JDIVariable jdiv = (JDIVariable)ov;
+                Value v = jdiv.getJDIValue();
+                if( v instanceof FXSequenceReference ) {
+                    FXSequenceReference seq = (FXSequenceReference)v;
+                    
+                    for( int i = 0; i < seq.length(); i++ ) {
+                        vc.add( new SequenceField( "[" + i + "]", (FXValue) seq.getValue( i )));
                     }
-                } else {
-                    System.out.println(" - " + child.toString());
+                    seqType = true;
+                } 
+            }
+            if( !seqType ) {
+                Object[] children = original.getChildren( parent, from, to );
+                for( int i = 0; i < children.length; i++ ) {
+                    Object child = children[i];
+                    if( child instanceof Field ) {
+                        Field f = (Field)child;
+    //                    if( f.getName().startsWith( "$" )) {
+                            vc.add( child );
+    //                    }
+                    } else {
+    //                    System.out.println(" - " + child.toString());
+                    }
                 }
             }
             visibleChildren = vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
@@ -166,4 +189,49 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
     public void removeModelListener( ModelListener l ) {
     }
 
+    /**
+     * Helper representation of Sequence
+     */
+    private class SequenceField implements Field {
+
+        private String name;
+        private FXValue value;
+
+        public SequenceField( String name, FXValue value ) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getClassName() {
+            return value.type().name();
+        }
+
+        public JPDAClassType getDeclaringClass() {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public String getDeclaredType() {
+            return value.type().name();
+        }
+
+        public boolean isStatic() {
+            return false;
+        }
+
+        public void setValue(String string) throws InvalidExpressionException {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public String getType() {
+            return value.type().name();
+        }
+
+        public String getValue() {
+            return value.toString();
+        }
+    }
 }
