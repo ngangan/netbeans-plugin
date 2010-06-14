@@ -24,15 +24,6 @@
                         <specification-version>2.17</specification-version>
                     </run-dependency>
                 </dependency>
-<!--                <dependency>
-                    <code-name-base>org.netbeans.api.java.classpath</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <release-version>1</release-version>
-                        <specification-version>1.26</specification-version>
-                    </run-dependency>
-                </dependency>-->
                 <dependency>
                     <code-name-base>org.netbeans.modules.ant.debugger</code-name-base>
                     <run-dependency>
@@ -79,7 +70,7 @@
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <specification-version>0.61.0.10.8.4</specification-version>
+                        <specification-version>0.60.1.10.8.4</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
