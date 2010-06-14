@@ -64,6 +64,7 @@ import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
 import org.openide.util.Lookup;
 import org.openide.windows.CloneableOpenSupport;
+import org.netbeans.api.javafx.editor.JavaFXEditorCookie;
 
 /**
  *
@@ -110,7 +111,7 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         return jes;
     }            
     
-    public static final class JavaFXEditorSupport extends DataEditorSupport implements OpenCookie, EditCookie, EditorCookie, PrintCookie, EditorCookie.Observable {
+    public static final class JavaFXEditorSupport extends DataEditorSupport implements OpenCookie, EditCookie, EditorCookie, PrintCookie, EditorCookie.Observable, JavaFXEditorCookie {
         
         private static final class Environment extends DataEditorSupport.Env {
             
