@@ -4,5 +4,5 @@ OpenIDE-Module: org.netbeans.modules.javafx.sdk.sol
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/sdk/sol/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.9
 OpenIDE-Module-Requires: org.openide.modules.os.Solaris
-OpenIDE-Module-Provides: javafx.sdk.v1_3
+OpenIDE-Module-Provides: javafx.sdk.v1_3, javafx.sdk.v1_3_1
 FeaturesOnDemand-Proxy-Layer: false

@@ -4,6 +4,6 @@ OpenIDE-Module: org.netbeans.modules.javafx.sdk.lin
 OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/sdk/lin/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.9
 OpenIDE-Module-Requires: org.openide.modules.os.Linux
-OpenIDE-Module-Provides: javafx.sdk.v1_3
+OpenIDE-Module-Provides: javafx.sdk.v1_3, javafx.sdk.v1_3_1
 FeaturesOnDemand-Proxy-Layer: false
  
