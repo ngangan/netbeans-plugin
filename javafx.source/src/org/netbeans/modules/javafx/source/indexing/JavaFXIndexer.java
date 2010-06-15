@@ -679,6 +679,7 @@ public class JavaFXIndexer extends CustomIndexer {
     @SuppressWarnings("unchecked")
     @Override
     protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
+        if (cntxt == null || cntxt.getRoot() == null) return; // #187177: No idea why but this can happen
         if (!JavaFXSourceUtils.isPlatformOk(cntxt.getRoot())) return; // don't try to index files in a project with broken javafx platform
 
         cancelled.set(false);
@@ -696,7 +697,9 @@ public class JavaFXIndexer extends CustomIndexer {
                     URI uri = ix.getURL().toURI();
                     File f = new File(uri.normalize());
                     FileObject fo = FileUtil.toFileObject(f);
-                    indexables.put(SourceFileObject.create(fo, null), ix);
+                    if (fo != null) { // #187413: Don't try to create SourceFileObject for NULL; not sure when this happens but it does
+                        indexables.put(SourceFileObject.create(fo, null), ix);
+                    }
                 } catch (URISyntaxException e) {
                 }
             }
