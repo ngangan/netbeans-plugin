@@ -147,13 +147,15 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
             }
             fireProgressListenerStep();
         }
-        FileObject primFile = fo;
-        FileObject folder = primFile.getParent();
-        FileObject existing = folder.getFileObject(refactoring.getNewName(), primFile.getExt());
-        if (existing != null && primFile != existing) {
-            // primFile != existing is check for case insensitive filesystems; #136434
-            msg = NbBundle.getMessage(RenameRefactoringPlugin.class,
-                    "ERR_ClassClash", refactoring.getNewName(), folder.getPath()); // NOI18N
+        if (edef.getKind().isClass() || edef.getKind().isInterface()) { // #187336: Only do the filename check when renaming a type
+            FileObject primFile = fo;
+            FileObject folder = primFile.getParent();
+            FileObject existing = folder.getFileObject(refactoring.getNewName(), primFile.getExt());
+            if (existing != null && primFile != existing) {
+                // primFile != existing is check for case insensitive filesystems; #136434
+                msg = NbBundle.getMessage(RenameRefactoringPlugin.class,
+                        "ERR_ClassClash", refactoring.getNewName(), folder.getPath()); // NOI18N
+            }
         }
         fireProgressListenerStep();
         if (edef != null) {
