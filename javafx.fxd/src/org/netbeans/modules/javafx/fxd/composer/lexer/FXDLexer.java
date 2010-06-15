@@ -57,7 +57,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import org.netbeans.api.lexer.Token;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceViewDescription;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerInput;
 import org.netbeans.spi.lexer.LexerRestartInfo;
@@ -96,17 +95,6 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             if (FXDTokenId.EOF != lastId) {
                 contLexer.parsingFinished();
             }
-        } catch (StringIndexOutOfBoundsException ex) {
-            ex.printStackTrace();
-            try {
-                String msg = NbBundle.getMessage(FXDLexer.class, MSG_NOT_SUPPORTED,
-                        ex.getLocalizedMessage());
-                FXDSyntaxErrorException syntaxEx = new FXDSyntaxErrorException(
-                        msg, parser.getPosition());
-                contLexer.markError(syntaxEx);
-            } catch (Exception e) {
-                Exceptions.printStackTrace(e);
-            }
         } catch (FXDSyntaxErrorException syntaxEx) {
             try {
                 // workaround for #183149.
@@ -120,7 +108,16 @@ public class FXDLexer implements Lexer<FXDTokenId> {
                 Exceptions.printStackTrace(e);
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
+            try {
+                String msg = NbBundle.getMessage(FXDLexer.class, MSG_NOT_SUPPORTED,
+                        ex.getLocalizedMessage());
+                FXDSyntaxErrorException syntaxEx = new FXDSyntaxErrorException(
+                        msg, parser.getPosition());
+                contLexer.markError(syntaxEx);
+            } catch (Exception e) {
+                Exceptions.printStackTrace(e);
+            }
         }
     }
 
