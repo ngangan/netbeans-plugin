@@ -170,7 +170,13 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         }
 
         // Get Element
-        Element element = compilationInfo.getTrees().getElement(tp);
+        Element element = null;
+        // #187394
+        try { // NPE in getSybolFor - compiler bug
+            element = compilationInfo.getTrees().getElement(tp);
+        } catch (Exception e) {
+            return;
+        }
 
         // if cancelled or no element, return
         if (isCancelled()) {
