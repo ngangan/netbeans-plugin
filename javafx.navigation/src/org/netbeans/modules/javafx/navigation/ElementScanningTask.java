@@ -48,6 +48,7 @@ import com.sun.javafx.api.tree.FunctionDefinitionTree;
 import com.sun.javafx.api.tree.InitDefinitionTree;
 import com.sun.javafx.api.tree.JavaFXTreePath;
 import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.javafx.api.tree.OverrideClassVarTree;
 import com.sun.javafx.api.tree.SourcePositions;
 import com.sun.javafx.api.tree.Tree;
 import com.sun.javafx.api.tree.UnitTree;
@@ -202,6 +203,16 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
         @Override
         public Void visitVariable(VariableTree node, Map<Element, Long> p) {
+            Element e = this.trees.getElement(this.getCurrentPath());
+            if (e != null) {
+                long pos = this.sourcePositions.getStartPosition(cu, node);
+                p.put(e, pos);
+            }
+            return null;
+        }
+
+        @Override
+        public Void visitOverrideClassVar(OverrideClassVarTree node, Map<Element, Long> p) {
             Element e = this.trees.getElement(this.getCurrentPath());
             if (e != null) {
                 long pos = this.sourcePositions.getStartPosition(cu, node);

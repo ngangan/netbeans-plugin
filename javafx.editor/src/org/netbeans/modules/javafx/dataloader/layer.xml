@@ -441,12 +441,10 @@ made subject to such option by the copyright holder.
                         <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                         <attr name="position" intvalue="1400"/>
                     </file>
-                    <!--
-                                        <file name="ToolsAction.shadow">
-                                            <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-ToolsAction.instance"/>
-                                            <attr name="position" intvalue="1500"/>
-                                        </file>
-                    -->
+                    <file name="ToolsAction.shadow">
+                        <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-ToolsAction.instance"/>
+                        <attr name="position" intvalue="1500"/>
+                    </file>
                     <file name="PropertiesAction.shadow">
                         <attr name="originalFile" stringvalue="Actions/System/org-openide-actions-PropertiesAction.instance"/>
                         <attr name="position" intvalue="1600"/>

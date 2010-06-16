@@ -37,42 +37,44 @@
  * 
  * Contributor(s):
  * 
- * Portions Copyrighted 2008 Sun Microsystems, Inc.
+ * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.palette;
 
-import junit.framework.Test;
-import org.netbeans.junit.NbModuleSuite;
+package org.netbeans.modules.javafx.editor.completion.environment;
+
+
+import com.sun.tools.javafx.tree.JFXSequenceInsert;
+import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+
+import javax.lang.model.type.TypeMirror;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.lang.model.type.TypeKind;
 
 /**
  *
- * @author Alexandr Scherbatiy sunflower@netbeans.org
+ * @author Petr Nejedly
  */
-public class JavaFXPaletteEffectsTest extends JavaFXPaletteTestCase {
+public class SequenceInsertEnvironment extends JavaFXCompletionEnvironment<JFXSequenceInsert> {
 
+    private static final Logger logger = Logger.getLogger(SequenceInsertEnvironment.class.getName());
+    private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
-    static final String CATEGORY = "Effects";
-
-
-    public JavaFXPaletteEffectsTest(String name) {
-        super(name);
+    @Override
+    protected void inside(JFXSequenceInsert t) throws IOException {
+        if (LOGGABLE) {
+            logger.fine("inside JFXSequenceInsert " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
+        }
+        localResult(getSmartType(t));
     }
 
-    public static Test suite() {
-        return NbModuleSuite.create(JavaFXPaletteEffectsTest.class, ".*", ".*", TESTS);
-
+    private TypeMirror getSmartType(JFXSequenceInsert t) throws IOException {
+        TypeMirror type = null;
+        return type;
     }
-
-
-    static final String[] TESTS = {
-        "testPalette",
-    };
-    
-    public void testPalette() {
-            filter = new String[] { "Identity" };
-            testItems(CATEGORY);
-    }
-
-
-
 }

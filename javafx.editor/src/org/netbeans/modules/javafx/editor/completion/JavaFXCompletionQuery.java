@@ -648,6 +648,8 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case POSTFIX_DECREMENT:
             case UNARY_MINUS:
             case LOGICAL_COMPLEMENT:
+            case SIZEOF:
+            case REVERSE:
                 result = new UnaryTreeEnvironment();
                 break;
             case CONDITIONAL_AND:
@@ -706,6 +708,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
             case POSTINIT_DEFINITION:
                 break;
             case SEQUENCE_DELETE:
+                result = new SequenceDeleteEnvironment();
                 break;
             case SEQUENCE_EMPTY:
                 result = new SequenceEmptyEnvironment();
@@ -717,6 +720,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 result = new SequenceIndexedEnvironment();
                 break;
             case SEQUENCE_INSERT:
+                result = new SequenceInsertEnvironment();
                 break;
             case SEQUENCE_RANGE:
                 result = new SequenceRangeEnvironment();
@@ -757,10 +761,6 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
                 break;
             case ERRONEOUS:
                 result = new ErroneousEnvironment();
-                break;
-            case SIZEOF:
-                break;
-            case REVERSE:
                 break;
             case INDEXOF:
                 break;

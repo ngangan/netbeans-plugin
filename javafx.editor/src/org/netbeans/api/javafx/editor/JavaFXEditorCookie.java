@@ -39,40 +39,12 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.palette;
-
-import junit.framework.Test;
-import org.netbeans.junit.NbModuleSuite;
+package org.netbeans.api.javafx.editor;
 
 /**
  *
- * @author Alexandr Scherbatiy sunflower@netbeans.org
+ * @author Adam
  */
-public class JavaFXPaletteEffectsTest extends JavaFXPaletteTestCase {
-
-
-    static final String CATEGORY = "Effects";
-
-
-    public JavaFXPaletteEffectsTest(String name) {
-        super(name);
-    }
-
-    public static Test suite() {
-        return NbModuleSuite.create(JavaFXPaletteEffectsTest.class, ".*", ".*", TESTS);
-
-    }
-
-
-    static final String[] TESTS = {
-        "testPalette",
-    };
-    
-    public void testPalette() {
-            filter = new String[] { "Identity" };
-            testItems(CATEGORY);
-    }
-
-
+public interface JavaFXEditorCookie {
 
 }

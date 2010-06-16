@@ -406,7 +406,8 @@ public class Util {
             Object scanning = JProgressBarOperator.findJProgressBar((Container)MainWindowOperator.getDefault().getSource());
             if(scanning == null) { return; }
         }
-        throw new TimeoutExpiredException("Scaning isn't finished in "+ MAX_WAIT_TIME+ " ms");
+        //throw new TimeoutExpiredException("Scaning isn't finished in "+ MAX_WAIT_TIME+ " ms");
+        System.out.println("Scaning isn't finished in "+ MAX_WAIT_TIME+ " ms");
     }
     
     
