@@ -57,31 +57,28 @@ public class VariableCellEditor extends javax.swing.JPanel implements TableCellE
     }
 
     public Object getCellEditorValue() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return 0;
     }
 
     public boolean isCellEditable( EventObject anEvent ) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return false;
     }
 
     public boolean shouldSelectCell( EventObject anEvent ) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return false;
     }
 
     public boolean stopCellEditing() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return true;
     }
 
     public void cancelCellEditing() {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void addCellEditorListener( CellEditorListener l ) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void removeCellEditorListener( CellEditorListener l ) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 

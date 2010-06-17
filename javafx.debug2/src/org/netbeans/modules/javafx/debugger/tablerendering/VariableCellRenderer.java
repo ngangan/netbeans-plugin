@@ -21,7 +21,7 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.api.debugger.jpda.Field;
-import org.netbeans.api.debugger.jpda.JDIVariable;
+import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 
 /**
  *
@@ -33,9 +33,6 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
     private Object o;
     private String columnName;
-
-    private static final String NAME = "Name";
-    private static final String TYPE = "LocalsType";
 
     /** Creates new form VaribleCellrenderer */
     public VariableCellRenderer( Object o, String columnName ) {
@@ -137,7 +134,6 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
         return this;
     }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonUpdate;

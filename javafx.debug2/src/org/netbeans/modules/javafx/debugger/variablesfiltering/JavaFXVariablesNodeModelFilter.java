@@ -70,17 +70,7 @@ public class JavaFXVariablesNodeModelFilter implements NodeModelFilter {
     }
     
     public String getDisplayName( NodeModel original, Object node ) throws UnknownTypeException {
-        String dn = "";
-
-        // Skip first $
-        dn = original.getDisplayName( node );
-        if( dn.startsWith( "$" )) { dn = dn.substring( 1 );
-            if( dn.contains( "$" )) {
-                int index = dn.lastIndexOf( "$" );
-                if( index + 1 < dn.length())
-                    dn = dn.substring( index + 1, dn.length());
-            }
-        }
+        String dn = original.getDisplayName( node );
         return dn;
     }
 

@@ -24,7 +24,7 @@ import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
-import org.netbeans.api.debugger.jpda.JDIVariable;
+import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 
 /**
  *
