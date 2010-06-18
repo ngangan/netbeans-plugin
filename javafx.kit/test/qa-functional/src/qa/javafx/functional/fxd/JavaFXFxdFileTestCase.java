@@ -41,13 +41,16 @@
  */
 package qa.javafx.functional.fxd;
 
+import javax.swing.tree.TreePath;
 import junit.framework.Test;
 import org.netbeans.jellytools.NewFileWizardOperator;
+import org.netbeans.jellytools.modules.web.NavigatorOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.junit.NbModuleSuite;
 import qa.javafx.functional.library.Util;
 import qa.javafx.functional.library.project.JavaFXProject;
 import org.netbeans.jellytools.nodes.Node;
+import org.netbeans.jemmy.operators.JTreeOperator;
 
 /**
  *
@@ -71,6 +74,7 @@ public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
     }
     static final String[] TESTS = {
         "testCreateFile",
+        "testCheckNavigator",
     };
 
 
@@ -100,6 +104,25 @@ public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
         
     }
 
+    public void testCheckNavigator() {
+        NavigatorOperator navigator = new NavigatorOperator();
+        JTreeOperator tree = navigator.getTree();
+        
+        Util.showComponents(tree);
+        
+        //TreePath path = tree.findPath(new String[]{"content.fxd", "Group", "content" });
 
+
+        String rootString = "content.fxd";
+        Object root = tree.getRoot();
+        assertNotNull("Navigator rott is null" , root);
+        assertTrue("Navigator root '" + root + "' is nor equal '" + rootString + "'" , rootString.equals(root.toString()));
+
+
+        TreePath path = tree.findPath(new String[]{ "Group", "content" });
+
+        assertNotNull("Navigator is empty" , path);
+        
+    }
 
 }
