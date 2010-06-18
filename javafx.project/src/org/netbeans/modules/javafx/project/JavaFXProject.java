@@ -715,7 +715,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             "wsdl",                 // NOI18N
             // "servlet-types",     // NOI18N
             // "web-types",         // NOI18N
-            "junit",                // NOI18N
+            //"junit",              // NOI18N
             // "MIDP",              // NOI18N
             "simple-files"          // NOI18N        
         };
@@ -736,7 +736,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             "web-service-clients",  // NOI18N
             "wsdl",                 // NOI18N
             // "web-types",         // NOI18N
-            "junit",                // NOI18N
+            //"junit",              // NOI18N
             // "MIDP",              // NOI18N
             "simple-files"          // NOI18N
         };
