@@ -20,7 +20,7 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  *
  * @author Michal Skvor <michal.skvor at sun.com>
  */
-@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TableRendererModel.class } )
+//@DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TableRendererModel.class } )
 public class JavaFXTableRendererModel implements TableRendererModel {
 
     public JavaFXTableRendererModel() {}
