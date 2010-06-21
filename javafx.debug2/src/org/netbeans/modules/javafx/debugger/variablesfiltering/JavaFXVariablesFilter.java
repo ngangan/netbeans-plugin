@@ -45,37 +45,26 @@
 
 package org.netbeans.modules.javafx.debugger.variablesfiltering;
 
-import com.sun.javafx.jdi.FXField;
 import com.sun.javafx.jdi.FXObjectReference;
-import com.sun.javafx.jdi.FXPrimitiveType;
 import com.sun.javafx.jdi.FXPrimitiveValue;
-import com.sun.javafx.jdi.FXReferenceType;
 import com.sun.javafx.jdi.FXSequenceReference;
 import com.sun.javafx.jdi.FXValue;
-import com.sun.jdi.AbsentInformationException;
 import com.sun.jdi.ObjectReference;
-import com.sun.jdi.PrimitiveValue;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import java.util.ArrayList;
 import java.util.List;
-import javax.security.auth.RefreshFailedException;
-import javax.security.auth.Refreshable;
 import org.netbeans.api.debugger.jpda.ClassVariable;
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.api.debugger.jpda.LocalVariable;
 import org.netbeans.api.debugger.jpda.ObjectVariable;
-import org.netbeans.api.debugger.jpda.Super;
 import org.netbeans.api.debugger.jpda.This;
 import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
-import org.netbeans.modules.debugger.jpda.jdi.FieldWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.InternalExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ObjectCollectedExceptionWrapper;
-import org.netbeans.modules.debugger.jpda.jdi.ReferenceTypeWrapper;
-import org.netbeans.modules.debugger.jpda.jdi.TypeComponentWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ValueWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
@@ -263,6 +252,11 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
         public boolean isStatic() {
             return false;
+        }
+
+        @Override
+        public String toString () {
+            return "SequenceField " + getName ();
         }
     }
 
