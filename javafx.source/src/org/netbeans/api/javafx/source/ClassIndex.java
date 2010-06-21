@@ -678,15 +678,19 @@ final public class ClassIndex {
                     srcs.addAll(newSrcs);
                     newSrcs.clear();
                     for(FileObject fo : srcs) {
+                        if (fo == null) continue; // don't process NULL values (no idea why they are here)
                         for(Map.Entry<URL, List<URL>> entry : rootDeps) {
                             try {
                                 if (entry != null) {
                                     List<URL> urls = entry.getValue();
-                                    if (urls != null && urls.contains(fo.getURL())) {
-                                        FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
-                                        if (!indexerDepRevRoots.contains(src)) {
-                                            indexerDepRevRoots.add(src);
-                                            newSrcs.add(src);
+                                    if (urls != null) {
+                                        URL url = fo.getURL();
+                                        if (url != null && urls.contains(fo.getURL())) {
+                                            FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
+                                            if (!indexerDepRevRoots.contains(src)) {
+                                                indexerDepRevRoots.add(src);
+                                                newSrcs.add(src);
+                                            }
                                         }
                                     }
                                 }
