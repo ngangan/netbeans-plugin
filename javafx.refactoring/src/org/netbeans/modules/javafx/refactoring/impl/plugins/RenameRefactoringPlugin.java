@@ -64,6 +64,7 @@ import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccur
 import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
 import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.javafx.refactoring.repository.GlobalDef;
 import org.netbeans.modules.javafx.refactoring.repository.Usage;
 import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
 import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
@@ -222,14 +223,14 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         final Problem p[] = new Problem[1];
 
         fireProgressListenerStart(RenameRefactoring.PRE_CHECK, 4);
-        
+
+        final Element el = edef.getElement();
         JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
         try {
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
-                    Element el = cc.getElementUtilities().elementFor(edef.getStartPos());
-                    p[0] = chainProblems(p[0], isSourceElement(el, cc));
+
                     if (el != null) {
                         switch (el.getKind()) {
                             case METHOD: {
