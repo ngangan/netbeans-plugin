@@ -99,7 +99,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
     public Object[] getChildren( TreeModel original, Object parent, int from, int to ) throws UnknownTypeException {
         Object[] visibleChildren = null;
-
+//        System.out.println(" - " + parent );
         if( parent.equals( original.getRoot())) {
             // Retrieve children
             int parentChildrenCount = original.getChildrenCount( parent );
@@ -112,12 +112,14 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     Object[] ch = original.getChildren( child, from, to );
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
-                        System.out.println(" - " + obj );
+//                        System.out.println(" - " + obj );
                         if( obj instanceof ClassVariable ) {
                             ClassVariable cv = (ClassVariable)obj;
 //                            vc.add( obj );
                         } else if( obj instanceof Field ) {
                             Field f = (Field)obj;
+                            vc.add( obj );
+                        } else {
                             vc.add( obj );
                         }
                     }
@@ -126,10 +128,10 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     vc.add( child );
                 }
             }
-            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
-            for( Object o : vvv ) {
-//                System.out.println(" - " + o );
-            }
+//            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
+//            for( Object o : vvv ) {
+//                System.out.println("    - " + o );
+//            }
             return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {
             // Root static class
@@ -169,6 +171,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                         Field f = (Field)child;
                         vc.add( child );
                     } else {
+                        vc.add( child );
 //                        System.out.println(" - " + child.toString());
                     }
                 }
