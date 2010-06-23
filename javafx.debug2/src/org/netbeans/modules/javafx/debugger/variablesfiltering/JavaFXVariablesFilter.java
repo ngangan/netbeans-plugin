@@ -151,12 +151,14 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                         Value iv = seq.getValue( i );
                         
                         if( iv instanceof FXPrimitiveValue ) {
-                            vc.add( new SequenceField( av.getDebugger(), (FXPrimitiveValue) seq.getValue( i ), ov, i, v.type().toString()));
+                            vc.add( new SequenceField( av.getDebugger(), 
+                                   (FXPrimitiveValue) seq.getValue( i ), ov, i,
+                                   v.type().toString()));
                         } else if( iv instanceof FXObjectReference ) {
                             String t = iv.type().name();
                             vc.add( new SequenceObject( av.getDebugger(),
                                     (FXObjectReference) iv, t,
-                                     ov, i, 1000, "parentID" ));
+                                     ov, i, 1000, v.toString()));
                         }
                     }
                     seqType = true;
