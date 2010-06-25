@@ -12,6 +12,7 @@
 package org.netbeans.modules.javafx.debugger.tablerendering;
 
 import com.sun.javafx.jdi.FXField;
+import com.sun.javafx.jdi.FXFloatType;
 import com.sun.javafx.jdi.FXIntegerType;
 import com.sun.javafx.jdi.FXPrimitiveType;
 import com.sun.javafx.jdi.FXPrimitiveValue;
@@ -79,7 +80,7 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
             Value oo = v.getJDIValue();
             FXValue fxv = (FXValue)oo;
             
-            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
+//            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
             
             String fieldTypeName = fxv.type().name();
             labelValue.setText( f.getDeclaredType());
@@ -88,6 +89,8 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                 FXPrimitiveValue ref = (FXPrimitiveValue)fxv;
                 if( ref.type() instanceof FXIntegerType ) {
                     labelValue.setText( "Integer" );
+                } else if( ref.type() instanceof FXFloatType ) {
+                    labelValue.setText( "Number" );
                 }
             } else if( fxv instanceof FXSequenceReference ) {
                 if( "com.sun.javafx.runtime.sequence.IntArraySequence".equals( fieldTypeName )) {

@@ -13,12 +13,23 @@ package org.netbeans.modules.javafx.debugger.tablerendering;
 
 import com.sun.javafx.jdi.FXField;
 import com.sun.javafx.jdi.FXValue;
-import com.sun.javafx.jdi.FXIntegerValue;
 import com.sun.javafx.jdi.FXSequenceReference;
+import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import java.awt.Component;
+import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.EventObject;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
@@ -27,12 +38,14 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
  *
  * @author Michal Skvor <michal.skvor at sun.com>
  */
-public class VariableCellRenderer extends javax.swing.JPanel implements TableCellRenderer {
+public class VariableCellRenderer extends javax.swing.JPanel implements TableCellRenderer, TableCellEditor {
 
     private static final boolean evaluateImmediate = false;
 
     private Object o;
     private String columnName;
+
+    private final Set<CellEditorListener> cellEditorListeners = new HashSet<CellEditorListener>();
 
     /** Creates new form VaribleCellrenderer */
     public VariableCellRenderer( Object o, String columnName ) {
@@ -54,6 +67,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
         labelValue = new javax.swing.JLabel();
         buttonUpdate = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -79,17 +93,30 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
                 buttonUpdateActionPerformed(evt);
             }
         });
+        add(buttonUpdate, new java.awt.GridBagConstraints());
+
+        jButton1.setText(org.openide.util.NbBundle.getMessage(VariableCellRenderer.class, "VariableCellRenderer.jButton1.text")); // NOI18N
+        jButton1.setMaximumSize(new java.awt.Dimension(16, 20));
+        jButton1.setMinimumSize(new java.awt.Dimension(16, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        add(buttonUpdate, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        add(jButton1, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdateActionPerformed
-        // TODO add your handling code here:
-        System.out.println(" - updating variable");
-        labelValue.setText( "Updating" );
+        if( o instanceof Field ) {
+            Field f = (Field)o;
+            JDIVariable v = (JDIVariable)f;
+            Value oo = v.getJDIValue();
+            FXValue fxv = (FXValue)oo;
+            oo.virtualMachine().classesByName( fxv.type().name());
+
+            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
+            boolean bound = fxf.declaringType().isBound( fxf );
+            boolean invalid = fxf.declaringType().isInvalid( fxf );
+
+            labelValue.setText( f.getValue());
+        }
     }//GEN-LAST:event_buttonUpdateActionPerformed
 
     public Component getTableCellRendererComponent( JTable table, Object value,
@@ -102,20 +129,34 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             FXValue fxv = (FXValue)oo;
             oo.virtualMachine().classesByName( fxv.type().name());
 
-            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
-            boolean bound = fxf.declaringType().isBound( fxf );
-            boolean invalid = fxf.declaringType().isInvalid( fxf );
+            boolean bound = false;
+            boolean invalid = false;
 
-            if(!( invalid || bound ) || evaluateImmediate ) {
+            List<ReferenceType> references = oo.virtualMachine().classesByName( f.getClassName());
+            if( references.size() > 0  ) {
+                ReferenceType ref = references.get( 0 );
+                if( ref != null ) {
+                    FXField field = (FXField)ref.fieldByName( f.getName());
+                    if( field != null ) {
+                        bound = field.declaringType().isBound( field );
+                        invalid = field.declaringType().isInvalid( field );
+                    }
+                }
+            }
+//            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
+//            boolean bound = fxf.declaringType().isBound( fxf );
+//            boolean invalid = fxf.declaringType().isInvalid( fxf );
+
+            buttonUpdate.setVisible( bound );
+
+            if(!( invalid ) || evaluateImmediate ) {
                 labelValue.setText( f.getValue());
                 if( fxv instanceof FXSequenceReference ) {
                     FXSequenceReference ref = (FXSequenceReference)fxv;
                     labelValue.setText( labelValue.getText() + "(length= " + ref.length() + ")" );
                 }
-                buttonUpdate.setVisible( false );
             } else {
                 labelValue.setText( "Invalid value" );
-                buttonUpdate.setVisible( true );
             }
         } else {
             labelValue.setText( value.toString());
@@ -137,7 +178,87 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonUpdate;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel labelValue;
     // End of variables declaration//GEN-END:variables
 
+    private JTextField textValue = new JTextField();
+
+    public Component getTableCellEditorComponent( JTable table, Object value, boolean isSelected, int row, int column ) {
+        if( o instanceof Field ) {
+            Field f = (Field)o;
+            JDIVariable v = (JDIVariable)f;
+            Value oo = v.getJDIValue();
+            FXValue fxv = (FXValue)oo;
+
+            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
+            boolean bound = fxf.declaringType().isBound( fxf );
+            boolean invalid = fxf.declaringType().isInvalid( fxf );
+
+            if( bound || invalid ) {
+                return this;
+            }
+            textValue.setText( f.getValue());
+        }
+        return textValue;
+    }
+
+    public Object getCellEditorValue() {
+        if( textValue != null ) {
+            return textValue.getText();
+        }
+        return null;
+    }
+
+    public boolean isCellEditable( EventObject anEvent ) {
+        return true;
+    }
+
+    public boolean shouldSelectCell( EventObject anEvent ) {
+        if( o instanceof Field ) {
+            Field f = (Field)o;
+            JDIVariable v = (JDIVariable)f;
+            Value oo = v.getJDIValue();
+            FXValue fxv = (FXValue)oo;
+            oo.virtualMachine().classesByName( fxv.type().name());
+
+            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
+            boolean bound = fxf.declaringType().isBound( fxf );
+            boolean invalid = fxf.declaringType().isInvalid( fxf );
+
+            if( bound ) {  
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean stopCellEditing() {
+        final Set<CellEditorListener> listeners = Collections.unmodifiableSet( cellEditorListeners );
+        synchronized( listeners ) {
+            for( CellEditorListener l : listeners ) {
+                ChangeEvent e = new ChangeEvent( this );
+                l.editingStopped( e );
+            }
+        }
+        return true;
+    }
+
+    public void cancelCellEditing() {
+        final Set<CellEditorListener> listeners = Collections.unmodifiableSet( cellEditorListeners );
+        synchronized( listeners ) {
+            for( CellEditorListener l : listeners ) {
+                ChangeEvent e = new ChangeEvent( this );
+                l.editingCanceled( e );
+            }
+        }
+    }
+
+    public void addCellEditorListener( CellEditorListener l ) {
+        cellEditorListeners.add( l );
+    }
+
+    public void removeCellEditorListener( CellEditorListener l ) {
+        cellEditorListeners.remove( l );
+    }
 }

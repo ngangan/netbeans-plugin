@@ -252,7 +252,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
         }
 
         public String getDeclaredType() {
-            throw new UnsupportedOperationException("Not supported yet.");
+            return value.type().name();
         }
 
         public boolean isStatic() {
@@ -315,7 +315,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
         }
 
         public String getDeclaredType() {
-            return declaredType;
+            return declaredType.replace( '$', '.' );
         }
 
         protected void setValue( Value value ) throws InvalidExpressionException {
