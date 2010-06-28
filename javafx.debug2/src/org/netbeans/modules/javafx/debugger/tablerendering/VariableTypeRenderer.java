@@ -17,6 +17,7 @@ import com.sun.javafx.jdi.FXIntegerType;
 import com.sun.javafx.jdi.FXPrimitiveType;
 import com.sun.javafx.jdi.FXPrimitiveValue;
 import com.sun.javafx.jdi.FXSequenceReference;
+import com.sun.javafx.jdi.FXSequenceReference.Types;
 import com.sun.javafx.jdi.FXStringReference;
 import com.sun.javafx.jdi.FXValue;
 import com.sun.jdi.Value;
@@ -93,10 +94,16 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                     labelValue.setText( "Number" );
                 }
             } else if( fxv instanceof FXSequenceReference ) {
-                if( "com.sun.javafx.runtime.sequence.IntArraySequence".equals( fieldTypeName )) {
-                    labelValue.setText( "Integer[]" );
-                } else if( "com.sun.javafx.runtime.sequence.ObjectArraySequence".equals( fieldTypeName )) {
-                    labelValue.setText( "Object[]" );
+                FXSequenceReference seq = (FXSequenceReference)fxv;
+                Types seqType = seq.getElementType();
+                if( Types.INT.equals( seqType )) {
+                    labelValue.setText( "Integer[]" ); // NOI18N
+                } else if( Types.OTHER.equals( seqType )) {
+                    labelValue.setText( "String[]" ); // NOI18N
+                } else {
+                    String typeName = seqType.name().toLowerCase();
+                    labelValue.setText( typeName.substring( 0, 1 ).toUpperCase() +
+                            typeName.substring( 1 ) + "[]" ); // NOI18N
                 }
             }
         }
