@@ -223,6 +223,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                 ObjectVariable parent, int index, String parentID )
         {
             super( debugger, value, parentID + "." + index );
+            this.index = index;
             this.parent = parent;
             this.value = value;
             this.sequence = (FXSequenceReference)((JDIVariable)parent).getJDIValue();

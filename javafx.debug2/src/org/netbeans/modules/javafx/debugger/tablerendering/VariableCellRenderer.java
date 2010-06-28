@@ -17,11 +17,9 @@ import com.sun.javafx.jdi.FXSequenceReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import java.awt.Component;
-import java.awt.event.MouseEvent;
 import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JTable;
@@ -149,7 +147,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
             buttonUpdate.setVisible( bound );
 
-            if(!( invalid ) || evaluateImmediate ) {
+            if( !invalid || evaluateImmediate ) {
                 labelValue.setText( f.getValue());
                 if( fxv instanceof FXSequenceReference ) {
                     FXSequenceReference ref = (FXSequenceReference)fxv;
