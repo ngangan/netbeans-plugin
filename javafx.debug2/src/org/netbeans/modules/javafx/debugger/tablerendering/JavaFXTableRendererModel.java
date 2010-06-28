@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.debugger.tablerendering;
 
 import com.sun.javafx.jdi.FXValue;
+import java.util.HashMap;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.api.debugger.jpda.Field;
@@ -22,6 +23,8 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TableRendererModel.class } )
 public class JavaFXTableRendererModel implements TableRendererModel {
+
+    private HashMap<Object, VariableCellRenderer> valueRenderers = new HashMap<Object,VariableCellRenderer>();
 
     public JavaFXTableRendererModel() {}
 
@@ -54,18 +57,30 @@ public class JavaFXTableRendererModel implements TableRendererModel {
     public TableCellRenderer getCellRenderer( Object o, String columnName ) throws UnknownTypeException {
         if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnName ))
             return new VariableTypeRenderer( o );
-        else if( Constants.LOCALS_VALUE_COLUMN_ID.equals( columnName ))
-            return new VariableCellRenderer( o, columnName );
-
+        else if( Constants.LOCALS_VALUE_COLUMN_ID.equals( columnName )) {
+            if( !valueRenderers.containsKey( o )) {
+                valueRenderers.put( o, new VariableCellRenderer( o, columnName ));
+            }
+            return valueRenderers.get( o );
+        }
         return null;
     }
 
-    public boolean canEditCell( Object o, String string ) throws UnknownTypeException {
-        return true;
+    public boolean canEditCell( Object o, String columnName ) throws UnknownTypeException {
+        if( Constants.LOCALS_VALUE_COLUMN_ID.equals( columnName )) {
+            return true;
+        }
+        return false;
     }
 
-    public TableCellEditor getCellEditor( Object o, String string ) throws UnknownTypeException {
-        return new VariableCellRenderer( o, string );
+    public TableCellEditor getCellEditor( Object o, String columnName ) throws UnknownTypeException {
+        if( Constants.LOCALS_VALUE_COLUMN_ID.equals( columnName )) {
+            if( !valueRenderers.containsKey( o )) {
+                valueRenderers.put( o, new VariableCellRenderer( o, columnName ));
+            }
+            return valueRenderers.get( o );
+        }
+        return null;
     };
 
     public void addModelListener( ModelListener ml ) {

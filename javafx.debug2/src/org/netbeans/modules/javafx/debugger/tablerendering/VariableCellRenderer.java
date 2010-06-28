@@ -193,7 +193,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             boolean bound = fxf.declaringType().isBound( fxf );
             boolean invalid = fxf.declaringType().isInvalid( fxf );
 
-            if( bound || invalid ) {
+            if( bound || invalid || fxv instanceof FXSequenceReference ) {
                 return this;
             }
             textValue.setText( f.getValue());
@@ -213,21 +213,6 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
     }
 
     public boolean shouldSelectCell( EventObject anEvent ) {
-        if( o instanceof Field ) {
-            Field f = (Field)o;
-            JDIVariable v = (JDIVariable)f;
-            Value oo = v.getJDIValue();
-            FXValue fxv = (FXValue)oo;
-            oo.virtualMachine().classesByName( fxv.type().name());
-
-            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
-            boolean bound = fxf.declaringType().isBound( fxf );
-            boolean invalid = fxf.declaringType().isInvalid( fxf );
-
-            if( bound ) {  
-                return false;
-            }
-        }
         return true;
     }
 
