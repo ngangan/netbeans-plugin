@@ -4,6 +4,11 @@
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fx">
+                <folder name="ToolTips">
+                    <file name="org-netbeans-modules-javafx-debugger-ToolTipAnnotation.instance"/>
+                </folder>
+
+
                 <folder name="Popup">
                     <file name="org-netbeans-modules-debugger-ui-actions-ToggleBreakpointAction.shadow">
                         <attr name="originalFile" stringvalue="Actions/Debug/org-netbeans-modules-debugger-ui-actions-ToggleBreakpointAction.instance"/>
