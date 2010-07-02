@@ -11,14 +11,12 @@
 
 package org.netbeans.modules.javafx.debugger.tablerendering;
 
-import com.sun.javafx.jdi.FXField;
+import com.sun.javafx.jdi.FXBooleanType;
 import com.sun.javafx.jdi.FXFloatType;
 import com.sun.javafx.jdi.FXIntegerType;
-import com.sun.javafx.jdi.FXPrimitiveType;
 import com.sun.javafx.jdi.FXPrimitiveValue;
 import com.sun.javafx.jdi.FXSequenceReference;
 import com.sun.javafx.jdi.FXSequenceReference.Types;
-import com.sun.javafx.jdi.FXStringReference;
 import com.sun.javafx.jdi.FXValue;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;
@@ -83,29 +81,31 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
             
 //            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
             
-            String fieldTypeName = fxv.type().name();
-            labelValue.setText( f.getDeclaredType());
+            String fieldTypeName = f.getDeclaredType().replace( '$', '.' );
 
             if( fxv instanceof FXPrimitiveValue ) {
                 FXPrimitiveValue ref = (FXPrimitiveValue)fxv;
                 if( ref.type() instanceof FXIntegerType ) {
-                    labelValue.setText( "Integer" );
+                    fieldTypeName = "Integer" ; // NOI18N
                 } else if( ref.type() instanceof FXFloatType ) {
-                    labelValue.setText( "Number" );
+                    fieldTypeName = "Number"; // NOI18N
+                } else if( ref.type() instanceof FXBooleanType ) {
+                    fieldTypeName = "Boolean"; // NOI18N
                 }
             } else if( fxv instanceof FXSequenceReference ) {
                 FXSequenceReference seq = (FXSequenceReference)fxv;
                 Types seqType = seq.getElementType();
                 if( Types.INT.equals( seqType )) {
-                    labelValue.setText( "Integer[]" ); // NOI18N
+                    fieldTypeName = "Integer[]"; // NOI18N
                 } else if( Types.OTHER.equals( seqType )) {
-                    labelValue.setText( "String[]" ); // NOI18N
+                    fieldTypeName = "String[]"; // NOI18N
                 } else {
                     String typeName = seqType.name().toLowerCase();
-                    labelValue.setText( typeName.substring( 0, 1 ).toUpperCase() +
-                            typeName.substring( 1 ) + "[]" ); // NOI18N
+                    fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
+                            typeName.substring( 1 ) + "[]"; // NOI18N
                 }
             }
+            labelValue.setText( fieldTypeName );            
         }
         if( isSelected ) {
             setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));

@@ -45,15 +45,27 @@
 
 package org.netbeans.modules.javafx.debugger.variablesfiltering;
 
+import org.netbeans.modules.javafx.debugger.models.SequenceObject;
+import org.netbeans.modules.javafx.debugger.models.SequenceField;
+import com.sun.javafx.jdi.FXClassObjectReference;
+import com.sun.javafx.jdi.FXClassType;
 import com.sun.javafx.jdi.FXObjectReference;
+import com.sun.javafx.jdi.FXPrimitiveType;
 import com.sun.javafx.jdi.FXPrimitiveValue;
+import com.sun.javafx.jdi.FXReferenceType;
 import com.sun.javafx.jdi.FXSequenceReference;
 import com.sun.javafx.jdi.FXValue;
+import com.sun.jdi.ClassNotLoadedException;
+import com.sun.jdi.InvalidTypeException;
 import com.sun.jdi.ObjectReference;
+import com.sun.jdi.PrimitiveValue;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import javax.swing.text.FieldView;
 import org.netbeans.api.debugger.jpda.ClassVariable;
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
@@ -63,13 +75,19 @@ import org.netbeans.api.debugger.jpda.ObjectVariable;
 import org.netbeans.api.debugger.jpda.This;
 import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
+import org.netbeans.modules.debugger.jpda.jdi.IllegalArgumentExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.InternalExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ObjectCollectedExceptionWrapper;
+import org.netbeans.modules.debugger.jpda.jdi.TypeComponentWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ValueWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
+//import org.netbeans.modules.debugger.jpda.models.FieldVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.netbeans.modules.javafx.debugger.models.ScriptClass;
+import org.netbeans.modules.javafx.debugger.models.ScriptFieldVariable;
+import org.netbeans.modules.javafx.debugger.models.ScriptObjectVariable;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TreeModel;
@@ -108,13 +126,14 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
             List vc = new ArrayList();
             for( int j = 0; j < parentChildrenCount; j++ ) {
                 Object child = children[j];
-                if( child instanceof JPDAClassType || child instanceof This ) {
-                    Object[] ch = original.getChildren( child, from, to );
+//                System.out.println(" - " + child );
+                if( child instanceof JPDAClassType ) {
+                    Object[] ch = original.getChildren( child, from, to );                
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
-//                        System.out.println(" - " + obj );
-                        if( obj instanceof ClassVariable ) {
-                            ClassVariable cv = (ClassVariable)obj;
+                        System.out.println("    - " + obj );
+                        if( obj instanceof This ) {
+//                            ClassVariable cv = (ClassVariable)obj;
 //                            vc.add( obj );
                         } else if( obj instanceof Field ) {
                             Field f = (Field)obj;
@@ -124,8 +143,16 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                         }
                     }
                 } else if( child instanceof LocalVariable ) {
-                    LocalVariable local = (LocalVariable)child;
                     vc.add( child );
+                } else if( child instanceof This ) {
+//                    vc.add( child );
+                    This t = (This)child;
+                    AbstractVariable av = (AbstractVariable)t;
+                    JDIVariable jdiv = (JDIVariable)t;
+                    Value v = jdiv.getJDIValue();
+                    FXObjectReference fx = (FXObjectReference)v;
+                    FXClassType clazz = ((FXReferenceType)fx.referenceType()).scriptClass();
+                    vc.add( new ScriptClass( av.getDebugger(), v, clazz ));
                 }
             }
 //            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
@@ -205,152 +232,5 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
     }
 
     public void removeModelListener( ModelListener l ) {
-    }
-
-    /**
-     * Helper representation of Sequence
-     */
-    private class SequenceField extends AbstractVariable implements Field {
-
-        private FXSequenceReference sequence;
-        private ObjectVariable parent;
-        private String name;
-        private FXValue value;
-
-        private int index;
-
-        public SequenceField( JPDADebuggerImpl debugger, FXPrimitiveValue value,
-                ObjectVariable parent, int index, String parentID )
-        {
-            super( debugger, value, parentID + "." + index );
-            this.index = index;
-            this.parent = parent;
-            this.value = value;
-            this.sequence = (FXSequenceReference)((JDIVariable)parent).getJDIValue();
-        }
-
-        public String getName() {
-            return "[" + index + "]";
-        }
-
-        public String getClassName() {
-            return getType();
-        }
-
-        public JPDAClassType getDeclaringClass() {
-            try {
-                return new JPDAClassTypeImpl( getDebugger(), (ReferenceType)ValueWrapper.type( sequence ));
-            } catch (InternalExceptionWrapper ex) {
-                // re-throw, we should not return null and can not throw anything checked.
-                throw ex.getCause();
-            } catch (ObjectCollectedExceptionWrapper ex) {
-                // re-throw, we should not return null and can not throw anything checked.
-                throw ex.getCause();
-            } catch (VMDisconnectedExceptionWrapper ex) {
-                // re-throw, we should not return null and can not throw anything checked.
-                throw ex.getCause();
-            }
-        }
-
-        public String getDeclaredType() {
-            return value.type().name();
-        }
-
-        public boolean isStatic() {
-            return false;
-        }
-
-        @Override
-        public String toString () {
-            return "SequenceField " + getName ();
-        }
-    }
-
-    public static final class SequenceObject extends AbstractObjectVariable implements Field {
-
-        private final FXSequenceReference array;
-        private final ObjectVariable parent;
-        private int index;
-        private int maxIndexLog;
-        private String declaredType;
-
-        SequenceObject( JPDADebuggerImpl debugger, ObjectReference value,
-                String declaredType, ObjectVariable array, int index,
-                int maxIndex, String parentID )
-        {
-            super( debugger, value, parentID + '.' + index + "^" );
-            this.index = index;
-//            this.maxIndexLog = ArrayFieldVariable.log10( maxIndex );
-            this.declaredType = declaredType;
-            this.parent = array;
-            this.array = (FXSequenceReference) ((JDIVariable) array).getJDIValue();
-        }
-
-         public String getName() {
-             return "[" + index + "]";
-//            return ArrayFieldVariable.getName( maxIndexLog, index );
-        }
-
-        public String getClassName() {
-            return getType ();
-        }
-
-        public JPDAClassType getDeclaringClass() {
-            try {
-                return new JPDAClassTypeImpl( getDebugger(), (ReferenceType) ValueWrapper.type( array ));
-            } catch (InternalExceptionWrapper ex) {
-                throw ex.getCause();
-            } catch (VMDisconnectedExceptionWrapper ex) {
-                throw ex.getCause();
-            } catch (ObjectCollectedExceptionWrapper ex) {
-                throw ex.getCause();
-            }
-        }
-
-        public ObjectVariable getParentVariable() {
-            return parent;
-        }
-
-        public boolean isStatic() {
-            return false;
-        }
-
-        public String getDeclaredType() {
-            return declaredType.replace( '$', '.' );
-        }
-
-        protected void setValue( Value value ) throws InvalidExpressionException {
-//            try {
-//                ArrayReferenceWrapper.setValue(array, index, value);
-//            } catch (InvalidTypeException ex) {
-//                throw new InvalidExpressionException (ex);
-//            } catch (ClassNotLoadedException ex) {
-//                throw new InvalidExpressionException (ex);
-//            } catch (InternalExceptionWrapper ex) {
-//                throw new InvalidExpressionException (ex.getCause());
-//            } catch (VMDisconnectedExceptionWrapper ex) {
-//                // Ignore
-//            } catch (ObjectCollectedExceptionWrapper ex) {
-//                throw new InvalidExpressionException (ex.getCause());
-//            }
-        }
-
-        public SequenceObject clone() {
-            SequenceObject clon = new SequenceObject(
-                    getDebugger(),
-                    (ObjectReference) getJDIValue(),
-                    getDeclaredType(),
-                    parent,
-                    index,
-                    0,
-                    getID());
-            clon.maxIndexLog = this.maxIndexLog;
-            return clon;
-        }
-
-        @Override
-        public String toString () {
-            return "SequenceObject " + getName ();
-        }
     }
 }

@@ -189,10 +189,20 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             Value oo = v.getJDIValue();
             FXValue fxv = (FXValue)oo;
 
-            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
-            boolean bound = fxf.declaringType().isBound( fxf );
-            boolean invalid = fxf.declaringType().isInvalid( fxf );
-
+            boolean bound = false;
+            boolean invalid = false;
+            List<ReferenceType> references = oo.virtualMachine().classesByName( f.getClassName());
+            if( references.size() > 0  ) {
+                ReferenceType ref = references.get( 0 );
+                if( ref != null ) {
+                    FXField field = (FXField)ref.fieldByName( f.getName());
+                    if( field != null ) {
+                        bound = field.declaringType().isBound( field );
+                        invalid = field.declaringType().isInvalid( field );
+                    }
+                }
+            }
+            
             if( bound || invalid || fxv instanceof FXSequenceReference ) {
                 return this;
             }
