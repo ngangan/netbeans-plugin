@@ -238,6 +238,8 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         for(final Map.Entry<FileObject, Set<ElementDef>> entry : movingDefs.entrySet()) {
             if (isCancelled()) return null;
 
+            if (entry.getValue().isEmpty()) continue; // skip over files with no element defs (#188433)
+
             final FileObject file = entry.getKey();
             final String oldPkgName = entry.getValue().iterator().next().getPackageName();
 
