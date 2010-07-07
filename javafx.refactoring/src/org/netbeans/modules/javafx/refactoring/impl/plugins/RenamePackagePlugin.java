@@ -175,9 +175,11 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
                             if (cc.toPhase(JavaSource.Phase.ELEMENTS_RESOLVED) == JavaSource.Phase.ELEMENTS_RESOLVED) {
                                 for(Object te : (Collection)cc.getClass().getMethod("getTopLevelElements").invoke(cc)) { // NOI18N
                                     ElementDef edef = RefactoringSupport.fromJava(te, cc);
-                                    edefs.add(edef);
-                                    if (pd[0] == PackageDef.DEFAULT) {
-                                        pd[0] = new PackageDef(edef.getPackageName());
+                                    if (edef != null) {
+                                        edefs.add(edef);
+                                        if (pd[0] == PackageDef.DEFAULT) {
+                                            pd[0] = new PackageDef(edef.getPackageName());
+                                        }
                                     }
                                 }
                             }

@@ -330,7 +330,10 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                 if (hdls != null) {
                     for(final Object hdl : hdls) {
                         if (hdl instanceof TreePathHandle) {
-                            edefs.add(RefactoringSupport.fromJava((TreePathHandle)hdl));
+                            ElementDef edef = RefactoringSupport.fromJava((TreePathHandle)hdl);
+                            if (edef != null) {
+                                edefs.add(edef);
+                            }
                         }
                     }
                 } else {
@@ -347,7 +350,9 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                                         while (iter.hasNext()) {
                                             Object te = iter.next();
                                             ElementDef edef = RefactoringSupport.fromJava(te, cc);
-                                            edefs.add(edef);
+                                            if (edef != null) {
+                                                edefs.add(edef);
+                                            }
                                         }
                                     }
                                 }
