@@ -51,6 +51,7 @@ import qa.javafx.functional.library.Util;
 import qa.javafx.functional.library.project.JavaFXProject;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jemmy.operators.JTreeOperator;
+import qa.javafx.functional.library.project.EditorOperator;
 
 /**
  *
@@ -75,6 +76,7 @@ public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
     static final String[] TESTS = {
         "testCreateFile",
         "testCheckNavigator",
+        "testCodeTyping",
     };
 
 
@@ -123,6 +125,22 @@ public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
 
         assertNotNull("Navigator is empty" , path);
         
+    }
+
+    public void testCodeTyping(){
+        EditorOperator editor = new EditorOperator(FILE_NAME + ".fxd");
+        System.out.println("Editor:\n" + editor.getText());
+
+
+        //editor.setCaretPosition(8, 0);
+        String label = "Label{}";
+        editor.typeText("\n" + label, 8, 0);
+        System.out.println("Editor:\n" + editor.getText());
+        String text = editor.getText();
+
+        assertTrue("Label is not typed", text.contains(label));
+
+        Util.sleep(5000);
     }
 
 }

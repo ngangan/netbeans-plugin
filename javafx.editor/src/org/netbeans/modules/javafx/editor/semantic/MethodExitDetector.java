@@ -254,7 +254,9 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
             ExpressionTree value = tree.getValue();
             if (value == null) {
                 List<? extends ExpressionTree> statements = tree.getStatements();
-                value = statements.get(statements.size() - 1);
+                if (statements.size() > 0) {
+                    value = statements.get(statements.size() - 1);
+                }
             }
             if (value != null) {
                 addHighlightFor(value);
