@@ -316,6 +316,12 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
     public void propertyChange(PropertyChangeEvent evt) {
         if( LineBreakpoint.PROP_URL.equals( evt.getPropertyName())) {
                 this.setURL((String) evt.getNewValue());
+        } else if( LineBreakpoint.PROP_ENABLED.equals( evt.getPropertyName())) {
+            if((Boolean) evt.getNewValue()) {
+                enable();
+            } else {
+                disable();
+            }
         }
     }
 }
