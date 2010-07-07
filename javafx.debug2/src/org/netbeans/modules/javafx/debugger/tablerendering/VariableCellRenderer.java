@@ -191,6 +191,11 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
             boolean bound = false;
             boolean invalid = false;
+            
+            if( oo == null ) {
+                textValue.setText( "null" ); // NOI18N
+                return textValue;
+            }
             List<ReferenceType> references = oo.virtualMachine().classesByName( f.getClassName());
             if( references.size() > 0  ) {
                 ReferenceType ref = references.get( 0 );
