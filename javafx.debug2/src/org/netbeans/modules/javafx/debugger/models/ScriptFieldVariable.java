@@ -6,10 +6,7 @@
 package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
-import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.Field;
-import com.sun.jdi.InvalidTypeException;
-import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
@@ -20,10 +17,8 @@ import org.netbeans.modules.debugger.jpda.jdi.ObjectCollectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ReferenceTypeWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.TypeComponentWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
-import org.netbeans.modules.debugger.jpda.jdi.ValueWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -93,12 +88,12 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
 
     @Override
     protected void setValue( Value value ) throws InvalidExpressionException {
-        try {
-            parentClass.setValue( field, value );
-        } catch( InvalidTypeException ex ) {
-            Exceptions.printStackTrace( ex );
-        } catch( ClassNotLoadedException ex ) {
-            Exceptions.printStackTrace( ex );
-        }
+//        try {
+//            parentClass.setValue( field, value );
+//        } catch( InvalidTypeException ex ) {
+//            Exceptions.printStackTrace( ex );
+//        } catch( ClassNotLoadedException ex ) {
+//            Exceptions.printStackTrace( ex );
+//        }
     }
 }
