@@ -94,6 +94,12 @@ public class ToolTipAnnotation extends Annotation implements Runnable {
 
     private Part lp;
     private EditorCookie ec;
+    private static RequestProcessor RP;
+
+    private static synchronized RequestProcessor getRP() {
+        if (RP == null) RP = new RequestProcessor("JavaFX tooltip evaluator");
+        return RP;
+    }
 
     public String getShortDescription () {
         // [TODO] hack for org.netbeans.modules.debugger.jpda.actions.MethodChooser that disables tooltips
@@ -120,8 +126,8 @@ public class ToolTipAnnotation extends Annotation implements Runnable {
         this.ec = ec;
         RequestProcessor rp = currentEngine.lookupFirst(null, RequestProcessor.class);
         if (rp == null) {
-            // Debugger is likely finishing...
-            rp = RequestProcessor.getDefault();
+            // Debugger is likely finishing or no shared processor available
+            rp = getRP();
         }
         rp.post (this);
         return "";
