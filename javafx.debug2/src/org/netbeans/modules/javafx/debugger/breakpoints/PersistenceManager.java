@@ -44,7 +44,11 @@
 
 package org.netbeans.modules.javafx.debugger.breakpoints;
 
+import com.sun.javafx.jdi.event.FXEventQueue;
+import com.sun.jdi.VirtualMachine;
+import com.sun.jdi.event.EventQueue;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerEngine;
@@ -54,6 +58,8 @@ import org.netbeans.api.debugger.LazyDebuggerManagerListener;
 import org.netbeans.api.debugger.Properties;
 import org.netbeans.api.debugger.Session;
 import org.netbeans.api.debugger.Watch;
+import org.netbeans.api.debugger.jpda.JPDADebugger;
+import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 
 /**
@@ -99,6 +105,7 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
         return new String [] {
             DebuggerManager.PROP_BREAKPOINTS_INIT,
             DebuggerManager.PROP_BREAKPOINTS,
+            DebuggerManager.PROP_DEBUGGER_ENGINES,
         };
     }
     
@@ -138,7 +145,29 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
     
     public void sessionAdded( Session session ) {}
     public void sessionRemoved( Session session ) {}
-    public void engineAdded( DebuggerEngine engine ) {}
+
+    public void engineAdded( DebuggerEngine engine ) {
+        JPDADebugger d = engine.lookupFirst(null, JPDADebugger.class);
+        if (!(d instanceof JPDADebuggerImpl)) return;
+        final JPDADebuggerImpl impl = (JPDADebuggerImpl)d;
+
+        impl.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (JPDADebugger.PROP_STATE.equals(evt.getPropertyName()) &&
+                        impl.getState() == JPDADebugger.STATE_RUNNING) {
+
+                    impl.removePropertyChangeListener(this);
+
+                    VirtualMachine vm = impl.getVirtualMachine ();
+                    EventQueue eq = vm.eventQueue();
+                    if (!(eq instanceof FXEventQueue)) return;
+                    FXEventQueue fxeq = (FXEventQueue)eq;
+                    fxeq.setAllowEventControl(true);
+                }
+            }
+        });
+    }
+
     public void engineRemoved( DebuggerEngine engine ) {}
     
     
