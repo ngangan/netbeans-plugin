@@ -108,7 +108,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
                 Exceptions.printStackTrace(e);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             try {
                 String msg = NbBundle.getMessage(FXDLexer.class, MSG_NOT_SUPPORTED,
                         ex.getLocalizedMessage());
