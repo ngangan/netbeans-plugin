@@ -100,9 +100,14 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                 } else if( Types.OTHER.equals( seqType )) {
                     fieldTypeName = "String[]"; // NOI18N
                 } else {
-                    String typeName = seqType.name().toLowerCase();
-                    fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
-                            typeName.substring( 1 ) + "[]"; // NOI18N
+                    if( seqType != null ) {
+                        String typeName = seqType.name().toLowerCase();
+                        fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
+                                typeName.substring( 1 ) + "[]"; // NOI18N
+                    } else {
+                        // FIXME: Why null value is here?                       
+                        fieldTypeName = "null"; // 
+                    }
                 }
             }
             labelValue.setText( fieldTypeName );            

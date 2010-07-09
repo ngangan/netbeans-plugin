@@ -141,7 +141,8 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
      *          <code>original.setValueAt (...)</code> method call only!
      */
     public void setValueAt( TableModel original, Object node, String columnID, Object value ) throws UnknownTypeException {
-        original.setValueAt( node, columnID, value );
+        // TODO: Enable set value for variable 
+//        original.setValueAt( node, columnID, value );
     }
 
     public void addModelListener(ModelListener l) {

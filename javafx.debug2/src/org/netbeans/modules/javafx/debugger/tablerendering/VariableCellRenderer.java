@@ -128,8 +128,12 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             JDIVariable v = (JDIVariable)f;
             Value oo = v.getJDIValue();
             FXValue fxv = (FXValue)oo;
-            oo.virtualMachine().classesByName( fxv.type().name());
 
+            if( oo == null ) {
+                textValue.setText( "null" ); // NOI18N
+                return textValue;
+            }
+            
             boolean bound = false;
             boolean invalid = false;
 
