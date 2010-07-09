@@ -7,6 +7,7 @@ package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
 import com.sun.jdi.Field;
+import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
