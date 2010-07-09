@@ -117,7 +117,8 @@ public class JavaFXWatch implements PropertyChangeListener {
 //        text = "pageContext.getExpressionEvaluator().evaluate(\"" + text +
 //                            "\", java.lang.String.class, (javax.servlet.jsp.PageContext)pageContext, null)";
         try {
-            variable = debugger.evaluate( text );
+            // TODO: Enable watches evaluation
+//            variable = debugger.evaluate( text );
             exception = null;
         } catch( Exception e ) {
             exception = e;
