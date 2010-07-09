@@ -215,9 +215,9 @@ final public class ClassIndex {
             cpLock.writeLock().lock();
             Set<FileObject> srcRoots = new HashSet();
             Set<FileObject> depRoots = new HashSet();
-            srcRoots.addAll(Arrays.asList(sourcePath.getRoots()));
-            depRoots.addAll(Arrays.asList(compilePath.getRoots()));
-            depRoots.addAll(Arrays.asList(bootPath.getRoots()));
+            srcRoots.addAll(sourcePath != null ? Arrays.asList(sourcePath.getRoots()) : Collections.EMPTY_SET);
+            depRoots.addAll(compilePath != null ? Arrays.asList(compilePath.getRoots()) : Collections.EMPTY_SET);
+            depRoots.addAll(bootPath != null ? Arrays.asList(bootPath.getRoots()) : Collections.EMPTY_SET);
 
             // #186163: need to add the new srcRoots before removing the unused ones
             getSrcRoots(true).retainAll(srcRoots);
@@ -678,15 +678,19 @@ final public class ClassIndex {
                     srcs.addAll(newSrcs);
                     newSrcs.clear();
                     for(FileObject fo : srcs) {
+                        if (fo == null) continue; // don't process NULL values (no idea why they are here)
                         for(Map.Entry<URL, List<URL>> entry : rootDeps) {
                             try {
                                 if (entry != null) {
                                     List<URL> urls = entry.getValue();
-                                    if (urls != null && urls.contains(fo.getURL())) {
-                                        FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
-                                        if (!indexerDepRevRoots.contains(src)) {
-                                            indexerDepRevRoots.add(src);
-                                            newSrcs.add(src);
+                                    if (urls != null) {
+                                        URL url = fo.getURL();
+                                        if (url != null && urls.contains(fo.getURL())) {
+                                            FileObject src = FileUtil.toFileObject(FileUtil.archiveOrDirForURL(entry.getKey()));
+                                            if (!indexerDepRevRoots.contains(src)) {
+                                                indexerDepRevRoots.add(src);
+                                                newSrcs.add(src);
+                                            }
                                         }
                                     }
                                 }

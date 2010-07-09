@@ -81,6 +81,16 @@ public class EditorOperator extends org.netbeans.jellytools.EditorOperator {
         textComponent.setText(text);
     }
 
+    public void typeText(String text){
+        //textComponent.setText(text);
+        typeText(text, 0, 0);
+    }
+    
+    public void typeText(String text, int line, int row){
+        setCaretPosition(line, row);
+        insert(text);
+    }
+
     public void format(){
         clickForPopup();
         //Util.sleep(2000);

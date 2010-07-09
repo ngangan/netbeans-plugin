@@ -45,6 +45,10 @@
 package org.netbeans.modules.javafx.fxd.composer.source;
        
 import com.sun.javafx.tools.fxd.FXDReference;
+import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
+import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,11 +74,10 @@ import org.netbeans.modules.javafx.fxd.composer.misc.CharSeqReader;
 import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
-import org.openide.util.Exceptions;
-
-import com.sun.javafx.tools.fxd.container.scene.fxd.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.netbeans.modules.javafx.fxd.composer.editor.SyntaxErrorsHighlightingTask;
 
 /**
  *
@@ -234,8 +237,15 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         String getName();
         int getStartOffset();
     }
-    
-    public static final String PROP_PARSE_ERROR = "parse-error"; // NOI18N
+
+    /**
+     * is used as key to store one selected error to be shown in e.g. status line
+     */
+    public static final String PROP_PARSE_ERROR_MSG = "parse-error-msg"; // NOI18N
+    /**
+     * Is used as key to store list of all appeared errors.
+     */
+    public static final String PROP_PARSE_ERROR_LIST = "parse-error-list"; // NOI18N
     
     /*
     private static FXDNode s_root = null;    
@@ -262,8 +272,9 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
         Reader docReader = new CharSeqReader(doc.getText());
         final StringBuilder statMsg = new StringBuilder(" "); // NOI18N
                     
+        FXDParser fxdParser = null;
         try {
-            FXDParser fxdParser = new FXDParser(docReader, new ContentHandler() {
+            fxdParser = new FXDParser(docReader, new ContentHandler() {
                 /** is last processed element was node or not (then array) */
                 private boolean m_isLastNode = true;
                 /** last processed element.
@@ -335,16 +346,21 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     }
                 }
 
-                private void synchArrayOfChildNodes(NodeBuilder deb, DocumentElement de) 
+                private void synchArrayOfChildNodes(NodeBuilder deb, DocumentElement de)
                         throws DocumentModelTransactionCancelledException {
                     List<NodeData> nodeList = deb.getNodesNamesFromAttrValue(de.getName());
                     for (DocumentElement child : de.getChildren()) {
-                        if (FXDFileModel.FXD_NODE.equals(child.getType())) {
+                        if (isNodeOrArrayElem(child)) {
                             if (!isDEInList(nodeList, child)) {
                                 trans.removeDocumentElement(child, true);
                             }
                         }
                     }
+                }
+
+                private boolean isNodeOrArrayElem(DocumentElement elem) {
+                    return FXDFileModel.FXD_NODE.equals(elem.getType())
+                            || FXDFileModel.FXD_ARRAY_ELEM.equals(elem.getType());
                 }
 
                 private boolean isDEInList(List<NodeData> list, DocumentElement de){
@@ -391,33 +407,83 @@ public final class FXDDocumentModelProvider implements DocumentModelProvider {
                     return null;
                 }
 
+                public boolean stopOnError() {
+                    return false;
+                }
+
             });
 
             showStatusText(dObj, " Parsing text..."); // NOI18N
 
             fxdParser.parseObject();
             reportDeletedElements(trans, model.getRootElement());
-            doc.putProperty( PROP_PARSE_ERROR, null);
+            doc.putProperty( PROP_PARSE_ERROR_MSG, null);
+            cleanParserErrors(doc);
         } catch( DocumentModelTransactionCancelledException e) {
             //s_root = null;
             throw e;
         } catch (Exception ex) {
-            if ( ex instanceof FXDSyntaxErrorException) {
-                statMsg.append( "Syntax error: "); //NOI18N
-            } else {
-                statMsg.append( "Unknown error: "); //NOI18N
-            }
-            String msg = ex.getLocalizedMessage();
-            statMsg.append(msg);
-            doc.putProperty( PROP_PARSE_ERROR, msg);
+            processErrorMessage(doc, ex, statMsg);
+            /* TODO: is it correct not to clean model on error?
             cleanModel(trans, model);
             try {
                 trans.addDocumentElement("Invalid FXD syntax", FXDFileModel.FXD_ERROR, NO_ATTRS, 0, doc.getLength()); // NOI18N
             } catch (BadLocationException ex1) {
                 Exceptions.printStackTrace(ex1);
             }
+             */
         } finally {
+            if (fxdParser != null && !fxdParser.getErrors().isEmpty()){
+                processErrorMessage(doc, fxdParser.getErrors().get(0), statMsg);
+                addParserErrors(doc, fxdParser.getErrors());
+            }
             showStatusText(dObj, statMsg.toString());
+        }
+    }
+
+
+    public static void cleanParserErrors(BaseDocument doc){
+        doc.putProperty(PROP_PARSE_ERROR_LIST, null);
+    }
+    
+    public static void addParserErrors(BaseDocument doc, List<FXDSyntaxErrorException> errors) {
+        List<FXDSyntaxErrorException> old = (List<FXDSyntaxErrorException>)doc.getProperty(PROP_PARSE_ERROR_LIST);
+        List<FXDSyntaxErrorException> merged = null;
+        if (errors != null){
+            if (old != null){
+                // todo: merge
+                merged = errors;
+            } else {
+                merged = errors;
+            }
+        }
+        doc.putProperty(PROP_PARSE_ERROR_LIST, merged);
+    }
+
+    public static void addParserErrors(BaseDocument doc, FXDSyntaxErrorException error){
+        addParserErrors(doc, Arrays.asList(error));
+    }
+
+    private void processErrorMessage(BaseDocument doc, Exception ex, StringBuilder statMsg) {
+        if (ex instanceof FXDSyntaxErrorException) {
+            FXDSyntaxErrorException syntaxError = (FXDSyntaxErrorException) ex;
+            statMsg.append("Syntax error: "); //NOI18N
+            String msg = syntaxError.getLocalizedMessage();
+
+            try {
+                int ErrRow = SyntaxErrorsHighlightingTask.getRow(syntaxError, (BaseDocument) doc);
+                int ErrPosition = SyntaxErrorsHighlightingTask.getPosition(syntaxError, (BaseDocument) doc);
+                msg += " at [" + ErrRow + "," + ErrPosition + "]"; //NOI18N
+            } catch (BadLocationException bex) {
+            }
+
+            statMsg.append(msg);
+            doc.putProperty(PROP_PARSE_ERROR_MSG, msg);
+        } else {
+            statMsg.append("Unknown error: "); //NOI18N
+            String msg = ex.getLocalizedMessage();
+            statMsg.append(msg);
+            doc.putProperty(PROP_PARSE_ERROR_MSG, msg);
         }
     }
 

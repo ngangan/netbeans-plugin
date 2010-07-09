@@ -1469,6 +1469,12 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
+// TODO do the same as in Reformatter - see processWSBeforeRB()
+//            if (acceptAndRollback(JFXTokenId.LINE_COMMENT) == JFXTokenId.LINE_COMMENT) {
+//               spaces(0, true);
+//               accept(JFXTokenId.LINE_COMMENT);
+//            }
+
 //            if (isEmpty || templateEdit) {
             if (templateEdit) {
                 newline();

@@ -98,11 +98,6 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 
             // attach vetoable change listener to be cancel loosing validity when modified
             env.addVetoableChangeListener(org.openide.util.WeakListeners.vetoableChange(  (VetoableChangeListener) allEditors,env));              
-        } else if (allEditors.getArbitraryComponent() == null) {
-            CloneableTopComponent ctc = (CloneableTopComponent) getFXZDataObject().getMVTC();
-            if (ctc != null) {
-                ctc.setReference(allEditors);
-            }
         }
 //        FXZListener l = new FXZListener((Env) env);
 //        allEditors = l;
@@ -131,6 +126,17 @@ public final class FXZEditorSupport extends DataEditorSupport implements OpenCoo
 
     private void editSuper() {
         super.edit();
+    }
+
+    @Override
+    public void open() {
+        if (allEditors.getArbitraryComponent() == null) {
+            CloneableTopComponent ctc = (CloneableTopComponent) getFXZDataObject().getMVTC();
+            if (ctc != null) {
+                ctc.setReference(allEditors);
+            }
+        }
+        super.open();
     }
 
     @Override

@@ -61,7 +61,6 @@ import java.util.NoSuchElementException;
 
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import com.sun.javafx.tools.fxd.container.ContainerEntry;
-import com.sun.javafx.tools.fxd.container.FXDContainer;
 
 import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
 import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
@@ -707,6 +706,10 @@ final class DocumentElementWrapper {
         }
 
         public void endNodeArray(Object o, int i) throws FXDException {
+        }
+
+        public boolean stopOnError() {
+            return true;
         }
     }
 }

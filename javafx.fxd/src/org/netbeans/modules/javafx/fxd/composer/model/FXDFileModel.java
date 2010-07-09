@@ -79,6 +79,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     public static final String FXD_ATTRIBUTE       = "attr";         //NOI18N
     public static final String FXD_ATTRIBUTE_ARRAY = "attr-array";   //NOI18N
     public static final String FXD_ARRAY_ELEM      = "array-elem";   //NOI18N
+    // TODO test usages and change to use new approach (doc. property?)
     public static final String FXD_ERROR           = "error";        //NOI18N
     
     private final    FXZArchive     m_archive;
@@ -125,7 +126,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     }
     
     public String getErrorMsg() {
-        return (String) m_docModel.getDocument().getProperty( FXDDocumentModelProvider.PROP_PARSE_ERROR);
+        return (String) m_docModel.getDocument().getProperty( FXDDocumentModelProvider.PROP_PARSE_ERROR_MSG);
     }
     
     public synchronized void updateModel() {

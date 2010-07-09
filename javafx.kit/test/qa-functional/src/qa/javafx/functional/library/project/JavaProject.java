@@ -342,6 +342,13 @@ public class JavaProject extends Project {
         rootNode.performPopupActionNoBlock("Close");
     }
 
+
+    public void popup(String pack, String name){
+        Node node = getFileNode(pack);
+        node.performPopupActionNoBlock(name);
+        
+    }
+
     public void openOutput() {
         new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Window|Output|Output");
     }

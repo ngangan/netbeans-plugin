@@ -51,7 +51,7 @@ import javax.swing.text.Document;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
-import org.netbeans.modules.javafx.fxd.composer.editor.parser.FXDSyntaxErrorParser.FXDParserResult;
+import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
@@ -82,8 +82,12 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
             if(document == null){
                 return;
             }
-            FXDParserResult fxdResult = (FXDParserResult) result;
-            List<FXDSyntaxErrorException> syntaxErrors = fxdResult.getSyntaxErrors();
+            Object prop = document.getProperty(FXDDocumentModelProvider.PROP_PARSE_ERROR_LIST);
+            List<FXDSyntaxErrorException> syntaxErrors = (List<FXDSyntaxErrorException>)prop;
+            if (syntaxErrors == null){
+                return;
+            }
+
             List<ErrorDescription> errors = new ArrayList<ErrorDescription>();
             for (FXDSyntaxErrorException syntaxError : syntaxErrors) {
                 int ErrRow = getRow(syntaxError, (BaseDocument) document);
@@ -103,20 +107,18 @@ public class SyntaxErrorsHighlightingTask extends ParserResultTask {
             }
         } catch (BadLocationException ex1) {
             Exceptions.printStackTrace(ex1);
-        } catch (org.netbeans.modules.parsing.spi.ParseException ex1) {
-            Exceptions.printStackTrace (ex1);
         }
     }
 
-    private int getRow(FXDSyntaxErrorException syntaxError, BaseDocument document)
+    public static int getRow(FXDSyntaxErrorException syntaxError, BaseDocument document)
             throws BadLocationException {
         return Utilities.getRowCount(document, 0, syntaxError.getOffset());
     }
 
-    private int getPosition(FXDSyntaxErrorException syntaxError, BaseDocument document)
+    public static int getPosition(FXDSyntaxErrorException syntaxError, BaseDocument document)
             throws BadLocationException {
         int offset = syntaxError.getOffset();
-        if (offset > -1) {
+        if (offset > -1 && offset < document.getLength()) {
             int rowStart = Utilities.getRowStart((BaseDocument) document, offset);
             int position = offset - rowStart;
             int tabs = syntaxError.getTabsInLastRow();

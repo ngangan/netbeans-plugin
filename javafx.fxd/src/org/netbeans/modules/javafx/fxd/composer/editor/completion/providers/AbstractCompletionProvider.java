@@ -444,7 +444,11 @@ public abstract class AbstractCompletionProvider {
                 return null;
             }
         }
-        return el.getDocument().getText(ts.offset(), caretOffset - ts.offset());
+        if (caretOffset > ts.offset()) {
+            return el.getDocument().getText(ts.offset(), caretOffset - ts.offset());
+        } else {
+            return "";
+        }
     }
 
     private void collectPropertyValues(List<AbstractSchemaElement> schElements,

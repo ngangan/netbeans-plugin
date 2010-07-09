@@ -57,7 +57,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import org.netbeans.api.lexer.Token;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceViewDescription;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerInput;
 import org.netbeans.spi.lexer.LexerRestartInfo;
@@ -81,6 +80,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
         //buildTokensList();
     }
 
+    // TODO change error handling
     private void buildTokensList() {
         final LexerInput input = m_info.input();
         Reader reader = new LexerInputReader(input);
@@ -90,16 +90,10 @@ public class FXDLexer implements Lexer<FXDTokenId> {
         try {
             parser = new FXDParser(reader, contLexer);
             parser.parseObject();
-        } catch (StringIndexOutOfBoundsException ex) {
-            ex.printStackTrace();
-            try {
-                String msg = NbBundle.getMessage(FXDLexer.class, MSG_NOT_SUPPORTED,
-                        ex.getLocalizedMessage());
-                FXDSyntaxErrorException syntaxEx = new FXDSyntaxErrorException(
-                        msg, parser.getPosition());
-                contLexer.markError(syntaxEx);
-            } catch (Exception e) {
-                Exceptions.printStackTrace(e);
+
+            FXDTokenId lastId = contLexer.getLastTokenId();
+            if (FXDTokenId.EOF != lastId) {
+                contLexer.parsingFinished();
             }
         } catch (FXDSyntaxErrorException syntaxEx) {
             try {
@@ -114,7 +108,16 @@ public class FXDLexer implements Lexer<FXDTokenId> {
                 Exceptions.printStackTrace(e);
             }
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            ex.printStackTrace();
+            try {
+                String msg = NbBundle.getMessage(FXDLexer.class, MSG_NOT_SUPPORTED,
+                        ex.getLocalizedMessage());
+                FXDSyntaxErrorException syntaxEx = new FXDSyntaxErrorException(
+                        msg, parser.getPosition());
+                contLexer.markError(syntaxEx);
+            } catch (Exception e) {
+                Exceptions.printStackTrace(e);
+            }
         }
     }
 
@@ -207,14 +210,19 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             this.m_tokensList = tokensList;
         }
 
+        protected FXDTokenId getLastTokenId() {
+            TokenData<FXDTokenId> td = m_tokensList.get(m_tokensList.size() - 1);
+            return (td != null) ? td.id() : null;
+        }
+
         public void parsingStarted(FXDParser parser) {
             m_parser = parser;
         }
 
         public void parsingFinished() throws IOException, FXDException {
-            // TODO tokenize the rest instead of marking it as error?
             if (m_parser.peekClean() != 0){
-                markError(null);
+                String msg = "Unexpected content"; //NOI18N
+                markError(new FXDSyntaxErrorException(msg, m_parser.getPosition()));
             } else {
                 markTailParsed();
             }
@@ -330,6 +338,14 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             createComment(FXDTokenId.LINE_COMMENT, startOff, endOff);
         }
 
+        public void error(int startOff, int endOff, FXDSyntaxErrorException syntaxEx) {
+            if (startOff < endOff) {
+                SyntaxErrorPropertyProvider provider = syntaxEx == null ? null
+                        : new SyntaxErrorPropertyProvider(syntaxEx);
+                addTokenData(FXDTokenId.UNKNOWN, startOff, endOff - startOff, provider);
+            }
+        }
+
         protected void markError(FXDSyntaxErrorException syntaxEx) throws IOException {
 
             char c = m_parser.peek();
@@ -337,12 +353,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
                 c = m_parser.fetch();
             }
 
-            if (m_tokenizedLength < m_parser.getPosition()) {
-                SyntaxErrorPropertyProvider provider = syntaxEx == null ? null
-                        : new SyntaxErrorPropertyProvider(syntaxEx);
-                addTokenData(FXDTokenId.UNKNOWN, m_tokenizedLength,
-                        m_parser.getPosition() - m_tokenizedLength, provider);
-            }
+            error(m_tokenizedLength, m_parser.getPosition(), syntaxEx);
             addTokenData(FXDTokenId.EOF, m_tokenizedLength, 1);
         }
 
@@ -384,6 +395,9 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             }
         }
 
+        public boolean stopOnError() {
+            return false;
+        }
     }
 
     private static class TokenData<E> {

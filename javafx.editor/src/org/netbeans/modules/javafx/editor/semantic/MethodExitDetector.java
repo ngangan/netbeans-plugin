@@ -240,13 +240,28 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     
     @Override
     public Boolean visitReturn(ReturnTree tree, Stack<Tree> d) {
-        if (exceptions == null) {
-            if (doExitPoints) {
-                addHighlightFor(tree);
-            }
+        if (exceptions == null && doExitPoints) {
+            addHighlightFor(tree);
         }
         
         super.visitReturn(tree, d);
+        return Boolean.TRUE;
+    }
+
+    @Override
+    public Boolean visitBlockExpression(BlockExpressionTree tree, Stack<Tree> p) {
+        if (exceptions == null && doExitPoints) {
+            ExpressionTree value = tree.getValue();
+            if (value == null) {
+                List<? extends ExpressionTree> statements = tree.getStatements();
+                if (statements.size() > 0) {
+                    value = statements.get(statements.size() - 1);
+                }
+            }
+            if (value != null) {
+                addHighlightFor(value);
+            }
+        }
         return Boolean.TRUE;
     }
     

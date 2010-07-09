@@ -238,6 +238,8 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         for(final Map.Entry<FileObject, Set<ElementDef>> entry : movingDefs.entrySet()) {
             if (isCancelled()) return null;
 
+            if (entry.getValue().isEmpty()) continue; // skip over files with no element defs (#188433)
+
             final FileObject file = entry.getKey();
             final String oldPkgName = entry.getValue().iterator().next().getPackageName();
 
@@ -330,7 +332,10 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                 if (hdls != null) {
                     for(final Object hdl : hdls) {
                         if (hdl instanceof TreePathHandle) {
-                            edefs.add(RefactoringSupport.fromJava((TreePathHandle)hdl));
+                            ElementDef edef = RefactoringSupport.fromJava((TreePathHandle)hdl);
+                            if (edef != null) {
+                                edefs.add(edef);
+                            }
                         }
                     }
                 } else {
@@ -347,7 +352,9 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
                                         while (iter.hasNext()) {
                                             Object te = iter.next();
                                             ElementDef edef = RefactoringSupport.fromJava(te, cc);
-                                            edefs.add(edef);
+                                            if (edef != null) {
+                                                edefs.add(edef);
+                                            }
                                         }
                                     }
                                 }

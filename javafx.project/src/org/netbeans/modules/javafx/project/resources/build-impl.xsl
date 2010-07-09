@@ -160,6 +160,19 @@ is divided into following sections:
             <condition property="binary.extension" value=".exe" else="">
                 <os family="windows"/>
             </condition>
+            <property environment="env"/>
+            <condition property="java.home.value" value="${{env.JAVA_HOME}}">
+                <available file="${{env.JAVA_HOME}}/bin/javac${{binary.extension}}"/>
+            </condition>
+            <condition property="java.home.value" value="${{java.home}}">
+                <available file="${{java.home}}/bin/javac${{binary.extension}}"/>
+            </condition>
+            <condition property="java.home.value" value="${{java.home}}/..">
+                <available file="${{java.home}}/../bin/javac${{binary.extension}}"/>
+            </condition>
+            <condition property="java.home.key" value="JAVA_HOME" else="NOTHING_IMPORTANT">
+                <isset property="java.home.value"/>
+            </condition>
             <property name="javafx.profile" value="desktop"/>
             <condition property="midp.execution.trigger">
                 <equals arg1="${{javafx.profile}}" arg2="mobile"/>
@@ -263,6 +276,7 @@ is divided into following sections:
                 <arg line="${{packager.options}}"/>
                 <arg value="-cp"/>
                 <arg path="${{javac.classpath}}"/>
+                <env key="${{java.home.key}}" file="${{java.home.value}}"/>
             </exec>
         </target>
         <target name="-post-compile">

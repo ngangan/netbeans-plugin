@@ -93,7 +93,8 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
     public Problem prepare(RefactoringElementsBag reb) {
         fireProgressListenerStart(WhereUsedQuery.PREPARE, -1);
         final ElementDef edef = getElementDef();
-
+        if (edef == null) return null;
+        
         final ClassIndex ci = RefactoringSupport.classIndex(refactoring);
 
         switch(edef.getKind()) {

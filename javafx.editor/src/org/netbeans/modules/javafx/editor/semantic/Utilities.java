@@ -424,10 +424,10 @@ public class Utilities {
             return null;
         }
         
-        ts.moveNext();
-        
-        if (ts.offset() == start && ts.token().id() == JFXTokenId.IDENTIFIER) {
-             return ts.token();
+        if (ts.moveNext()) {
+            if (ts.offset() == start && ts.token().id() == JFXTokenId.IDENTIFIER) {
+                return ts.token();
+            }
         }
         
         return null;

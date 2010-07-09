@@ -95,7 +95,8 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
         } else if (prev == FXDTokenId.RBRACE && next == null) {
             // after }.
             processParentDocElement(resultSet, el, caretOffset, ts);
-        } else if (next != FXDTokenId.UNKNOWN) {
+        //} else if (next != FXDTokenId.UNKNOWN) {
+        } else {
             // between { and }, but not before error
             processNodeBody(resultSet, el, caretOffset, ts);
         }
@@ -151,6 +152,17 @@ class NodeCompletionProvider extends AbstractCompletionProvider {
                 processAttrId(resultSet, el, caretOffset, ts);
             } else {
                 // between id and :
+                // nothing to suggest?
+            }
+        } else if (prev == FXDTokenId.IDENTIFIER_ATTR && next == FXDTokenId.UNKNOWN){
+            Token<FXDTokenId> prevT = TokenUtils.getPrevNonWhite(ts, caretOffset);
+            if (ts.offset() + prevT.length() == caretOffset) {
+                // at the end of id before Error.
+                processAttrId(resultSet, el, caretOffset, ts);
+            } else {
+                //processAttrValue(resultSet, el, caretOffset);
+                resultSet.addItem(new FXDCompletionItem(":", ":", caretOffset));
+                // between id and Error
                 // nothing to suggest?
             }
         } else if (prev == FXDTokenId.COLON){
