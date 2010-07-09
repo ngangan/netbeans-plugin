@@ -91,6 +91,9 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                     fieldTypeName = "Number"; // NOI18N
                 } else if( ref.type() instanceof FXBooleanType ) {
                     fieldTypeName = "Boolean"; // NOI18N
+                } else {
+                    fieldTypeName = ref.type().name().substring( 0, 1 ).toUpperCase() +
+                            ref.type().name().substring( 1 );
                 }
             } else if( fxv instanceof FXSequenceReference ) {
                 FXSequenceReference seq = (FXSequenceReference)fxv;

@@ -83,7 +83,12 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
 
     @Override
     public Value getJDIValue() {
-        return parentClass.getValue( field );
+        try {
+            return parentClass.getValue( field );
+        } catch( VMDisconnectedException ex ) {
+            // Do nothing
+        }
+        return null;
     }
 
     @Override

@@ -8,6 +8,7 @@ package org.netbeans.modules.javafx.debugger.models;
 import com.sun.javafx.jdi.FXClassType;
 import com.sun.jdi.Field;
 import com.sun.jdi.ObjectReference;
+import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.Value;
 import java.util.logging.Logger;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
@@ -74,9 +75,9 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     public String getDeclaredType() {
         try {
             return FieldWrapper.typeName( field );
-        } catch (InternalExceptionWrapper ex) {
+        } catch( InternalExceptionWrapper ex ) {
             return ex.getLocalizedMessage();
-        } catch (VMDisconnectedExceptionWrapper ex) {
+        } catch( VMDisconnectedExceptionWrapper ex ) {
             return "";
         }
     }
@@ -99,7 +100,12 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
 
     @Override
     public Value getJDIValue() {
-        return parentClass.getValue( field );
+        try {
+            return parentClass.getValue( field );
+        } catch( VMDisconnectedException ex ) {
+            // Do nothing
+        }
+        return null;
     }
     
     @Override
