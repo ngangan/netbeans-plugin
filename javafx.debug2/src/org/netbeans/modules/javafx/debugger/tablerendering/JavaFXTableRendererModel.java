@@ -6,7 +6,7 @@
 package org.netbeans.modules.javafx.debugger.tablerendering;
 
 import com.sun.javafx.jdi.FXValue;
-import java.util.HashMap;
+import java.util.WeakHashMap;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.api.debugger.jpda.Field;
@@ -24,7 +24,7 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TableRendererModel.class } )
 public class JavaFXTableRendererModel implements TableRendererModel {
 
-    private HashMap<Object, VariableCellRenderer> valueRenderers = new HashMap<Object,VariableCellRenderer>();
+    private WeakHashMap<Object, VariableCellRenderer> valueRenderers = new WeakHashMap<Object,VariableCellRenderer>();
 
     public JavaFXTableRendererModel() {}
 
@@ -61,7 +61,9 @@ public class JavaFXTableRendererModel implements TableRendererModel {
             if( !valueRenderers.containsKey( o )) {
                 valueRenderers.put( o, new VariableCellRenderer( o, columnName ));
             }
-            return valueRenderers.get( o );
+            VariableCellRenderer renderer = valueRenderers.get( o );
+            renderer.setObject( o );
+            return renderer;
         }
         return null;
     }
