@@ -157,10 +157,9 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     FXSequenceReference seq = (FXSequenceReference)v;
 
                     AbstractVariable av = (AbstractVariable)ov;
-                    
+                    try {                    
                     if( seq != null ) {
                         for( int i = 0; i < seq.length(); i++ ) {
-                            try {
                                 Value iv = seq.getValue( i );
 
                                 if( iv instanceof FXPrimitiveValue ) {
@@ -173,11 +172,11 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                                             (FXObjectReference) iv, t,
                                              ov, i, 1000, v.toString()));
                                 }
-                            } catch( VMDisconnectedException ex ) {                                
-                            } catch( ObjectCollectedException ex ) {
-                            } catch( InternalException ex ) {}
+                            }
                         }
-                    }
+                    } catch( VMDisconnectedException ex ) {                                
+                    } catch( ObjectCollectedException ex ) {
+                    } catch( InternalException ex ) {}
                     seqType = true;
                 } 
             }
