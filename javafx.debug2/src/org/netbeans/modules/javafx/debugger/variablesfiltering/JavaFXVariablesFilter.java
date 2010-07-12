@@ -63,6 +63,7 @@ import org.netbeans.api.debugger.jpda.This;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 //import org.netbeans.modules.debugger.jpda.models.FieldVariable;
+import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
 import org.netbeans.modules.javafx.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -103,12 +104,14 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
             for( int j = 0; j < parentChildrenCount; j++ ) {
                 Object child = children[j];
 //                System.out.println(" - " + child );
-                if( child instanceof JPDAClassType ) {
+                if( child instanceof ClassVariableImpl ) {
+                } else if (child instanceof JPDAClassType) {
                     Object[] ch = original.getChildren( child, from, to );                
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
                         System.out.println("    - " + obj );
-                        if( obj instanceof This ) {
+                        if( obj instanceof ClassVariableImpl ) {
+                        } else if (obj instanceof This) {
 //                            ClassVariable cv = (ClassVariable)obj;
 //                            vc.add( obj );
                         } else if( obj instanceof Field ) {
