@@ -109,7 +109,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     Object[] ch = original.getChildren( child, from, to );                
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
-                        System.out.println("    - " + obj );
+//                        System.out.println("    - " + obj );
                         if( obj instanceof ClassVariableImpl ) {
                         } else if (obj instanceof This) {
 //                            ClassVariable cv = (ClassVariable)obj;
