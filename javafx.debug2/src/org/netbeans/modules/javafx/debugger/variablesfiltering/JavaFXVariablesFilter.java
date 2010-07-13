@@ -52,6 +52,9 @@ import com.sun.javafx.jdi.FXObjectReference;
 import com.sun.javafx.jdi.FXPrimitiveValue;
 import com.sun.javafx.jdi.FXReferenceType;
 import com.sun.javafx.jdi.FXSequenceReference;
+import com.sun.jdi.InternalException;
+import com.sun.jdi.ObjectCollectedException;
+import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.Value;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +66,7 @@ import org.netbeans.api.debugger.jpda.This;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 //import org.netbeans.modules.debugger.jpda.models.FieldVariable;
+import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
 import org.netbeans.modules.javafx.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -103,12 +107,14 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
             for( int j = 0; j < parentChildrenCount; j++ ) {
                 Object child = children[j];
 //                System.out.println(" - " + child );
-                if( child instanceof JPDAClassType ) {
+                if( child instanceof ClassVariableImpl ) {
+                } else if (child instanceof JPDAClassType) {
                     Object[] ch = original.getChildren( child, from, to );                
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
-                        System.out.println("    - " + obj );
-                        if( obj instanceof This ) {
+//                        System.out.println("    - " + obj );
+                        if( obj instanceof ClassVariableImpl ) {
+                        } else if (obj instanceof This) {
 //                            ClassVariable cv = (ClassVariable)obj;
 //                            vc.add( obj );
                         } else if( obj instanceof Field ) {
@@ -128,7 +134,9 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     Value v = jdiv.getJDIValue();
                     FXObjectReference fx = (FXObjectReference)v;
                     FXClassType clazz = ((FXReferenceType)fx.referenceType()).scriptClass();
-                    vc.add( new ScriptClass( av.getDebugger(), v, clazz ));
+                    if( clazz != null ) {
+                        vc.add( new ScriptClass( av.getDebugger(), v, clazz ));
+                    }
                 }
             }
 //            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
@@ -149,23 +157,26 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     FXSequenceReference seq = (FXSequenceReference)v;
 
                     AbstractVariable av = (AbstractVariable)ov;
-                    
+                    try {                    
                     if( seq != null ) {
                         for( int i = 0; i < seq.length(); i++ ) {
-                            Value iv = seq.getValue( i );
+                                Value iv = seq.getValue( i );
 
-                            if( iv instanceof FXPrimitiveValue ) {
-                                vc.add( new SequenceField( av.getDebugger(), 
-                                       (FXPrimitiveValue) seq.getValue( i ), ov, i,
-                                       v.type().toString()));
-                            } else if( iv instanceof FXObjectReference ) {
-                                String t = iv.type().name();
-                                vc.add( new SequenceObject( av.getDebugger(),
-                                        (FXObjectReference) iv, t,
-                                         ov, i, 1000, v.toString()));
+                                if( iv instanceof FXPrimitiveValue ) {
+                                    vc.add( new SequenceField( av.getDebugger(), 
+                                           (FXPrimitiveValue) seq.getValue( i ), ov, i,
+                                           v.type().toString()));
+                                } else if( iv instanceof FXObjectReference ) {
+                                    String t = iv.type().name();
+                                    vc.add( new SequenceObject( av.getDebugger(),
+                                            (FXObjectReference) iv, t,
+                                             ov, i, 1000, v.toString()));
+                                }
                             }
                         }
-                    }
+                    } catch( VMDisconnectedException ex ) {                                
+                    } catch( ObjectCollectedException ex ) {
+                    } catch( InternalException ex ) {}
                     seqType = true;
                 } 
             }

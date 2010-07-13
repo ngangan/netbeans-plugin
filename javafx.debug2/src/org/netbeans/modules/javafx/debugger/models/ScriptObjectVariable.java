@@ -7,6 +7,8 @@ package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
 import com.sun.jdi.Field;
+import com.sun.jdi.InternalException;
+import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.Value;
@@ -90,9 +92,13 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     protected Value getInnerValue() {
         synchronized (valueLock) {
             if (!valueRetrieved) {
-                Value v = parentClass.getValue( field );
-                this.value = (ObjectReference) v;
-                this.valueRetrieved = true;
+                try {
+                    Value v = parentClass.getValue( field );
+                    this.value = (ObjectReference) v;
+                    this.valueRetrieved = true;
+                } catch( RuntimeException e ) {
+                    //
+                }
             }
             return value;
         }
@@ -104,6 +110,10 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
             return parentClass.getValue( field );
         } catch( VMDisconnectedException ex ) {
             // Do nothing
+        } catch( InternalException ex ) {
+            
+        } catch( ObjectCollectedException ex ) {
+            
         }
         return null;
     }

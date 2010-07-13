@@ -96,6 +96,8 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
     private final Set<FileObject> annotatedFiles = new WeakSet<FileObject>();
     private Set<PropertyChangeListener> dataObjectListeners;
     private boolean attachManagerListener = true;
+    
+    private static RequestProcessor rp = new RequestProcessor( "JavaFXBreakpointAnnotationProvider" );
 
     public void annotate (Line.Set set, Lookup lookup) {
         final FileObject fo = lookup.lookup(FileObject.class);
@@ -213,7 +215,7 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
             // breakpoint has been removed
             return;
         }
-        RequestProcessor.getDefault().post( new AnnotationRefresh(b, true, true));
+        rp.post( new AnnotationRefresh( b, true, true ));
     }
 
     private final class AnnotationRefresh implements Runnable {

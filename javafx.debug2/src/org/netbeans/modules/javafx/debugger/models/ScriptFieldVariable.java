@@ -7,6 +7,8 @@ package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
 import com.sun.jdi.Field;
+import com.sun.jdi.InternalException;
+import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
@@ -88,6 +90,10 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
             return parentClass.getValue( field );
         } catch( VMDisconnectedException ex ) {
             // Do nothing
+        } catch( InternalException ex ) {
+            
+        } catch( ObjectCollectedException ex ) {
+            
         }
         return null;
     }
