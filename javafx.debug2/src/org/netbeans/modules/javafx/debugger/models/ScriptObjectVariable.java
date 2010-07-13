@@ -92,9 +92,13 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     protected Value getInnerValue() {
         synchronized (valueLock) {
             if (!valueRetrieved) {
-                Value v = parentClass.getValue( field );
-                this.value = (ObjectReference) v;
-                this.valueRetrieved = true;
+                try {
+                    Value v = parentClass.getValue( field );
+                    this.value = (ObjectReference) v;
+                    this.valueRetrieved = true;
+                } catch( RuntimeException e ) {
+                    //
+                }
             }
             return value;
         }
