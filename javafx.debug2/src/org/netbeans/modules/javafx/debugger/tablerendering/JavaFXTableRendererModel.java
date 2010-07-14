@@ -5,12 +5,20 @@
 
 package org.netbeans.modules.javafx.debugger.tablerendering;
 
-import com.sun.javafx.jdi.FXValue;
+import com.sun.javafx.jdi.FXClassType;
 import java.util.WeakHashMap;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.api.debugger.jpda.Field;
-import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
+import org.netbeans.api.debugger.jpda.JPDAClassType;
+import org.netbeans.api.debugger.jpda.ObjectVariable;
+import org.netbeans.modules.debugger.jpda.models.FieldVariable;
+import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.netbeans.modules.javafx.debugger.models.ScriptClass;
+import org.netbeans.modules.javafx.debugger.models.ScriptFieldVariable;
+import org.netbeans.modules.javafx.debugger.models.ScriptObjectVariable;
+import org.netbeans.modules.javafx.debugger.models.SequenceField;
+import org.netbeans.modules.javafx.debugger.models.SequenceObject;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.debugger.ui.Constants;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -32,21 +40,54 @@ public class JavaFXTableRendererModel implements TableRendererModel {
         if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnName )) {
             if( o instanceof Field ) {
                 Field f = (Field)o;
-                if( f instanceof JDIVariable ) {
-                    JDIVariable v = (JDIVariable)f;
-                    if( v.getJDIValue() instanceof FXValue ) {
-                        return true;
+                System.out.println(" f  - " + f );
+                if( f instanceof FieldVariable ) {
+                    FieldVariable fv = (FieldVariable)f;
+                    JPDAClassType ct = fv.getDeclaringClass();
+                    if( ct instanceof JPDAClassTypeImpl ) {
+                        JPDAClassTypeImpl cti = (JPDAClassTypeImpl)ct;
+                        if( cti.getType() instanceof FXClassType ) return true;
                     }
+                } else if (f instanceof ScriptClass) {
+                    return true;
+                } else if( f instanceof ScriptObjectVariable ) {
+                    return true;
+                } else if( f instanceof ScriptFieldVariable ) {
+                    return true;
+                } else if( f instanceof SequenceObject ) {
+                    return true;
+                } else if( f instanceof SequenceField ) {
+                    return true;
+                } else if( f instanceof ObjectVariable ) {
+                    ObjectVariable ov = (ObjectVariable)f;
+//                    System.out.println("");
+                    return true;
                 }
             }
         } else if( Constants.LOCALS_VALUE_COLUMN_ID.equals( columnName )) {
             if( o instanceof Field ) {
                 Field f = (Field)o;
-                if( f instanceof JDIVariable ) {
-                    JDIVariable v = (JDIVariable)f;
-                    if( v.getJDIValue() instanceof FXValue ) {
-                        return true;
+                if( f instanceof FieldVariable ) {
+                    FieldVariable fv = (FieldVariable)f;
+                    JPDAClassType ct = fv.getDeclaringClass();
+                    if( ct instanceof JPDAClassTypeImpl ) {
+                        JPDAClassTypeImpl cti = (JPDAClassTypeImpl)ct;
+                        if( cti.getType() instanceof FXClassType ) return true;
                     }
+                } else if (f instanceof ScriptClass) {
+                    return true;
+                } else if( f instanceof ScriptObjectVariable ) {
+                    return true;
+                } else if( f instanceof ScriptFieldVariable ) {
+                    return true;
+                } else if( f instanceof SequenceObject ) {
+                    return true;
+                } else if( f instanceof SequenceField ) {
+                    return true;
+                } else if( f instanceof ObjectVariable ) {
+                    ObjectVariable ov = (ObjectVariable)f;
+                    System.out.println("");
+                    return true;
                 }
             }
         }

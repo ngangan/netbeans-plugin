@@ -30,7 +30,10 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.api.debugger.jpda.Field;
+import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
+import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
+import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 
 /**
  *
@@ -123,42 +126,33 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
     public Component getTableCellRendererComponent( JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column )
     {
+        System.out.println(" getTableCellRendererComponent " + value + ", " + row + ", " + column );
         if( o instanceof Field ) {
             Field f = (Field)o;
             JDIVariable v = (JDIVariable)f;
-            Value oo = v.getJDIValue();
-            FXValue fxv = (FXValue)oo;
-
-            if( oo == null ) {
-                textValue.setText( "null" ); // NOI18N
-                return textValue;
-            }
+            AbstractVariable av = (AbstractVariable)f;
             
             boolean bound = false;
             boolean invalid = false;
-
-            List<ReferenceType> references = oo.virtualMachine().classesByName( f.getClassName());
-            if( references.size() > 0  ) {
-                ReferenceType ref = references.get( 0 );
-                if( ref != null ) {
-                    FXField field = (FXField)ref.fieldByName( f.getName());
-                    if( field != null ) {
-                        bound = field.declaringType().isBound( field );
-                        invalid = field.declaringType().isInvalid( field );
-                    }
-                }
+            
+            JPDAClassType ref = f.getDeclaringClass();            
+            JPDAClassTypeImpl refi = (JPDAClassTypeImpl)ref;
+            ReferenceType referenceType = refi.getType();
+            FXField field = (FXField)referenceType.fieldByName( f.getName());
+            if( field != null ) {
+                bound = field.declaringType().isBound( field );
+                invalid = field.declaringType().isInvalid( field );
             }
-//            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
-//            boolean bound = fxf.declaringType().isBound( fxf );
-//            boolean invalid = fxf.declaringType().isInvalid( fxf );
-
+            
             buttonUpdate.setVisible( bound );
 
             if( !invalid || evaluateImmediate ) {
+                Value oo = v.getJDIValue();
+                FXValue fxv = (FXValue)oo;
                 labelValue.setText( f.getValue());
                 if( fxv instanceof FXSequenceReference ) {
-                    FXSequenceReference ref = (FXSequenceReference)fxv;
-                    labelValue.setText( labelValue.getText() + "(length= " + ref.length() + ")" );
+                    FXSequenceReference sref = (FXSequenceReference)fxv;
+                    labelValue.setText( labelValue.getText() + "(length= " + sref.length() + ")" );
                 }
             } else {
                 labelValue.setText( "Invalid value" );

@@ -67,6 +67,7 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 //import org.netbeans.modules.debugger.jpda.models.FieldVariable;
 import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
+import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 import org.netbeans.modules.javafx.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -112,7 +113,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     Object[] ch = original.getChildren( child, from, to );                
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
-//                        System.out.println("    - " + obj );
+//                        System.out.println("    - " + obj );e 
                         if( obj instanceof ClassVariableImpl ) {
                         } else if (obj instanceof This) {
 //                            ClassVariable cv = (ClassVariable)obj;
@@ -208,9 +209,11 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
         if( node instanceof Field ) {
             Field f = (Field)node;
-            if( "java.lang.String".equals( f.getType())) {
-                return true;
-            }
+            if( f instanceof ScriptClass || f instanceof ObjectVariable || f instanceof SequenceObject ) {
+                if( "java.lang.String".equals( f.getDeclaredType())) return false;
+                return false;
+            } 
+            return true;
         }
         il = original.isLeaf( node );
 

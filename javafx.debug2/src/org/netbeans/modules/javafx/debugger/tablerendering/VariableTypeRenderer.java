@@ -21,10 +21,12 @@ import com.sun.javafx.jdi.FXValue;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;
 import java.awt.Component;
+import java.util.HashMap;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
+import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 
 /**
  *
@@ -33,6 +35,17 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 public class VariableTypeRenderer extends javax.swing.JPanel implements TableCellRenderer {
 
     private Object o;
+    
+    private static final HashMap<String, String> types = new HashMap<String, String>();
+    
+    static {
+        types.put( "int", "Integer" );
+        types.put( "float", "Number" );
+        types.put( "boolean", "Boolean" );
+        types.put( "short", "Short" );
+        types.put( "long", "Long" );
+        types.put( "byte", "Byte" );
+    }
 
     /** Creates new form VariableTypeRenderer */
     public VariableTypeRenderer( Object o ) {
@@ -76,40 +89,30 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
         if( o instanceof Field ) {
             Field f = (Field)o;
             JDIVariable v = (JDIVariable)f;
-            Value oo = v.getJDIValue();
-            FXValue fxv = (FXValue)oo;
-            
-//            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
             
             String fieldTypeName = f.getDeclaredType().replace( '$', '.' );
-
-            if( fxv instanceof FXPrimitiveValue ) {
-                FXPrimitiveValue ref = (FXPrimitiveValue)fxv;
-                if( ref.type() instanceof FXIntegerType ) {
-                    fieldTypeName = "Integer" ; // NOI18N
-                } else if( ref.type() instanceof FXFloatType ) {
-                    fieldTypeName = "Number"; // NOI18N
-                } else if( ref.type() instanceof FXBooleanType ) {
-                    fieldTypeName = "Boolean"; // NOI18N
-                } else {
-                    fieldTypeName = ref.type().name().substring( 0, 1 ).toUpperCase() +
-                            ref.type().name().substring( 1 );
-                }
-            } else if( fxv instanceof FXSequenceReference ) {
-                FXSequenceReference seq = (FXSequenceReference)fxv;
-                Types seqType = seq.getElementType();
-                if( Types.INT.equals( seqType )) {
-                    fieldTypeName = "Integer[]"; // NOI18N
-                } else if( Types.OTHER.equals( seqType )) {
-                    fieldTypeName = "String[]"; // NOI18N
-                } else {
-                    if( seqType != null ) {
-                        String typeName = seqType.name().toLowerCase();
-                        fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
-                                typeName.substring( 1 ) + "[]"; // NOI18N
+                                    
+            if( types.containsKey( fieldTypeName )) {
+                fieldTypeName = types.get( fieldTypeName );
+            } else if( "com.sun.javafx.runtime.sequence.Sequence".equals( fieldTypeName )) {
+                Value oo = v.getJDIValue();
+                FXValue fxv = (FXValue)oo;
+                if( fxv instanceof FXSequenceReference ) {
+                    FXSequenceReference seq = (FXSequenceReference)fxv;
+                    Types seqType = seq.getElementType();
+                    if( Types.INT.equals( seqType )) {
+                        fieldTypeName = "Integer[]"; // NOI18N
+                    } else if( Types.OTHER.equals( seqType )) {
+                        fieldTypeName = "String[]"; // NOI18N
                     } else {
-                        // FIXME: Why null value is here?                       
-                        fieldTypeName = "null"; // 
+                        if( seqType != null ) {
+                            String typeName = seqType.name().toLowerCase();
+                            fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
+                                    typeName.substring( 1 ) + "[]"; // NOI18N
+                        } else {
+                            // FIXME: Why null value is here?                       
+                            fieldTypeName = "null"; // 
+                        }
                     }
                 }
             }

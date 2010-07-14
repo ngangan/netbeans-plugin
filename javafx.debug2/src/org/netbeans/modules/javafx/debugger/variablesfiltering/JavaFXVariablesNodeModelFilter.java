@@ -49,6 +49,8 @@ import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import org.netbeans.api.debugger.jpda.Field;
+import org.netbeans.api.debugger.jpda.ObjectVariable;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ExtendedNodeModel;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -70,6 +72,10 @@ public class JavaFXVariablesNodeModelFilter implements NodeModelFilter {
     }
     
     public String getDisplayName( NodeModel original, Object node ) throws UnknownTypeException {
+        if( node instanceof Field ) {
+            Field f = (Field)node;
+            return f.getName();
+        }
         String dn = original.getDisplayName( node );
         return dn;
     }
