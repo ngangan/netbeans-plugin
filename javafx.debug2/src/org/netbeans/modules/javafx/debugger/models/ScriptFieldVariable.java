@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
+import com.sun.javafx.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
@@ -31,12 +32,14 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
 
     private FXClassType parentClass;
     private Field field;
+    private FXObjectReference value;
     
-    public ScriptFieldVariable( JPDADebuggerImpl debugger, Field field, FXClassType parentClass, String parentID ) {
+    public ScriptFieldVariable( JPDADebuggerImpl debugger, Field field, FXClassType parentClass, String parentID, FXObjectReference value ) {
         super( debugger, null, parentID );
         
         this.field = field;
         this.parentClass = parentClass;
+        this.value = value;
     }
 
     public String getName() {
@@ -81,13 +84,18 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
 
     @Override
     public String getValue() {
-        return parentClass.getValue( field ).toString();
+        if( field.isStatic()) {
+            return parentClass.getValue( field ).toString();
+        }
+        return value.getValue( field ).toString();
     }
 
     @Override
     public Value getJDIValue() {
         try {
-            return parentClass.getValue( field );
+            if( field.isStatic()) {
+                return parentClass.getValue( field );
+            }
         } catch( VMDisconnectedException ex ) {
             // Do nothing
         } catch( InternalException ex ) {
@@ -95,7 +103,7 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
         } catch( ObjectCollectedException ex ) {
             
         }
-        return null;
+        return value.getValue( field );
     }
 
     @Override

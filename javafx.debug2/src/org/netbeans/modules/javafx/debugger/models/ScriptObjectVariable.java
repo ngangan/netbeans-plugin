@@ -6,6 +6,8 @@
 package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
+import com.sun.javafx.jdi.FXField;
+import com.sun.javafx.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
@@ -16,6 +18,7 @@ import java.util.logging.Logger;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
+import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.jdi.FieldWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.InternalExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ObjectCollectedExceptionWrapper;
@@ -39,13 +42,14 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     private boolean valueSet = true;
     private final Object valueLock = new Object();
     private boolean valueRetrieved = false;
-    private ObjectReference value;
+    private FXObjectReference value;
     
-    public ScriptObjectVariable( JPDADebuggerImpl debugger, Field field, FXClassType parentClass, String parentID ) {
+    public ScriptObjectVariable( JPDADebuggerImpl debugger, Field field, FXClassType parentClass, String parentID, FXObjectReference value ) {
         super( debugger, null, parentID );
         
         this.field = field;
         this.parentClass = parentClass;
+        this.value = value;
     }
     
     public String getName() {
@@ -94,7 +98,7 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
             if (!valueRetrieved) {
                 try {
                     Value v = parentClass.getValue( field );
-                    this.value = (ObjectReference) v;
+                    this.value = (FXObjectReference) v;
                     this.valueRetrieved = true;
                 } catch( RuntimeException e ) {
                     //
@@ -107,7 +111,11 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     @Override
     public Value getJDIValue() {
         try {
-            return parentClass.getValue( field );
+            if( field.isStatic()) {
+                return parentClass.getValue( field );
+            } else {
+                return value.getValue( field );
+            }
         } catch( VMDisconnectedException ex ) {
             // Do nothing
         } catch( InternalException ex ) {

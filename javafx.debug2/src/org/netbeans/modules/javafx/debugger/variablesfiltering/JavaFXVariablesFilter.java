@@ -136,7 +136,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     FXObjectReference fx = (FXObjectReference)v;
                     FXClassType clazz = ((FXReferenceType)fx.referenceType()).scriptClass();
                     if( clazz != null ) {
-                        vc.add( new ScriptClass( av.getDebugger(), v, clazz ));
+                        vc.add( new ScriptClass( av.getDebugger(), v, clazz, fx ));
                     }
                 }
             }

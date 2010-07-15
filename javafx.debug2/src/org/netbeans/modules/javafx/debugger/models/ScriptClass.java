@@ -6,6 +6,7 @@
 package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
+import com.sun.javafx.jdi.FXObjectReference;
 import com.sun.javafx.jdi.FXPrimitiveType;
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.Value;
@@ -26,10 +27,12 @@ import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 public class ScriptClass extends AbstractObjectVariable implements ObjectVariable, Field {
 
     FXClassType scriptClass;
+    FXObjectReference objectReference;
     
-    public ScriptClass( JPDADebuggerImpl debugger, Value value, FXClassType scriptClass ) {        
+    public ScriptClass( JPDADebuggerImpl debugger, Value value, FXClassType scriptClass, FXObjectReference objectReference ) {        
         super( debugger, value, "script" );
         this.scriptClass = scriptClass;
+        this.objectReference = objectReference;
     }
 
     @Override
@@ -50,9 +53,9 @@ public class ScriptClass extends AbstractObjectVariable implements ObjectVariabl
             com.sun.jdi.Field f = fields.get(  i );
             try {
                 if( f.type() instanceof FXPrimitiveType ) {
-                    result.add( new ScriptFieldVariable( getDebugger(), f, scriptClass, "FX" + f.name())); // NOI18N
+                    result.add( new ScriptFieldVariable( getDebugger(), f, scriptClass, "FX" + f.name(), objectReference )); // NOI18N
                 } else {
-                    result.add( new ScriptObjectVariable( getDebugger(), f, scriptClass, "FX" + f.name())); // NOI18N
+                    result.add( new ScriptObjectVariable( getDebugger(), f, scriptClass, "FX" + f.name(), objectReference )); // NOI18N
                 }
             } catch( ClassNotLoadedException ex ) {
                 ex.printStackTrace();
