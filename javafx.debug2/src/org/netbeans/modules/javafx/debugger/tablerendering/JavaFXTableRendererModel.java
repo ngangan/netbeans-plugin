@@ -40,7 +40,7 @@ public class JavaFXTableRendererModel implements TableRendererModel {
         if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnName )) {
             if( o instanceof Field ) {
                 Field f = (Field)o;
-                System.out.println(" f  - " + f );
+//                System.out.println(" f  - " + f );
                 if( f instanceof FieldVariable ) {
                     FieldVariable fv = (FieldVariable)f;
                     JPDAClassType ct = fv.getDeclaringClass();
@@ -86,7 +86,7 @@ public class JavaFXTableRendererModel implements TableRendererModel {
                     return true;
                 } else if( f instanceof ObjectVariable ) {
                     ObjectVariable ov = (ObjectVariable)f;
-                    System.out.println("");
+//                    System.out.println("");
                     return true;
                 }
             }

@@ -126,7 +126,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
     public Component getTableCellRendererComponent( JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column )
     {
-        System.out.println(" getTableCellRendererComponent " + value + ", " + row + ", " + column );
+//        System.out.println(" getTableCellRendererComponent " + value + ", " + row + ", " + column );
         if( o instanceof Field ) {
             Field f = (Field)o;
             JDIVariable v = (JDIVariable)f;
