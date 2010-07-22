@@ -52,6 +52,7 @@ public class ScriptClass extends AbstractObjectVariable implements ObjectVariabl
         for( int i = 0; i < fields.size(); i++ ) {
             com.sun.jdi.Field f = fields.get(  i );
             try {
+                if( !f.isStatic()) continue;
                 if( f.type() instanceof FXPrimitiveType ) {
                     result.add( new ScriptFieldVariable( getDebugger(), f, scriptClass, "FX" + f.name(), objectReference )); // NOI18N
                 } else {
@@ -62,7 +63,8 @@ public class ScriptClass extends AbstractObjectVariable implements ObjectVariabl
             }
         }
 
-        return result.subList( start, end ).toArray( new Field[0] );
+        return result.subList( start, end < result.size() ? end : result.size()).
+                toArray( new Field[0] );
     }
 
     @Override

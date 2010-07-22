@@ -67,7 +67,6 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 //import org.netbeans.modules.debugger.jpda.models.FieldVariable;
 import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
-import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 import org.netbeans.modules.javafx.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -162,7 +161,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                     if( seq != null ) {
                         for( int i = 0; i < seq.length(); i++ ) {
                                 Value iv = seq.getValue( i );
-
+                                
                                 if( iv instanceof FXPrimitiveValue ) {
                                     vc.add( new SequenceField( av.getDebugger(), 
                                            (FXPrimitiveValue) seq.getValue( i ), ov, i,

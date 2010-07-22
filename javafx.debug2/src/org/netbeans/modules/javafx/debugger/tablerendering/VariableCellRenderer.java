@@ -34,6 +34,7 @@ import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
 
 /**
  *
@@ -135,28 +136,45 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             boolean bound = false;
             boolean invalid = false;
             
-            JPDAClassType ref = f.getDeclaringClass();            
-            JPDAClassTypeImpl refi = (JPDAClassTypeImpl)ref;
-            ReferenceType referenceType = refi.getType();
-            FXField field = (FXField)referenceType.fieldByName( f.getName());
-            if( field != null ) {
-                bound = field.declaringType().isBound( field );
-                invalid = field.declaringType().isInvalid( field );
-            }
-            
-            buttonUpdate.setVisible( bound );
-
-            if( !invalid || evaluateImmediate ) {
-                Value oo = v.getJDIValue();
-                FXValue fxv = (FXValue)oo;
-                labelValue.setText( f.getValue());
-                if( fxv instanceof FXSequenceReference ) {
-                    FXSequenceReference sref = (FXSequenceReference)fxv;
-                    labelValue.setText( labelValue.getText() + "(length= " + sref.length() + ")" );
+//            JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
+//            if( thread == null ) {
+//                buttonUpdate.setVisible( false );
+//                labelValue.setText( "No current thread." );
+//                return this;
+//            }
+//            thread.accessLock.writeLock().lock();
+//            if( !thread.isSuspended()) {
+//                buttonUpdate.setVisible( false );
+//                labelValue.setText( "No current thread." );
+//                return this;
+//            }
+//            
+//            try {
+                JPDAClassType ref = f.getDeclaringClass();            
+                JPDAClassTypeImpl refi = (JPDAClassTypeImpl)ref;
+                ReferenceType referenceType = refi.getType();
+                FXField field = (FXField)referenceType.fieldByName( f.getName());
+                if( field != null ) {
+                    bound = field.declaringType().isBound( field );
+                    invalid = field.declaringType().isInvalid( field );
                 }
-            } else {
-                labelValue.setText( "Invalid value" );
-            }
+
+                buttonUpdate.setVisible( bound );
+
+                if( !invalid || evaluateImmediate ) {
+                    Value oo = v.getJDIValue();
+                    FXValue fxv = (FXValue)oo;
+                    labelValue.setText( f.getValue());
+                    if( fxv instanceof FXSequenceReference ) {
+                        FXSequenceReference sref = (FXSequenceReference)fxv;
+                        labelValue.setText( labelValue.getText() + "(length= " + sref.length() + ")" );
+                    }
+                } else {
+                    labelValue.setText( "Invalid value" );
+                }
+//            } finally {
+//                thread.accessLock.writeLock().unlock();
+//            }
         } else {
             labelValue.setText( value.toString());
         }
