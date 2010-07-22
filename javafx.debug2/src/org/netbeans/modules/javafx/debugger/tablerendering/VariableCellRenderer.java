@@ -35,6 +35,7 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -48,7 +49,9 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
     private String columnName;
 
     private final Set<CellEditorListener> cellEditorListeners = new HashSet<CellEditorListener>();
-
+    
+    private RequestProcessor rp = new RequestProcessor();
+    
     /** Creates new form VaribleCellrenderer */
     public VariableCellRenderer( Object o, String columnName ) {
         this.o = o;
@@ -109,18 +112,8 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdateActionPerformed
-        if( o instanceof Field ) {
-            Field f = (Field)o;
-            JDIVariable v = (JDIVariable)f;
-            Value oo = v.getJDIValue();
-            FXValue fxv = (FXValue)oo;
-            oo.virtualMachine().classesByName( fxv.type().name());
-
-            FXField fxf = (FXField)oo.virtualMachine().classesByName( f.getClassName()).get( 0 ).fieldByName( f.getName());
-            boolean bound = fxf.declaringType().isBound( fxf );
-            boolean invalid = fxf.declaringType().isInvalid( fxf );
-
-            labelValue.setText( f.getValue());
+        if( o instanceof Field ) {      
+            rp.post( new ValueEvaluator((Field)o ));
         }
     }//GEN-LAST:event_buttonUpdateActionPerformed
 
@@ -128,7 +121,38 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             boolean isSelected, boolean hasFocus, int row, int column )
     {
 //        System.out.println(" getTableCellRendererComponent " + value + ", " + row + ", " + column );
-        if( o instanceof Field ) {
+        if( o instanceof Field ) {     
+            rp.post( new ValueEvaluator((Field)o ));
+        } else {
+            labelValue.setText( value.toString());
+        }
+        if( isSelected ) {
+            setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));
+            setForeground( UIManager.getDefaults().getColor( "Table.selectionForeground" ));
+            labelValue.setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));
+            labelValue.setForeground( UIManager.getDefaults().getColor( "Table.selectionForeground" ));
+        } else {
+            setBackground( UIManager.getDefaults().getColor( "Table.focusCellBackground" ));
+            setForeground( UIManager.getDefaults().getColor( "Table.focusCellForeground" ));
+            labelValue.setBackground( UIManager.getDefaults().getColor( "Table.focusCellBackground" ));
+            labelValue.setForeground( UIManager.getDefaults().getColor( "Table.focusCellForeground" ));
+        }
+
+        return this;
+    }
+    
+    /**
+     * Task which evaluates value from JDI in separate thread from AWT
+     */
+    private class ValueEvaluator implements Runnable {
+        
+        Field field;
+        
+        ValueEvaluator( Field field ) {
+            this.field = field;
+        }
+        
+        public void run() {
             Field f = (Field)o;
             JDIVariable v = (JDIVariable)f;
             AbstractVariable av = (AbstractVariable)f;
@@ -136,20 +160,20 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             boolean bound = false;
             boolean invalid = false;
             
-//            JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
-//            if( thread == null ) {
-//                buttonUpdate.setVisible( false );
-//                labelValue.setText( "No current thread." );
-//                return this;
-//            }
-//            thread.accessLock.writeLock().lock();
-//            if( !thread.isSuspended()) {
-//                buttonUpdate.setVisible( false );
-//                labelValue.setText( "No current thread." );
-//                return this;
-//            }
-//            
-//            try {
+            JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
+            if( thread == null ) {
+                buttonUpdate.setVisible( false );
+                labelValue.setText( "No current thread." );
+                return;
+            }
+            thread.accessLock.writeLock().lock();
+            if( !thread.isSuspended()) {
+                buttonUpdate.setVisible( false );
+                labelValue.setText( "No current thread." );
+                return;
+            }
+            
+            try {
                 JPDAClassType ref = f.getDeclaringClass();            
                 JPDAClassTypeImpl refi = (JPDAClassTypeImpl)ref;
                 ReferenceType referenceType = refi.getType();
@@ -172,25 +196,11 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
                 } else {
                     labelValue.setText( "Invalid value" );
                 }
-//            } finally {
-//                thread.accessLock.writeLock().unlock();
-//            }
-        } else {
-            labelValue.setText( value.toString());
+            } finally {
+                thread.accessLock.writeLock().unlock();
+            }            
         }
-        if( isSelected ) {
-            setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));
-            setForeground( UIManager.getDefaults().getColor( "Table.selectionForeground" ));
-            labelValue.setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));
-            labelValue.setForeground( UIManager.getDefaults().getColor( "Table.selectionForeground" ));
-        } else {
-            setBackground( UIManager.getDefaults().getColor( "Table.focusCellBackground" ));
-            setForeground( UIManager.getDefaults().getColor( "Table.focusCellForeground" ));
-            labelValue.setBackground( UIManager.getDefaults().getColor( "Table.focusCellBackground" ));
-            labelValue.setForeground( UIManager.getDefaults().getColor( "Table.focusCellForeground" ));
-        }
-
-        return this;
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
