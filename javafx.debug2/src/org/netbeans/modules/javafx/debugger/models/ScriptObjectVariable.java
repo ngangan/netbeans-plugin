@@ -6,19 +6,18 @@
 package org.netbeans.modules.javafx.debugger.models;
 
 import com.sun.javafx.jdi.FXClassType;
-import com.sun.javafx.jdi.FXField;
 import com.sun.javafx.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
-import com.sun.jdi.ObjectReference;
 import com.sun.jdi.VMDisconnectedException;
 import com.sun.jdi.Value;
 import java.util.logging.Logger;
+import javax.security.auth.RefreshFailedException;
+import javax.security.auth.Refreshable;
 import org.netbeans.api.debugger.jpda.InvalidExpressionException;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
-import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.jdi.FieldWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.InternalExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ObjectCollectedExceptionWrapper;
@@ -27,19 +26,20 @@ import org.netbeans.modules.debugger.jpda.jdi.TypeComponentWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.netbeans.modules.javafx.debugger.utils.Utils;
 
 /**
  *
  * @author Michal Skvor
  */
-public class ScriptObjectVariable extends AbstractObjectVariable implements org.netbeans.api.debugger.jpda.Field {
+public class ScriptObjectVariable extends AbstractObjectVariable implements org.netbeans.api.debugger.jpda.Field, Refreshable {
 
     private static final Logger logger = Logger.getLogger( "org.netbeans.modules.debugger.jpda.getValue" ); // NOI18N
     
     private FXClassType parentClass;
     private Field field;
     
-    private boolean valueSet = true;
+    private boolean valueSet = false;
     private final Object valueLock = new Object();
     private boolean valueRetrieved = false;
     private FXObjectReference value;
@@ -94,10 +94,10 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     
     @Override
     protected Value getInnerValue() {
-        synchronized (valueLock) {
-            if (!valueRetrieved) {
+//        synchronized (valueLock) {
+            if( !valueRetrieved ) {
                 try {
-                    Value v = parentClass.getValue( field );
+                    Value v = Utils.getClassValue( getDebugger(), parentClass, field );
                     this.value = (FXObjectReference) v;
                     this.valueRetrieved = true;
                 } catch( RuntimeException e ) {
@@ -105,16 +105,16 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
                 }
             }
             return value;
-        }
+//        }
     }
 
     @Override
     public Value getJDIValue() {
         try {
             if( field.isStatic()) {
-                return parentClass.getValue( field );
+                return Utils.getClassValue( getDebugger(), parentClass, field );
             } else {
-                return value.getValue( field );
+                return Utils.getObjectValue( getDebugger(), value, field );
             }
         } catch( VMDisconnectedException ex ) {
             // Do nothing
@@ -129,5 +129,19 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
     @Override
     public void setValue(String string) throws InvalidExpressionException {
         // Do nothing
-    }    
+    }
+
+    public boolean isCurrent() {
+//        return valueSet || valueRetrieved;
+        return valueRetrieved;
+    }
+
+    public void refresh() throws RefreshFailedException {
+//        if( valueSet ) return ;
+        synchronized( valueLock ) {
+            if( !valueRetrieved ) {
+                getInnerValue();
+            }
+        }
+    }
 }

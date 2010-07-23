@@ -23,6 +23,7 @@ import org.netbeans.modules.debugger.jpda.jdi.TypeComponentWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.netbeans.modules.javafx.debugger.utils.Utils;
 
 /**
  *
@@ -85,16 +86,17 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
     @Override
     public String getValue() {
         if( field.isStatic()) {
-            return parentClass.getValue( field ).toString();
+            return Utils.getClassValue( getDebugger(), parentClass, field ).toString();
         }
-        return value.getValue( field ).toString();
+        return Utils.getObjectValue( getDebugger(), value, field ).toString();
     }
 
     @Override
     public Value getJDIValue() {
         try {
             if( field.isStatic()) {
-                return parentClass.getValue( field );
+                return Utils.getClassValue( getDebugger(), parentClass, field );
+//                return parentClass.getValue( field );
             }
         } catch( VMDisconnectedException ex ) {
             // Do nothing
@@ -103,7 +105,7 @@ public class ScriptFieldVariable extends AbstractVariable implements org.netbean
         } catch( ObjectCollectedException ex ) {
             
         }
-        return value.getValue( field );
+        return Utils.getObjectValue( getDebugger(), value, field );
     }
 
     @Override

@@ -32,7 +32,10 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TableRendererModel.class } )
 public class JavaFXTableRendererModel implements TableRendererModel {
 
-    private WeakHashMap<Object, VariableCellRenderer> valueRenderers = new WeakHashMap<Object,VariableCellRenderer>();
+    private WeakHashMap<Object, VariableCellRenderer> valueRenderers = 
+            new WeakHashMap<Object,VariableCellRenderer>();
+    private WeakHashMap<Object, VariableTypeRenderer> typeRenderers = 
+            new WeakHashMap<Object, VariableTypeRenderer>();
 
     public JavaFXTableRendererModel() {}
 
@@ -96,9 +99,15 @@ public class JavaFXTableRendererModel implements TableRendererModel {
     }
 
     public TableCellRenderer getCellRenderer( Object o, String columnName ) throws UnknownTypeException {
-        if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnName ))
-            return new VariableTypeRenderer( o );
-        else if( Constants.LOCALS_VALUE_COLUMN_ID.equals( columnName )) {
+        if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnName )) {
+            VariableTypeRenderer renderer;
+            if( !typeRenderers.containsKey( o )) {
+                renderer = typeRenderers.put( o, new VariableTypeRenderer( o ));
+            } else {
+                renderer = typeRenderers.get( o );               
+            }
+            return renderer;
+        } else if (Constants.LOCALS_VALUE_COLUMN_ID.equals(columnName)) {
             if( !valueRenderers.containsKey( o )) {
                 valueRenderers.put( o, new VariableCellRenderer( o, columnName ));
             }

@@ -67,6 +67,7 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 //import org.netbeans.modules.debugger.jpda.models.FieldVariable;
 import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
+import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
 import org.netbeans.modules.javafx.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -158,20 +159,34 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
                     AbstractVariable av = (AbstractVariable)ov;
                     try {                    
-                    if( seq != null ) {
-                        for( int i = 0; i < seq.length(); i++ ) {
-                                Value iv = seq.getValue( i );
-                                
-                                if( iv instanceof FXPrimitiveValue ) {
-                                    vc.add( new SequenceField( av.getDebugger(), 
-                                           (FXPrimitiveValue) seq.getValue( i ), ov, i,
-                                           v.type().toString()));
-                                } else if( iv instanceof FXObjectReference ) {
-                                    String t = iv.type().name();
-                                    vc.add( new SequenceObject( av.getDebugger(),
-                                            (FXObjectReference) iv, t,
-                                             ov, i, 1000, v.toString()));
+                        if( seq != null ) {
+                            for( int i = 0; i < seq.length(); i++ ) {
+                                JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
+                                if( thread == null ) {
+                                    return null;
                                 }
+                                thread.accessLock.writeLock().lock();
+
+                                try {            
+                                    if( !thread.isSuspended()) {
+                                        return null;
+                                    }        
+                                    Value iv = seq.getValue( i );
+
+                                    if( iv instanceof FXPrimitiveValue ) {
+                                        vc.add( new SequenceField( av.getDebugger(), 
+                                               (FXPrimitiveValue) seq.getValue( i ), ov, i,
+                                               v.type().toString()));
+                                    } else if( iv instanceof FXObjectReference ) {
+                                        String t = iv.type().name();
+                                        vc.add( new SequenceObject( av.getDebugger(),
+                                                (FXObjectReference) iv, t,
+                                                 ov, i, 1000, v.toString()));
+                                    }
+                                } finally {
+                                    thread.accessLock.writeLock().unlock();
+                                }          
+
                             }
                         }
                     } catch( VMDisconnectedException ex ) {                                

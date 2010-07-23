@@ -19,7 +19,6 @@ import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 
 public final class SequenceObject extends AbstractObjectVariable implements Field {
 
-    private final FXSequenceReference array;
     private final ObjectVariable parent;
     private int index;
     private int maxIndexLog;
@@ -31,7 +30,6 @@ public final class SequenceObject extends AbstractObjectVariable implements Fiel
         //            this.maxIndexLog = ArrayFieldVariable.log10( maxIndex );
         this.declaredType = declaredType;
         this.parent = array;
-        this.array = (FXSequenceReference) ((JDIVariable) array).getJDIValue();
     }
 
     public String getName() {
@@ -45,7 +43,8 @@ public final class SequenceObject extends AbstractObjectVariable implements Fiel
 
     public JPDAClassType getDeclaringClass() {
         try {
-            return new JPDAClassTypeImpl(getDebugger(), (ReferenceType) ValueWrapper.type(array));
+            FXSequenceReference a = (FXSequenceReference) ((JDIVariable) parent).getJDIValue();
+            return new JPDAClassTypeImpl(getDebugger(), (ReferenceType) ValueWrapper.type(a));
         } catch (InternalExceptionWrapper ex) {
             throw ex.getCause();
         } catch (VMDisconnectedExceptionWrapper ex) {

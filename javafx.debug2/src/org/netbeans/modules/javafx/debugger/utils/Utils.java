@@ -45,34 +45,25 @@
 
 package org.netbeans.modules.javafx.debugger.utils;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.tools.javafx.api.JavafxcScope;
-import java.io.IOException;
+import com.sun.javafx.jdi.FXClassType;
+import com.sun.javafx.jdi.FXObjectReference;
+import com.sun.jdi.Field;
+import com.sun.jdi.Value;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.lang.model.element.TypeElement;
-import javax.swing.text.StyledDocument;
 import org.netbeans.api.java.project.JavaProjectConstants;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
-import org.netbeans.modules.javafx.debugger.Context;
-import org.openide.ErrorManager;
-import org.openide.cookies.EditorCookie;
+import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
+import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
-import org.openide.text.NbDocument;
 
 /**
  *
@@ -146,5 +137,43 @@ public class Utils {
 
         clsName = clsName.substring( 0, clsName.length() - 3 ).replace( '/', '.' );
         return clsName;
+    }
+    
+    public static Value getClassValue( JPDADebuggerImpl debug, FXClassType classType, Field field ) {
+        JPDAThreadImpl thread = (JPDAThreadImpl)debug.getCurrentThread();  
+        if( thread == null ) {
+            return null;
+        }
+        thread.accessLock.writeLock().lock();
+
+        Value value = null;
+        try {            
+            if( !thread.isSuspended()) {
+                return null;
+            }        
+            value = classType.getValue( field );
+        } finally {
+            thread.accessLock.writeLock().unlock();
+        }          
+        return value;
+}
+    
+    public static Value getObjectValue( JPDADebuggerImpl debug, FXObjectReference classType, Field field ) {
+        JPDAThreadImpl thread = (JPDAThreadImpl)debug.getCurrentThread();  
+        if( thread == null ) {
+            return null;
+        }
+        thread.accessLock.writeLock().lock();
+
+        Value value = null;
+        try {            
+            if( !thread.isSuspended()) {
+                return null;
+            }        
+           value = classType.getValue( field );
+        } finally {
+            thread.accessLock.writeLock().unlock();
+        }          
+        return value;
     }
 }

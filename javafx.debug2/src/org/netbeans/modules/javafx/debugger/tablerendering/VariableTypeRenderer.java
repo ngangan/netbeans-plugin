@@ -11,22 +11,20 @@
 
 package org.netbeans.modules.javafx.debugger.tablerendering;
 
-import com.sun.javafx.jdi.FXBooleanType;
-import com.sun.javafx.jdi.FXFloatType;
-import com.sun.javafx.jdi.FXIntegerType;
-import com.sun.javafx.jdi.FXPrimitiveValue;
 import com.sun.javafx.jdi.FXSequenceReference;
 import com.sun.javafx.jdi.FXSequenceReference.Types;
 import com.sun.javafx.jdi.FXValue;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;
 import java.awt.Component;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import javax.swing.JTable;
-import javax.swing.UIManager;
 import javax.swing.table.TableCellRenderer;
 import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
-import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
+import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
+import org.openide.util.RequestProcessor;
 
 /**
  *
@@ -46,7 +44,13 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
         types.put( "long", "Long" );
         types.put( "byte", "Byte" );
     }
-
+    
+    private RequestProcessor rp = new RequestProcessor();
+    private boolean repaintCall = false;
+    private int row, column;
+    private JTable table;
+    private TypeEvaluator typeEvaluator = new TypeEvaluator();
+    
     /** Creates new form VariableTypeRenderer */
     public VariableTypeRenderer( Object o ) {
         this.o = o;
@@ -85,52 +89,96 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
     public Component getTableCellRendererComponent( JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column)
     {
-        labelValue.setText( o.toString());
+        this.table = table;
+        this.row = row;
+        this.column = column;
+        
+//        labelValue.setText( o.toString());
         if( o instanceof Field ) {
+            if( !repaintCall ) {
+                repaintCall = true;
+                rp.post( typeEvaluator );
+            } else {
+                repaintCall = false;
+            }
+            
+        }
+        if( isSelected ) {
+            setBackground( table.getSelectionBackground());
+            setForeground( table.getSelectionForeground());
+            labelValue.setBackground( table.getSelectionBackground());
+            labelValue.setForeground( table.getSelectionForeground());
+        } else {
+            setBackground( table.getBackground());
+            setForeground( table.getForeground());
+            labelValue.setBackground( table.getBackground());
+            labelValue.setForeground( table.getForeground());
+        }
+
+        return this;
+    }
+    
+    private class TypeEvaluator implements Runnable {
+
+        private void update() {
+            repaintCall = true;
+            Rectangle r = table.getCellRect( row, column, true );                   
+            table.repaint( r );
+        }
+        
+        public void run() {
             Field f = (Field)o;
             JDIVariable v = (JDIVariable)f;
+            AbstractVariable av = (AbstractVariable)f;
             
             String fieldTypeName = f.getDeclaredType().replace( '$', '.' );
                                     
             if( types.containsKey( fieldTypeName )) {
                 fieldTypeName = types.get( fieldTypeName );
             } else if( "com.sun.javafx.runtime.sequence.Sequence".equals( fieldTypeName )) {
-                Value oo = v.getJDIValue();
-                FXValue fxv = (FXValue)oo;
-                if( fxv instanceof FXSequenceReference ) {
-                    FXSequenceReference seq = (FXSequenceReference)fxv;
-                    Types seqType = seq.getElementType();
-                    if( Types.INT.equals( seqType )) {
-                        fieldTypeName = "Integer[]"; // NOI18N
-                    } else if( Types.OTHER.equals( seqType )) {
-                        fieldTypeName = "String[]"; // NOI18N
-                    } else {
-                        if( seqType != null ) {
-                            String typeName = seqType.name().toLowerCase();
-                            fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
-                                    typeName.substring( 1 ) + "[]"; // NOI18N
+                
+                JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
+                if( thread == null ) {
+                    labelValue.setText( "No current thread." );
+                    update();
+                    return;
+                }
+                thread.accessLock.writeLock().lock();
+
+                try {
+                    if( !thread.isSuspended()) {
+                        labelValue.setText( "No current thread." );
+                        update();
+                        return;
+                    }                
+
+                    Value oo = v.getJDIValue();
+                    FXValue fxv = (FXValue)oo;
+                    if( fxv instanceof FXSequenceReference ) {
+                        FXSequenceReference seq = (FXSequenceReference)fxv;
+                        Types seqType = seq.getElementType();
+                        if( Types.INT.equals( seqType )) {
+                            fieldTypeName = "Integer[]"; // NOI18N
+                        } else if( Types.OTHER.equals( seqType )) {
+                            fieldTypeName = "String[]"; // NOI18N
                         } else {
-                            // FIXME: Why null value is here?                       
-                            fieldTypeName = "null"; // 
+                            if( seqType != null ) {
+                                String typeName = seqType.name().toLowerCase();
+                                fieldTypeName = typeName.substring( 0, 1 ).toUpperCase() +
+                                        typeName.substring( 1 ) + "[]"; // NOI18N
+                            } else {
+                                // FIXME: Why null value is here?                       
+                                fieldTypeName = "null"; // 
+                            }
                         }
                     }
-                }
-            }
-            labelValue.setText( fieldTypeName );            
+                } finally {
+                    thread.accessLock.writeLock().unlock();
+                }    
+            } 
+            labelValue.setText( fieldTypeName );                    
+            update();
         }
-        if( isSelected ) {
-            setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));
-            setForeground( UIManager.getDefaults().getColor( "Table.selectionForeground" ));
-            labelValue.setBackground( UIManager.getDefaults().getColor( "Table.selectionBackground" ));
-            labelValue.setForeground( UIManager.getDefaults().getColor( "Table.selectionForeground" ));
-        } else {
-            setBackground( UIManager.getDefaults().getColor( "Table.focusCellBackground" ));
-            setForeground( UIManager.getDefaults().getColor( "Table.focusCellForeground" ));
-            labelValue.setBackground( UIManager.getDefaults().getColor( "Table.focusCellBackground" ));
-            labelValue.setForeground( UIManager.getDefaults().getColor( "Table.focusCellForeground" ));
-        }
-
-        return this;
     }
 
 }

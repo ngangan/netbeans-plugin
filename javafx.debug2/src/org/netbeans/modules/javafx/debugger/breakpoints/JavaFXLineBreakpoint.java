@@ -51,8 +51,6 @@ import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDABreakpoint;
 import org.netbeans.api.debugger.jpda.LineBreakpoint;
-import org.netbeans.api.debugger.jpda.event.JPDABreakpointEvent;
-import org.netbeans.api.debugger.jpda.event.JPDABreakpointListener;
 import org.netbeans.modules.javafx.debugger.utils.Utils;
 
 /**
@@ -106,9 +104,6 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
         javalb.addPropertyChangeListener( this );
 
         String context = Utils.getContextPath( url );
-
-        // FIXME: determine 'real' context path for web app based on used application server
-        // See issues 146793, 161026, 162286 and 162715 (new API request)
 
 //        String condition = "request.getContextPath().equals(\"" + context + "\")"; // NOI18N
 //        javalb.setCondition(condition);
