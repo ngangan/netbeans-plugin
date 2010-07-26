@@ -45,7 +45,7 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
         types.put( "byte", "Byte" );
     }
     
-    private RequestProcessor rp = new RequestProcessor();
+    private RequestProcessor rp = new RequestProcessor( "", 5 );
     private boolean repaintCall = false;
     private int row, column;
     private JTable table;
