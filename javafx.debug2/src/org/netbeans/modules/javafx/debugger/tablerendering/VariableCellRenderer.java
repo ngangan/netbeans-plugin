@@ -50,7 +50,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
     private final Set<CellEditorListener> cellEditorListeners = new HashSet<CellEditorListener>();
     
-    private RequestProcessor rp = new RequestProcessor();
+    private RequestProcessor rp = new RequestProcessor( "", 5 );
     private JTable table;
     private int row, column;
     private boolean repaintCall = false;
