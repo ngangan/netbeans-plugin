@@ -150,7 +150,7 @@ public class JFXReformatTask implements ReformatTask {
             EditorCookie ec = (EditorCookie) dObj.getCookie(EditorCookie.class);
             Document doc = ec.openDocument();
             doc.putProperty(Language.class, JFXTokenId.language());
-            doc.putProperty("mimeType", FXSourceUtils.MIME_TYPE); // NOI18N
+            doc.putProperty("mimeType", FXSourceUtils.MIME_TYPE_FX); // NOI18N
 
             JavaFXSource src = JavaFXSource.forDocument(doc);
             src.runUserActionTask(new Task<CompilationController>() {
@@ -1029,6 +1029,7 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
+        // magic from Dusan
         private void processWSBeforeRB() {
             Diff diff = diffs.isEmpty() ? null : diffs.getFirst();
             if (diff != null && diff.end == tokens.offset()) {
@@ -1046,13 +1047,30 @@ public class JFXReformatTask implements ReformatTask {
                 }
             } else if (tokens.movePrevious()) {
                 if (tokens.token().id() == JFXTokenId.WS) {
-                    String text = tokens.token().text().toString();
+                    StringBuilder t1 = new StringBuilder();
+                    do {
+                        t1.append(tokens.token().text().toString());
+                    } while (tokens.moveNext() && tokens.token().id() == JFXTokenId.WS);
+
+                    String text = t1.toString();
+
+//                    String text = tokens.token().text().toString();
                     int idx = text.lastIndexOf(NEWLINE);
                     if (idx >= 0) {
                         text = text.substring(idx + 1);
                         String ind = getIndent();
                         if (!ind.equals(text)) {
                             addDiff(new Diff(tokens.offset() + idx + 1, tokens.offset() + tokens.token().length(), ind));
+                        }
+                    } else if (tokens.movePrevious()) {
+                        if (tokens.token().id() == JFXTokenId.LINE_COMMENT) {
+                            tokens.moveNext();
+                            String ind = getIndent();
+                            if (!ind.equals(text)) {
+                                addDiff(new Diff(tokens.offset(), tokens.offset() + tokens.token().length(), ind));
+                            }
+                        } else {
+                            tokens.moveNext();
                         }
                     }
                 }
@@ -1527,7 +1545,7 @@ public class JFXReformatTask implements ReformatTask {
                     } else {
                         blankLines();
                     }
-//                    processWSBeforeRB();
+                    processWSBeforeRB();
                     accept(JFXTokenId.RBRACE);
                     indent = old;
                 }

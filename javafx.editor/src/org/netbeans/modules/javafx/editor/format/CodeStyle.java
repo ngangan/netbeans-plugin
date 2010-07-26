@@ -100,7 +100,7 @@ public final class CodeStyle {
      * @since 0.39
      */
     public synchronized static CodeStyle getDefault(FileObject file) {
-        Preferences prefs = CodeStylePreferences.get(file, FXSourceUtils.MIME_TYPE).getPreferences();
+        Preferences prefs = CodeStylePreferences.get(file, FXSourceUtils.MIME_TYPE_FX).getPreferences();
         return FmtOptions.codeStyleProducer.create(prefs);
     }
 
@@ -116,7 +116,7 @@ public final class CodeStyle {
      * @since 0.39
      */
     public synchronized static CodeStyle getDefault(Document doc) {
-        Preferences prefs = CodeStylePreferences.get(doc, FXSourceUtils.MIME_TYPE).getPreferences();
+        Preferences prefs = CodeStylePreferences.get(doc, FXSourceUtils.MIME_TYPE_FX).getPreferences();
         return FmtOptions.codeStyleProducer.create(prefs);
     }
     

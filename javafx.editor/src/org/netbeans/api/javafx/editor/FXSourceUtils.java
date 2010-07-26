@@ -62,7 +62,17 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.util.Elements;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import org.netbeans.api.editor.mimelookup.MimeLookup;
+import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.lexer.InputAttributes;
+import org.netbeans.api.lexer.Language;
+import org.netbeans.api.lexer.LanguagePath;
+import org.netbeans.api.lexer.TokenHierarchy;
+import org.netbeans.api.lexer.TokenSequence;
+import org.netbeans.modules.editor.NbEditorUtilities;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
@@ -73,8 +83,8 @@ import org.openide.util.NbBundle;
  */
 public final class FXSourceUtils {
 
-    /** Mime-type of FX sources. */
-    public static final String MIME_TYPE = "text/x-fx";
+    public static final String MIME_TYPE_FX = "text/x-fx";  // NOI18N
+    public static final String MIME_TYPE_DIALOG_BINDING = "text/x-dialog-binding"; // NOI18N
 
     private static final char[] CODE_COMPL_SUBST_BREAKERS = 
         {';', '.', ',', '+', '-', '/', '%', '^', '|', '&', // NOI18N
@@ -85,7 +95,7 @@ public final class FXSourceUtils {
     private static final String TYPE_COLOR = "#707070"; // NOI18N
     private static final String INHERITED_COLOR = "#7D694A"; // NOI18N
 
-    private static Logger log = Logger.getLogger(FXSourceUtils.class.getName());
+    private static final Logger log = Logger.getLogger(FXSourceUtils.class.getName());
 
     private FXSourceUtils() {
     }
@@ -362,7 +372,7 @@ public final class FXSourceUtils {
                         sb.append(boundsToString(bounds, types));
                     }
                 } catch (NullPointerException npe) {
-                    npe.printStackTrace(); // TODO
+                    log.log(Level.SEVERE, "Exception: ", npe); // NOI18N
                 }
                 if (it.hasNext()) {
                     sb.append(", "); // NOI18N
@@ -686,6 +696,80 @@ public final class FXSourceUtils {
             }
         }
         return modifiers;
+    }
+
+    public static boolean isJavaFXContext(final JTextComponent component, final int offset) {
+        return isJavaFXContext(component.getDocument(), offset);
+    }
+
+    @SuppressWarnings("fallthrough")
+    public static boolean isJavaFXContext(final Document doc, final int offset) {
+        if (doc instanceof AbstractDocument) {
+            ((AbstractDocument) doc).readLock();
+        }
+        try {
+            if (doc.getLength() == 0 && MIME_TYPE_DIALOG_BINDING.equals(doc.getProperty("mimeType"))) { // NOI18N
+                InputAttributes attributes = (InputAttributes) doc.getProperty(InputAttributes.class);
+                LanguagePath path = LanguagePath.get(MimeLookup.getLookup(MIME_TYPE_DIALOG_BINDING).lookup(Language.class));
+                Document d = (Document) attributes.getValue(path, "dialogBinding.document"); // NOI18N
+                if (d != null) {
+                    return MIME_TYPE_FX.equals(NbEditorUtilities.getMimeType(d));
+                }
+                FileObject fo = (FileObject) attributes.getValue(path, "dialogBinding.fileObject"); // NOI18N
+                return MIME_TYPE_FX.equals(fo.getMIMEType());
+            }
+
+            TokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
+            if (ts == null) {
+                return false;
+            }
+            if (!ts.moveNext() && !ts.movePrevious()) {
+                return true;
+            }
+            if (offset == ts.offset()) {
+                return true;
+            }
+            switch (ts.token().id()) {
+                case FLOATING_POINT_LITERAL:
+                    if (ts.token().text().charAt(0) == '.') { // NOI18N
+                        break;
+                    }
+                case DOC_COMMENT:
+                case STRING_LITERAL:
+                case LINE_COMMENT:
+                case COMMENT:
+                    return false;
+            }
+            return true;
+        } finally {
+            if (doc instanceof AbstractDocument) {
+                ((AbstractDocument) doc).readUnlock();
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
+        if (hierarchy != null) {
+            TokenSequence<?> ts_ = hierarchy.tokenSequence();
+            while (ts_ != null && ts_.isValid() && (offset == 0 || ts_.moveNext())) {
+                ts_.move(offset);
+                if (ts_.language() == JFXTokenId.language()) {
+                    return (TokenSequence<JFXTokenId>) ts_;
+                }
+                if (!ts_.moveNext() && !ts_.movePrevious()) {
+                    if (log.isLoggable(Level.FINE)) {
+                        log.log(Level.FINE, "getJavaFXTokenSequence returning null (1) for offset {0}", offset); // NOI18N
+                    }
+                    return null;
+                }
+                ts_ = ts_.embedded();
+            }
+        }
+        if (log.isLoggable(Level.FINE)) {
+            log.log(Level.FINE, "getJavaFXTokenSequence returning null (2) for offset {0}", offset); // NOI18N
+        }
+        return null;
     }
 
     private static CharSequence getFragment(Element e) {

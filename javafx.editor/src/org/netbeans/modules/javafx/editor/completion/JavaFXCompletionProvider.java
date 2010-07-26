@@ -49,15 +49,11 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import javax.swing.text.AbstractDocument;
-import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import com.sun.javafx.api.tree.Tree;
 import org.netbeans.api.editor.EditorRegistry;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.netbeans.api.javafx.source.*;
-import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.completion.*;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 
@@ -75,7 +71,7 @@ public class JavaFXCompletionProvider implements CompletionProvider {
     
     public int getAutoQueryTypes(JTextComponent component, String typedText) {
         if (".".equals(typedText) || (autoMode && JavaFXCompletionQuery.isJavaIdentifierPart(typedText))) { // NOI18N
-            if (isJavaFXContext(component, component.getSelectionStart() - 1))
+            if (FXSourceUtils.isJavaFXContext(component, component.getSelectionStart() - 1))
                 return COMPLETION_QUERY_TYPE;
         }
         return 0;
@@ -102,61 +98,61 @@ public class JavaFXCompletionProvider implements CompletionProvider {
         return null;        
     }        
 
-    @SuppressWarnings("fallthrough")
-    public static boolean isJavaFXContext(final JTextComponent component, final int offset) {
-        Document doc = component.getDocument();
-        if (doc instanceof AbstractDocument) {
-            ((AbstractDocument)doc).readLock();
-        }
-        try {
-            TokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
-            if (ts == null) {
-                return false;
-            }
-            if (!ts.moveNext() && !ts.movePrevious()) {
-                return true;
-            }
-            if (offset == ts.offset()) {
-                return true;
-            }
-            switch (ts.token().id()) {
-                case FLOATING_POINT_LITERAL:
-                    if (ts.token().text().charAt(0) == '.') { // NOI18N
-                        break;
-                    }
-                case DOC_COMMENT:
-                case STRING_LITERAL:
-                case LINE_COMMENT:
-                case COMMENT:
-                    return false;
-            }
-            return true;
-        } finally {
-            if (doc instanceof AbstractDocument) {
-                ((AbstractDocument) doc).readUnlock();
-            }
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
-        if (hierarchy != null) {
-            TokenSequence<?> ts_ = hierarchy.tokenSequence();
-            while(ts_ != null && ts_.isValid() && (offset == 0 || ts_.moveNext())) {
-                ts_.move(offset);
-                if (ts_.language() == JFXTokenId.language()) {
-                    return (TokenSequence<JFXTokenId>)ts_;
-                }
-                if (!ts_.moveNext() && !ts_.movePrevious()) {
-                    if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset); // NOI18N
-                    return null;
-                }
-                ts_ = ts_.embedded();
-            }
-        }
-        if (LOGGABLE) log("getJavaFXTokenSequence returning null (2) for offset " + offset); // NOI18N
-        return null;
-    }
+//    @SuppressWarnings("fallthrough")
+//    public static boolean isJavaFXContext(final JTextComponent component, final int offset) {
+//        Document doc = component.getDocument();
+//        if (doc instanceof AbstractDocument) {
+//            ((AbstractDocument)doc).readLock();
+//        }
+//        try {
+//            TokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
+//            if (ts == null) {
+//                return false;
+//            }
+//            if (!ts.moveNext() && !ts.movePrevious()) {
+//                return true;
+//            }
+//            if (offset == ts.offset()) {
+//                return true;
+//            }
+//            switch (ts.token().id()) {
+//                case FLOATING_POINT_LITERAL:
+//                    if (ts.token().text().charAt(0) == '.') { // NOI18N
+//                        break;
+//                    }
+//                case DOC_COMMENT:
+//                case STRING_LITERAL:
+//                case LINE_COMMENT:
+//                case COMMENT:
+//                    return false;
+//            }
+//            return true;
+//        } finally {
+//            if (doc instanceof AbstractDocument) {
+//                ((AbstractDocument) doc).readUnlock();
+//            }
+//        }
+//    }
+//
+//    @SuppressWarnings("unchecked")
+//    public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
+//        if (hierarchy != null) {
+//            TokenSequence<?> ts_ = hierarchy.tokenSequence();
+//            while(ts_ != null && ts_.isValid() && (offset == 0 || ts_.moveNext())) {
+//                ts_.move(offset);
+//                if (ts_.language() == JFXTokenId.language()) {
+//                    return (TokenSequence<JFXTokenId>)ts_;
+//                }
+//                if (!ts_.moveNext() && !ts_.movePrevious()) {
+//                    if (LOGGABLE) log("getJavaFXTokenSequence returning null (1) for offset " + offset); // NOI18N
+//                    return null;
+//                }
+//                ts_ = ts_.embedded();
+//            }
+//        }
+//        if (LOGGABLE) log("getJavaFXTokenSequence returning null (2) for offset " + offset); // NOI18N
+//        return null;
+//    }
     
     public CompletionTask createTask(int type, JTextComponent component) {
         if ((type & COMPLETION_QUERY_TYPE) != 0 || type == TOOLTIP_QUERY_TYPE || type == DOCUMENTATION_QUERY_TYPE)

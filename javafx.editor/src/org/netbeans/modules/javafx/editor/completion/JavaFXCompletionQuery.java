@@ -73,6 +73,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 
 public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements Task<CompilationController> {
 
@@ -214,7 +215,7 @@ public final class JavaFXCompletionQuery extends AsyncCompletionQuery implements
     protected void query(CompletionResultSet resultSet, Document doc, int caretOffset) {
         try {
             this.caretOffset = caretOffset;
-            if (queryType == JavaFXCompletionProvider.TOOLTIP_QUERY_TYPE || JavaFXCompletionProvider.isJavaFXContext(component, caretOffset)) {
+            if (queryType == JavaFXCompletionProvider.TOOLTIP_QUERY_TYPE || FXSourceUtils.isJavaFXContext(component, caretOffset)) {
                 results = null;
                 documentation = null;
                 toolTip = null;
