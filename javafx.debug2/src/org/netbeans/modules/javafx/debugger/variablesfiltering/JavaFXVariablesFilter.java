@@ -101,7 +101,7 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 //        System.out.println(" - " + parent );
         if( parent.equals( original.getRoot())) {
             // Retrieve children
-            int parentChildrenCount = original.getChildrenCount( parent );
+            int parentChildrenCount = original.getChildrenCount( parent );            
             Object[] children = original.getChildren( parent, 0, parentChildrenCount );
             parentChildrenCount = children.length;
             List vc = new ArrayList();
@@ -163,13 +163,13 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
                             for( int i = 0; i < seq.length(); i++ ) {
                                 JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
                                 if( thread == null ) {
-                                    return null;
+                                    return new Object[0];
                                 }
                                 thread.accessLock.writeLock().lock();
 
                                 try {            
                                     if( !thread.isSuspended()) {
-                                        return null;
+                                        return new Object[0];
                                     }        
                                     Value iv = seq.getValue( i );
 
