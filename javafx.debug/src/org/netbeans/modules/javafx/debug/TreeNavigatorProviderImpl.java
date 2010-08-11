@@ -84,6 +84,8 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
     private JComponent panel;
     private final ExplorerManager manager = new ExplorerManager();
     private BeanTreeView view;
+
+    private final RequestProcessor taskQueue = new RequestProcessor(TreeNavigatorProviderImpl.class.getName(), 1);
     
     /**
      * Default constructor for layer instance.
@@ -95,7 +97,7 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
                     setHighlights(TreeNavigatorJavaFXSourceFactory.getInstance().getFile(), manager);
                 }
                 if (ExplorerManager.PROP_ROOT_CONTEXT.equals(evt.getPropertyName())) {
-                    RequestProcessor.getDefault().post(new Runnable() {
+                    taskQueue.post(new Runnable() {
                         public void run() {
                            SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {

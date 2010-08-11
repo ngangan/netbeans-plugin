@@ -82,6 +82,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 
 /**
  *
@@ -266,7 +267,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             if (i > 0)
                 toAdd = toAdd.substring(i);
-            TokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+            TokenSequence<JFXTokenId> sequence = FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
             if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                 text.append(toAdd);
                 toAdd = null;
@@ -429,7 +430,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             if (semiPos > -2)
                 toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
             if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
-                TokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+                TokenSequence<JFXTokenId> sequence = FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text.append(toAdd);
                     toAdd = null;
@@ -1472,7 +1473,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 final int semiPos = add.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
                 if (semiPos > -2)
                     add = add.length() > 1 ? add.substring(0, add.length() - 1) : null;
-                TokenSequence<JFXTokenId> sequence = JavaFXCompletionProvider.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+                TokenSequence<JFXTokenId> sequence = FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text += add;
                     add = null;

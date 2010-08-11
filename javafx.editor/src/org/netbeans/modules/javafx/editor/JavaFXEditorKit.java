@@ -60,6 +60,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
 import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
 import org.netbeans.modules.javafx.editor.rename.InstantRenameAction;
 import org.openide.util.ImageUtilities;

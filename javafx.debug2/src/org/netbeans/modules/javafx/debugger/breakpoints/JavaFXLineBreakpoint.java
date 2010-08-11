@@ -51,8 +51,6 @@ import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDABreakpoint;
 import org.netbeans.api.debugger.jpda.LineBreakpoint;
-import org.netbeans.api.debugger.jpda.event.JPDABreakpointEvent;
-import org.netbeans.api.debugger.jpda.event.JPDABreakpointListener;
 import org.netbeans.modules.javafx.debugger.utils.Utils;
 
 /**
@@ -98,15 +96,14 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
         javalb.setSourceName( Utils.getFXName( url ));
         javalb.setSourcePath( Utils.getFXPath( url ));
         javalb.setPreferredClassName( Utils.getFXClassName( url, lineNumber ) + "*" ); // HACK: Add all class files
+//        javalb.setPreferredClassName( Utils.getFXClassName( url, lineNumber ) ); // HACK: Add all class files
+//        javalb.setPreferredClassName( "test.Main" );
         javalb.setHidden( true );
         javalb.setPrintText( printText );
 //        javalb.setCondition( "true" );
         javalb.addPropertyChangeListener( this );
 
         String context = Utils.getContextPath( url );
-
-        // FIXME: determine 'real' context path for web app based on used application server
-        // See issues 146793, 161026, 162286 and 162715 (new API request)
 
 //        String condition = "request.getContextPath().equals(\"" + context + "\")"; // NOI18N
 //        javalb.setCondition(condition);
@@ -316,6 +313,14 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
     public void propertyChange(PropertyChangeEvent evt) {
         if( LineBreakpoint.PROP_URL.equals( evt.getPropertyName())) {
                 this.setURL((String) evt.getNewValue());
+        } else if( LineBreakpoint.PROP_ENABLED.equals( evt.getPropertyName())) {
+            if((Boolean) evt.getNewValue()) {
+                enable();
+            } else {
+                disable();
+            }
+        } else if( LineBreakpoint.PROP_VALIDITY.equals( evt.getPropertyName())) {
+//            setValidity((VALIDITY) evt.getNewValue(), "validity" );
         }
     }
 }

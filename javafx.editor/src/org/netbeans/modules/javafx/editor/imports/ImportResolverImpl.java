@@ -70,6 +70,8 @@ final class ImportResolverImpl {
     private CompilationInfo ci;
     private int caret;
 
+    private final RequestProcessor taskQueue = new RequestProcessor(ImportResolverImpl.class.getName(), 1);
+
     /**
      * The resolver will use the imformation from the given {@linkplain ImportsModel} instance
      * to resolve missing imports. In case a missing import can be resolved to more than one
@@ -103,7 +105,7 @@ final class ImportResolverImpl {
      * @param model The {@linkplain ImportsModel} instance holding the info about unresolved imports
      */
     public void resolve(final ImportsModel model) {
-        RequestProcessor.getDefault().post(new Runnable() {
+        taskQueue.post(new Runnable() {
 
             public void run() {
                 doResolve(model);

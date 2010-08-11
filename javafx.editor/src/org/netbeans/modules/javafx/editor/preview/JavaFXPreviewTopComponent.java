@@ -38,14 +38,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
@@ -83,23 +81,25 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
     private Process pr;
     private int timer;
 
+    private final RequestProcessor taskQueue = new RequestProcessor(JavaFXPreviewTopComponent.class.getName(), 1);
+
     private static boolean isResource(String name) {
-        if (name.endsWith(".class")) return false;
-        if (name.endsWith(".java")) return false;
-        if (name.endsWith(".fx")) return false;
-        if (name.endsWith(".cvsignore")) return false;
-        if (name.endsWith(".hgignore")) return false;
-        if (name.endsWith("vssver.scc")) return false;
-        if (name.endsWith(".DS_Store")) return false;
-        if (name.endsWith("~")) return false;
-        if (name.indexOf("/CVS/") >= 0) return false;
-        if (name.indexOf("/.svn/") >= 0) return false;
-        if (name.indexOf("/.hg/") >= 0) return false;
-        if (name.indexOf("/.#") >= 0) return false;
-        if (name.indexOf("/._") >= 0) return false;
-        if (name.endsWith("#") && name.indexOf("/#") >= 0) return false;
-        if (name.endsWith("%") && name.indexOf("/%") >= 0) return false;
-        if (name.endsWith("MANIFEST.MF")) return false;
+        if (name.endsWith(".class")) return false; //NOI18N
+        if (name.endsWith(".java")) return false; //NOI18N
+        if (name.endsWith(".fx")) return false; //NOI18N
+        if (name.endsWith(".cvsignore")) return false; //NOI18N
+        if (name.endsWith(".hgignore")) return false; //NOI18N
+        if (name.endsWith("vssver.scc")) return false; //NOI18N
+        if (name.endsWith(".DS_Store")) return false; //NOI18N
+        if (name.endsWith("~")) return false; //NOI18N
+        if (name.indexOf("/CVS/") >= 0) return false; //NOI18N
+        if (name.indexOf("/.svn/") >= 0) return false; //NOI18N
+        if (name.indexOf("/.hg/") >= 0) return false; //NOI18N
+        if (name.indexOf("/.#") >= 0) return false; //NOI18N
+        if (name.indexOf("/._") >= 0) return false; //NOI18N
+        if (name.endsWith("#") && name.indexOf("/#") >= 0) return false; //NOI18N
+        if (name.endsWith("%") && name.indexOf("/%") >= 0) return false; //NOI18N
+        if (name.endsWith("MANIFEST.MF")) return false; //NOI18N
         return true;
     }
 
@@ -111,7 +111,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
             } else if (isResource(f.getPath())) {
                 FileObject f2 = dir2.getFileObject(f.getName(), f.getExt());
                 if (f2 == null || f.lastModified().after(f2.lastModified())) {
-                    if (f.getExt().equals("fxz")) {
+                    if (f.getExt().equals("fxz")) { //NOI18N
                         dir2 = FileUtil.createFolder(dir2, f.getNameExt());
                         InputStream is = f.getInputStream();
                         try {
@@ -127,7 +127,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
         }
     }
 
-    private final RequestProcessor.Task task = RequestProcessor.getDefault().create(new Runnable() {
+    private final RequestProcessor.Task task = taskQueue.create(new Runnable() {
         public void run() {
             synchronized (JavaFXPreviewTopComponent.this) {
                 if (pr != null) {
@@ -154,7 +154,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                         if (p instanceof JavaFXProject) {
                             PropertyEvaluator ev = ((JavaFXProject)p).evaluator();
                             FileObject srcRoots[] = ((JavaFXProject)p).getFOSourceRoots();
-                            StringBuffer src = new StringBuffer();
+                            StringBuilder src = new StringBuilder();
                             String className = null;
                             File basedir = FileUtil.toFile(p.getProjectDirectory());
                             File build = PropertyUtils.resolveFile(basedir, "build/compiled"); //NOI18N
@@ -227,7 +227,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                         pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
                                     }
                                     if (log.isLoggable(Level.INFO)) {
-                                        RequestProcessor.getDefault().execute(new Runnable() {
+                                        taskQueue.execute(new Runnable() {
                                             public void run() {
                                                 ByteArrayOutputStream err = new ByteArrayOutputStream();
                                                 Process p = pr;

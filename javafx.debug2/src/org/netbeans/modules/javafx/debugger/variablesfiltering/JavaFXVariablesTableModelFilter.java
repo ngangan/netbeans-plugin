@@ -93,12 +93,14 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
                     return "Number";
                 } else if( "String".equals( colValue )) {
                     return "String";
+                } else if( "com.sun.javafx.runtime.sequence.Sequence".equals( colValue )) {
+                    return "Sequence[]";
                 }
                 String type = ((Field)node).getDeclaredType();
                 return type.replace( '$', '.' );
-            } else if( node instanceof LocalVariable ) {
-                LocalVariable variable = (LocalVariable)node;
-                return variable.getType().replace( '$', '.' );
+//            } else if( node instanceof LocalVariable ) {
+//                LocalVariable variable = (LocalVariable)node;
+//                return variable.getType().replace( '$', '.' );
             }
         }
 
@@ -139,7 +141,8 @@ public class JavaFXVariablesTableModelFilter implements TableModelFilter {
      *          <code>original.setValueAt (...)</code> method call only!
      */
     public void setValueAt( TableModel original, Object node, String columnID, Object value ) throws UnknownTypeException {
-        //original.setValueAt( node, columnID, value );
+        // TODO: Enable set value for variable 
+//        original.setValueAt( node, columnID, value );
     }
 
     public void addModelListener(ModelListener l) {

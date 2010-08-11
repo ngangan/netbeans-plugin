@@ -529,7 +529,7 @@ public class FmtOptions {
                 previewPane.getAccessibleContext().setAccessibleName(NbBundle.getMessage(FmtOptions.class, "AN_Preview")); //NOI18N
                 previewPane.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(FmtOptions.class, "AD_Preview")); //NOI18N
                 previewPane.putClientProperty("HighlightsLayerIncludes", "^org\\.netbeans\\.modules\\.editor\\.lib2\\.highlighting\\.SyntaxHighlighting$"); //NOI18N
-                previewPane.setEditorKit(CloneableEditorSupport.getEditorKit(FXSourceUtils.MIME_TYPE));
+                previewPane.setEditorKit(CloneableEditorSupport.getEditorKit(FXSourceUtils.MIME_TYPE_FX));
                 previewPane.setEditable(false);
             }
             return previewPane;

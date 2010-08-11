@@ -45,13 +45,30 @@
 
 package org.netbeans.modules.javafx.debugger.variablesfiltering;
 
+import org.netbeans.modules.javafx.debugger.models.SequenceObject;
+import org.netbeans.modules.javafx.debugger.models.SequenceField;
+import com.sun.javafx.jdi.FXClassType;
+import com.sun.javafx.jdi.FXObjectReference;
+import com.sun.javafx.jdi.FXPrimitiveValue;
+import com.sun.javafx.jdi.FXReferenceType;
+import com.sun.javafx.jdi.FXSequenceReference;
+import com.sun.jdi.InternalException;
+import com.sun.jdi.ObjectCollectedException;
+import com.sun.jdi.VMDisconnectedException;
+import com.sun.jdi.Value;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.api.debugger.jpda.ClassVariable;
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.api.debugger.jpda.LocalVariable;
+import org.netbeans.api.debugger.jpda.ObjectVariable;
 import org.netbeans.api.debugger.jpda.This;
+import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
+import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
+//import org.netbeans.modules.debugger.jpda.models.FieldVariable;
+import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
+import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
+import org.netbeans.modules.javafx.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TreeModel;
@@ -81,60 +98,115 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
     public Object[] getChildren( TreeModel original, Object parent, int from, int to ) throws UnknownTypeException {
         Object[] visibleChildren = null;
-
+//        System.out.println(" - " + parent );
         if( parent.equals( original.getRoot())) {
             // Retrieve children
-            int parentChildrenCount = original.getChildrenCount( parent );
+            int parentChildrenCount = original.getChildrenCount( parent );            
             Object[] children = original.getChildren( parent, 0, parentChildrenCount );
             parentChildrenCount = children.length;
             List vc = new ArrayList();
             for( int j = 0; j < parentChildrenCount; j++ ) {
                 Object child = children[j];
-                if( child instanceof JPDAClassType || child instanceof This ) {
-                    Object[] ch = original.getChildren( child, from, to );
+//                System.out.println(" - " + child );
+                if( child instanceof ClassVariableImpl ) {
+                } else if (child instanceof JPDAClassType) {
+                    Object[] ch = original.getChildren( child, from, to );                
                     for( int i = 0; i < ch.length; i++ ) {
                         Object obj = ch[i];
-    //                    System.out.println(" - " + obj );
-                        if( obj instanceof ClassVariable ) {
-                            ClassVariable cv = (ClassVariable)obj;
-    //                        vc.add( obj );
+//                        System.out.println("    - " + obj );e 
+                        if( obj instanceof ClassVariableImpl ) {
+                        } else if (obj instanceof This) {
+//                            ClassVariable cv = (ClassVariable)obj;
+//                            vc.add( obj );
                         } else if( obj instanceof Field ) {
                             Field f = (Field)obj;
-                            if( f.getName().startsWith( "$" )) {
-                                vc.add( obj );
-                            }
+                            vc.add( obj );
+                        } else {
+                            vc.add( obj );
                         }
-
                     }
                 } else if( child instanceof LocalVariable ) {
-                    LocalVariable local = (LocalVariable)child;
-                    // Helper Sequences out
-                    if( local.getDeclaredType().startsWith( "com.sun.javafx.runtime." )) continue;
-                    if( local.getName().endsWith( "$ind" )) continue;
-                    if( local.getName().endsWith( "$limit" )) continue;
-                    // Skip all internal jfx$ variables
-                    if( local.getName().startsWith( "jfx$" )) continue;
                     vc.add( child );
+                } else if( child instanceof This ) {
+//                    vc.add( child );
+                    This t = (This)child;
+                    AbstractVariable av = (AbstractVariable)t;
+                    JDIVariable jdiv = (JDIVariable)t;
+                    Value v = jdiv.getJDIValue();
+                    FXObjectReference fx = (FXObjectReference)v;
+                    FXClassType clazz = ((FXReferenceType)fx.referenceType()).scriptClass();
+                    if( clazz != null ) {
+                        vc.add( new ScriptClass( av.getDebugger(), v, clazz, fx ));
+                    }
                 }
             }
-            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
-            for( Object o : vvv ) {
-                System.out.println(" - " + o );
-            }
+//            List<Object> vvv = vc.subList( from, to > vc.size() ? vc.size() : to );
+//            for( Object o : vvv ) {
+//                System.out.println("    - " + o );
+//            }
             return vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
         } else {
             // Root static class
-            Object[] children = original.getChildren( parent, from, to );
+            boolean seqType = false;
             List vc = new ArrayList();
-            for( int i = 0; i < children.length; i++ ) {
-                Object child = children[i];
-                if( child instanceof Field ) {
-                    Field f = (Field)child;
-                    if( f.getName().startsWith( "$" )) {
+            if( parent instanceof ObjectVariable ) {
+                ObjectVariable ov = (ObjectVariable)parent;
+
+                JDIVariable jdiv = (JDIVariable)ov;
+                Value v = jdiv.getJDIValue();
+                if( v instanceof FXSequenceReference ) {
+                    FXSequenceReference seq = (FXSequenceReference)v;
+
+                    AbstractVariable av = (AbstractVariable)ov;
+                    try {                    
+                        if( seq != null ) {
+                            for( int i = 0; i < seq.length(); i++ ) {
+                                JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
+                                if( thread == null ) {
+                                    return new Object[0];
+                                }
+                                thread.accessLock.writeLock().lock();
+
+                                try {            
+                                    if( !thread.isSuspended()) {
+                                        return new Object[0];
+                                    }        
+                                    Value iv = seq.getValue( i );
+
+                                    if( iv instanceof FXPrimitiveValue ) {
+                                        vc.add( new SequenceField( av.getDebugger(), 
+                                               (FXPrimitiveValue) seq.getValue( i ), ov, i,
+                                               v.type().toString()));
+                                    } else if( iv instanceof FXObjectReference ) {
+                                        String t = iv.type().name();
+                                        vc.add( new SequenceObject( av.getDebugger(),
+                                                (FXObjectReference) iv, t,
+                                                 ov, i, 1000, v.toString()));
+                                    }
+                                } finally {
+                                    thread.accessLock.writeLock().unlock();
+                                }          
+
+                            }
+                        }
+                    } catch( VMDisconnectedException ex ) {                                
+                    } catch( ObjectCollectedException ex ) {
+                    } catch( InternalException ex ) {}
+                    seqType = true;
+                } 
+            }
+            if( !seqType ) {
+                Object[] children = original.getChildren( parent, from, to );
+                for( int i = 0; i < children.length; i++ ) {
+                    Object child = children[i];
+//                    System.out.println(" - " + child.toString());
+                    if( child instanceof Field ) {
+                        Field f = (Field)child;
                         vc.add( child );
+                    } else {
+                        vc.add( child );
+//                        System.out.println(" - " + child.toString());
                     }
-                } else {
-                    System.out.println(" - " + child.toString());
                 }
             }
             visibleChildren = vc.subList( from, to > vc.size() ? vc.size() : to ).toArray();
@@ -151,9 +223,11 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
         if( node instanceof Field ) {
             Field f = (Field)node;
-            if( "java.lang.String".equals( f.getType())) {
-                return true;
-            }
+            if( f instanceof ScriptClass || f instanceof ObjectVariable || f instanceof SequenceObject ) {
+                if( "java.lang.String".equals( f.getDeclaredType())) return false;
+                return false;
+            } 
+            return true;
         }
         il = original.isLeaf( node );
 
@@ -165,5 +239,4 @@ public class JavaFXVariablesFilter implements TreeModelFilter {
 
     public void removeModelListener( ModelListener l ) {
     }
-
 }

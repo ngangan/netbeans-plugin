@@ -57,6 +57,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import java.util.Arrays;
 import java.util.List;
+import org.netbeans.api.javafx.editor.FXSourceUtils;
 import org.openide.util.NbBundle;
 
 
@@ -135,9 +136,14 @@ final class BracketCompletion {
     }
 
     public static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
-        TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
-        @SuppressWarnings("unchecked")
-        TokenSequence<T> seq = (TokenSequence<T>)th.tokenSequence();
+//        if (!FXSourceUtils.isJavaFXContext(doc, dotPos)) {
+//            return null;
+//        }
+        
+//        TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
+//        @SuppressWarnings("unchecked")
+//        TokenSequence<T> seq = (TokenSequence<T>)th.tokenSequence();
+        TokenSequence<T> seq = (TokenSequence<T>) FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), dotPos, doc);
         seq.move(dotPos);
         return seq;
     }
