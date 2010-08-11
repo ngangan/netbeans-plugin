@@ -207,8 +207,8 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                                             if (error == null) {
                                                 showImagePanel(loader);
                                             } else {
-                                                String msg = error != null ? error.getLocalizedMessage() : null;
-                                                showError(MSG_CANNOT_SHOW, msg);
+                                                showError(MSG_CANNOT_SHOW, error.getLocalizedMessage());
+                                                m_fxScene = null;
                                             }
                                         }
                                     });
@@ -246,6 +246,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         assert SwingUtilities.isEventDispatchThread();
         try {
             m_fxScene = loader.createScene();
+            
             JComponent scenePanel = getScenePanel(m_fxScene);
 
             removeAll();
@@ -268,7 +269,6 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             oom.printStackTrace();
             showError(MSG_CANNOT_SHOW_OOM, oom.getLocalizedMessage());
         } catch (Exception e) {
-            e.printStackTrace();
             showError(MSG_CANNOT_SHOW, e.getLocalizedMessage());
         } finally {
             System.gc();
@@ -300,33 +300,38 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     
     private void updateZoom() {
         JComponent scenePanel = getScenePanel();
-        if (scenePanel != null){
+        if (scenePanel != null) {
             float zoom = m_dObj.getDataModel().getZoomRatio();
             Node node = getSceneRoot();
 
             Bounds2D bounds = getNodeLocalBounds(node);
-            node.set$scaleX(zoom);
-            node.set$scaleY(zoom);
-            float cx = (bounds.x1 + bounds.x2) / 2;
-            float cy = (bounds.y1 + bounds.y2) / 2;
-            node.set$translateX(cx * zoom - cx);
-            node.set$translateY(cy * zoom - cy);
+            if (bounds != null) {
+                node.set$scaleX(zoom);
+                node.set$scaleY(zoom);
+                float cx = (bounds.x1 + bounds.x2) / 2;
+                float cy = (bounds.y1 + bounds.y2) / 2;
+                node.set$translateX(cx * zoom - cx);
+                node.set$translateY(cy * zoom - cy);
 
-            scenePanel.invalidate();
-            if (scenePanel.getParent() != null){
-                scenePanel.getParent().validate();
+                scenePanel.invalidate();
+                if (scenePanel.getParent() != null) {
+                    scenePanel.getParent().validate();
+                }
             }
         }
     }
 
     private Bounds2D getNodeLocalBounds(Node node) {
-        Bounds2D bounds = new Bounds2D();
+        Bounds2D bounds = null;
         //node.getLocalBounds(bounds, BaseTransform.IDENTITY_TRANSFORM);
         Bounds localBounds = node.get$boundsInLocal();
-        bounds.x1 = localBounds.$minX;
-        bounds.x2 = localBounds.$maxX;
-        bounds.y1 = localBounds.$minY;
-        bounds.y2 = localBounds.$maxY;
+        if (localBounds != null){
+            bounds = new Bounds2D();
+            bounds.x1 = localBounds.$minX;
+            bounds.x2 = localBounds.$maxX;
+            bounds.y1 = localBounds.$minY;
+            bounds.y2 = localBounds.$maxY;
+        }
         return bounds;
     }
 
