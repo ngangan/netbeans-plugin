@@ -81,7 +81,7 @@ public final class ReformatUtils {
             JFXTokenId.PACKAGE, JFXTokenId.PROTECTED, JFXTokenId.PUBLIC,
             JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT, JFXTokenId.STATIC,
             JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY, JFXTokenId.MIXIN,
-            JFXTokenId.OVERRIDE);
+            JFXTokenId.OVERRIDE, JFXTokenId.BOUND);
 
     public static EnumSet<JFXTokenId> NON_STRING_LITERALS = EnumSet.of(JFXTokenId.TRUE,
             JFXTokenId.FALSE, JFXTokenId.NULL, JFXTokenId.DECIMAL_LITERAL,
