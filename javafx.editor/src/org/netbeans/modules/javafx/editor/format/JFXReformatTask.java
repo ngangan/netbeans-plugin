@@ -2510,7 +2510,17 @@ public class JFXReformatTask implements ReformatTask {
             } else { // BEFORE/AFTER
                 accept(insertNode.shouldInsertAfter() ? JFXTokenId.AFTER : JFXTokenId.BEFORE);
                 space();
-                accept(JFXTokenId.IDENTIFIER);
+
+                // #189380
+                boolean dot = false;
+                do {
+                    accept(JFXTokenId.IDENTIFIER, JFXTokenId.STAR, JFXTokenId.THIS, JFXTokenId.SUPER);
+                    dot = acceptAndRollback(JFXTokenId.DOT) == JFXTokenId.DOT;
+                    if (dot) {
+                        accept(JFXTokenId.DOT);
+                    }
+                } while (dot);
+
                 accept(JFXTokenId.LBRACKET);
                 scan(position, p);
                 accept(JFXTokenId.RBRACKET);
