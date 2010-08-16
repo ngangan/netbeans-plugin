@@ -45,6 +45,7 @@ package org.netbeans.modules.javafx.fxd.composer.preview;
 
 import com.sun.javafx.geom.Bounds2D;
 import java.net.URL;
+import org.openide.util.Exceptions;
 
 import org.openide.util.NbBundle;
 
@@ -95,6 +96,7 @@ import org.openide.windows.TopComponent;
 final class PreviewImagePanel extends JPanel implements ActionLookup {
     static final String      MSG_CANNOT_SHOW     = "MSG_CANNOT_SHOW"; // NOI18N
     static final String      MSG_CANNOT_SHOW_OOM = "MSG_CANNOT_SHOW_OOM"; // NOI18N
+    private static final String      MSG_FAILED_TO_RENDER = "MSG_FAILED_TO_RENDER"; // NOI18N
     private static final String      LBL_PARSING         = "LBL_PARSING"; // NOI18N
     private static final String      LBL_RENDERING       = "LBL_RENDERING"; // NOI18N
 
@@ -225,7 +227,11 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 th.setName("ModelUpdate-Thread");  //NOI18N
                 th.start();
             } else {
-                updateZoom();
+                try {
+                    updateZoom();
+                } catch (Exception ex) {
+                    showError(MSG_CANNOT_SHOW, ex.getLocalizedMessage());
+                }
             }
         } else {
             Exception error = m_dObj.getDataModel().getFXDContainerLoadError();
@@ -252,6 +258,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
             removeAll();
             add(new ImageHolder(scenePanel, m_dObj), BorderLayout.CENTER);
 
+            // TODO: see RT-9343. should stop here or at least disable events (and then warn user)
             MouseEventCollector mec = new MouseEventCollector();
             scenePanel.addMouseListener(mec);
             scenePanel.addMouseMotionListener(mec);
@@ -298,7 +305,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
         add(label, BorderLayout.CENTER);
     }
     
-    private void updateZoom() {
+    private void updateZoom() throws Exception {
         JComponent scenePanel = getScenePanel();
         if (scenePanel != null) {
             float zoom = m_dObj.getDataModel().getZoomRatio();
@@ -317,6 +324,10 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
                 if (scenePanel.getParent() != null) {
                     scenePanel.getParent().validate();
                 }
+            } else {
+                throw new Exception(NbBundle.getMessage( PreviewImagePanel.class,
+                        MSG_FAILED_TO_RENDER));
+
             }
         }
     }
