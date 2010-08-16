@@ -107,6 +107,13 @@ public class FXDLexer implements Lexer<FXDTokenId> {
             } catch (Exception e) {
                 Exceptions.printStackTrace(e);
             }
+        } catch (RuntimeException runtimeEx) {
+            try { // workaround for problems caused by errors processing
+                contLexer.markError(new FXDSyntaxErrorException(
+                        runtimeEx.getLocalizedMessage(), parser.getPosition()));
+            } catch (Exception e) {
+                Exceptions.printStackTrace(e);
+            }
         } catch (Exception ex) {
             //ex.printStackTrace();
             try {
@@ -203,6 +210,7 @@ public class FXDLexer implements Lexer<FXDTokenId> {
         private int m_tokenizedLength = 0;
         private LexerRestartInfo<FXDTokenId> m_info;
         private List<TokenData<FXDTokenId>> m_tokensList;
+        private int m_lastErrorEndOff = -1;
 
         public ContentLexerImpl(LexerRestartInfo<FXDTokenId> info,
                 List<TokenData<FXDTokenId>> tokensList) {
@@ -339,6 +347,12 @@ public class FXDLexer implements Lexer<FXDTokenId> {
         }
 
         public void error(int startOff, int endOff, FXDSyntaxErrorException syntaxEx) {
+            if (m_lastErrorEndOff == endOff){
+                // workaround for problems caused by errors processing.
+                //waiting for fix in FXDLoader
+                throw new RuntimeException(syntaxEx.getMessage());
+            }
+            m_lastErrorEndOff = startOff;
             if (startOff < endOff) {
                 SyntaxErrorPropertyProvider provider = syntaxEx == null ? null
                         : new SyntaxErrorPropertyProvider(syntaxEx);
