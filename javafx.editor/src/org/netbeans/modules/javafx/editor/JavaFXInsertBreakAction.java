@@ -47,6 +47,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
+import org.netbeans.modules.editor.indent.api.Indent;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -146,7 +147,9 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
                     // complete open javadoc
                     // note that the formater will add one line of javadoc
                     doc.insertString(dotPosition, "*/", null); // NOI18N
-                    doc.getFormatter().indentNewLine(doc, dotPosition);
+                    final Indent formatter = Indent.get(doc);
+                    //doc.getFormatter().indentNewLine(doc, dotPosition);
+                    formatter.reindent(dotPosition + 1);   // newline
                     target.setCaretPosition(dotPosition);
 
                     isJavadocTouched = true;
