@@ -114,6 +114,10 @@
                 <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
                 <unzip src="testdist.zip" dest="build/testdist"/>
             </sequential>
+            <sequential>
+                <!-- TODO: get visage.zip -->
+                <unzip src="visage.zip" dest="build/netbeans/javafx/javafx-sdk"/>
+            </sequential>
         </parallel>
         <antcall target="get-ergonomics"/>
     </target>
@@ -189,10 +193,12 @@
         <mkdir dir="build"/>
 <!--        <parallel failonany="true">-->
             <antcall target="get-netbeans"/>
+<!--
             <antcall target="get-sdk-win" />
             <antcall target="get-sdk-mac" />
             <antcall target="get-sdk-lin" />
             <antcall target="get-sdk-sol" />
+-->
 <!--        </parallel>-->
         <concat>
            <filelist dir="build/netbeans/javafx/javafx-sdk" files="timestamp"/>

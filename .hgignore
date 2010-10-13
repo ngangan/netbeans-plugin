@@ -5,6 +5,7 @@
 ^netbeans.*.html$
 ^installers.*.html$
 ^testdist.*.zip$
+^visage.*.zip$
 ^dist$
 /build$
 /dist$
