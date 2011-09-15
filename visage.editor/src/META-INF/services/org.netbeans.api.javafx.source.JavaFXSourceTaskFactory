@@ -1,0 +1,17 @@
+org.netbeans.modules.javafx.editor.fold.JavaFXElementFoldManagerTaskFactory
+org.netbeans.modules.javafx.editor.semantic.JavaFXSourceHighlightingTaskFactory
+org.netbeans.modules.javafx.editor.semantic.UpToDateTaskFactory
+org.netbeans.modules.javafx.editor.semantic.MarkOccurrencesHighlighterFactory
+org.netbeans.modules.javafx.editor.imports.MarkUnusedImportsTaskFactory
+org.netbeans.modules.javafx.editor.task.WrongPackageStatmentTaskFactory
+org.netbeans.modules.javafx.editor.hints.UncaughtExceptionsTaskFactory
+org.netbeans.modules.javafx.editor.semantic.MarkUnusedElementsTaskFactory
+org.netbeans.modules.javafx.editor.hints.OverrideAllTaskFactory
+#org.netbeans.modules.javafx.editor.hints.MixinNotImplementedAbstractsTaskFactory
+org.netbeans.modules.javafx.editor.hints.MarkOverriddenTaskFactory
+org.netbeans.modules.javafx.editor.hints.AddImportTaskFactory
+org.netbeans.modules.javafx.editor.hints.CreateElementTaskFactory
+org.netbeans.modules.javafx.editor.hints.ExtImportWarningTaskFactory
+
+
+#org.netbeans.modules.javafx.preview.JavaFXSourcePreviewTaskFactory

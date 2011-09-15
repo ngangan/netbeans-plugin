@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.1//EN" "http://www.netbeans.org/dtds/filesystem-1_1.dtd">
+<filesystem>
+    <folder name="Actions">
+        <folder name="Other">
+            <file name="org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.instance"/>
+        </folder>
+    </folder>
+
+    <folder name="Editors">
+        <folder name="text">
+            <folder name="x-fx">
+                <file name="PaletteFactory.instance">
+                    <attr name="instanceClass" stringvalue="org.netbeans.spi.palette.PaletteController" />
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.palette.JavaFXPaletteFactory.getPalette" />
+                </file>
+            </folder>
+        </folder>
+    </folder>
+            
+    <folder name="Menu">
+        <folder name="Tools">
+            <folder name="PaletteManager">
+                <file name="org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Other/org-netbeans-modules-javafx-palette-JavaFXPaletteCustomizerAction.instance"/>
+                    <attr name="position" intvalue="215"/>
+                </file>
+            </folder>
+        </folder>
+    </folder>
+        
+    <folder name="JavaFXPalette">
+        <folder name="Applications">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="100"/>
+            <file name="Stage.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stage.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="CustomNode.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CustomNode.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Scene.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Scene.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
+        
+        <folder name="Swing_Components">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="200"/>
+            <file name="SwingButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingButton.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="SwingCheckBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingCheckBox.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="SwingComboBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingComboBox.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="SwingComboBoxItem.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingComboBoxItem.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="SwingLabel.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingLabel.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="SwingRadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingRadioButton.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="SwingSlider.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingSlider.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="SwingTextField.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingTextField.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="SwingToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SwingToggleButton.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>
+        </folder>
+        
+        <folder name="Actions">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="300"/>
+            <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="OnMouseMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseMoved.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="OnMouseEntered.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseEntered.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="OnMouseExited.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseExited.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="OnMouseClicked.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseClicked.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="OnMousePressed.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMousePressed.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="OnMouseReleased.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseReleased.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="OnMouseDragged.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseDragged.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="OnMouseWheelMoved.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/OnMouseWheelMoved.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="OnKeyPressed.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyPressed.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="OnKeyReleased.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyReleased.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="OnKeyTyped.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyTyped.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>
+        </folder>
+        
+        <folder name="Shapes">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="400"/>
+            
+            <file name="Arc.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Arc.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Circle.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Circle.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Ellipse.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Ellipse.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Group.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Group.xml">
+                <attr name="position" intvalue="350"/>
+            </file>
+            <file name="Image.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Image.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Line.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Line.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Poygon.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Polygon.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="Polyline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Polyline.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="Rectangle.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Rectangle.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="Text.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Text.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="CubicCurve.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CubicCurve.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+             <file name="QuadCurve.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/QuadCurve.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+
+        </folder>
+        <folder name="Paths">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="450"/>
+            
+            <file name="Path.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Path.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="MoveTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MoveTo.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="LineTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LineTo.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="ArcTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ArcTo.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="CubicCurveTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CubicCurveTo.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="QuadCurveTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/QuadCurveTo.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="HLineTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/HLineTo.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="VLineTo.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/VLineTo.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="ClosePath.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ClosePath.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+        </folder>
+        <folder name="Transformations">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="500"/>
+            
+            <file name="Rotate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Rotate.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Scale.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Scale.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Translate.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Translate.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Shear.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Shear.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+        </folder>
+        
+        <folder name="Colors">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="600"/>
+            <file name="Black.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Black.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Blue.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Blue.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Cyan.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Cyan.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="DarkGray.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DarkGray.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Gray.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Gray.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Green.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Green.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="LightGray.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LightGray.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="Magenta.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Magenta.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="Orange.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Orange.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="Pink.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Pink.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="Red.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Red.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="White.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/White.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>
+            <file name="Yellow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Yellow.xml">
+                <attr name="position" intvalue="1300"/>
+            </file>
+        </folder>
+        <folder name="Gradients">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="650"/>
+            <file name="LinearGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LinearGradient.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="RadialGradient.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadialGradient.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Stop.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stop.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
+        <folder name="Effects">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="670"/>
+            
+            <file name="Blend.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Blend.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="Bloom.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Bloom.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="BoxBlur.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BoxBlur.xml">
+                <attr name="position" intvalue="250"/>
+            </file>
+            <file name="ColorAdjust.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ColorAdjust.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="DisplacementMap.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DisplacementMap.xml">
+                <attr name="position" intvalue="350"/>
+            </file>
+            <file name="DropShadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/DropShadow.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Flood.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Flood.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="GaussianBlur.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/GaussianBlur.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="Glow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Glow.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="Identity.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Identity.xml">
+                <attr name="position" intvalue="750"/>
+            </file>
+            <file name="InnerShadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/InnerShadow.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="InvertMask.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/InvertMask.xml">
+                <attr name="position" intvalue="850"/>
+            </file>
+            <file name="Lighting.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Lighting.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="MotionBlur.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MotionBlur.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="PerspectiveTransform.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PerspectiveTransform.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="Reflection.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Reflection.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>
+            <file name="SepiaTone.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SepiaTone.xml">
+                <attr name="position" intvalue="1300"/>
+            </file>
+            <file name="Shadow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Shadow.xml">
+                <attr name="position" intvalue="1400"/>
+            </file>
+        </folder>
+        <folder name="Animation">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="700"/>
+            <file name="Timeline.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Timeline.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="KeyFrame.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/KeyFrame.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Values.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Values.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Action.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Action.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Discrete.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Discrete.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Linear.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Linear.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="EaseIn.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseIn.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="EaseOut.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseOut.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="EaseBoth.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/EaseBoth.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+             <file name="At.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/At.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+        </folder>
+        <folder name="Transitions">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="750"/>
+            <file name="PauseTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PauseTransition.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="TranslateTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/TranslateTransition.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="FadeTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/FadeTransition.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="ParallelTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ParallelTransition.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="PathTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PathTransition.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+             <file name="RotateTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RotateTransition.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="ScaleTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScaleTransition.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="SequentialTransition.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/SequentialTransition.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+        </folder>
+
+        <folder name="Charts">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="770"/>
+            <file name="BarChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BarChart.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="BarChart3D.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BarChart3D.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+             <file name="PieChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PieChart.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="PieChart3D.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PieChart3D.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="LineChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/LineChart.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="AreaChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/AreaChart.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="ScatterChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScatterChart.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="BubbleChart.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/BubbleChart.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+        </folder>
+        <folder name="Media">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="800"/>
+            <file name="Media.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Media.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="MediaPlayer.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MediaPlayer.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="MediaView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/MediaView.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+        </folder>
+        <folder name="Controls">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="430"/>
+            <file name="Button.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Button.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="CheckBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/CheckBox.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="Label.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Label.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="ListView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ListView.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="ProgressBar.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ProgressBar.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="ProgressIndicator.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ProgressIndicator.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="RadioButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/RadioButton.xml">
+                <attr name="position" intvalue="700"/>
+            </file>
+            <file name="ScrollBar.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScrollBar.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+            <file name="Slider.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Slider.xml">
+                <attr name="position" intvalue="900"/>
+            </file>
+            <file name="TextBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/TextBox.xml">
+                <attr name="position" intvalue="1000"/>
+            </file>
+            <file name="ToggleButton.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleButton.xml">
+                <attr name="position" intvalue="1100"/>
+            </file>
+            <file name="Hyperlink.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Hyperlink.xml">
+                <attr name="position" intvalue="1200"/>
+            </file>
+            <file name="PasswordBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/PasswordBox.xml">
+                <attr name="position" intvalue="1300"/>
+            </file>
+            <file name="ToggleGroup.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ToggleGroup.xml">
+                <attr name="position" intvalue="1400"/>
+            </file>
+            <file name="ScrollView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ScrollView.xml">
+                <attr name="position" intvalue="1500"/>
+            </file>
+            <file name="Tooltip.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Tooltip.xml">
+                <attr name="position" intvalue="1600"/>
+            </file>
+            <file name="ChoiceBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ChoiceBox.xml">
+                <attr name="position" intvalue="1700"/>
+            </file>
+            <file name="Separator.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Separator.xml">
+                <attr name="position" intvalue="1800"/>
+            </file>
+        </folder>
+        <folder name="Layouts">
+            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.palette.Bundle"/>
+            <attr name="position" intvalue="440"/>
+            <file name="HBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/HBox.xml">
+                <attr name="position" intvalue="100"/>
+            </file>
+            <file name="VBox.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/VBox.xml">
+                <attr name="position" intvalue="200"/>
+            </file>
+            <file name="ClipView.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/ClipView.xml">
+                <attr name="position" intvalue="300"/>
+            </file>
+            <file name="Flow.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Flow.xml">
+                <attr name="position" intvalue="400"/>
+            </file>
+            <file name="Stack.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Stack.xml">
+                <attr name="position" intvalue="500"/>
+            </file>
+            <file name="Tile.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Tile.xml">
+                <attr name="position" intvalue="600"/>
+            </file>
+            <file name="Panel.xml" url="nbresloc:/org/netbeans/modules/javafx/palette/items/resources/Panel.xml">
+                <attr name="position" intvalue="800"/>
+            </file>
+        </folder>
+    </folder>
+</filesystem>

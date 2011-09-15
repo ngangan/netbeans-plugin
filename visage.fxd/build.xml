@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See harness/README in the NetBeans platform -->
+<!-- for some information on what you could do (e.g. targets to override). -->
+<!-- If you delete this file and reopen the project it will be recreated. -->
+<project name="org.netbeans.modules.javafx.fxd" default="netbeans" basedir=".">
+    <description>Builds, tests, and runs the project org.netbeans.modules.javafx.fxd.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <target name="init-release-external" depends="basic-init">
+        <property name="build.config" value="daily"/>
+        <property file="../build-${build.config}.properties"/>
+        <!--
+        <mkdir dir="external"/>
+        <get src="${javafx-fxd-netbeans-support.zip.url}" dest="external/javafx-fxd-netbeans-support.zip" usetimestamp="true" verbose="true"/> 
+        <delete dir="release"/>
+        <mkdir dir="release/modules/ext/fxd/lib"/>
+        <unzip src="external/javafx-fxd-netbeans-support.zip" dest="release/modules/ext/fxd/lib">
+            <patternset>
+                <include name="**/*.jar"/>
+            </patternset>
+            <mapper type="flatten"/>    
+        </unzip>
+        -->
+    </target>
+    
+        <!--<target name="init" depends="basic-init,init-release-external,files-init,build-init"/>-->
+     <target name="init" depends="init-release-external,harness.init"/>
+</project>

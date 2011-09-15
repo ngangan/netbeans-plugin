@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.netbeans.modules.javafx.debugger
+AutoUpdate-Show-In-Client: false
+OpenIDE-Module-Layer: org/netbeans/modules/javafx/debugger/resources/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/debugger/resources/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.3
+

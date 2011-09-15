@@ -1,0 +1,19 @@
+javafx.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int) - parameters
+javafx.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int, arg3 : float) - parameters
+javafx.scene.paint.Color c
+com.sun.javafx.runtime.FXBase super
+javafxtester.Test this
+public static boolean isInitialized(arg0 : java.lang.Object)
+public static boolean isReadOnly(arg0 : java.lang.Object)
+public static boolean isSameObject(arg0 : java.lang.Object, arg1 : java.lang.Object)
+public static void print(arg0 : java.lang.Object)
+public static void println(arg0 : java.lang.Object)
+bind
+false
+function
+new
+null
+true
+String __DIR__
+String __FILE__
+String __PROFILE__

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--       
+*     Copyright (c) 2008 Sun Microsystems, Inc. All rights reserved.
+*     Use is subject to license terms.
+-->
+<html>
+<head>
+	<title>Copy a Class</title>
+<link href="nbdocs:/org/netbeans/modules/usersguide/ide.css"  rel="stylesheet" type="text/css">
+</head>
+<body>
+<h2>Copy a Class</h2>
+<p> <small><a href="#seealso">See Also</a></small> 
+
+
+<p>You can copy a class to the same package or a different package. </p>
+<p><b>To copy a class and change the code that references that class: </b></p>
+<ol>
+<li>In the Projects window or Source editor right-click the class and choose Refactor > Copy  from the  contextual menu.</li>
+<li>In the Copy Class dialog box, select the package from the To Package combo box or type the fully qualified package name.<br/> 
+If you copy to the same package, type a new name for the class.</li>
+<li>To apply the changes to the code, do one of the following:
+  <ul>
+<li>Click the Refactor button. <br>
+    The IDE instantly applies all the changes.</li>
+<li>Click the Preview button. <br>
+    The Refactoring window displays all lines of code that will be changed. Review the changes and clear the checkbox for any code that you do not want to change. Click the Do Refactoring button to apply the changes. </li>
+</ul>
+</ol>
+<ul class="note">
+		<li>You can also initiate the copying of a class by dragging the class's node in the Project's window to another package or by copying and pasting the class's node.</li> </ul>
+
+<p><b>To copy a class without doing refactoring: </b></p>
+<ol>
+<li>In the Projects window, manually copy the class to another package.<br>
+You can copy and paste the class, or you can use drag and drop.</li>        
+<li>In the Copy Class dialog box, select the Copy Without Refactoring checkbox.</li>
+<li>Click Next</li>
+</ol>
+
+<ul class="note">
+<li>You should always perform a clean build after completing any refactoring commands. To perform a clean build,  right-click the project's node in the Projects window and choose Clean and Build Project.</li> </ul>
+
+<dl>
+<dt><a name="seealso">See Also</a></dt>
+<dd><a href="rename_class.html">Renaming a Class </a></dd>
+<dd><a href="undo_refactor_changes.html">Undoing Refactoring Changes</a></dd>
+</dl>
+
+<hr>
+<p><font size=-2><a href="../credits.html">Legal Notices</a></font>
+</p>
+<table cellpadding="50" border="0">
+  <tr>
+    <td>&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+</html>

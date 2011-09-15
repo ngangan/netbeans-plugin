@@ -1,0 +1,5 @@
+int elem
+int index
+public static boolean isInitialized(arg0 : java.lang.Object)
+public static boolean isReadOnly(arg0 : java.lang.Object)
+public static boolean isSameObject(arg0 : java.lang.Object, arg1 : java.lang.Object)

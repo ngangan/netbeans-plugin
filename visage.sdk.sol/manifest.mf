@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+AutoUpdate-Show-In-Client: false
+OpenIDE-Module: org.netbeans.modules.javafx.sdk.sol
+OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/javafx/sdk/sol/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.10
+OpenIDE-Module-Requires: org.openide.modules.os.Solaris
+OpenIDE-Module-Provides: javafx.sdk.v1_3, javafx.sdk.v1_3_1
+FeaturesOnDemand-Proxy-Layer: false

@@ -1,0 +1,16 @@
+javafx.geometry.Rectangle2D bounds
+float dpi
+javafx.stage.Screen primary
+com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> screens
+javafx.geometry.Rectangle2D visualBounds
+public boolean equals(arg0 : java.lang.Object)
+public final native java.lang.Class<?> getClass()
+public static com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> getScreensForRectangle(arg0 : javafx.geometry.Rectangle2D)
+public static com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> getScreensForRectangle(arg0 : float, arg1 : float, arg2 : float, arg3 : float)
+public int hashCode()
+public final native void notify()
+public final native void notifyAll()
+public java.lang.String toString()
+public final void wait()
+public final native void wait(arg0 : long)
+public final void wait(arg0 : long, arg1 : int)

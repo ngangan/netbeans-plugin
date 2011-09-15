@@ -1,0 +1,21 @@
+float height
+float maxX
+float maxY
+float minX
+float minY
+float width
+public boolean contains(arg0 : javafx.geometry.Point2D)
+public boolean contains(arg0 : javafx.geometry.Rectangle2D)
+public boolean contains(arg0 : float, arg1 : float)
+public boolean contains(arg0 : float, arg1 : float, arg2 : float, arg3 : float)
+public boolean equals(arg0 : java.lang.Object)
+public final native java.lang.Class<?> getClass()
+public int hashCode()
+public boolean intersects(arg0 : javafx.geometry.Rectangle2D)
+public boolean intersects(arg0 : float, arg1 : float, arg2 : float, arg3 : float)
+public final native void notify()
+public final native void notifyAll()
+public java.lang.String toString()
+public final void wait()
+public final native void wait(arg0 : long)
+public final void wait(arg0 : long, arg1 : int)
