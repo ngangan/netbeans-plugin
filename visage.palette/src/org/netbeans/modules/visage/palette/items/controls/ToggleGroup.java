@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.controls;
+package org.netbeans.modules.visage.palette.items.controls;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class ToggleGroup implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(ToggleGroup.class, "TEMPLATE_ToggleGroup", targetComponent, "javafx.scene.control.ToggleGroup"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(ToggleGroup.class, "TEMPLATE_ToggleGroup", targetComponent, "visage.scene.control.ToggleGroup"); //NOI18N;
     }
 }

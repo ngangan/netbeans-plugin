@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.colors;
+package org.netbeans.modules.visage.palette.items.colors;
 
 /**
  *

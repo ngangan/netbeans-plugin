@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.debugger.breakpoints;
+package org.netbeans.modules.visage.debugger.breakpoints;
 
-import com.sun.javafx.jdi.event.FXEventQueue;
+import com.sun.visage.jdi.event.FXEventQueue;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.event.EventQueue;
 import java.beans.PropertyChangeEvent;
@@ -73,7 +73,7 @@ import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 @DebuggerServiceRegistration( types={ org.netbeans.api.debugger.LazyDebuggerManagerListener.class } )
 public class PersistenceManager implements LazyDebuggerManagerListener {
     
-    private static final String JAVAFX_PROPERTY = "JavaFX";
+    private static final String JAVAFX_PROPERTY = "Visage";
     
     public Breakpoint[] initBreakpoints () {
         Properties p = Properties.getDefault ().getProperties( "debugger" ).
@@ -110,7 +110,7 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
     }
     
     public void breakpointAdded( Breakpoint breakpoint ) {
-        if( breakpoint instanceof JavaFXLineBreakpoint ) {
+        if( breakpoint instanceof VisageLineBreakpoint ) {
             Properties p = Properties.getDefault().getProperties( "debugger" ).
                 getProperties( DebuggerManager.PROP_BREAKPOINTS );
             p.setArray( JAVAFX_PROPERTY, getBreakpoints());
@@ -119,8 +119,8 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
     }
 
     public void breakpointRemoved( Breakpoint breakpoint ) {
-        if( breakpoint instanceof JavaFXLineBreakpoint ) {
-            JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint)breakpoint;
+        if( breakpoint instanceof VisageLineBreakpoint ) {
+            VisageLineBreakpoint lb = (VisageLineBreakpoint)breakpoint;
             Properties p = Properties.getDefault().getProperties( "debugger" ).
                 getProperties( DebuggerManager.PROP_BREAKPOINTS );
             p.setArray( JAVAFX_PROPERTY, getBreakpoints());
@@ -178,7 +178,7 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
         ArrayList bb = new ArrayList();
         for( i = 0; i < k; i++ ) {
             // We store only the JSP breakpoints
-            if( bs[i] instanceof JavaFXLineBreakpoint ) {
+            if( bs[i] instanceof VisageLineBreakpoint ) {
                 bb.add (bs [i]);
             }
         }

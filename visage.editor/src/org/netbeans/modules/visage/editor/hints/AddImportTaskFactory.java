@@ -41,28 +41,28 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.ImportTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
-import com.sun.tools.javafx.tree.JFXInstanciate;
+import com.sun.tools.visage.tree.VSGInstanciate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.*;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.VisageSource;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -71,10 +71,10 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
+public final class AddImportTaskFactory extends VisageAbstractEditorHint {
 
     private static final EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.SOURCE, ClassIndex.SearchScope.DEPENDENCIES);
-    private static final String HINTS_IDENT = "addimportjavafx"; //NOI18N
+    private static final String HINTS_IDENT = "addimportvisage"; //NOI18N
     private static final String ERROR_CODE1 = "compiler.err.cant.resolve.location";//NOI18N
     private static final String ERROR_CODE2 = "compiler.err.cant.resolve";//NOI18N
     private static final String MESSAGE = NbBundle.getMessage(AddImportTaskFactory.class, "TITLE_ADD_IMPORT"); //NOI18N
@@ -82,7 +82,7 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public AddImportTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.NORMAL);
     }
 
     @Override
@@ -113,7 +113,7 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                 final Collection<ClassSymbol> imports = new HashSet<ClassSymbol>();
                 final String[] currentPackageName = new String[1];
                 final ClassIndex classIndex = compilationInfo.getClasspathInfo().getClassIndex();
-                new JavaFXTreePathScanner<Void, Void>() {
+                new VisageTreePathScanner<Void, Void>() {
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
@@ -128,7 +128,7 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                     @Override
                     public Void visitImport(ImportTree node, Void p) {
                         node.getQualifiedIdentifier();
-                        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
+                        VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node.getQualifiedIdentifier());
                         Element element = compilationInfo.getTrees().getElement(path);
                         if (element instanceof ClassSymbol) {
                             ClassSymbol classSymbol = (ClassSymbol) element;
@@ -144,17 +144,17 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
                     if (cancel.get()) {
                         break;
                     }
-                    JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
+                    VisageTreePath path = compilationInfo.getTreeUtilities().pathFor(diagnostic.getPosition());
                     Element element = compilationInfo.getTrees().getElement(path);
                     Tree superTree = path.getLeaf();
                     String potentialClassSimpleName = null;
                     if (element != null && element instanceof ClassSymbol) {
                         ClassSymbol classSymbol = (ClassSymbol) element;
                         potentialClassSimpleName = classSymbol.getSimpleName().toString();
-                    } else if (superTree instanceof JFXInstanciate) {
+                    } else if (superTree instanceof VSGInstanciate) {
                         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                         final Tree[] tree = new Tree[1];
-                        JavaFXTreePathScanner<Void, Void> scaner = new JavaFXTreePathScanner<Void, Void>() {
+                        VisageTreePathScanner<Void, Void> scaner = new VisageTreePathScanner<Void, Void>() {
 
                             @Override
                             public Void visitIdentifier(IdentifierTree node, Void p) {
@@ -283,7 +283,7 @@ public final class AddImportTaskFactory extends JavaFXAbstractEditorHint {
             if (fqnName1.contains(".")) { // NOI18N
                 int index = fqnName1.indexOf("."); //NOI18N
                 String pn = fqnName1.substring(0, index);
-                if (pn.contains("javafx")) { //NOI18N
+                if (pn.contains("visage")) { //NOI18N
                     return -1;
                 }
             }

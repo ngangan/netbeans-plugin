@@ -42,10 +42,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
@@ -57,7 +57,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import java.util.Arrays;
 import java.util.List;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils;
 import org.openide.util.NbBundle;
 
 
@@ -94,23 +94,23 @@ final class BracketCompletion {
         if (((ch == ')' || ch == '(') && !posWithinString(doc, caret.getDot())) //parenthesis completion works only outside of string.  // NOI18N
                 || ((ch == ']' || ch == '[') && !posWithinString(doc, caret.getDot()))  // NOI18N
                 || ch == '{' || ch == '}') { // NOI18N
-            TokenSequence<JFXTokenId> seq = getTokenSequence(doc, dotPos);
-            JFXTokenId tidAtDot = seq.moveNext() ? seq.token().id() : null;
+            TokenSequence<VSGTokenId> seq = getTokenSequence(doc, dotPos);
+            VSGTokenId tidAtDot = seq.moveNext() ? seq.token().id() : null;
             if (tidAtDot == null) return;
 
-            if (tidAtDot == JFXTokenId.RBRACKET
-                    || tidAtDot == JFXTokenId.RPAREN
-//                    || tidAtDot == JFXTokenId.RBRACE
-                    || (tidAtDot == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL && nextIs(doc, caret.getDot(), '}')) // NOI18N
-                    || (tidAtDot == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && ch == '}')) { // NOI18N
+            if (tidAtDot == VSGTokenId.RBRACKET
+                    || tidAtDot == VSGTokenId.RPAREN
+//                    || tidAtDot == VSGTokenId.RBRACE
+                    || (tidAtDot == VSGTokenId.RBRACE_QUOTE_STRING_LITERAL && nextIs(doc, caret.getDot(), '}')) // NOI18N
+                    || (tidAtDot == VSGTokenId.RBRACE_LBRACE_STRING_LITERAL && ch == '}')) { // NOI18N
                 skipClosingBracket(doc, caret, tidAtDot, ch);
-//                skipClosingBracket(doc, caret, (ch == ')') ? JFXTokenId.RPAREN : JFXTokenId.RBRACKET);
-            } else if (tidAtDot == JFXTokenId.LBRACKET
-                    || tidAtDot == JFXTokenId.LPAREN
-//                    || tidAtDot == JFXTokenId.LBRACE
-//                    || tidAtDot == JFXTokenId.STRING_LITERAL
-                    || tidAtDot == JFXTokenId.QUOTE_LBRACE_STRING_LITERAL
-                    || tidAtDot == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL) {
+//                skipClosingBracket(doc, caret, (ch == ')') ? VSGTokenId.RPAREN : VSGTokenId.RBRACKET);
+            } else if (tidAtDot == VSGTokenId.LBRACKET
+                    || tidAtDot == VSGTokenId.LPAREN
+//                    || tidAtDot == VSGTokenId.LBRACE
+//                    || tidAtDot == VSGTokenId.STRING_LITERAL
+                    || tidAtDot == VSGTokenId.QUOTE_LBRACE_STRING_LITERAL
+                    || tidAtDot == VSGTokenId.RBRACE_LBRACE_STRING_LITERAL) {
                 completeOpeningBracket(doc, dotPos, caret, ch);
             }
         } else if (ch == ';') {
@@ -136,14 +136,14 @@ final class BracketCompletion {
     }
 
     public static <T extends TokenId> TokenSequence<T> getTokenSequence(BaseDocument doc, int dotPos) {
-//        if (!FXSourceUtils.isJavaFXContext(doc, dotPos)) {
+//        if (!FXSourceUtils.isVisageContext(doc, dotPos)) {
 //            return null;
 //        }
         
 //        TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
 //        @SuppressWarnings("unchecked")
 //        TokenSequence<T> seq = (TokenSequence<T>)th.tokenSequence();
-        TokenSequence<T> seq = (TokenSequence<T>) FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), dotPos, doc);
+        TokenSequence<T> seq = (TokenSequence<T>) FXSourceUtils.getVisageTokenSequence(TokenHierarchy.get(doc), dotPos, doc);
         seq.move(dotPos);
         return seq;
     }
@@ -160,11 +160,11 @@ final class BracketCompletion {
             if (seq.offset() >= eolPos) break;
             TokenId tid = seq.token().id();
             System.err.println("  token: " + tid); // NOI18N
-            if (tid == JFXTokenId.RPAREN) {
+            if (tid == VSGTokenId.RPAREN) {
                 lastParenPos = seq.offset();
-            } else if (tid == JFXTokenId.WS) {
+            } else if (tid == VSGTokenId.WS) {
                 return;
-            } else if (tid == JFXTokenId.LPAREN) {
+            } else if (tid == VSGTokenId.LPAREN) {
                 return;
             }
         }
@@ -196,8 +196,8 @@ final class BracketCompletion {
         if (completionSettingEnabled()) {
             if (ch == '(' || ch == '[' || ch == '{') { // NOI18N
                 TokenId tidAtDot = tokenAt(doc, dotPos);
-                if ((tidAtDot == JFXTokenId.RBRACKET && tokenBalance(doc, JFXTokenId.LBRACKET, JFXTokenId.RBRACKET) != 0) ||
-                        (tidAtDot == JFXTokenId.RPAREN && tokenBalance(doc, JFXTokenId.LPAREN, JFXTokenId.RPAREN) != 0)) {
+                if ((tidAtDot == VSGTokenId.RBRACKET && tokenBalance(doc, VSGTokenId.LBRACKET, VSGTokenId.RBRACKET) != 0) ||
+                        (tidAtDot == VSGTokenId.RPAREN && tokenBalance(doc, VSGTokenId.LPAREN, VSGTokenId.RPAREN) != 0)) {
                     doc.remove(dotPos, 1);
                 }
             } else if (ch == '\"') { // NOI18N
@@ -238,8 +238,8 @@ final class BracketCompletion {
             if (caretOffset > 0) {
                 // Check whether line ends with '{' ignoring any whitespace
                 // or comments
-                final TokenSequence<JFXTokenId> ts = getTokenSequence(doc, caretOffset);
-                Token<JFXTokenId> token = ts.moveNext() ? ts.token() : null;
+                final TokenSequence<VSGTokenId> ts = getTokenSequence(doc, caretOffset);
+                Token<VSGTokenId> token = ts.moveNext() ? ts.token() : null;
 
                 addRightBrace = true; // suppose that right brace should be added
 
@@ -285,7 +285,7 @@ final class BracketCompletion {
                             break;
                         }
                     }
-                    if ((token != null) && ((token.id() != JFXTokenId.LBRACE) || (ts.offset() < caretRowStartOffset))) {
+                    if ((token != null) && ((token.id() != VSGTokenId.LBRACE) || (ts.offset() < caretRowStartOffset))) {
                         addRightBrace = false;
                     }
 
@@ -318,7 +318,7 @@ final class BracketCompletion {
         TokenSequence<?> seq = getTokenSequence(doc, caretOffset);
 
         while (seq.moveNext() && seq.offset() < rowEnd) {
-            switch ((JFXTokenId) seq.token().id()) {
+            switch ((VSGTokenId) seq.token().id()) {
                 case LPAREN:
                     parenBalance++;
                     break;
@@ -358,7 +358,7 @@ final class BracketCompletion {
      * @return The number of { - number of } (>0 more { than } ,<0 more } than {)
      */
     private static int braceBalance(BaseDocument doc) {
-        return tokenBalance(doc, JFXTokenId.LBRACE, JFXTokenId.RBRACE);
+        return tokenBalance(doc, VSGTokenId.LBRACE, VSGTokenId.RBRACE);
     }
 
 
@@ -376,12 +376,12 @@ final class BracketCompletion {
 
     /**
      * The same as braceBalance but generalized to any pairs of matching
-     * tokens including optional scan of {@link org.netbeans.api.javafx.lexer.JFXTokenId#RBRACE_LBRACE_STRING_LITERAL}
+     * tokens including optional scan of {@link org.netbeans.api.visage.lexer.VSGTokenId#RBRACE_LBRACE_STRING_LITERAL}
      * token.
      *
      * @param doc                      document representing source code.
      * @param handleSpecialBracesToken if true, method manualy parses
-     *                                 {@link org.netbeans.api.javafx.lexer.JFXTokenId#RBRACE_LBRACE_STRING_LITERAL}
+     *                                 {@link org.netbeans.api.visage.lexer.VSGTokenId#RBRACE_LBRACE_STRING_LITERAL}
      *                                 tokens to determine correct balance.
      * @param pairs                    pairs of oposite tokens to perform balance operation.
      * @return adjusted balance.
@@ -389,7 +389,7 @@ final class BracketCompletion {
     private static int tokenBalance(BaseDocument doc, boolean handleSpecialBracesToken, TokenId... pairs) {
         if (pairs == null || pairs.length == 0) return 0;
         if (pairs.length % 2 != 0)
-            throw new IllegalArgumentException(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
+            throw new IllegalArgumentException(NbBundle.getBundle("org/netbeans/modules/visage/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
 
         final List<TokenId> ids = Arrays.asList(pairs);
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
@@ -404,7 +404,7 @@ final class BracketCompletion {
                 } else {
                     balance--;
                 }
-            } else if (handleSpecialBracesToken && JFXTokenId.RBRACE_LBRACE_STRING_LITERAL == id) {
+            } else if (handleSpecialBracesToken && VSGTokenId.RBRACE_LBRACE_STRING_LITERAL == id) {
                 balance = balanceOfRLSL(balance, ts.token());
 
             }
@@ -414,7 +414,7 @@ final class BracketCompletion {
     }
 
     /**
-     * Gets balance of {@link org.netbeans.api.javafx.lexer.JFXTokenId#RBRACE_LBRACE_STRING_LITERAL} token. This is
+     * Gets balance of {@link org.netbeans.api.visage.lexer.VSGTokenId#RBRACE_LBRACE_STRING_LITERAL} token. This is
      * couted manualy based on characted occurence.
      *
      * @param balance current balance or zero if there is no balance precedens.
@@ -446,7 +446,7 @@ final class BracketCompletion {
      * @throws javax.swing.text.BadLocationException
      *          if document location is invalid.
      */
-    private static void skipClosingBracket(BaseDocument doc, Caret caret, JFXTokenId bracketId, char ch) throws BadLocationException {
+    private static void skipClosingBracket(BaseDocument doc, Caret caret, VSGTokenId bracketId, char ch) throws BadLocationException {
 
         int caretOffset = caret.getDot();
         if (isSkipClosingBracket(caretOffset, doc, bracketId, ch)) {
@@ -469,7 +469,7 @@ final class BracketCompletion {
      * @throws javax.swing.text.BadLocationException
      *          if operation is called on invalid document position.
      */
-    static boolean isSkipClosingBracket(int caretOffset, BaseDocument doc, JFXTokenId bracketId, char c) throws BadLocationException {
+    static boolean isSkipClosingBracket(int caretOffset, BaseDocument doc, VSGTokenId bracketId, char c) throws BadLocationException {
         //TODO: [RKo] Make this method more readable. Too high CC, nesting and length
         // First check whether the caret is not after the last char in the document
         // because no bracket would follow then so it could not be skipped.
@@ -489,9 +489,9 @@ final class BracketCompletion {
         if (token != null && token.id() == bracketId
                 // we are escaping right bracket inserted into RL_SL because it is correct statement.
                 // manowar: commented this weird line according issue #156157
-//                && !(bracketId == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
+//                && !(bracketId == VSGTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
                 ) {
-            JFXTokenId leftBracketIntId = JavaFXBracesMatcher.getOposite(bracketId, false);
+            VSGTokenId leftBracketIntId = VisageBracesMatcher.getOposite(bracketId, false);
 
             // Skip all the brackets of the same type that follow the last one
 
@@ -507,7 +507,7 @@ final class BracketCompletion {
             token = ts.movePrevious() ? ts.token() : null;
             boolean finished = false;
             while (!finished && token != null) {
-                final JFXTokenId tokenIntId = (JFXTokenId) token.id();
+                final VSGTokenId tokenIntId = (VSGTokenId) token.id();
                 switch (tokenIntId) {
                     case LPAREN:
                     case LBRACKET:
@@ -573,7 +573,7 @@ final class BracketCompletion {
                 token = ts.moveNext() ? ts.token() : null;
                 finished = false;
                 while (!finished && token != null) {
-                    JFXTokenId tokenIntId = (JFXTokenId) token.id();
+                    VSGTokenId tokenIntId = (VSGTokenId) token.id();
                     switch (tokenIntId) {
                         case LPAREN:
                         case LBRACKET:
@@ -675,7 +675,7 @@ final class BracketCompletion {
             return false;
         }
 
-        JFXTokenId token = null;
+        VSGTokenId token = null;
         if (doc.getLength() > dotPos) {
             token = tokenAt(doc, dotPos);
         }
@@ -686,10 +686,10 @@ final class BracketCompletion {
 
         if (isComment(token)) {
             return false;
-        } else if (token == JFXTokenId.WS && eol && dotPos - 1 > 0) {
+        } else if (token == VSGTokenId.WS && eol && dotPos - 1 > 0) {
             // check if the caret is at the very end of the line comment
             token = tokenAt(doc, dotPos - 1);
-            if (token == JFXTokenId.LINE_COMMENT) {
+            if (token == VSGTokenId.LINE_COMMENT) {
                 return false;
             }
         }
@@ -700,7 +700,7 @@ final class BracketCompletion {
         if (!insideString) {
             // check if the caret is at the very end of the line and there
             // is an unterminated string literal
-            if (token == JFXTokenId.WS && eol) {
+            if (token == VSGTokenId.WS && eol) {
                 if (dotPos - 1 > 0) {
                     token = tokenAt(doc, dotPos - 1);
                     insideString = insideString(token);
@@ -730,14 +730,14 @@ final class BracketCompletion {
         return false;
     }
 
-    private static boolean isComment(JFXTokenId token) {
-        return token == JFXTokenId.COMMENT || token == JFXTokenId.LINE_COMMENT || token == JFXTokenId.DOC_COMMENT;
+    private static boolean isComment(VSGTokenId token) {
+        return token == VSGTokenId.COMMENT || token == VSGTokenId.LINE_COMMENT || token == VSGTokenId.DOC_COMMENT;
     }
 
-    private static boolean insideString(JFXTokenId token) {
-        return token != null && (token == JFXTokenId.STRING_LITERAL
-                || token == JFXTokenId.SingleQuoteBody
-                || token == JFXTokenId.DoubleQuoteBody);
+    private static boolean insideString(VSGTokenId token) {
+        return token != null && (token == VSGTokenId.STRING_LITERAL
+                || token == VSGTokenId.SingleQuoteBody
+                || token == VSGTokenId.DoubleQuoteBody);
     }
 
     /**
@@ -800,7 +800,7 @@ final class BracketCompletion {
      * @return true if bracket completion is enabled
      */
     private static boolean completionSettingEnabled() {
-        //return ((Boolean)Settings.getValue(JavaFXEditorKit.class, JavaSettingsNames.PAIR_CHARACTERS_COMPLETION)).booleanV
+        //return ((Boolean)Settings.getValue(VisageEditorKit.class, JavaSettingsNames.PAIR_CHARACTERS_COMPLETION)).booleanV
         return true;
     }
 
@@ -838,7 +838,7 @@ final class BracketCompletion {
      * @return true if matched.
      */
     static boolean posWithinString(BaseDocument doc, int dotPos) {
-        return posWithinQuotes(doc, dotPos, '\"', JFXTokenId.STRING_LITERAL, JFXTokenId.DoubleQuoteBody, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL); // NOI18N
+        return posWithinQuotes(doc, dotPos, '\"', VSGTokenId.STRING_LITERAL, VSGTokenId.DoubleQuoteBody, VSGTokenId.RBRACE_LBRACE_STRING_LITERAL); // NOI18N
     }
 
     /**
@@ -855,7 +855,7 @@ final class BracketCompletion {
      */
     static boolean posWithinQuotes(BaseDocument doc, int dotPos, char quote, TokenId... tokenID) {
         try {
-            JFXTokenId tid = tokenAt(doc, dotPos);
+            VSGTokenId tid = tokenAt(doc, dotPos);
             return tid != null && Arrays.asList(tokenID).contains(tid) && doc.getChars(dotPos - 1, 1)[0] != quote;
         } catch (BadLocationException ex) {
             return false;
@@ -864,8 +864,8 @@ final class BracketCompletion {
 
     static boolean posWithinAnyQuote(BaseDocument doc, int dotPos) {
         try {
-            TokenSequence<JFXTokenId> ts = getTokenSequence(doc, dotPos);
-            JFXTokenId tid = ts.moveNext() ? ts.token().id() : null;
+            TokenSequence<VSGTokenId> ts = getTokenSequence(doc, dotPos);
+            VSGTokenId tid = ts.moveNext() ? ts.token().id() : null;
             if (insideString(tid)) {
                 char[] ch = doc.getChars(dotPos - 1, 1);
                 return dotPos - ts.offset() == 1 || (ch[0] != '\"' && ch[0] != '\''); // NOI18N

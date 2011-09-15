@@ -46,7 +46,7 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -196,11 +196,11 @@ made subject to such option by the copyright holder.
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.source</code-name-base>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
@@ -214,17 +214,17 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>org.netbeans.api.javafx.platform</package>
-                <package>org.netbeans.modules.javafx.platform</package>
-                <package>org.netbeans.modules.javafx.platform.platformdefinition</package>
-                <package>com.sun.javafx.api</package>
-                <package>com.sun.javafx.api.tree</package>
-                <package>com.sun.javafx.functions</package>
-                <package>com.sun.javafx.runtime</package>
-                <package>com.sun.javafx.runtime.annotation</package>
-                <!-- <package>com.sun.javafx.runtime.location</package> -->
-                <package>com.sun.javafx.runtime.sequence</package>
-                <package>com.sun.javafx.geom</package>
+                <package>org.netbeans.api.visage.platform</package>
+                <package>org.netbeans.modules.visage.platform</package>
+                <package>org.netbeans.modules.visage.platform.platformdefinition</package>
+                <package>com.sun.visage.api</package>
+                <package>com.sun.visage.api.tree</package>
+                <package>com.sun.visage.functions</package>
+                <package>com.sun.visage.runtime</package>
+                <package>com.sun.visage.runtime.annotation</package>
+                <!-- <package>com.sun.visage.runtime.location</package> -->
+                <package>com.sun.visage.runtime.sequence</package>
+                <package>com.sun.visage.geom</package>
                 <package>com.sun.scenario.scenegraph</package>
                 <package>com.sun.source.tree</package>
                 <package>com.sun.source.util</package>
@@ -236,16 +236,16 @@ made subject to such option by the copyright holder.
                 <package>com.sun.tools.mjavac.comp</package>
                 <package>com.sun.tools.mjavac.parser</package>
                 <package>com.sun.tools.mjavac.util</package>
-                <package>com.sun.tools.javafx.antlr</package>
-                <package>com.sun.tools.javafx.api</package>
-                <package>com.sun.tools.javafx.code</package>
-                <package>com.sun.tools.javafx.comp</package>
-                <package>com.sun.tools.javafx.main</package>
-                <package>com.sun.tools.javafx.script</package>
-                <package>com.sun.tools.javafx.tree</package>
-                <package>com.sun.tools.javafx.util</package>
-                <package>com.sun.tools.javafxdoc</package>
-                <package>javafx.lang</package>
+                <package>com.sun.tools.visage.antlr</package>
+                <package>com.sun.tools.visage.api</package>
+                <package>com.sun.tools.visage.code</package>
+                <package>com.sun.tools.visage.comp</package>
+                <package>com.sun.tools.visage.main</package>
+                <package>com.sun.tools.visage.script</package>
+                <package>com.sun.tools.visage.tree</package>
+                <package>com.sun.tools.visage.util</package>
+                <package>com.sun.tools.visagedoc</package>
+                <package>visage.lang</package>
                 <package>javax.lang.model</package>
                 <package>javax.lang.model.element</package>
                 <package>javax.lang.model.type</package>
@@ -255,16 +255,16 @@ made subject to such option by the copyright holder.
                 <package>org.antlr.runtime.tree</package>
             </public-packages>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/javafxc.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagec.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/javafxdoc.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagedoc.jar</runtime-relative-path>
             </class-path-extension>
             <extra-compilation-unit>
                 <package-root>probesrc</package-root>
                 <classpath/>
                 <built-to>build/probe/classes</built-to>
-                <built-to>${cluster}/modules/ext/org-netbeans-modules-javafx-platform-probe.jar</built-to>
+                <built-to>${cluster}/modules/ext/org-netbeans-modules-visage-platform-probe.jar</built-to>
             </extra-compilation-unit>
         </data>
     </configuration>

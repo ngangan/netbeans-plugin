@@ -34,12 +34,12 @@
 
 package image;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.transform.Translate;
-import javafx.scene.transform.Scale;
+import visage.scene.image.Image;
+import visage.scene.image.ImageView;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.transform.Translate;
+import visage.scene.transform.Scale;
 
 /**
  * @author Michal Skvor

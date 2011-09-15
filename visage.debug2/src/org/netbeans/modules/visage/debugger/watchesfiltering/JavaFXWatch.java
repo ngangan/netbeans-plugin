@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -57,7 +57,7 @@ import org.openide.util.WeakListeners;
  *
  * @author Michal Skvor
  */
-public class JavaFXWatch implements PropertyChangeListener {
+public class VisageWatch implements PropertyChangeListener {
 
     private final Watch     watch;
 
@@ -66,7 +66,7 @@ public class JavaFXWatch implements PropertyChangeListener {
     private Variable        variable;
     private Exception       exception;
 
-    public JavaFXWatch( Watch w, JPDADebugger debugger ) {
+    public VisageWatch( Watch w, JPDADebugger debugger ) {
         watch = w;
         this.debugger = debugger;
         w.addPropertyChangeListener((PropertyChangeListener) WeakListeners.create( PropertyChangeListener.class, this, w ));

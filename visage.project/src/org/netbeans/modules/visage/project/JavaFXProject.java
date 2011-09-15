@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -67,7 +67,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.classpath.GlobalPathRegistry;
 import org.netbeans.api.java.project.JavaProjectConstants;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ClasspathInfo;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectManager;
@@ -77,16 +77,16 @@ import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
 import org.netbeans.modules.java.api.common.ant.UpdateImplementation;
 import org.netbeans.modules.java.api.common.queries.QuerySupport;
-import org.netbeans.modules.javafx.project.api.JavaFXPropertyEvaluator;
-import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
-import org.netbeans.modules.javafx.project.classpath.JavaFXProjectClassPathExtender;
-import org.netbeans.modules.javafx.project.classpath.JavaFXProjectClassPathModifier;
-import org.netbeans.modules.javafx.project.queries.BinaryForSourceQueryImpl;
-import org.netbeans.modules.javafx.project.queries.FXFileBuiltQueryImpl;
-import org.netbeans.modules.javafx.project.queries.JavaFXProjectEncodingQueryImpl;
-import org.netbeans.modules.javafx.project.ui.JavaFXLogicalViewProvider;
-import org.netbeans.modules.javafx.project.ui.customizer.CustomizerProviderImpl;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.api.VisagePropertyEvaluator;
+import org.netbeans.modules.visage.project.classpath.ClassPathProviderImpl;
+import org.netbeans.modules.visage.project.classpath.VisageProjectClassPathExtender;
+import org.netbeans.modules.visage.project.classpath.VisageProjectClassPathModifier;
+import org.netbeans.modules.visage.project.queries.BinaryForSourceQueryImpl;
+import org.netbeans.modules.visage.project.queries.FXFileBuiltQueryImpl;
+import org.netbeans.modules.visage.project.queries.VisageProjectEncodingQueryImpl;
+import org.netbeans.modules.visage.project.ui.VisageLogicalViewProvider;
+import org.netbeans.modules.visage.project.ui.customizer.CustomizerProviderImpl;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.java.project.support.ExtraSourceJavadocSupport;
 import org.netbeans.spi.java.project.support.LookupMergerSupport;
 import org.netbeans.spi.java.project.support.ui.BrokenReferencesSupport;
@@ -134,20 +134,20 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 
 /**
- * Represents one plain JavaFX project.
+ * Represents one plain Visage project.
  * @author kaktus
  */
 @AntBasedProjectRegistration(
-    type=JavaFXProjectType.TYPE,
-    iconResource="org/netbeans/modules/javafx/project/ui/resources/fx.png",
-    sharedName=JavaFXProjectType.PROJECT_CONFIGURATION_NAME,
-    privateName=JavaFXProjectType.PRIVATE_CONFIGURATION_NAME,
-    sharedNamespace=JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,
-    privateNamespace=JavaFXProjectType.PRIVATE_CONFIGURATION_NAMESPACE
+    type=VisageProjectType.TYPE,
+    iconResource="org/netbeans/modules/visage/project/ui/resources/fx.png",
+    sharedName=VisageProjectType.PROJECT_CONFIGURATION_NAME,
+    privateName=VisageProjectType.PRIVATE_CONFIGURATION_NAME,
+    sharedNamespace=VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,
+    privateNamespace=VisageProjectType.PRIVATE_CONFIGURATION_NAMESPACE
 )
-public final class JavaFXProject implements Project, AntProjectListener {
-    private static final Icon JAVAFX_PROJECT_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/project/ui/resources/fx.png")); // NOI18N
-    private static final Logger LOG = Logger.getLogger(JavaFXProject.class.getName());
+public final class VisageProject implements Project, AntProjectListener {
+    private static final Icon JAVAFX_PROJECT_ICON = new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/project/ui/resources/fx.png")); // NOI18N
+    private static final Logger LOG = Logger.getLogger(VisageProject.class.getName());
 
     private final AuxiliaryConfiguration aux;
     private final AntProjectHelper helper;
@@ -160,40 +160,40 @@ public final class JavaFXProject implements Project, AntProjectListener {
     private SourceRoots sourceRoots;
     private SourceRoots testRoots;
     private final ClassPathProviderImpl cpProvider;
-    private final JavaFXProjectClassPathModifier cpMod;
+    private final VisageProjectClassPathModifier cpMod;
 
     private AntBuildExtender buildExtender;
     private final ThreadLocal<Boolean> projectPropertiesSave;
 
-    public JavaFXProject(AntProjectHelper helper) throws IOException {
+    public VisageProject(AntProjectHelper helper) throws IOException {
         this.projectPropertiesSave = new ThreadLocal<Boolean>();
         this.helper = helper;
         eval = createEvaluator();
         aux = helper.createAuxiliaryConfiguration();
         for (int v = 4; v < 10; v++) {
-            if (aux.getConfigurationFragment("data", "http://www.netbeans.org/ns/javafx-project/" + v, true) != null) { // NOI18N
+            if (aux.getConfigurationFragment("data", "http://www.netbeans.org/ns/visage-project/" + v, true) != null) { // NOI18N
                 throw Exceptions.attachLocalizedMessage(new IOException("too new"), // NOI18N
-                        NbBundle.getMessage(JavaFXProject.class, "JavaFXProject.too_new", FileUtil.getFileDisplayName(helper.getProjectDirectory()))); // NOI18N
+                        NbBundle.getMessage(VisageProject.class, "VisageProject.too_new", FileUtil.getFileDisplayName(helper.getProjectDirectory()))); // NOI18N
             }
         }
         refHelper = new ReferenceHelper(helper, aux, eval);
-        buildExtender = AntBuildExtenderFactory.createAntExtender(new JavaFXExtenderImplementation());
+        buildExtender = AntBuildExtenderFactory.createAntExtender(new VisageExtenderImplementation());
     /// TODO replace this GeneratedFilesHelper with the default one when fixing #101710
         genFilesHelper = new GeneratedFilesHelper(helper, buildExtender);
         UpdateImplementation updateProject = new UpdateProjectImpl(this, helper, aux);
         this.updateHelper = new UpdateHelper(updateProject, helper);
 
         this.cpProvider = new ClassPathProviderImpl(this.helper, evaluator(), getSourceRoots(),getTestSourceRoots()); //Does not use APH to get/put properties/cfgdata
-        this.cpMod = new JavaFXProjectClassPathModifier(this, this.updateHelper, eval, refHelper);
-        final JavaFXActionProvider actionProvider = new JavaFXActionProvider( this, this.updateHelper );
+        this.cpMod = new VisageProjectClassPathModifier(this, this.updateHelper, eval, refHelper);
+        final VisageActionProvider actionProvider = new VisageActionProvider( this, this.updateHelper );
         lookup = createLookup(aux, actionProvider);
         actionProvider.startFSListener();
         helper.addAntProjectListener(this);
     }
 
     /**
-     * JavaFXProjectProperties helper method to notify ProjectXmlSavedHookImpl about customizer save
-     * @see JavaFXProjectProperties.ProjectXmlSavedHookImpl#projectXmlSaved()
+     * VisageProjectProperties helper method to notify ProjectXmlSavedHookImpl about customizer save
+     * @see VisageProjectProperties.ProjectXmlSavedHookImpl#projectXmlSaved()
      * @param value true = active
      */
     public void setProjectPropertiesSave(boolean value) {
@@ -209,7 +209,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
     }
 
     public String toString() {
-        return "JavaFXProject[" + FileUtil.getFileDisplayName(getProjectDirectory()) + "]"; // NOI18N
+        return "VisageProject[" + FileUtil.getFileDisplayName(getProjectDirectory()) + "]"; // NOI18N
     }
     
     private PropertyEvaluator createEvaluator() {
@@ -217,13 +217,13 @@ public final class JavaFXProject implements Project, AntProjectListener {
         // Adapted from APH.getStandardPropertyEvaluator (delegates to ProjectProperties):
         PropertyEvaluator baseEval1 = PropertyUtils.sequentialPropertyEvaluator(
                 helper.getStockPropertyPreprovider(),
-                helper.getPropertyProvider(JavaFXConfigurationProvider.CONFIG_PROPS_PATH));
+                helper.getPropertyProvider(VisageConfigurationProvider.CONFIG_PROPS_PATH));
         PropertyEvaluator baseEval2 = PropertyUtils.sequentialPropertyEvaluator(
                 helper.getStockPropertyPreprovider(),
                 helper.getPropertyProvider(AntProjectHelper.PRIVATE_PROPERTIES_PATH));
         return PropertyUtils.sequentialPropertyEvaluator(
                 helper.getStockPropertyPreprovider(),
-                helper.getPropertyProvider(JavaFXConfigurationProvider.CONFIG_PROPS_PATH),
+                helper.getPropertyProvider(VisageConfigurationProvider.CONFIG_PROPS_PATH),
                 new ConfigPropertyProvider(baseEval1, "nbproject/private/configs", helper), // NOI18N
                 helper.getPropertyProvider(AntProjectHelper.PRIVATE_PROPERTIES_PATH),
                 helper.getProjectLibrariesPropertyProvider(),
@@ -243,12 +243,12 @@ public final class JavaFXProject implements Project, AntProjectListener {
             baseEval.addPropertyChangeListener(this);
         }
         public void propertyChange(PropertyChangeEvent ev) {
-            if (JavaFXConfigurationProvider.PROP_CONFIG.equals(ev.getPropertyName())) {
+            if (VisageConfigurationProvider.PROP_CONFIG.equals(ev.getPropertyName())) {
                 setDelegate(computeDelegate(baseEval, prefix, helper));
             }
         }
         private static PropertyProvider computeDelegate(PropertyEvaluator baseEval, String prefix, AntProjectHelper helper) {
-            String config = baseEval.getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
+            String config = baseEval.getProperty(VisageConfigurationProvider.PROP_CONFIG);
             if (config != null) {
                 return helper.getPropertyProvider(prefix + "/" + config + ".properties"); // NOI18N
             } else {
@@ -281,13 +281,13 @@ public final class JavaFXProject implements Project, AntProjectListener {
             final ActionProvider actionProvider) {
         final SubprojectProvider spp = refHelper.createSubprojectProvider();        
         final Lookup base = Lookups.fixed(new Object[] {
-            JavaFXProject.this,
+            VisageProject.this,
             new Info(),
             aux,
             helper.createCacheDirectoryProvider(),
             spp,
             actionProvider,
-            new JavaFXLogicalViewProvider(this, this.updateHelper, evaluator(), spp, refHelper),
+            new VisageLogicalViewProvider(this, this.updateHelper, evaluator(), spp, refHelper),
             // new J2SECustomizerProvider(this, this.updateHelper, evaluator(), refHelper),
             new CustomizerProviderImpl(this, this.updateHelper, evaluator(), refHelper, this.genFilesHelper),        
             new ClassPathProviderMerger(cpProvider),
@@ -298,38 +298,38 @@ public final class JavaFXProject implements Project, AntProjectListener {
             UILookupMergerSupport.createProjectOpenHookMerger(new ProjectOpenedHookImpl()),
             QuerySupport.createUnitTestForSourceQuery(getSourceRoots(), getTestSourceRoots()),
             QuerySupport.createSourceLevelQuery(evaluator()),
-            new JavaFXSources (this.helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
+            new VisageSources (this.helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
             QuerySupport.createSharabilityQuery(helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
             new FXFileBuiltQueryImpl(helper, evaluator(), getSourceRoots(), getTestSourceRoots()),
             new RecommendedTemplatesImpl (this.updateHelper),
-            new JavaFXProjectClassPathExtender(cpMod),
+            new VisageProjectClassPathExtender(cpMod),
             buildExtender,
             cpMod,
             this, // never cast an externally obtained Project to J2SEProject - use lookup instead
-            new JavaFXProjectOperations(this),
-            new JavaFXConfigurationProvider(this),
-//kaktus            new JavaFXPersistenceProvider(this, cpProvider),
+            new VisageProjectOperations(this),
+            new VisageConfigurationProvider(this),
+//kaktus            new VisagePersistenceProvider(this, cpProvider),
             UILookupMergerSupport.createPrivilegedTemplatesMerger(),
             UILookupMergerSupport.createRecommendedTemplatesMerger(),
             LookupProviderSupport.createSourcesMerger(),
-//cms            QuerySupport.createFileEncodingQuery(evaluator(), JavaFXProjectProperties.SOURCE_ENCODING),
-            new JavaFXProjectEncodingQueryImpl(evaluator()),
-            new JavaFXPropertyEvaluatorImpl(evaluator()),
-//            new JavaFXTemplateAttributesProvider(this.helper),
+//cms            QuerySupport.createFileEncodingQuery(evaluator(), VisageProjectProperties.SOURCE_ENCODING),
+            new VisageProjectEncodingQueryImpl(evaluator()),
+            new VisagePropertyEvaluatorImpl(evaluator()),
+//            new VisageTemplateAttributesProvider(this.helper),
             ExtraSourceJavadocSupport.createExtraSourceQueryImplementation(this, helper, eval),
             LookupMergerSupport.createSFBLookupMerger(),
             ExtraSourceJavadocSupport.createExtraJavadocQueryImplementation(this, helper, eval),
             LookupMergerSupport.createJFBLookupMerger(),
             new BinaryForSourceQueryImpl(this.sourceRoots, this.testRoots, this.helper, this.eval) //Does not use APH to get/put properties/cfgdata
         });
-        return LookupProviderSupport.createCompositeLookup(base, "Projects/org-netbeans-modules-javafx-project/Lookup"); //NOI18N
+        return LookupProviderSupport.createCompositeLookup(base, "Projects/org-netbeans-modules-visage-project/Lookup"); //NOI18N
     }
     
     public ClassPathProviderImpl getClassPathProvider () {
         return this.cpProvider;
     }
     
-    public JavaFXProjectClassPathModifier getProjectClassPathModifier () {
+    public VisageProjectClassPathModifier getProjectClassPathModifier () {
         return this.cpMod;
     }
 
@@ -355,7 +355,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
     public synchronized SourceRoots getSourceRoots() {        
         if (this.sourceRoots == null) { //Local caching, no project metadata access
             this.sourceRoots = SourceRoots.create(updateHelper, evaluator(), getReferenceHelper(),
-                    JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "source-roots", false, "src.{0}{1}.dir"); //NOI18N
+                    VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "source-roots", false, "src.{0}{1}.dir"); //NOI18N
        }
         return this.sourceRoots;
     }
@@ -366,7 +366,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
     public synchronized SourceRoots getTestSourceRoots() {
         if (this.testRoots == null) { //Local caching, no project metadata access
             this.testRoots = SourceRoots.create(updateHelper, evaluator(), getReferenceHelper(),
-                    JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "test-roots", true, "test.{0}{1}.dir"); //NOI18N
+                    VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "test-roots", true, "test.{0}{1}.dir"); //NOI18N
         }
         return this.testRoots;
     }
@@ -378,7 +378,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             public Void run() {
                 Element data = helper.getPrimaryConfigurationData(true);
                 // XXX replace by XMLUtil when that has findElement, findText, etc.
-                NodeList nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
+                NodeList nl = data.getElementsByTagNameNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
                 Element nameEl;
                 if (nl.getLength() == 1) {
                     nameEl = (Element) nl.item(0);
@@ -387,7 +387,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
                         nameEl.removeChild(deadKids.item(0));
                     }
                 } else {
-                    nameEl = data.getOwnerDocument().createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
+                    nameEl = data.getOwnerDocument().createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
                     data.insertBefore(nameEl, /* OK if null */data.getChildNodes().item(0));
                 }
                 nameEl.appendChild(data.getOwnerDocument().createTextNode(name));
@@ -433,7 +433,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
                 public String run() {
                     Element data = updateHelper.getPrimaryConfigurationData(true);
                     // XXX replace by XMLUtil when that has findElement, findText, etc.
-                    NodeList nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
+                    NodeList nl = data.getElementsByTagNameNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
                     if (nl.getLength() == 1) {
                         nl = nl.item(0).getChildNodes();
                         if (nl.getLength() == 1 && nl.item(0).getNodeType() == Node.TEXT_NODE) {
@@ -454,7 +454,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
         }
         
         public Project getProject() {
-            return JavaFXProject.this;
+            return VisageProject.this;
         }
         
         public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -476,10 +476,10 @@ public final class JavaFXProject implements Project, AntProjectListener {
             //which didn't affect the j2seproject 
             if (updateHelper.isCurrent()) {
                 //Refresh build-impl.xml only for j2seproject/2
-                final Boolean projectPropertiesSave = JavaFXProject.this.projectPropertiesSave.get();
+                final Boolean projectPropertiesSave = VisageProject.this.projectPropertiesSave.get();
                 if (projectPropertiesSave != null &&
                     projectPropertiesSave.booleanValue() &&
-                    (genFilesHelper.getBuildScriptState(GeneratedFilesHelper.BUILD_IMPL_XML_PATH,JavaFXProject.class.getResource("resources/build-impl.xsl")) & GeneratedFilesHelper.FLAG_MODIFIED) == GeneratedFilesHelper.FLAG_MODIFIED) {  //NOI18N
+                    (genFilesHelper.getBuildScriptState(GeneratedFilesHelper.BUILD_IMPL_XML_PATH,VisageProject.class.getResource("resources/build-impl.xsl")) & GeneratedFilesHelper.FLAG_MODIFIED) == GeneratedFilesHelper.FLAG_MODIFIED) {  //NOI18N
                     //When the project.xml was changed from the customizer and the build-impl.xml was modified
                     //move build-impl.xml into the build-impl.xml~ to force regeneration of new build-impl.xml.
                     //Never do this if it's not a customizer otherwise user modification of build-impl.xml will be deleted
@@ -503,11 +503,11 @@ public final class JavaFXProject implements Project, AntProjectListener {
                 }
                 genFilesHelper.refreshBuildScript(
                     GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
-                    JavaFXProject.class.getResource("resources/build-impl.xsl"), // NOI18N
+                    VisageProject.class.getResource("resources/build-impl.xsl"), // NOI18N
                     false);
                 genFilesHelper.refreshBuildScript(
-                    JavaFXProjectUtil.getBuildXmlName(JavaFXProject.this),
-                    JavaFXProject.class.getResource("resources/build.xsl"), // NOI18N
+                    VisageProjectUtil.getBuildXmlName(VisageProject.this),
+                    VisageProject.class.getResource("resources/build.xsl"), // NOI18N
                     false);
             }
         }    
@@ -526,18 +526,18 @@ public final class JavaFXProject implements Project, AntProjectListener {
                 AntBuildExtender extender = lookup.lookup(AntBuildExtender.class);
                 if (extender.getExtension("jws") != null) { //NOI18N
                     extender.removeExtension("jws"); //NOI18N
-                    ProjectManager.getDefault().saveProject(JavaFXProject.this);
+                    ProjectManager.getDefault().saveProject(VisageProject.this);
                 }
 
                 if (updateHelper.isCurrent()) {
                     //Refresh build-impl.xml only for j2seproject/2
                     genFilesHelper.refreshBuildScript(
                         GeneratedFilesHelper.BUILD_IMPL_XML_PATH,
-                        JavaFXProject.class.getResource("resources/build-impl.xsl"), // NOI18N
+                        VisageProject.class.getResource("resources/build-impl.xsl"), // NOI18N
                         true);
                     genFilesHelper.refreshBuildScript(
-                        JavaFXProjectUtil.getBuildXmlName(JavaFXProject.this),
-                        JavaFXProject.class.getResource("resources/build.xsl"), // NOI18N
+                        VisageProjectUtil.getBuildXmlName(VisageProject.this),
+                        VisageProject.class.getResource("resources/build.xsl"), // NOI18N
                         true);
                 }                
             } catch (IOException e) {
@@ -552,8 +552,8 @@ public final class JavaFXProject implements Project, AntProjectListener {
 
             //register updater of main.class
             //the updater is active only on the opened projects
-	    mainClassUpdater = new MainClassUpdater (JavaFXProject.this, eval, updateHelper,
-                    cpProvider.getProjectClassPaths(ClassPath.SOURCE)[0], JavaFXProjectProperties.MAIN_CLASS);
+	    mainClassUpdater = new MainClassUpdater (VisageProject.this, eval, updateHelper,
+                    cpProvider.getProjectClassPaths(ClassPath.SOURCE)[0], VisageProjectProperties.MAIN_CLASS);
 
             // Make it easier to run headless builds on the same machine at least.
             try {
@@ -600,20 +600,20 @@ public final class JavaFXProject implements Project, AntProjectListener {
 
                                 updateHelper.putProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH, ep);
                                 ep = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-                                if (!ep.containsKey(JavaFXProjectProperties.INCLUDES)) {
-                                    ep.setProperty(JavaFXProjectProperties.INCLUDES, "**"); // NOI18N
+                                if (!ep.containsKey(VisageProjectProperties.INCLUDES)) {
+                                    ep.setProperty(VisageProjectProperties.INCLUDES, "**"); // NOI18N
                                 }
-                                if (!ep.containsKey(JavaFXProjectProperties.EXCLUDES)) {
-                                    ep.setProperty(JavaFXProjectProperties.EXCLUDES, ""); // NOI18N
+                                if (!ep.containsKey(VisageProjectProperties.EXCLUDES)) {
+                                    ep.setProperty(VisageProjectProperties.EXCLUDES, ""); // NOI18N
                                 }
                                 helper.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
                                 try {
-                                    ProjectManager.getDefault().saveProject(JavaFXProject.this);
+                                    ProjectManager.getDefault().saveProject(VisageProject.this);
                                 } catch (IOException e) {
                                     //#91398 provide a better error message in case of read-only location of project.
-                                    if (!JavaFXProject.this.getProjectDirectory().canWrite()) {
-                                        NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(JavaFXProject.class, "ERR_ProjectReadOnly", // NOI18N
-                                                JavaFXProject.this.getProjectDirectory().getName()));
+                                    if (!VisageProject.this.getProjectDirectory().canWrite()) {
+                                        NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(VisageProject.class, "ERR_ProjectReadOnly", // NOI18N
+                                                VisageProject.this.getProjectDirectory().getName()));
                                         DialogDisplayer.getDefault().notify(nd);
                                     } else {
                                         ErrorManager.getDefault().notify(e);
@@ -627,11 +627,11 @@ public final class JavaFXProject implements Project, AntProjectListener {
             } catch (IOException e) {
                 Exceptions.printStackTrace(e);
             }
-            JavaFXLogicalViewProvider physicalViewProvider = getLookup().lookup(JavaFXLogicalViewProvider.class);
+            VisageLogicalViewProvider physicalViewProvider = getLookup().lookup(VisageLogicalViewProvider.class);
             if (physicalViewProvider != null &&  physicalViewProvider.hasBrokenLinks()) {   
                 BrokenReferencesSupport.showAlert();
             }
-            String prop = eval.getProperty(JavaFXProjectProperties.SOURCE_ENCODING);
+            String prop = eval.getProperty(VisageProjectProperties.SOURCE_ENCODING);
             if (prop != null) {
                 try {
                     Charset c = Charset.forName(prop);
@@ -651,9 +651,9 @@ public final class JavaFXProject implements Project, AntProjectListener {
             if (getProjectDirectory().isValid()) {
                 // Probably unnecessary, but just in case:
                 try {
-                    ProjectManager.getDefault().saveProject(JavaFXProject.this);
+                    ProjectManager.getDefault().saveProject(VisageProject.this);
                 } catch (IOException e) {
-                    if (!JavaFXProject.this.getProjectDirectory().canWrite()) {
+                    if (!VisageProject.this.getProjectDirectory().canWrite()) {
                         // #91398 - ignore, we already reported on project open. 
                         // not counting with someone setting the ro flag while the project is opened.
                     } else {
@@ -682,7 +682,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
 
         public AntArtifact[] getBuildArtifacts() {
             return new AntArtifact[] {
-                new JavaFXProjectAntArtifact (JavaFXProject.this,
+                new VisageProjectAntArtifact (VisageProject.this,
                         JavaProjectConstants.ARTIFACT_TYPE_JAR,
                         "dist.jar", "jar", "clean"), // NOI18N
             };
@@ -700,13 +700,13 @@ public final class JavaFXProject implements Project, AntProjectListener {
         // List of primarily supported templates
         
         private static final String[] APPLICATION_TYPES = new String[] { 
-            "javafx",         // NOI18N
+            "visage",         // NOI18N
             "java-classes",         // NOI18N
             "java-main-class",      // NOI18N
             "java-forms",           // NOI18N
             "gui-java-application", // NOI18N
             "java-beans",           // NOI18N
-            //"persistence",        // NOI18N //TODO: implement JavaFXPersistenceProvider
+            //"persistence",        // NOI18N //TODO: implement VisagePersistenceProvider
             "oasis-XML-catalogs",   // NOI18N
             "XML",                  // NOI18N
             "ant-script",           // NOI18N
@@ -721,13 +721,13 @@ public final class JavaFXProject implements Project, AntProjectListener {
         };
         
         private static final String[] LIBRARY_TYPES = new String[] { 
-            "javafx",         // NOI18N
+            "visage",         // NOI18N
             "java-classes",         // NOI18N
             "java-main-class",      // NOI18N
             "java-forms",           // NOI18N
             //"gui-java-application", // NOI18N
             "java-beans",           // NOI18N
-            //"persistence",        // NOI18N //TODO: implement JavaFXPersistenceProvider
+            //"persistence",        // NOI18N //TODO: implement VisagePersistenceProvider
             "oasis-XML-catalogs",   // NOI18N
             "XML",                  // NOI18N
             "ant-script",           // NOI18N
@@ -742,16 +742,16 @@ public final class JavaFXProject implements Project, AntProjectListener {
         };
         
         private static final String[] PRIVILEGED_NAMES = new String[] {
-            "Templates/JavaFX/JavaFXClass.fx", // NOI18N
-            "Templates/JavaFX/JavaFXEmpty.fx", // NOI18N
-            "Templates/JavaFX/JavaFXStage.fx", // NOI18N
+            "Templates/Visage/VisageClass.fx", // NOI18N
+            "Templates/Visage/VisageEmpty.fx", // NOI18N
+            "Templates/Visage/VisageStage.fx", // NOI18N
             "Templates/Classes/Class.java", // NOI18N
             "Templates/Classes/Package", // NOI18N
             "Templates/Classes/Interface.java", // NOI18N
             "Templates/GUIForms/JPanel.java", // NOI18N
             "Templates/GUIForms/JFrame.java", // NOI18N
-            //"Templates/Persistence/Entity.java", // NOI18N //TODO: implement JavaFXPersistenceProvider
-            //"Templates/Persistence/RelatedCMP", // NOI18N //TODO: implement JavaFXPersistenceProvider
+            //"Templates/Persistence/Entity.java", // NOI18N //TODO: implement VisagePersistenceProvider
+            //"Templates/Persistence/RelatedCMP", // NOI18N //TODO: implement VisagePersistenceProvider
             "Templates/WebServices/WebServiceClient"   // NOI18N                    
         };
         
@@ -759,7 +759,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
             
             EditableProperties ep = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
             // if the project has no main class, it's not really an application
-            boolean isLibrary = ep.getProperty (JavaFXProjectProperties.MAIN_CLASS) == null || "".equals (ep.getProperty (JavaFXProjectProperties.MAIN_CLASS)); // NOI18N
+            boolean isLibrary = ep.getProperty (VisageProjectProperties.MAIN_CLASS) == null || "".equals (ep.getProperty (VisageProjectProperties.MAIN_CLASS)); // NOI18N
             return isLibrary ? LIBRARY_TYPES : APPLICATION_TYPES;
         }
         
@@ -769,9 +769,9 @@ public final class JavaFXProject implements Project, AntProjectListener {
         
     }
     
-    private static final class JavaFXPropertyEvaluatorImpl implements JavaFXPropertyEvaluator {
+    private static final class VisagePropertyEvaluatorImpl implements VisagePropertyEvaluator {
         private PropertyEvaluator evaluator;
-        public JavaFXPropertyEvaluatorImpl (PropertyEvaluator eval) {
+        public VisagePropertyEvaluatorImpl (PropertyEvaluator eval) {
             evaluator = eval;
         }
         public PropertyEvaluator evaluator() {
@@ -779,7 +779,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
         }
     }
 
-    private class JavaFXExtenderImplementation implements AntBuildExtenderImplementation {
+    private class VisageExtenderImplementation implements AntBuildExtenderImplementation {
         //add targets here as required by the external plugins..
         public List<String> getExtensibleTargets() {
             String[] targets = new String[] {
@@ -789,7 +789,7 @@ public final class JavaFXProject implements Project, AntProjectListener {
         }
 
         public Project getOwningProject() {
-            return JavaFXProject.this;
+            return VisageProject.this;
         }
 
     }

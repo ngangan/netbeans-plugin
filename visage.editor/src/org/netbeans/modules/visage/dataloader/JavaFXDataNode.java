@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import java.awt.Image;
 import java.beans.PropertyChangeEvent;
@@ -80,12 +80,12 @@ import static org.openide.util.NbBundle.getMessage;
  * @author answer
  */
 
-public class JavaFXDataNode extends DataNode implements ChangeListener{
+public class VisageDataNode extends DataNode implements ChangeListener{
 
-    private static final String FX_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
-    private static final String CLASS_ICON_BASE = "org/netbeans/modules/javafx/dataloader/FX-filetype.png"; // NOI18N
+    private static final String FX_ICON_BASE = "org/netbeans/modules/visage/dataloader/FX-filetype.png"; // NOI18N
+    private static final String CLASS_ICON_BASE = "org/netbeans/modules/visage/dataloader/FX-filetype.png"; // NOI18N
 
-    private static final String NEEDS_COMPILE_BADGE_URL = "org/netbeans/modules/javafx/dataloader/resources/needs-compile.png"; // NOI18N
+    private static final String NEEDS_COMPILE_BADGE_URL = "org/netbeans/modules/visage/dataloader/resources/needs-compile.png"; // NOI18N
     private static final Image NEEDS_COMPILE;
     
     private Status status;
@@ -94,20 +94,20 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
 //    private final AtomicBoolean isExecutable;
 
     static{
-        URL needsCompileIconURL = JavaFXDataNode.class.getClassLoader().getResource(NEEDS_COMPILE_BADGE_URL);
-        String needsCompileTP = "<img src=\"" + needsCompileIconURL + "\">&nbsp;" + getMessage(JavaFXDataNode.class, "TP_NeedsCompileBadge"); // NOI18N
+        URL needsCompileIconURL = VisageDataNode.class.getClassLoader().getResource(NEEDS_COMPILE_BADGE_URL);
+        String needsCompileTP = "<img src=\"" + needsCompileIconURL + "\">&nbsp;" + getMessage(VisageDataNode.class, "TP_NeedsCompileBadge"); // NOI18N
         NEEDS_COMPILE = assignToolTipToImage(loadImage(NEEDS_COMPILE_BADGE_URL), needsCompileTP); // NOI18N
     }
 
     /** Create a node for the Java data object using the default children.
     * @param jdo the data object to represent
     */
-    public JavaFXDataNode (final DataObject jdo, boolean isJavaFXSource) {
+    public VisageDataNode (final DataObject jdo, boolean isVisageSource) {
         super (jdo, Children.LEAF);
-        setIconBaseWithExtension(isJavaFXSource ? FX_ICON_BASE : CLASS_ICON_BASE);
-        Logger.getLogger("TIMER").log(Level.FINE, "JavaFXNode", new Object[] {jdo.getPrimaryFile(), this}); // NOI18N
+        setIconBaseWithExtension(isVisageSource ? FX_ICON_BASE : CLASS_ICON_BASE);
+        Logger.getLogger("TIMER").log(Level.FINE, "VisageNode", new Object[] {jdo.getPrimaryFile(), this}); // NOI18N
         
-        if (isJavaFXSource) {
+        if (isVisageSource) {
             this.isCompiled = new AtomicBoolean(true);                                        
             WORKER.post(new BuildStatusTask(this));
 //            this.isExecutable = new AtomicBoolean(false);
@@ -116,14 +116,14 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
             jdo.addPropertyChangeListener(new PropertyChangeListener() {
                 public void propertyChange(PropertyChangeEvent evt) {
                     if (DataObject.PROP_PRIMARY_FILE.equals(evt.getPropertyName())) {
-                        Logger.getLogger("TIMER").log(Level.FINE, "JavaFXDataNode", new Object[]{jdo.getPrimaryFile(), this}); // NOI18N
+                        Logger.getLogger("TIMER").log(Level.FINE, "VisageDataNode", new Object[]{jdo.getPrimaryFile(), this}); // NOI18N
                         WORKER.post(new Runnable() {
                             public void run() {
-                                synchronized (JavaFXDataNode.this) {
+                                synchronized (VisageDataNode.this) {
                                     status = null;
                                     executableListener = null;
-                                    WORKER.post(new BuildStatusTask(JavaFXDataNode.this));
-  //                                  WORKER.post(new ExecutableTask(JavaFXDataNode.this));
+                                    WORKER.post(new BuildStatusTask(VisageDataNode.this));
+  //                                  WORKER.post(new ExecutableTask(VisageDataNode.this));
                                 }
                             }
                         });
@@ -139,7 +139,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
 
     @Override
     public HelpCtx getHelpCtx() {
-        return new HelpCtx("javafx_editing_source"); // NOI18N
+        return new HelpCtx("visage_editing_source"); // NOI18N
     }
 
 
@@ -150,7 +150,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
             super.setName(name);
         } else {
             try {
-                handler.handleRename(JavaFXDataNode.this, name);
+                handler.handleRename(VisageDataNode.this, name);
             } catch (IllegalArgumentException ioe) {
                 super.setName(name);
             }
@@ -183,18 +183,18 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         // Add classpath-related properties.
         Sheet.Set ps = new Sheet.Set();
         ps.setName("classpaths"); // NOI18N
-        ps.setDisplayName(NbBundle.getMessage(JavaFXDataNode.class, "LBL_JavaFXDataNode_sheet_classpaths")); // NOI18N
-        ps.setShortDescription(NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_sheet_classpaths")); // NOI18N
+        ps.setDisplayName(NbBundle.getMessage(VisageDataNode.class, "LBL_VisageDataNode_sheet_classpaths")); // NOI18N
+        ps.setShortDescription(NbBundle.getMessage(VisageDataNode.class, "HINT_VisageDataNode_sheet_classpaths")); // NOI18N
         ps.put(new Node.Property[] {
             new ClasspathProperty(ClassPath.COMPILE,
-                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_compile_classpath"), // NOI18N
-                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_compile_classpath")), // NOI18N
+                    NbBundle.getMessage(VisageDataNode.class, "PROP_VisageDataNode_compile_classpath"), // NOI18N
+                    NbBundle.getMessage(VisageDataNode.class, "HINT_VisageDataNode_compile_classpath")), // NOI18N
                     new ClasspathProperty(ClassPath.EXECUTE,
-                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_execute_classpath"), // NOI18N
-                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_execute_classpath")), // NOI18N
+                    NbBundle.getMessage(VisageDataNode.class, "PROP_VisageDataNode_execute_classpath"), // NOI18N
+                    NbBundle.getMessage(VisageDataNode.class, "HINT_VisageDataNode_execute_classpath")), // NOI18N
                     new ClasspathProperty(ClassPath.BOOT,
-                    NbBundle.getMessage(JavaFXDataNode.class, "PROP_JavaFXDataNode_boot_classpath"), // NOI18N
-                    NbBundle.getMessage(JavaFXDataNode.class, "HINT_JavaFXDataNode_boot_classpath")), // NOI18N
+                    NbBundle.getMessage(VisageDataNode.class, "PROP_VisageDataNode_boot_classpath"), // NOI18N
+                    NbBundle.getMessage(VisageDataNode.class, "HINT_VisageDataNode_boot_classpath")), // NOI18N
         });
         sheet.put(ps);
         return sheet;
@@ -208,7 +208,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
                 NbBundle.getMessage (DataObject.class, "HINT_name") // NOI18N
                 ) {
             public String getValue () {
-                return JavaFXDataNode.this.getName();
+                return VisageDataNode.this.getName();
             }
             @Override
             public Object getValue(String key) {
@@ -222,11 +222,11 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
                     IllegalArgumentException, InvocationTargetException {
                 if (!canWrite())
                     throw new IllegalAccessException();
-                JavaFXDataNode.this.setName(val);
+                VisageDataNode.this.setName(val);
             }
             @Override
             public boolean canWrite() {
-                return JavaFXDataNode.this.canRename();
+                return VisageDataNode.this.canRename();
             }
             
         };
@@ -272,7 +272,7 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
                 }
                 return sb.toString();
             } else {
-                return NbBundle.getMessage(JavaFXDataNode.class, "LBL_JavaFXDataNode_classpath_unknown"); // NOI18N
+                return NbBundle.getMessage(VisageDataNode.class, "LBL_VisageDataNode_classpath_unknown"); // NOI18N
             }
         }
     }
@@ -303,12 +303,12 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
         return i;
     }
     
-    private static final RequestProcessor WORKER = new RequestProcessor("JavaFX Node Badge Processor", 1); // NOI18N
+    private static final RequestProcessor WORKER = new RequestProcessor("Visage Node Badge Processor", 1); // NOI18N
     
     private static class BuildStatusTask implements Runnable {
-        private final JavaFXDataNode node;
+        private final VisageDataNode node;
         
-        public BuildStatusTask(JavaFXDataNode node) {
+        public BuildStatusTask(VisageDataNode node) {
             this.node = node;
         }
 
@@ -340,9 +340,9 @@ public class JavaFXDataNode extends DataNode implements ChangeListener{
     
 /*    
     private static class ExecutableTask implements Runnable {
-        private final JavaFXDataNode node;
+        private final VisageDataNode node;
         
-        public ExecutableTask(JavaFXDataNode node) {
+        public ExecutableTask(VisageDataNode node) {
             this.node = node;
         }
 

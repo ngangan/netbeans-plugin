@@ -44,8 +44,8 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.netbeans.org/ns/javafx-project/3"
-            xmlns="http://www.netbeans.org/ns/javafx-project/3"
+            targetNamespace="http://www.netbeans.org/ns/visage-project/3"
+            xmlns="http://www.netbeans.org/ns/visage-project/3"
             elementFormDefault="qualified">
     <xsd:element name="data">
         <xsd:complexType>

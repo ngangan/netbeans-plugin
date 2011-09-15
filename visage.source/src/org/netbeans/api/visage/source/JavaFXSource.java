@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -62,8 +62,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
-import org.netbeans.modules.javafx.source.parsing.LegacyUserTask;
+import org.netbeans.modules.visage.source.parsing.VisageParserFactory;
+import org.netbeans.modules.visage.source.parsing.LegacyUserTask;
 import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.cookies.EditorCookie;
@@ -76,12 +76,12 @@ import org.openide.util.Exceptions;
 import org.netbeans.modules.parsing.api.Source;
 
 /**
- * A class representing JavaFX source.
+ * A class representing Visage source.
  * 
  * @author nenik
  * @author David Strupl
  */
-public final class JavaFXSource {
+public final class VisageSource {
 
     static {
         hackCompilersLexer();
@@ -117,8 +117,8 @@ public final class JavaFXSource {
         MIN
     };
 
-    private static Map<FileObject, Reference<JavaFXSource>> file2Source = new WeakHashMap<FileObject, Reference<JavaFXSource>>();
-    static final Logger LOGGER = Logger.getLogger(JavaFXSource.class.getName());
+    private static Map<FileObject, Reference<VisageSource>> file2Source = new WeakHashMap<FileObject, Reference<VisageSource>>();
+    static final Logger LOGGER = Logger.getLogger(VisageSource.class.getName());
     
     //Source files being processed, may be empty
     private final List<Source> sources;
@@ -131,14 +131,14 @@ public final class JavaFXSource {
         return files.iterator().next();
     }
 
-    private JavaFXSource(ClasspathInfo cpInfo, Collection<? extends FileObject> files) throws IOException {
+    private VisageSource(ClasspathInfo cpInfo, Collection<? extends FileObject> files) throws IOException {
         this.cpInfo = cpInfo;
         List<FileObject> filesList = new LinkedList<FileObject>();
         List<Source> sourcesList = new LinkedList<Source>();
         boolean multipleSources = files.size() > 1;
         for (Iterator<? extends FileObject> it = files.iterator(); it.hasNext();) {
             FileObject file = it.next();
-            Logger.getLogger("TIMER").log(Level.FINE, "JavaFXSource",
+            Logger.getLogger("TIMER").log(Level.FINE, "VisageSource",
                 new Object[] {file, this});
             if (!file.isValid()) {
                 if (multipleSources) {
@@ -157,21 +157,21 @@ public final class JavaFXSource {
         this.sources = Collections.unmodifiableList(sourcesList);
         
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Created JavaFXSource for " + files); // NOI18N
+            LOGGER.fine("Created VisageSource for " + files); // NOI18N
         }
     }
     
     
     /**
-     * Returns a {@link JavaFXSource} instance associated with given
+     * Returns a {@link VisageSource} instance associated with given
      * {@link org.openide.filesystems.FileObject}.
-     * It returns null if the file doesn't represent JavaFX source file.
+     * It returns null if the file doesn't represent Visage source file.
      * 
-     * @param fileObject for which the {@link JavaFXSource} should be found/created.
-     * @return {@link JavaFXSource} or null
+     * @param fileObject for which the {@link VisageSource} should be found/created.
+     * @return {@link VisageSource} or null
      * @throws {@link IllegalArgumentException} if fileObject is null
      */
-    public static JavaFXSource forFileObject(FileObject fileObject) throws IllegalArgumentException {
+    public static VisageSource forFileObject(FileObject fileObject) throws IllegalArgumentException {
         if (fileObject == null) {
             throw new IllegalArgumentException ("fileObject == null");  //NOI18N
         }
@@ -196,18 +196,18 @@ public final class JavaFXSource {
             return null;
         }
         
-        Reference<JavaFXSource> ref = file2Source.get(fileObject);
-        JavaFXSource source = ref != null ? ref.get() : null;
+        Reference<VisageSource> ref = file2Source.get(fileObject);
+        VisageSource source = ref != null ? ref.get() : null;
         if (source == null) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine("Not found in cache: " + fileObject); // NOI18N
             }
 
-            if (!JavaFXParserFactory.MIME_TYPE.equals(FileUtil.getMIMEType(fileObject)) && !"fx".equals(fileObject.getExt())) {  //NOI18N
+            if (!VisageParserFactory.MIME_TYPE.equals(FileUtil.getMIMEType(fileObject)) && !"fx".equals(fileObject.getExt())) {  //NOI18N
                 return null;
             }
             source = create(ClasspathInfo.create(fileObject), Collections.singletonList(fileObject));
-            file2Source.put(fileObject, new WeakReference<JavaFXSource>(source));
+            file2Source.put(fileObject, new WeakReference<VisageSource>(source));
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.fine("Put into the cache: " + fileObject); // NOI18N
             }
@@ -215,9 +215,9 @@ public final class JavaFXSource {
         return source;
     }
 
-    public static JavaFXSource create(final ClasspathInfo cpInfo, final Collection<? extends FileObject> files) throws IllegalArgumentException {
+    public static VisageSource create(final ClasspathInfo cpInfo, final Collection<? extends FileObject> files) throws IllegalArgumentException {
         try {
-            return new JavaFXSource(cpInfo, files);
+            return new VisageSource(cpInfo, files);
         } catch (DataObjectNotFoundException donf) {
             Logger.getLogger("global").warning("Ignoring non existent file: " + FileUtil.getFileDisplayName(donf.getFileObject()));     //NOI18N
         } catch (IOException ex) {            
@@ -286,12 +286,12 @@ public final class JavaFXSource {
      * @return {@link JavaSource} or null
      * @throws {@link IllegalArgumentException} if doc is null
      */
-    public static JavaFXSource forDocument(Document doc) throws IllegalArgumentException {
+    public static VisageSource forDocument(Document doc) throws IllegalArgumentException {
         if (doc == null) {
             throw new IllegalArgumentException ("doc == null");  //NOI18N
         }
-        Reference<?> ref = (Reference<?>) doc.getProperty(JavaFXSource.class);
-        JavaFXSource js = ref != null ? (JavaFXSource) ref.get() : null;
+        Reference<?> ref = (Reference<?>) doc.getProperty(VisageSource.class);
+        VisageSource js = ref != null ? (VisageSource) ref.get() : null;
         if (js == null) {
             Object source = doc.getProperty(Document.StreamDescriptionProperty);
             
@@ -316,11 +316,11 @@ public final class JavaFXSource {
     private static void hackCompilersLexer() {
         try {
             // cache provider is not an API
-            Class dfa = Class.forName("org.netbeans.lib.javafx.lexer.DFA", true, Thread.currentThread().getContextClassLoader());
+            Class dfa = Class.forName("org.netbeans.lib.visage.lexer.DFA", true, Thread.currentThread().getContextClassLoader());
             Method share = dfa.getDeclaredMethod("getShared", new short[0].getClass());
 
             // compiler internals access
-            Class cls = Class.forName("com.sun.tools.javafx.antlr.v4Lexer");
+            Class cls = Class.forName("com.sun.tools.visage.antlr.v4Lexer");
             Field[] fields = cls.getDeclaredFields();
             for (Field fld : fields) {
                 if ((fld.getModifiers() & Modifier.STATIC) == 0) continue;

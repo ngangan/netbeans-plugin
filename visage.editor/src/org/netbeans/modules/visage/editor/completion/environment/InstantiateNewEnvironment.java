@@ -40,12 +40,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXInstanciate;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.tools.visage.code.JavafxTypes;
+import com.sun.tools.visage.tree.VSGInstanciate;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -57,13 +57,13 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class InstantiateNewEnvironment extends JavaFXCompletionEnvironment<JFXInstanciate> {
+public class InstantiateNewEnvironment extends VisageCompletionEnvironment<VSGInstanciate> {
     
     private static final Logger logger = Logger.getLogger(InstantiateNewEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXInstanciate it) throws IOException {
+    protected void inside(VSGInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
         if (LOGGABLE) log("inside InstantiateNewEnvironment " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n"); // NOI18N
         if (pos < 0) {
@@ -72,7 +72,7 @@ public class InstantiateNewEnvironment extends JavaFXCompletionEnvironment<JFXIn
         addLocalAndImportedTypes(null, null, null, false, getSmartType(it));
     }
 
-    public TypeMirror getSmartType(JFXInstanciate it) throws IOException {
+    public TypeMirror getSmartType(VSGInstanciate it) throws IOException {
         String s = it.getIdentifier().toString();
         TypeElement te = findTypeElement(s);
         TypeMirror type = te != null ? te.asType() : null;

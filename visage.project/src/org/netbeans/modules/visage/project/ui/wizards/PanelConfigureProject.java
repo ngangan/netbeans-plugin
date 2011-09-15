@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import java.awt.Component;
 import javax.swing.JComponent;
@@ -59,10 +59,10 @@ import org.openide.util.HelpCtx;
 final class PanelConfigureProject implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
     
     private WizardDescriptor wizardDescriptor;
-    private NewJavaFXProjectWizardIterator.WizardType type;
+    private NewVisageProjectWizardIterator.WizardType type;
     private PanelConfigureProjectVisual component;
     
-    public PanelConfigureProject(NewJavaFXProjectWizardIterator.WizardType type) {
+    public PanelConfigureProject(NewVisageProjectWizardIterator.WizardType type) {
         this.type = type;
     }
     

@@ -43,10 +43,10 @@
  */
 
 
-package org.netbeans.modules.javafx.palette.items.colors;
+package org.netbeans.modules.visage.palette.items.colors;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -63,7 +63,7 @@ abstract class AbstractColor implements ActiveEditorDrop {
     }
     
     public final boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(code, targetComponent, "javafx.scene.paint.Color"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(code, targetComponent, "visage.scene.paint.Color"); //NOI18N;
     }
 
 }

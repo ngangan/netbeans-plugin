@@ -41,29 +41,29 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.BlockExpressionTree;
-import com.sun.javafx.api.tree.CatchTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TryTree;
+import com.sun.visage.api.tree.BlockExpressionTree;
+import com.sun.visage.api.tree.CatchTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.TryTree;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxVarSymbol;
-import com.sun.tools.javafx.tree.JFXFunctionInvocation;
+import com.sun.tools.visage.code.JavafxVarSymbol;
+import com.sun.tools.visage.tree.VSGFunctionInvocation;
 import java.util.*;
 import javax.lang.model.element.Element;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.modules.visage.editor.hints.HintsModel.Hint;
 
 /**
  *
  * @author karol harezlak
  */
-final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsModel> {
+final class UncaughtExceptionsVisitor extends VisageTreePathScanner<Void, HintsModel> {
 
     private CompilationInfo compilationInfo;
 
@@ -96,7 +96,7 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
             if (catchTree == null) {
                 continue;
             }
-            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), catchTree.getParameter());
+            VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), catchTree.getParameter());
             if (path == null) {
                 continue;
             }
@@ -132,10 +132,10 @@ final class UncaughtExceptionsVisitor extends JavaFXTreePathScanner<Void, HintsM
         }
         Map<Tree, Collection<Type>> throwsMap = new HashMap<Tree, Collection<Type>>();
         for (ExpressionTree statement : statements) {
-            if (!(statement instanceof JFXFunctionInvocation)) {
+            if (!(statement instanceof VSGFunctionInvocation)) {
                 continue;
             }
-            JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), statement);
+            VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), statement);
             Element element = compilationInfo.getTrees().getElement(path);
             if (!(element instanceof MethodSymbol)) {
                 continue;

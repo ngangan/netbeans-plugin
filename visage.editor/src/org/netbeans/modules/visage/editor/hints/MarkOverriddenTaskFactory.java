@@ -41,15 +41,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.visage.api.tree.VisageTreePathScanner;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
 import javax.lang.model.element.ExecutableElement;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.VisageSource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
@@ -57,8 +57,8 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.*;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.text.Annotation;
 import org.openide.text.NbDocument;
@@ -68,14 +68,14 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
+public final class MarkOverriddenTaskFactory extends VisageAbstractEditorHint {
 
-    static final String ANNOTATION_TYPE = "org.netbeans.modules.javafx.editor.hints"; //NOI18N
+    static final String ANNOTATION_TYPE = "org.netbeans.modules.visage.editor.hints"; //NOI18N
     private Collection<OverriddenAnnotation> annotations = new HashSet<OverriddenAnnotation>();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MarkOverriddenTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     @Override
@@ -94,7 +94,7 @@ public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
             public void run(final CompilationInfo compilationInfo) throws Exception {
                 cancel.set(false);
                 final Map<Element, List<MethodSymbol>> overriddenMethods = new LinkedHashMap<Element, List<MethodSymbol>>();
-                final JavaFXTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, overriddenMethods, positions);
+                final VisageTreePathScanner<Void, Void> visitor = new OverrideVisitor(compilationInfo, overriddenMethods, positions);
                 visitor.scan(compilationInfo.getCompilationUnit(), null);
                 final Map<Element, List<MethodSymbol>> om = new LinkedHashMap<Element, List<MethodSymbol>>(overriddenMethods);
                 for (Element currentClass : om.keySet()) {
@@ -123,7 +123,7 @@ public final class MarkOverriddenTaskFactory extends JavaFXAbstractEditorHint {
                                         try {
                                             overrides = compilationInfo.getElements().overrides((ExecutableElement) element, (ExecutableElement) e, classSymbol);
                                         } catch (Exception ex) {
-                                            System.out.println("Workaround for issue: JFXC-4386"); //NOI18N
+                                            System.out.println("Workaround for issue: VSGC-4386"); //NOI18N
                                             System.out.println(ex.getMessage());
                                         }
                                     }

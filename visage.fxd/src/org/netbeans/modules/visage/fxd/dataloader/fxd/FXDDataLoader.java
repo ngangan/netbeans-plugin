@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader.fxd;
+package org.netbeans.modules.visage.fxd.dataloader.fxd;
 
 import java.io.IOException;
 import org.openide.filesystems.FileObject;
@@ -55,7 +55,7 @@ public final class FXDDataLoader extends UniFileLoader {
     private static final long serialVersionUID = 2L;
 
     public FXDDataLoader() {
-        super("org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataObject");  //NOI18N
+        super("org.netbeans.modules.visage.fxd.dataloader.fxd.FXDDataObject");  //NOI18N
     }
 
     @Override

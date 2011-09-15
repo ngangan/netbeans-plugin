@@ -42,14 +42,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.archive;
+package org.netbeans.modules.visage.fxd.composer.archive;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JPanel;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
-import org.netbeans.modules.javafx.fxd.composer.misc.FXDToolbar;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookup;
+import org.netbeans.modules.visage.fxd.composer.misc.FXDToolbar;
+import org.netbeans.modules.visage.fxd.composer.model.actions.ActionController;
 
 /**
  *

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.net.URL;
 import org.netbeans.api.project.FileOwnerQuery;

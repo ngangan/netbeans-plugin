@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.controls;
+package org.netbeans.modules.visage.palette.items.controls;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -53,6 +53,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Separator implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.insertSnippet(Separator.class, "TEMPLATE_Separator", targetComponent, "javafx.scene.control.Separator");//NOI18N
+        return VisagePaletteUtilities.insertSnippet(Separator.class, "TEMPLATE_Separator", targetComponent, "visage.scene.control.Separator");//NOI18N
     }
 }

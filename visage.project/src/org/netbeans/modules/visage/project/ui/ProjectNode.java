@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 import java.awt.Image;
 import java.io.File;
@@ -70,7 +70,7 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.ant.AntArtifact;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
+import org.netbeans.modules.visage.project.classpath.ClassPathSupport;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
@@ -98,7 +98,7 @@ import org.openide.util.lookup.Lookups;
  */
 class ProjectNode extends AbstractNode {
 
-    private static final String PROJECT_ICON = "org/netbeans/modules/javafx/project/ui/resources/projectDependencies.gif";    //NOI18N
+    private static final String PROJECT_ICON = "org/netbeans/modules/visage/project/ui/resources/projectDependencies.gif";    //NOI18N
 
     private final AntArtifact antArtifact;
     private final URI artifactLocation;

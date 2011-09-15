@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
@@ -50,7 +50,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.netbeans.modules.java.api.common.SourceRoots;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.openide.util.Mutex;
 import org.netbeans.api.project.Sources;
 import org.netbeans.api.project.SourceGroup;
@@ -63,12 +63,12 @@ import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.util.ChangeSupport;
 
 /**
- * Implementation of {@link Sources} interface for JavaFXProject.
+ * Implementation of {@link Sources} interface for VisageProject.
  */
-public class JavaFXSources implements Sources, PropertyChangeListener, ChangeListener  {
+public class VisageSources implements Sources, PropertyChangeListener, ChangeListener  {
     
-    private static final String BUILD_DIR_PROP = "${" + JavaFXProjectProperties.BUILD_DIR + "}";    //NOI18N
-    private static final String DIST_DIR_PROP = "${" + JavaFXProjectProperties.DIST_DIR + "}";    //NOI18N
+    private static final String BUILD_DIR_PROP = "${" + VisageProjectProperties.BUILD_DIR + "}";    //NOI18N
+    private static final String DIST_DIR_PROP = "${" + VisageProjectProperties.DIST_DIR + "}";    //NOI18N
 
     private final AntProjectHelper helper;
     private final PropertyEvaluator evaluator;
@@ -82,7 +82,7 @@ public class JavaFXSources implements Sources, PropertyChangeListener, ChangeLis
     private boolean externalRootsRegistered;    
     private final ChangeSupport changeSupport = new ChangeSupport(this);
 
-    JavaFXSources(AntProjectHelper helper, PropertyEvaluator evaluator,
+    VisageSources(AntProjectHelper helper, PropertyEvaluator evaluator,
                 SourceRoots sourceRoots, SourceRoots testRoots) {
         this.helper = helper;
         this.evaluator = evaluator;
@@ -99,16 +99,16 @@ public class JavaFXSources implements Sources, PropertyChangeListener, ChangeLis
      * This method firstly acquire the {@link ProjectManager#mutex} in read mode then it enters
      * into the synchronized block to ensure that just one instance of the {@link SourcesHelper}
      * is created. These instance is cleared also in the synchronized block by the
-     * {@link JavaFXSources#fireChange} method.
+     * {@link VisageSources#fireChange} method.
      */
     public SourceGroup[] getSourceGroups(final String type) {
         return ProjectManager.mutex().readAccess(new Mutex.Action<SourceGroup[]>() {
             public SourceGroup[] run() {
                 Sources _delegate;
-                synchronized (JavaFXSources.this) {
+                synchronized (VisageSources.this) {
                     if (delegate == null) {                    
                         delegate = initSources();
-                        delegate.addChangeListener(JavaFXSources.this);
+                        delegate.addChangeListener(VisageSources.this);
                     }
                     _delegate = delegate;
                 }
@@ -142,8 +142,8 @@ public class JavaFXSources implements Sources, PropertyChangeListener, ChangeLis
             String prop = propNames[i];
             String displayName = roots.getRootDisplayName(rootNames[i], prop);
             String loc = "${" + prop + "}"; // NOI18N
-            String includes = "${" + JavaFXProjectProperties.INCLUDES + "}"; // NOI18N
-            String excludes = "${" + JavaFXProjectProperties.EXCLUDES + "}"; // NOI18N
+            String includes = "${" + VisageProjectProperties.INCLUDES + "}"; // NOI18N
+            String excludes = "${" + VisageProjectProperties.EXCLUDES + "}"; // NOI18N
             sourcesHelper.addPrincipalSourceRoot(loc, includes, excludes, displayName, null, null); // NOI18N
             sourcesHelper.addTypedSourceRoot(loc, includes, excludes, JavaProjectConstants.SOURCES_TYPE_JAVA, displayName, null, null);
         }
@@ -170,8 +170,8 @@ public class JavaFXSources implements Sources, PropertyChangeListener, ChangeLis
     public void propertyChange(PropertyChangeEvent evt) {
         String propName = evt.getPropertyName();
         if (SourceRoots.PROP_ROOT_PROPERTIES.equals(propName) ||
-            JavaFXProjectProperties.BUILD_DIR.equals(propName)  ||
-            JavaFXProjectProperties.DIST_DIR.equals(propName)) {
+            VisageProjectProperties.BUILD_DIR.equals(propName)  ||
+            VisageProjectProperties.DIST_DIR.equals(propName)) {
             this.fireChange();
         }
     }

@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.options;
+package org.netbeans.modules.visage.editor.options;
 
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;

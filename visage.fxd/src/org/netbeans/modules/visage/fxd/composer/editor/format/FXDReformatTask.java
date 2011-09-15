@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor.format;
+package org.netbeans.modules.visage.fxd.composer.editor.format;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -60,9 +60,9 @@ import org.netbeans.modules.editor.indent.api.IndentUtils;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
-import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
+import org.netbeans.modules.visage.fxd.composer.editor.BracketCompletion;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.lexer.TokenUtils;
 
 /**
  *
@@ -71,7 +71,7 @@ import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
 public class FXDReformatTask implements ReformatTask {
     private final Context context;
 
-    private static Logger logger = Logger.getLogger( "org.netbeans.modules.javafx.fxd.composer.editor.format" ); // NOI18N
+    private static Logger logger = Logger.getLogger( "org.netbeans.modules.visage.fxd.composer.editor.format" ); // NOI18N
 
     public FXDReformatTask(Context context) {
         this.context = context;

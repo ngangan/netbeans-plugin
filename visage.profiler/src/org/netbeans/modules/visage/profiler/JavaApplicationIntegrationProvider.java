@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.profiler;
+package org.netbeans.modules.visage.profiler;
 
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
@@ -61,7 +61,7 @@ public class JavaApplicationIntegrationProvider extends AbstractIntegrationProvi
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.modules.javafx.profiler.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.modules.visage.profiler.Bundle"); // NOI18N
     private static final String MANUAL_REMOTE_STEP3_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_ManualRemoteStep3Message"); // NOI18N
     private static final String MANUAL_REMOTE_STEP4_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_ManualRemoteStep4Message"); // NOI18N
     private static final String MANUAL_REMOTE_HINT_MESSAGE = messages.getString("JavaApplicationIntegrationProvider_ManualRemoteHintMessage"); // NOI18N

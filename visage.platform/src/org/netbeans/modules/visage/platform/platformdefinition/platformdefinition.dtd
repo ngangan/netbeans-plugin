@@ -43,10 +43,10 @@ Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
 
-<!-- "-//NetBeans//DTD JavaFX PlatformDefinition 1.0//EN" "http://www.netbeans.org/dtds/javafx-platformdefinition-1_0.dtd" -->
+<!-- "-//NetBeans//DTD Visage PlatformDefinition 1.0//EN" "http://www.netbeans.org/dtds/visage-platformdefinition-1_0.dtd" -->
 
 <!--
-    DTD to describe a JavaFX SDK installation
+    DTD to describe a Visage SDK installation
 -->
 
 <!--

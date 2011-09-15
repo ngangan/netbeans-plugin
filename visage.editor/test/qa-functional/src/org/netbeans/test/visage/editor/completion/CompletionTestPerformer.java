@@ -44,7 +44,7 @@
 
 //This class is automatically generated - DO NOT MODIFY (ever)
 
-package org.netbeans.test.javafx.editor.completion;
+package org.netbeans.test.visage.editor.completion;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.io.File;

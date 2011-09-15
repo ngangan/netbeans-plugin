@@ -41,23 +41,23 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source.support;
+package org.netbeans.api.visage.source.support;
 
 import java.util.List;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;
-//import org.netbeans.api.javafx.source.SourceUtils;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.VisageSourceTaskFactory;
+//import org.netbeans.api.visage.source.SourceUtils;
 import org.openide.filesystems.FileObject;
 
-/**A {@link JavaFXSourceTaskFactorySupport} that registers tasks to all files that are
+/**A {@link VisageSourceTaskFactorySupport} that registers tasks to all files that are
  * opened in the editor and are visible.
  *
  * @author Jan Lahoda
  */
-public abstract class EditorAwareJavaFXSourceTaskFactory extends JavaFXSourceTaskFactory {
+public abstract class EditorAwareVisageSourceTaskFactory extends VisageSourceTaskFactory {
     
     private String[] supportedMimeTypes;
     
@@ -66,7 +66,7 @@ public abstract class EditorAwareJavaFXSourceTaskFactory extends JavaFXSourceTas
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      */
-    protected EditorAwareJavaFXSourceTaskFactory(Phase phase, Priority priority) {
+    protected EditorAwareVisageSourceTaskFactory(Phase phase, Priority priority) {
         this(phase, priority, (String[]) null);
     }
     
@@ -77,7 +77,7 @@ public abstract class EditorAwareJavaFXSourceTaskFactory extends JavaFXSourceTas
      * @param supportedMimeTypes a list of mime types on which the tasks created by this factory should be run
      * @since 0.21
      */
-    protected EditorAwareJavaFXSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
+    protected EditorAwareVisageSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
         super(phase, priority);
         //XXX: weak, or something like this:
         OpenedEditors.getDefault().addChangeListener(new ChangeListenerImpl());

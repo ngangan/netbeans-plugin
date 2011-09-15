@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
@@ -51,10 +51,10 @@ import org.netbeans.spi.java.queries.SourceLevelQueryImplementation;
  *
  * @author  tom
  */
-public class JavaFXPlatformSourceLevelQueryImpl implements SourceLevelQueryImplementation {
+public class VisagePlatformSourceLevelQueryImpl implements SourceLevelQueryImplementation {
 
-    /** Creates a new instance of JavaFXPlatformSourceLevelQueryImpl */
-    public JavaFXPlatformSourceLevelQueryImpl() {
+    /** Creates a new instance of VisagePlatformSourceLevelQueryImpl */
+    public VisagePlatformSourceLevelQueryImpl() {
     }
 
     public String getSourceLevel(org.openide.filesystems.FileObject javaFile) {
@@ -62,7 +62,7 @@ public class JavaFXPlatformSourceLevelQueryImpl implements SourceLevelQueryImple
         } catch (Exception e) {}
         JavaPlatform[] platforms = JavaPlatformManager.getDefault().getInstalledPlatforms ();
         for (int i=0; i< platforms.length; i++) {
-            if (JavaFXPlatformImpl.PLATFORM_JAVAFX.equalsIgnoreCase(platforms[i].getSpecification().getName()) && platforms[i].getSourceFolders().contains(javaFile)) {
+            if (VisagePlatformImpl.PLATFORM_JAVAFX.equalsIgnoreCase(platforms[i].getSpecification().getName()) && platforms[i].getSourceFolders().contains(javaFile)) {
                 return platforms[i].getSpecification().getVersion().toString();
             }
         }        

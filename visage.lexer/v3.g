@@ -177,22 +177,22 @@ tokens {
 }
 
 @lexer::header {
-package com.sun.tools.javafx.antlr;
+package com.sun.tools.visage.antlr;
 
 import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.Convert;
 import com.sun.tools.mjavac.util.Log;
-import com.sun.tools.javafx.util.MsgSym;
+import com.sun.tools.visage.util.MsgSym;
 }
 
 @header {
-package com.sun.tools.javafx.antlr;
+package com.sun.tools.visage.antlr;
 
 import com.sun.tools.mjavac.util.Context;
 import org.antlr.runtime.tree.*;
 import org.antlr.runtime.*;
 
-import com.sun.tools.javafx.util.MsgSym;
+import com.sun.tools.visage.util.MsgSym;
 }
 
 @lexer::members {
@@ -721,7 +721,7 @@ assignmentOpExpression
 	   |   SUBEQ   e2=expression				-> ^(SUBEQ $e1 $e2) 
 	   |   STAREQ   e2=expression				-> ^(STAREQ $e1 $e2) 
 	   |   SLASHEQ   e2=expression				-> ^(SLASHEQ $e1 $e2) 
-	   |   PERCENTEQ   e2=expression	{ log.warning(pos($PERCENTEQ), MsgSym.MESSAGE_JAVAFX_GENERALWARNING, "The operator \%= will not be supported in the JavaFX 1.0 release" );}			
+	   |   PERCENTEQ   e2=expression	{ log.warning(pos($PERCENTEQ), MsgSym.MESSAGE_JAVAFX_GENERALWARNING, "The operator \%= will not be supported in the Visage 1.0 release" );}			
                                                                 -> ^(PERCENTEQ $e1 $e2) 
 /*	   | SUCHTHAT expr=andExpression (TWEEN interpolate=andExpression)?
                                                                -> ^(SUCHTHAT $e1 $expr $interpolate?)*/
@@ -920,7 +920,7 @@ cardinality
 	;
 typeName  
 	: qualname 		
-		(LT genericArgument (COMMA genericArgument)* GT { log.error(pos($LT), "javafx.generalerror", "Java generic type declarations are not currently supported"); }
+		(LT genericArgument (COMMA genericArgument)* GT { log.error(pos($LT), "visage.generalerror", "Java generic type declarations are not currently supported"); }
 						-> ^(TYPE_ARG[$LT] qualname genericArgument+)
 		|				-> qualname
 		)

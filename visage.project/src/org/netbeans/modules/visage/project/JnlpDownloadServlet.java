@@ -29,7 +29,7 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.io.FileInputStream;

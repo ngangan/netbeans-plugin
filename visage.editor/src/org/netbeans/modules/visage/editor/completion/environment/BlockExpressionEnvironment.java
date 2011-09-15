@@ -40,27 +40,27 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXBlock;
+import com.sun.tools.visage.tree.VSGBlock;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.*;
 
 /**
  *
  * @author David Strupl
  */
-public class BlockExpressionEnvironment extends JavaFXCompletionEnvironment<JFXBlock> {
+public class BlockExpressionEnvironment extends VisageCompletionEnvironment<VSGBlock> {
 
     private static final Logger logger = Logger.getLogger(BlockExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXBlock bl) throws IOException {
-        if (LOGGABLE) log("inside JFXBlock " + bl); // NOI18N
+    protected void inside(VSGBlock bl) throws IOException {
+        if (LOGGABLE) log("inside VSGBlock " + bl); // NOI18N
         insideFunctionBlock(bl.getStatements());
     }
 

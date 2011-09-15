@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.source;
+package org.netbeans.modules.visage.fxd.composer.source;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -58,8 +58,8 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Lookup;
 

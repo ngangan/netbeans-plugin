@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform;
+package org.netbeans.modules.visage.platform;
 
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -63,7 +63,7 @@ import javax.swing.event.ListDataListener;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.java.platform.Specification;
-import org.netbeans.modules.javafx.platform.platformdefinition.DefaultPlatformImpl;
+import org.netbeans.modules.visage.platform.platformdefinition.DefaultPlatformImpl;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.HtmlRenderer;
@@ -633,7 +633,7 @@ public final class PlatformUiSupport {
 
     public static JavaPlatform findPlatform(String displayName) {
         JavaPlatform[] platforms = JavaPlatformManager.getDefault().getPlatforms(
-                displayName, new Specification("JavaFX", null)); //NOI18N
+                displayName, new Specification("Visage", null)); //NOI18N
         if (platforms.length == 0) {
             return null;
         }

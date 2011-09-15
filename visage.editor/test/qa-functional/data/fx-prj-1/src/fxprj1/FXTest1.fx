@@ -1,6 +1,6 @@
 package fxprj1;
 
-import javafx.ext.swing.SwingLabel;
+import visage.ext.swing.SwingLabel;
 
 var x = new SwingLabel();
 x.text = "x";

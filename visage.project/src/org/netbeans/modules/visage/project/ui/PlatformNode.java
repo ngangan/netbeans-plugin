@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 
 import java.beans.PropertyChangeEvent;
@@ -64,7 +64,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.filesystems.FileUtil;
@@ -77,7 +77,7 @@ import org.openide.util.WeakListeners;
 import org.openide.ErrorManager;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.java.project.support.ui.PackageView;
@@ -99,8 +99,8 @@ import org.openide.xml.XMLUtil;
  */
 class PlatformNode extends AbstractNode implements ChangeListener {
 
-    private static final String PLATFORM_ICON = "org/netbeans/modules/javafx/project/ui/resources/platform";    //NOI18N
-    private static final String ARCHIVE_ICON = "org/netbeans/modules/javafx/project/ui/resources/jar.gif"; //NOI18N
+    private static final String PLATFORM_ICON = "org/netbeans/modules/visage/project/ui/resources/platform";    //NOI18N
+    private static final String ARCHIVE_ICON = "org/netbeans/modules/visage/project/ui/resources/jar.gif"; //NOI18N
 
     private final PlatformProvider pp;
 
@@ -206,7 +206,7 @@ class PlatformNode extends AbstractNode implements ChangeListener {
                 return Collections.EMPTY_LIST;
             }
             //Todo: Should listen on returned classpath, but now the bootstrap libraries are read only
-            FileObject[] roots = (platform instanceof JavaFXPlatform ? ((JavaFXPlatform)platform).getBootstrapLibraries(((PlatformNode)this.getNode()).pp.getProfile()) : platform.getBootstrapLibraries()).getRoots();
+            FileObject[] roots = (platform instanceof VisagePlatform ? ((VisagePlatform)platform).getBootstrapLibraries(((PlatformNode)this.getNode()).pp.getProfile()) : platform.getBootstrapLibraries()).getRoots();
             List result = new ArrayList (roots.length);
             for (int i=0; i<roots.length; i++) {
                 try {
@@ -252,13 +252,13 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         }
         
         public String getProfile() {
-            return evaluator.getProperty("javafx.profile"); //NOI18N
+            return evaluator.getProperty("visage.profile"); //NOI18N
         }
         
         public JavaPlatform getPlatform () {
             if (platformCache == null) {
                 final String platformSystemName = getPlatformId();
-                platformCache = JavaFXProjectUtil.getActivePlatform (platformSystemName);
+                platformCache = VisageProjectUtil.getActivePlatform (platformSystemName);
                 if (platformCache != null && platformCache.getInstallFolders().size() == 0) {
                     //Deleted platform
                     platformCache = null;
@@ -285,7 +285,7 @@ class PlatformNode extends AbstractNode implements ChangeListener {
         }
         
         public void propertyChange(PropertyChangeEvent evt) {
-            if (platformPropName.equals (evt.getPropertyName()) || "javafx.profile".equals(evt.getPropertyName())) { // NOI18N
+            if (platformPropName.equals (evt.getPropertyName()) || "visage.profile".equals(evt.getPropertyName())) { // NOI18N
                 platformCache = null;
                 RequestProcessor.getDefault().post(this);
             }

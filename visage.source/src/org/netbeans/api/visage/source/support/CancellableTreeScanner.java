@@ -41,17 +41,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source.support;
+package org.netbeans.api.visage.source.support;
 
-import com.sun.javafx.api.tree.JavaFXTreeScanner;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.VisageTreeScanner;
+import com.sun.visage.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
  * @author Jan Lahoda
  */
-public class CancellableTreeScanner<R,P> extends JavaFXTreeScanner<R,P> {
+public class CancellableTreeScanner<R,P> extends VisageTreeScanner<R,P> {
 
     private final AtomicBoolean internalCanceled;
     private final AtomicBoolean canceled;

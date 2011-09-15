@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -50,8 +50,8 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
@@ -96,7 +96,7 @@ public class ProjectNode extends ContainerNode {
         }
 
         protected SelectorChildren getChildren() {
-            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Libraries, (JavaFXProject)getParent().getLookup().lookup(Project.class), includeSubprojects);
+            return new VisageProjectPackages(VisageProjectPackages.PackageType.Libraries, (VisageProject)getParent().getLookup().lookup(Project.class), includeSubprojects);
         }
     }
 
@@ -109,7 +109,7 @@ public class ProjectNode extends ContainerNode {
         }
 
         protected SelectorChildren getChildren() {
-            return new JavaFXProjectPackages(JavaFXProjectPackages.PackageType.Source, (JavaFXProject)getParent().getLookup().lookup(Project.class), includeSubprojects);
+            return new VisageProjectPackages(VisageProjectPackages.PackageType.Source, (VisageProject)getParent().getLookup().lookup(Project.class), includeSubprojects);
         }
     }
 

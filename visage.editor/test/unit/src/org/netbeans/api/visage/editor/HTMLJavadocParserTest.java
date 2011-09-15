@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.editor;
+package org.netbeans.api.visage.editor;
 
 import java.io.File;
 import java.net.URL;
@@ -61,37 +61,37 @@ public class HTMLJavadocParserTest extends NbTestCase {
     @Test
     public void testonMouseClicked() throws Exception {
         File dd = getDataDir();
-        URL url = new URL(dd.toURL(), "javafx.scene.Node.html#onMouseClicked");
-        boolean isJavaFXDoc = true;
+        URL url = new URL(dd.toURL(), "visage.scene.Node.html#onMouseClicked");
+        boolean isVisageDoc = true;
         String expResult = "Defines a function to be called when a mouse button has been clicked";
-        String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
+        String result = HTMLJavadocParser.getJavadocText(url, isVisageDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
     @Test
     public void testonKeyTyped() throws Exception {
         File dd = getDataDir();
-        URL url = new URL(dd.toURL(), "javafx.scene.Node.html#onKeyTyped");
-        boolean isJavaFXDoc = true;
+        URL url = new URL(dd.toURL(), "visage.scene.Node.html#onKeyTyped");
+        boolean isVisageDoc = true;
         String expResult = "Defines a function to be called when this <code>Node</code> has input focus and";
-        String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
+        String result = HTMLJavadocParser.getJavadocText(url, isVisageDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
     @Test
     public void testcache() throws Exception {
         File dd = getDataDir();
-        URL url = new URL(dd.toURL(), "javafx.scene.Node.html#cache");
-        boolean isJavaFXDoc = true;
+        URL url = new URL(dd.toURL(), "visage.scene.Node.html#cache");
+        boolean isVisageDoc = true;
         String expResult = "little benefit to caching Nodes as bitmaps when blurs and other effects";
-        String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
+        String result = HTMLJavadocParser.getJavadocText(url, isVisageDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
     @Test
     public void testboundsInLocal() throws Exception {
         File dd = getDataDir();
-        URL url = new URL(dd.toURL(), "javafx.scene.Node.html#boundsInLocal");
-        boolean isJavaFXDoc = true;
+        URL url = new URL(dd.toURL(), "visage.scene.Node.html#boundsInLocal");
+        boolean isVisageDoc = true;
         String expResult = "Note that boundsInLocal is automatically recomputed whenever the";
-        String result = HTMLJavadocParser.getJavadocText(url, isJavaFXDoc);
+        String result = HTMLJavadocParser.getJavadocText(url, isVisageDoc);
         assertTrue("Did not expect " + result, result.contains(expResult));
     }
 }

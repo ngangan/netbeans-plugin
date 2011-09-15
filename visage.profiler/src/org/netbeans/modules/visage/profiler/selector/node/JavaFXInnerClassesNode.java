@@ -41,25 +41,25 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.GreedySelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.InnerClassesNode;
 import org.openide.util.NbBundle;
 
@@ -67,29 +67,29 @@ import org.openide.util.NbBundle;
  *
  * @author cms
  */
-public class JavaFXInnerClassesNode extends ContainerNode {
+public class VisageInnerClassesNode extends ContainerNode {
 
-    private static class Children extends GreedySelectorChildren<JavaFXInnerClassesNode> {
+    private static class Children extends GreedySelectorChildren<VisageInnerClassesNode> {
 
-        protected List<?extends SelectorNode> prepareChildren(final JavaFXInnerClassesNode parent) {
-            final List<JavaFXClassNode> classNodes = new ArrayList<JavaFXClassNode>();
+        protected List<?extends SelectorNode> prepareChildren(final VisageInnerClassesNode parent) {
+            final List<VisageClassNode> classNodes = new ArrayList<VisageClassNode>();
 
             try {
-                JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+                VisageSource js = VisageSource.forFileObject(VisageProjectUtilities.getFile(classElement, parent.cpInfo));
                 js.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
                         }
 
                         public void run(CompilationController controller)
                                  throws Exception {
-                            if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
+                            if (VisageSource.Phase.ANALYZED.compareTo(controller.toPhase(VisageSource.Phase.ANALYZED))<=0) {
                                 classElement = parent.getClassHandle().resolve(controller);
 
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
                                     Element tek = methods.get(k);
                                     if (classElement.equals(tek.getEnclosingElement()) && tek.getKind().isClass()) {
-                                        JavaFXClassNode classNode = new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, (TypeElement)tek, parent);
+                                        VisageClassNode classNode = new VisageClassNode(parent.cpInfo, IconResource.CLASS_ICON, (TypeElement)tek, parent);
                                         if (classNode.getSignature() != null) {
                                             classNodes.add(classNode);
                                         }
@@ -98,7 +98,7 @@ public class JavaFXInnerClassesNode extends ContainerNode {
                             }
                         }
                     }, true);
-                Collections.sort(classNodes, JavaFXClassNode.COMPARATOR);
+                Collections.sort(classNodes, VisageClassNode.COMPARATOR);
             } catch (IllegalArgumentException ex) {
                 ex.printStackTrace();
             } catch (IOException ex) {
@@ -113,15 +113,15 @@ public class JavaFXInnerClassesNode extends ContainerNode {
     private static Element classElement;
     
 
-    /** Creates a new instance of JavaFXInnerClassesNode */
-    public JavaFXInnerClassesNode(final ClasspathInfo cpInfo, final JavaFXClassNode parent) {
+    /** Creates a new instance of VisageInnerClassesNode */
+    public VisageInnerClassesNode(final ClasspathInfo cpInfo, final VisageClassNode parent) {
         super(NbBundle.getMessage(InnerClassesNode.class, "InnerClasses_DisplayName"), IconResource.CLASS_ICON, parent); // NOI18N
         classElement = parent.getClassElement();
         this.cpInfo = cpInfo;
     }
 
     public ElementHandle<TypeElement> getClassHandle() {
-        return ((JavaFXClassNode) getParent()).getClassHandle();
+        return ((VisageClassNode) getParent()).getClassHandle();
     }
 
     protected SelectorChildren getChildren() {

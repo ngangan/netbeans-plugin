@@ -43,30 +43,30 @@
  */
 
 
-package org.netbeans.modules.javafx.bindspy;
+package org.netbeans.modules.visage.bindspy;
 
-import com.sun.javafx.api.JavafxBindStatus;
-import com.sun.javafx.api.tree.ForExpressionInClauseTree;
-import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXForExpression;
-import com.sun.tools.javafx.tree.JFXForExpressionInClause;
+import com.sun.visage.api.JavafxBindStatus;
+import com.sun.visage.api.tree.ForExpressionInClauseTree;
+import com.sun.visage.api.tree.ForExpressionTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.InstantiateTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.ObjectLiteralPartTree;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.tree.VSGForExpression;
+import com.sun.tools.visage.tree.VSGForExpressionInClause;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.bindspy.BindsModel.BindVariable;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.modules.visage.bindspy.BindsModel.BindVariable;
 import org.openide.loaders.DataObject;
 
 /**
  *
  * @author Michal Skvor <michal.skvor at sun.com>
  */
-public class BindsWalker extends JavaFXTreePathScanner<Void, BindsModel> {
+public class BindsWalker extends VisageTreePathScanner<Void, BindsModel> {
 
     final private CompilationInfo ci;
     final private ClassIndex index;
@@ -135,8 +135,8 @@ public class BindsWalker extends JavaFXTreePathScanner<Void, BindsModel> {
     @Override
     public Void visitForExpression(ForExpressionTree node, BindsModel p) {
         Object o = node.getInClauses().get( 0 );
-        if( o instanceof JFXForExpressionInClause ) {
-            JFXForExpressionInClause ex = (JFXForExpressionInClause)o;
+        if( o instanceof VSGForExpressionInClause ) {
+            VSGForExpressionInClause ex = (VSGForExpressionInClause)o;
             scan( ex.getSequenceExpression(), p );
         }
         return super.visitForExpression(node, p);
@@ -150,10 +150,10 @@ public class BindsWalker extends JavaFXTreePathScanner<Void, BindsModel> {
 
 //    @Override
 //    public Void visitBinary(BinaryTree node, BindsModel p) {
-//        if( node.getLeftOperand().getJavaFXKind() == BinaryTree.JavaFXKind.IDENTIFIER ) {
+//        if( node.getLeftOperand().getVisageKind() == BinaryTree.VisageKind.IDENTIFIER ) {
 //            System.out.println(" - binary : identifier = " + node.getLeftOperand().toString());
 //        }
-//        if( node.getRightOperand().getJavaFXKind() == BinaryTree.JavaFXKind.IDENTIFIER ) {
+//        if( node.getRightOperand().getVisageKind() == BinaryTree.VisageKind.IDENTIFIER ) {
 //            System.out.println(" - binary : identifier = " + node.getRightOperand().toString());
 //        }
 //        return super.visitBinary(node, p);
@@ -161,7 +161,7 @@ public class BindsWalker extends JavaFXTreePathScanner<Void, BindsModel> {
 
 //    @Override
 //    public Void visitUnary(UnaryTree node, BindsModel p) {
-//        if( node.getExpression().getJavaFXKind() == UnaryTree.JavaFXKind.IDENTIFIER ) {
+//        if( node.getExpression().getVisageKind() == UnaryTree.VisageKind.IDENTIFIER ) {
 //            System.out.println(" - unary : identifier = " + node.toString());
 //        }
 //        return super.visitUnary(node, p);
@@ -188,7 +188,7 @@ public class BindsWalker extends JavaFXTreePathScanner<Void, BindsModel> {
         if( node.getBindStatus().isBound()) {
             System.out.println(" - object literal : " + node.getName().toString());
             System.out.println("    - " + node.getExpression().toString());
-            System.out.println("    - " + node.getExpression().getJavaFXKind());
+            System.out.println("    - " + node.getExpression().getVisageKind());
         }
         return super.visitObjectLiteralPart(node, p);
     }

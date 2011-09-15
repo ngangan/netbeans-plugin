@@ -41,15 +41,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 
-import com.sun.javafx.tools.fxd.loader.Profile;
-import com.sun.javafx.tools.fxd.container.FXDContainer;
-import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
+import com.sun.visage.tools.fxd.loader.Profile;
+import com.sun.visage.tools.fxd.container.FXDContainer;
+import org.netbeans.modules.visage.fxd.composer.misc.FXDComposerUtils;
 
 /**
  *

@@ -46,7 +46,7 @@ made subject to such option by the copyright holder.
 <filesystem>
     <folder name="Services">
         <folder name="MIMEResolver">
-            <file name="JavaFXResolver.xml" url="JavaFXResolver.xml">
+            <file name="VisageResolver.xml" url="VisageResolver.xml">
                 <attr name="position" intvalue="114"/>
             </file>
         </folder>
@@ -55,7 +55,7 @@ made subject to such option by the copyright holder.
         <folder name="text">
             <folder name="x-fx">
                 <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.api.javafx.lexer.JFXTokenId.language"/>
+                    <attr name="instanceCreate" methodvalue="org.netbeans.api.visage.lexer.VSGTokenId.language"/>
                     <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
                 </file>
             </folder>

@@ -28,11 +28,11 @@
  *
  * Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.modules.visage.editor.VisageDocument;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -57,7 +57,7 @@ import org.openide.util.NbBundle;
 class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
     private final WeakReference<FileObject> file;
     private final AtomicBoolean canceled = new AtomicBoolean(false);
-    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle"); // NOI18N
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/visage/editor/imports/Bundle"); // NOI18N
 
     MarkUnusedImportsTask(FileObject file) {
         assert file != null : "File cannot be null!"; // NOI18N
@@ -71,7 +71,7 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
     public void run(CompilationInfo cp) throws Exception {
         try {
             if (canceled.get() || file.get() == null || !file.get().isValid()) return;
-            final JavaFXDocument document = getDoc(file.get());
+            final VisageDocument document = getDoc(file.get());
             if (document == null || canceled.get()) return;
 
             ArrayList<ErrorDescription> warnings = new ArrayList<ErrorDescription>();
@@ -96,7 +96,7 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
         }
     }
 
-    private JavaFXDocument getDoc(FileObject file) {
+    private VisageDocument getDoc(FileObject file) {
         if (file == null || !file.isValid()) return null;        
         DataObject od = null;
         try {
@@ -109,8 +109,8 @@ class MarkUnusedImportsTask implements CancellableTask<CompilationInfo> {
             return null;
         }
         Document doc = ec.getDocument();
-        if (doc instanceof JavaFXDocument) {
-            return (JavaFXDocument) doc;
+        if (doc instanceof VisageDocument) {
+            return (VisageDocument) doc;
         }
         return null;
     }

@@ -46,11 +46,11 @@ made subject to such option by the copyright holder.
 <!DOCTYPE editor_palette_item PUBLIC "-//NetBeans//Editor Palette Item 1.0//EN" "http://www.netbeans.org/dtds/editor-palette-item-1_0.dtd">
 
 <editor_palette_item version="1.0">
-    <class name="org.netbeans.modules.javafx.palette.items.paths.Path" />
+    <class name="org.netbeans.modules.visage.palette.items.paths.Path" />
 
-    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/path_16.png" />
-    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/path_32.png" />
-    <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
-               display-name-key="NAME_javafx-Path"
-               tooltip-key="HINT_javafx-Path" />
+    <icon16 urlvalue="org/netbeans/modules/visage/palette/items/resources/icons/path_16.png" />
+    <icon32 urlvalue="org/netbeans/modules/visage/palette/items/resources/icons/path_32.png" />
+    <description localizing-bundle="org.netbeans.modules.visage.palette.items.resources.Bundle"
+               display-name-key="NAME_visage-Path"
+               tooltip-key="HINT_visage-Path" />
 </editor_palette_item>

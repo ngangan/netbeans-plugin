@@ -46,12 +46,12 @@ made subject to such option by the copyright holder.
 <!DOCTYPE editor_palette_item PUBLIC "-//NetBeans//Editor Palette Item 1.0//EN" "http://www.netbeans.org/dtds/editor-palette-item-1_0.dtd">
 
 <editor_palette_item version="1.0">
-    <class name="org.netbeans.modules.javafx.palette.items.charts.AreaChart" />
+    <class name="org.netbeans.modules.visage.palette.items.charts.AreaChart" />
 
-    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/area_chart_16.png" />
-    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/area_chart_32.png" />
-    <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
-               display-name-key="NAME_javafx-AreaChart"
-               tooltip-key="HINT_javafx-AreaChart" />
+    <icon16 urlvalue="org/netbeans/modules/visage/palette/items/resources/icons/area_chart_16.png" />
+    <icon32 urlvalue="org/netbeans/modules/visage/palette/items/resources/icons/area_chart_32.png" />
+    <description localizing-bundle="org.netbeans.modules.visage.palette.items.resources.Bundle"
+               display-name-key="NAME_visage-AreaChart"
+               tooltip-key="HINT_visage-AreaChart" />
 </editor_palette_item>
 

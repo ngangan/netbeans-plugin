@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -66,9 +66,9 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.java.project.support.ui.BrokenReferencesSupport;
 import org.netbeans.spi.java.project.support.ui.PackageView;
 import org.netbeans.spi.project.ActionProvider;
@@ -105,18 +105,18 @@ import org.openide.xml.XMLUtil;
  * Support for creating logical views.
  * @author Petr Hrebejk
  */
-public class JavaFXLogicalViewProvider implements LogicalViewProvider {
+public class VisageLogicalViewProvider implements LogicalViewProvider {
     
     private static final RequestProcessor BROKEN_LINKS_RP = new RequestProcessor("J2SEPhysicalViewProvider.BROKEN_LINKS_RP"); // NOI18N
     
-    private final JavaFXProject project;
+    private final VisageProject project;
     private final UpdateHelper helper;
     private final PropertyEvaluator evaluator;
     private final SubprojectProvider spp;
     private final ReferenceHelper resolver;
     private final ChangeSupport changeSupport = new ChangeSupport(this);
     
-    public JavaFXLogicalViewProvider(JavaFXProject project, UpdateHelper helper, PropertyEvaluator evaluator, SubprojectProvider spp, ReferenceHelper resolver) {
+    public VisageLogicalViewProvider(VisageProject project, UpdateHelper helper, PropertyEvaluator evaluator, SubprojectProvider spp, ReferenceHelper resolver) {
         this.project = project;
         assert project != null;
         this.helper = helper;
@@ -129,7 +129,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
     }
     
     public Node createLogicalView() {
-        return new JavaFXLogicalViewRootNode();
+        return new VisageLogicalViewRootNode();
     }
     
     public PropertyEvaluator getEvaluator() {
@@ -197,17 +197,17 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
     // Private innerclasses ----------------------------------------------------
     
     private static final String[] BREAKABLE_PROPERTIES = {
-        JavaFXProjectProperties.JAVAC_CLASSPATH,
-        JavaFXProjectProperties.RUN_CLASSPATH,
-//        JavaFXProjectProperties.DEBUG_CLASSPATH,
-//        JavaFXProjectProperties.RUN_TEST_CLASSPATH,
-//        JavaFXProjectProperties.DEBUG_TEST_CLASSPATH,
-//        JavaFXProjectProperties.JAVAC_TEST_CLASSPATH,
+        VisageProjectProperties.JAVAC_CLASSPATH,
+        VisageProjectProperties.RUN_CLASSPATH,
+//        VisageProjectProperties.DEBUG_CLASSPATH,
+//        VisageProjectProperties.RUN_TEST_CLASSPATH,
+//        VisageProjectProperties.DEBUG_TEST_CLASSPATH,
+//        VisageProjectProperties.JAVAC_TEST_CLASSPATH,
     };
     
     public boolean hasBrokenLinks () {
         return BrokenReferencesSupport.isBroken(helper.getAntProjectHelper(), resolver, getBreakableProperties(),
-                new String[] {JavaFXProjectProperties.JAVA_PLATFORM});
+                new String[] {VisageProjectProperties.JAVA_PLATFORM});
     }
     
     public boolean hasInvalidJdkVersion () {
@@ -219,7 +219,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         }
         
         final String platformId = this.evaluator.getProperty("platform.active");  //NOI18N
-        final JavaPlatform activePlatform = JavaFXProjectUtil.getActivePlatform (platformId);
+        final JavaPlatform activePlatform = VisageProjectUtil.getActivePlatform (platformId);
         if (activePlatform == null) {
             return true;
         }        
@@ -246,19 +246,19 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         return result;
     }
     
-    private static Image brokenProjectBadge = Utilities.loadImage("org/netbeans/modules/javafx/project/ui/resources/brokenProjectBadge.gif", true); // NOI18N
+    private static Image brokenProjectBadge = Utilities.loadImage("org/netbeans/modules/visage/project/ui/resources/brokenProjectBadge.gif", true); // NOI18N
     
     /** Filter node containin additional features for the J2SE physical
      */
-    private final class JavaFXLogicalViewRootNode extends AbstractNode {        
+    private final class VisageLogicalViewRootNode extends AbstractNode {        
         private Action brokenLinksAction;
         private boolean broken;         //Represents a state where project has a broken reference repairable by broken reference support
         private boolean illegalState;   //Represents a state where project is not in legal state, eg invalid source/target level
         
-        public JavaFXLogicalViewRootNode() {
-            super(NodeFactorySupport.createCompositeChildren(project, "Projects/org-netbeans-modules-javafx-project/Nodes"), // NOI18N
+        public VisageLogicalViewRootNode() {
+            super(NodeFactorySupport.createCompositeChildren(project, "Projects/org-netbeans-modules-visage-project/Nodes"), // NOI18N
                   Lookups.singleton(project));
-            setIconBaseWithExtension("org/netbeans/modules/javafx/project/ui/resources/fx.png"); // NOI18N
+            setIconBaseWithExtension("org/netbeans/modules/visage/project/ui/resources/fx.png"); // NOI18N
             super.setName( ProjectUtils.getInformation( project ).getDisplayName() );
             if (hasBrokenLinks()) {
                 broken = true;
@@ -304,14 +304,14 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
         }
         
         public HelpCtx getHelpCtx() {
-            return new HelpCtx("javafx_proj_about"); // NOI18N
+            return new HelpCtx("visage_proj_about"); // NOI18N
         }
         
         // Private methods -------------------------------------------------
         
         private Action[] getAdditionalActions() {
             
-            ResourceBundle bundle = NbBundle.getBundle(JavaFXLogicalViewProvider.class);
+            ResourceBundle bundle = NbBundle.getBundle(VisageLogicalViewProvider.class);
             
             List<Action> actions = new ArrayList<Action>();
             
@@ -401,7 +401,7 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
             private PropertyChangeListener weakPCL;
             
             public BrokenLinksAction() {
-                putValue(Action.NAME, NbBundle.getMessage(JavaFXLogicalViewProvider.class, "LBL_Fix_Broken_Links_Action")); // NOI18N
+                putValue(Action.NAME, NbBundle.getMessage(VisageLogicalViewProvider.class, "LBL_Fix_Broken_Links_Action")); // NOI18N
                 setEnabled(broken);
                 evaluator.addPropertyChangeListener(this);
                 // When evaluator fires changes that platform properties were
@@ -409,13 +409,13 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
                 // That's why I have to listen here also on JPM:
                 weakPCL = WeakListeners.propertyChange(this, JavaPlatformManager.getDefault());
                 JavaPlatformManager.getDefault().addPropertyChangeListener(weakPCL);
-                JavaFXLogicalViewProvider.this.addChangeListener(WeakListeners.change(this, JavaFXLogicalViewProvider.this));
+                VisageLogicalViewProvider.this.addChangeListener(WeakListeners.change(this, VisageLogicalViewProvider.this));
             }
             
             public void actionPerformed(ActionEvent e) {
                 try {
                     helper.requestUpdate();
-                    BrokenReferencesSupport.showCustomizer(helper.getAntProjectHelper(), resolver, getBreakableProperties(), new String[] {JavaFXProjectProperties.JAVA_PLATFORM});
+                    BrokenReferencesSupport.showCustomizer(helper.getAntProjectHelper(), resolver, getBreakableProperties(), new String[] {VisageProjectProperties.JAVA_PLATFORM});
                     run();
                 } catch (IOException ioe) {
                     ErrorManager.getDefault().notify(ioe);
@@ -432,13 +432,13 @@ public class JavaFXLogicalViewProvider implements LogicalViewProvider {
             }
             
             public synchronized void run() {
-                boolean old = JavaFXLogicalViewRootNode.this.broken;
+                boolean old = VisageLogicalViewRootNode.this.broken;
                 boolean broken = hasBrokenLinks();
                 if (old != broken) {
                     setBroken(broken);
                 }
                 
-                old = JavaFXLogicalViewRootNode.this.illegalState;
+                old = VisageLogicalViewRootNode.this.illegalState;
                 broken = hasInvalidJdkVersion ();
                 if (old != broken) {
                     setIllegalState(broken);

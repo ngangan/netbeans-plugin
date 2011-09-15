@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader.fxd;
+package org.netbeans.modules.visage.fxd.dataloader.fxd;
 
 import java.awt.Image;
 import org.openide.loaders.DataNode;
@@ -50,7 +50,7 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 
 public class FXDDataNode extends DataNode {
-    public static final String FILE_IMAGE_ID = "org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png";  //NOI18N
+    public static final String FILE_IMAGE_ID = "org/netbeans/modules/visage/fxd/dataloader/resources/fxdFile16.png";  //NOI18N
     public static final Image  FILE_IMAGE    = ImageUtilities.loadImage( FILE_IMAGE_ID);
     
     public FXDDataNode(FXDDataObject obj) {

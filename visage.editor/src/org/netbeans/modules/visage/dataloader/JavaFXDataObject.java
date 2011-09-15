@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import java.io.IOException;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.netbeans.modules.visage.editor.VisageDocument;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
@@ -64,32 +64,32 @@ import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
 import org.openide.util.Lookup;
 import org.openide.windows.CloneableOpenSupport;
-import org.netbeans.api.javafx.editor.JavaFXEditorCookie;
+import org.netbeans.api.visage.editor.VisageEditorCookie;
 
 /**
  *
  * @author answer
  */
 
-public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider {
-    private JavaFXEditorSupport jes;
+public class VisageDataObject extends MultiDataObject implements Lookup.Provider {
+    private VisageEditorSupport jes;
     
-    public JavaFXDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException {
+    public VisageDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException {
         super(pf, loader);
         getCookieSet().assign( SaveAsCapable.class, new SaveAsCapable() {
             public void saveAs( FileObject folder, String fileName ) throws IOException {
-                createJavaFXEditorSupport().saveAs( folder, fileName );
+                createVisageEditorSupport().saveAs( folder, fileName );
             }
         });
-        getCookieSet().add(JavaFXEditorSupport.class, new org.openide.nodes.CookieSet.Factory() {
+        getCookieSet().add(VisageEditorSupport.class, new org.openide.nodes.CookieSet.Factory() {
             public <T extends Cookie> T createCookie(Class<T> klass) {
-                return klass.cast(createJavaFXEditorSupport());
+                return klass.cast(createVisageEditorSupport());
             }
         });
     }
 
     public @Override Node createNodeDelegate() {
-        return JavaFXDataSupport.createJavaFXNode(getPrimaryFile());
+        return VisageDataSupport.createVisageNode(getPrimaryFile());
     }
 
     @Override
@@ -104,14 +104,14 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         return dob;
     }
     
-    private synchronized JavaFXEditorSupport createJavaFXEditorSupport () {
+    private synchronized VisageEditorSupport createVisageEditorSupport () {
         if (jes == null) {
-            jes = new JavaFXEditorSupport (this);
+            jes = new VisageEditorSupport (this);
         }
         return jes;
     }            
     
-    public static final class JavaFXEditorSupport extends DataEditorSupport implements OpenCookie, EditCookie, EditorCookie, PrintCookie, EditorCookie.Observable, JavaFXEditorCookie {
+    public static final class VisageEditorSupport extends DataEditorSupport implements OpenCookie, EditCookie, EditorCookie, PrintCookie, EditorCookie.Observable, VisageEditorCookie {
         
         private static final class Environment extends DataEditorSupport.Env {
             
@@ -121,12 +121,12 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
             
             private final class SaveSupport implements SaveCookie {
                 public void save() throws java.io.IOException {
-                    ((JavaFXEditorSupport)findCloneableOpenSupport()).saveDocument();
+                    ((VisageEditorSupport)findCloneableOpenSupport()).saveDocument();
                     getDataObject().setModified(false);
                 }
             }
             
-            public Environment(JavaFXDataObject obj) {
+            public Environment(VisageDataObject obj) {
                 super(obj);
             }
             
@@ -139,30 +139,30 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
             }
             
             public @Override CloneableOpenSupport findCloneableOpenSupport() {
-                return (CloneableEditorSupport) ((JavaFXDataObject)this.getDataObject()).getCookie(EditorCookie.class);
+                return (CloneableEditorSupport) ((VisageDataObject)this.getDataObject()).getCookie(EditorCookie.class);
             }
             
             
             public void addSaveCookie() {
-                JavaFXDataObject javafxData = (JavaFXDataObject) this.getDataObject();
-                if (javafxData.getCookie(SaveCookie.class) == null) {
+                VisageDataObject visageData = (VisageDataObject) this.getDataObject();
+                if (visageData.getCookie(SaveCookie.class) == null) {
                     if (this.saveCookie == null)
                         this.saveCookie = new SaveSupport();
-                    javafxData.getCookieSet().add(this.saveCookie);
-                    javafxData.setModified(true);
+                    visageData.getCookieSet().add(this.saveCookie);
+                    visageData.setModified(true);
                 }
             }
             
             public void removeSaveCookie() {
-                JavaFXDataObject javafxData = (JavaFXDataObject) this.getDataObject();
-                if (javafxData.getCookie(SaveCookie.class) != null) {
-                    javafxData.getCookieSet().remove(this.saveCookie);
-                    javafxData.setModified(false);
+                VisageDataObject visageData = (VisageDataObject) this.getDataObject();
+                if (visageData.getCookie(SaveCookie.class) != null) {
+                    visageData.getCookieSet().remove(this.saveCookie);
+                    visageData.setModified(false);
                 }
             }
         }
         
-        public JavaFXEditorSupport(JavaFXDataObject dataObject) {
+        public VisageEditorSupport(VisageDataObject dataObject) {
             super(dataObject, new Environment(dataObject));
             setMIMEType("text/x-fx"); // NOI18N
         }
@@ -182,18 +182,18 @@ public class JavaFXDataObject extends MultiDataObject implements Lookup.Provider
         }
 
         protected @Override CloneableEditor createCloneableEditor() {
-            return new JavaFXEditor(this);
+            return new VisageEditor(this);
         }
     }
     
-    private static final class JavaFXEditor extends CloneableEditor {
+    private static final class VisageEditor extends CloneableEditor {
         
         private static final long serialVersionUID = -1;        
         
-        public JavaFXEditor() {
+        public VisageEditor() {
         }
         
-        public JavaFXEditor(JavaFXEditorSupport sup) {
+        public VisageEditor(VisageEditorSupport sup) {
             super(sup);
         }
     }

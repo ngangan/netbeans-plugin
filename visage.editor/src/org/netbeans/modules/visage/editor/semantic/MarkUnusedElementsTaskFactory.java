@@ -41,25 +41,25 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.CatchTree;
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ForExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXForExpressionInClause;
-import com.sun.tools.javafx.tree.JFXVar;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import com.sun.visage.api.tree.CatchTree;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.ForExpressionTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.FunctionInvocationTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.InstantiateTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.tree.VSGForExpressionInClause;
+import com.sun.tools.visage.tree.VSGVar;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
+import org.netbeans.api.visage.source.VisageSource;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,11 +80,11 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.settings.EditorStyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.TreeUtilities;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.editor.highlighting.HighlightsSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
@@ -95,13 +95,13 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class MarkUnusedElementsTaskFactory extends EditorAwareVisageSourceTaskFactory {
 
     //private final static Logger LOG = Logger.getAnonymousLogger();
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MarkUnusedElementsTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 final Map<Element, Tree> elementsToRemove = new HashMap<Element, Tree>();
                 //final Map<Tree, Integer> cachedPositions = new HashMap<Tree, Integer>();
 
-                JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
+                VisageTreePathScanner<Void, Void> scanner = new VisageTreePathScanner<Void, Void>() {
 
                     boolean parentClass = true;
 
@@ -202,8 +202,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                             return null;
                         }
                         for (Tree tree : node.getInClauses()) {
-                            if (tree instanceof JFXForExpressionInClause) {
-                                Tree variable = ((JFXForExpressionInClause) tree).getVariable();
+                            if (tree instanceof VSGForExpressionInClause) {
+                                Tree variable = ((VSGForExpressionInClause) tree).getVariable();
                                 addElementToAdd(variable);
                             }
                         }
@@ -257,7 +257,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (node == null) {
                             return;
                         }
-                        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
+                        VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                         Element element = compilationInfo.getTrees().getElement(path);
                         if (element == null || element.getSimpleName() == null) {
                             return;
@@ -270,7 +270,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         if (node == null) {
                             return;
                         }
-                        JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
+                        VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                         Element element = compilationInfo.getTrees().getElement(path);
                         elementsToRemove.put(element, node);
                     }
@@ -282,8 +282,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                 }
                 for (Element element : elementsToAdd.keySet()) {
                     Tree tree = elementsToAdd.get(element);
-                    if (tree instanceof JFXVar && element.getSimpleName() != null) {
-                        if (((JFXVar) elementsToAdd.get(element)).isBound()) {
+                    if (tree instanceof VSGVar && element.getSimpleName() != null) {
+                        if (((VSGVar) elementsToAdd.get(element)).isBound()) {
                             elementsToRemove.put(element, tree);
                             elementsNames.put(tree, element.getSimpleName().toString());
                         }
@@ -331,7 +331,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareJavaFXSourceTaskFa
                         continue;
                     }
                     TreeUtilities treeUtilities = compilationInfo.getTreeUtilities();
-                    TokenSequence<JFXTokenId> tokenSequence = treeUtilities.tokensFor(tree);
+                    TokenSequence<VSGTokenId> tokenSequence = treeUtilities.tokensFor(tree);
                     if (tokenSequence == null) {
                         return;
                     }

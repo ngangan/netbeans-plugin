@@ -39,15 +39,15 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.shapes;
+package org.netbeans.modules.visage.palette.items.shapes;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 public class QuadCurve implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(QuadCurve.class, "TEMPLATE_QuadCurve", targetComponent, "javafx.scene.shape.QuadCurve"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(QuadCurve.class, "TEMPLATE_QuadCurve", targetComponent, "visage.scene.shape.QuadCurve"); //NOI18N;
     }
 }

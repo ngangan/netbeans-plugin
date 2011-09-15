@@ -42,10 +42,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
+import com.sun.tools.visage.code.JavafxClassSymbol;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -57,9 +57,9 @@ import javax.lang.model.element.TypeElement;
 import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.modules.visage.editor.VisageDocument;
 import org.openide.util.Exceptions;
 
 /**
@@ -88,7 +88,7 @@ final class HintsUtils {
     }
 
     /**
-     * Add imports for provided document. Based on Imports.addImport from module JavaFX Source
+     * Add imports for provided document. Based on Imports.addImport from module Visage Source
      *
      * @param document
      * @param im - import string
@@ -330,9 +330,9 @@ final class HintsUtils {
     }
 
     static boolean isInGuardedBlock(Document document, int position) {
-        JavaFXDocument fxdocument = null;
-        if (document instanceof JavaFXDocument) {
-            fxdocument = (JavaFXDocument) document;
+        VisageDocument fxdocument = null;
+        if (document instanceof VisageDocument) {
+            fxdocument = (VisageDocument) document;
         }
         if (fxdocument != null && fxdocument.isPosGuarded(position)) {
             return true;

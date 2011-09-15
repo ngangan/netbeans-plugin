@@ -41,13 +41,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.lexer;
+package org.netbeans.modules.visage.fxd.composer.lexer;
 
 import java.util.Arrays;
 import java.util.Collection;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.TokenId;
-import org.netbeans.modules.javafx.fxd.dataloader.fxd.FXDDataLoader;
+import org.netbeans.modules.visage.fxd.dataloader.fxd.FXDDataLoader;
 import org.netbeans.spi.lexer.LanguageHierarchy;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerRestartInfo;

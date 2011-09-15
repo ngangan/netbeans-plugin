@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger;
+package org.netbeans.modules.visage.debugger;
 
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;

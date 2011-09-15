@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.source.tasklist;
+package org.netbeans.modules.visage.source.tasklist;
 
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
@@ -61,8 +61,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.parsing.spi.indexing.ErrorsCache;
@@ -82,11 +82,11 @@ import org.openide.util.RequestProcessor;
  *
  * @author Karol Harezlak
  */
-// NEVER CHANGE NAME OF THIS CLASS (JavaFXErrorTaskListProvider)! binded with tasklist.ui/src/org/netbeans/modules/tasklist/filter/TypesFilter.java
-public class JavaFXErrorTaskListProvider extends PushTaskScanner {
+// NEVER CHANGE NAME OF THIS CLASS (VisageErrorTaskListProvider)! binded with tasklist.ui/src/org/netbeans/modules/tasklist/filter/TypesFilter.java
+public class VisageErrorTaskListProvider extends PushTaskScanner {
 
     private static final Logger LOG = Logger.getAnonymousLogger(); //NOI18N
-    private static final String TASK_LIST_NAME = NbBundle.getMessage(JavaFXErrorTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
+    private static final String TASK_LIST_NAME = NbBundle.getMessage(VisageErrorTaskListProvider.class, "LABEL_TL_JAVAFX_ISSUES"); //NOI18N
     private static final String FX_EXT = "fx"; //NOI18N
     private static final int TIME_WAIT = 3000;
     private final Map<FileObject, FileChangeListener> projectDirs;
@@ -96,7 +96,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
     private RequestProcessor.Task majorTask;
     private RequestProcessor processor;
 
-    private JavaFXErrorTaskListProvider() {
+    private VisageErrorTaskListProvider() {
         super(TASK_LIST_NAME, TASK_LIST_NAME, TASK_LIST_NAME);
         projectDirs = Collections.synchronizedMap(new HashMap<FileObject, FileChangeListener>());
         waitingTasks = Collections.synchronizedMap(new HashMap<FileObject, RequestProcessor.Task>());
@@ -104,7 +104,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
     }
 
     public static final PushTaskScanner create() {
-        return new JavaFXErrorTaskListProvider();
+        return new VisageErrorTaskListProvider();
     }
 
     @Override
@@ -221,7 +221,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
             callback.setTasks(fileObject, Collections.EMPTY_LIST);
             return;
         }
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fileObject);
+        VisageSource jfxs = VisageSource.forFileObject(fileObject);
         if (jfxs == null) {
             return;
         }
@@ -313,7 +313,7 @@ public class JavaFXErrorTaskListProvider extends PushTaskScanner {
         //LOG.info("Major task has been CREATED " + majorTask.hashCode()); //NOI18N
     }
 
-    private class ScannerTask implements org.netbeans.api.javafx.source.Task<CompilationController> {
+    private class ScannerTask implements org.netbeans.api.visage.source.Task<CompilationController> {
 
         private final Callback callback;
 

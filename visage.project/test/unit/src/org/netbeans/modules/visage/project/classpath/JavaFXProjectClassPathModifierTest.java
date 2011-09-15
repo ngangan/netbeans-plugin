@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.beans.PropertyChangeListener;
 import java.net.URI;
@@ -60,8 +60,8 @@ import org.netbeans.api.project.ant.AntArtifact;
 import org.netbeans.api.project.libraries.Library;
 import org.netbeans.api.project.libraries.LibraryManager;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
-import org.netbeans.modules.javafx.project.TestUtil;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
+import org.netbeans.modules.visage.project.TestUtil;
 import org.netbeans.spi.project.ant.AntArtifactProvider;
 import org.netbeans.spi.project.libraries.LibraryImplementation;
 import org.netbeans.spi.project.libraries.LibraryProvider;
@@ -79,7 +79,7 @@ import org.openide.util.Lookup;
  *
  * @author answer
  */
-public class JavaFXProjectClassPathModifierTest extends NbTestCase {
+public class VisageProjectClassPathModifierTest extends NbTestCase {
 
     private FileObject scratch;
     private AntProjectHelper helper;
@@ -87,7 +87,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
     private FileObject src;
     private Project prj;
 
-    public JavaFXProjectClassPathModifierTest(String testName) {
+    public VisageProjectClassPathModifierTest(String testName) {
         super(testName);
     }
 
@@ -95,16 +95,16 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         super.setUp();
         clearWorkDir();
         TestUtil.setLookup(new Object[] {
-            new org.netbeans.modules.javafx.project.JavaFXProjectType(),
+            new org.netbeans.modules.visage.project.VisageProjectType(),
             new org.netbeans.modules.projectapi.SimpleFileOwnerQueryImplementation(),
             new TestLibraryProvider (),
         });
         this.scratch = TestUtil.makeScratchDir(this);
         FileObject projdir = scratch.createFolder("proj");  //NOI18N
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        this.helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        this.helper = null; // FIXME (not compilable): VisageProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
         this.eval = this.helper.getStandardPropertyEvaluator();
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         this.prj = FileOwnerQuery.getOwner(projdir);
         assertNotNull (this.prj);
         this.src = projdir.getFileObject("src");
@@ -147,9 +147,9 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
 
     public void testAddRemoveArtifact () throws Exception {
         FileObject projdir = scratch.createFolder("libPrj");  //NOI18N
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"libProj",null,null); //NOI18N
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper helper = null; // FIXME (not compilable): VisageProjectGenerator.createProject(FileUtil.toFile(projdir),"libProj",null,null); //NOI18N
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         Project libPrj = FileOwnerQuery.getOwner(projdir);
         assertNotNull (this.prj);
         AntArtifactProvider ap = (AntArtifactProvider) libPrj.getLookup().lookup(AntArtifactProvider.class);
@@ -220,7 +220,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
             lck.releaseLock();
         }
         final FileObject jarRoot = FileUtil.getArchiveRoot(jarFile);
-        JavaFXProjectClassPathExtender extender = (JavaFXProjectClassPathExtender) this.prj.getLookup().lookup(JavaFXProjectClassPathExtender.class);
+        VisageProjectClassPathExtender extender = (VisageProjectClassPathExtender) this.prj.getLookup().lookup(VisageProjectClassPathExtender.class);
         assertNotNull (extender);
         extender.addArchiveFile(rootFolder);
 //        extender.addArchiveFile(jarFile);
@@ -309,7 +309,7 @@ public class JavaFXProjectClassPathModifierTest extends NbTestCase {
         }
 
         public String getType() {
-            return "javafx";
+            return "visage";
         }
 
         public String getName() {

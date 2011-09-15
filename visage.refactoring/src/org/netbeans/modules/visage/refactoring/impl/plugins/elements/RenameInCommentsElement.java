@@ -43,18 +43,18 @@
  */
 
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
+package org.netbeans.modules.visage.refactoring.impl.plugins.elements;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.modules.visage.refactoring.transformations.ReplaceTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -82,12 +82,12 @@ public class RenameInCommentsElement extends BaseRefactoringElementImplementatio
             EditorCookie ec = dobj.getCookie(EditorCookie.class);
             Document doc = ec.openDocument();
             TokenHierarchy th = TokenHierarchy.get(doc);
-            TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) th.tokenSequence();
+            TokenSequence<VSGTokenId> ts = (TokenSequence<VSGTokenId>) th.tokenSequence();
             ts.moveStart();
             int pos = 0;
             while (ts.moveNext()) {
-                Token<JFXTokenId> t = ts.token();
-                if (t.id() == JFXTokenId.COMMENT || t.id() == JFXTokenId.DOC_COMMENT) {
+                Token<VSGTokenId> t = ts.token();
+                if (t.id() == VSGTokenId.COMMENT || t.id() == VSGTokenId.DOC_COMMENT) {
                     int locPos = 0;
                     String tt = t.text().toString();
                     while (locPos > -1) {

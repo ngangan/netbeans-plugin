@@ -43,10 +43,10 @@
  */
 
 
-package org.netbeans.modules.javafx.palette.items.controls;
+package org.netbeans.modules.visage.palette.items.controls;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -58,6 +58,6 @@ public class Button implements ActiveEditorDrop {
     private static final String templateName = "TEMPLATE_Button"; //NOI18N
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.insertSnippet(Button.class, templateName, targetComponent, "javafx.scene.control.Button"); //NOI18N
+        return VisagePaletteUtilities.insertSnippet(Button.class, templateName, targetComponent, "visage.scene.control.Button"); //NOI18N
     }
 }

@@ -41,12 +41,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import com.sun.javadoc.Doc;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Source;
 import com.sun.tools.mjavac.code.Symbol;
@@ -60,14 +60,14 @@ import com.sun.tools.mjavac.code.Type.ClassType;
 import com.sun.tools.mjavac.code.Types;
 import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.Name;
-import com.sun.tools.javafx.api.JavafxcScope;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXOverrideClassVar;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
-import com.sun.tools.javafxdoc.ClassDocImpl;
-import com.sun.tools.javafxdoc.DocEnv;
+import com.sun.tools.visage.api.JavafxcScope;
+import com.sun.tools.visage.code.JavafxTypes;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGOverrideClassVar;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.JavafxTreeInfo;
+import com.sun.tools.visagedoc.ClassDocImpl;
+import com.sun.tools.visagedoc.DocEnv;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,8 +84,8 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
-import org.netbeans.modules.javafx.source.JavadocEnv;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.netbeans.modules.visage.source.JavadocEnv;
+import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 import org.openide.util.Exceptions;
 
 /**
@@ -97,13 +97,13 @@ public final class ElementUtilities {
 
     private final Context ctx;
 //    private final ElementsService delegate;
-    private final JavaFXParserResultImpl parserResultImpl;
+    private final VisageParserResultImpl parserResultImpl;
 
     ElementUtilities(final CompilationInfo info) {
         this(info.impl().parserResultImpl());
     }
 
-    ElementUtilities(JavaFXParserResultImpl parserResultImpl) {
+    ElementUtilities(VisageParserResultImpl parserResultImpl) {
         this.parserResultImpl = parserResultImpl;
         this.ctx = parserResultImpl.getJavafxcTaskImpl().getContext();
 //        this.delegate = ElementsService.instance(ctx);
@@ -279,7 +279,7 @@ public final class ElementUtilities {
         }
         final SourcePositions positions = parserResultImpl.getTrees().getSourcePositions();
         final Element[] e = new Element[1];
-        JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
+        VisageTreePathScanner<Void, Void> scanner = new VisageTreePathScanner<Void, Void>() {
             private long lastValidSpan = Long.MAX_VALUE;
             @Override
             public Void scan(Tree tree, Void p) {
@@ -288,23 +288,23 @@ public final class ElementUtilities {
                     long start = positions.getStartPosition(parserResultImpl.getCompilationUnit(), tree);
                     long end = positions.getEndPosition(parserResultImpl.getCompilationUnit(), tree);
 
-                    if (tree.getJavaFXKind() != Tree.JavaFXKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals(""))) {
-                        if (tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS && tree.getJavaFXKind() != Tree.JavaFXKind.FUNCTION_VALUE && start != -1 && start != end && start <= pos && end >=pos) {
-                            // check for javafx$run$ magic
-                            if (!(tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && ((JFXFunctionDefinition)tree).getName().contentEquals("javafx$run$"))) {
+                    if (tree.getVisageKind() != Tree.VisageKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals(""))) {
+                        if (tree.getVisageKind() != Tree.VisageKind.MODIFIERS && tree.getVisageKind() != Tree.VisageKind.FUNCTION_VALUE && start != -1 && start != end && start <= pos && end >=pos) {
+                            // check for visage$run$ magic
+                            if (!(tree.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION && ((VSGFunctionDefinition)tree).getName().contentEquals("visage$run$"))) {
                                 long span = end - start + 1;
                                 if (span < lastValidSpan) {
-                                    e[0] = JavafxTreeInfo.symbolFor((JFXTree)tree);
+                                    e[0] = JavafxTreeInfo.symbolFor((VSGTree)tree);
                                     if (e[0] != null) {
                                         lastValidSpan = span;
                                     } else {
-                                        if (tree.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT || tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER) {
-                                            // a bug in javafxc - not resolving package symbols in "package statement"
+                                        if (tree.getVisageKind() == Tree.VisageKind.MEMBER_SELECT || tree.getVisageKind() == Tree.VisageKind.IDENTIFIER) {
+                                            // a bug in visagec - not resolving package symbols in "package statement"
                                             e[0] = getPackageElement(tree.toString());
                                             lastValidSpan = span;
-                                        } else if (tree.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
-                                            if (tree instanceof JFXOverrideClassVar) {
-                                                e[0] = ((JFXOverrideClassVar)tree).sym;
+                                        } else if (tree.getVisageKind() == Tree.VisageKind.VARIABLE) {
+                                            if (tree instanceof VSGOverrideClassVar) {
+                                                e[0] = ((VSGOverrideClassVar)tree).sym;
                                                 lastValidSpan = span;
                                             }
                                         }
@@ -597,7 +597,7 @@ public final class ElementUtilities {
         return false;
     }
 
-    // JFXC-2154
+    // VSGC-2154
     public static java.util.List<? extends Element> getAllMembers(Elements elements, TypeElement type) {
         java.util.List<? extends Element> allMembers = Collections.<Element>emptyList();
         if (elements == null || type == null) {

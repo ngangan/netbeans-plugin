@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 /** Cancellable runnable which takes parameter of given type.
  *

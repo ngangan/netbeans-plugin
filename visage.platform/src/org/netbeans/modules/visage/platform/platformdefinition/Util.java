@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.text.MessageFormat;
 import org.netbeans.api.java.classpath.ClassPath;

@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -59,15 +59,15 @@ import org.netbeans.modules.editor.indent.spi.ReformatTask;
  *
  * @author Anton Chechel
  */
-public class CompilerIndependentJFXReformatTask implements ReformatTask {
+public class CompilerIndependentVSGReformatTask implements ReformatTask {
     private static final String TEMPLATE_START = "&template_start&"; // NOI18N
     private static final String TEMPLATE_END = "&template_end&"; // NOI18N
 
     private final Context context;
 
-    private static Logger logger = Logger.getLogger( "org.netbeans.modules.javafx.editor.format" ); // NOI18N
+    private static Logger logger = Logger.getLogger( "org.netbeans.modules.visage.editor.format" ); // NOI18N
 
-    public CompilerIndependentJFXReformatTask(Context context) {
+    public CompilerIndependentVSGReformatTask(Context context) {
         this.context = context;
     }
 

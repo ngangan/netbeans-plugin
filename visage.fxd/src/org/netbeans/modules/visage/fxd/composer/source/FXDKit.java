@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.source;
+package org.netbeans.modules.visage.fxd.composer.source;
 
-import org.netbeans.modules.javafx.fxd.composer.editor.FXDKeyTypedAction;
+import org.netbeans.modules.visage.fxd.composer.editor.FXDKeyTypedAction;
 import java.util.Map;
 import javax.swing.Action;
 import javax.swing.text.BadLocationException;
@@ -54,8 +54,8 @@ import org.netbeans.editor.ActionFactory.FormatAction;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.BaseKit;
 import org.netbeans.modules.editor.NbEditorKit;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
-import org.netbeans.modules.javafx.fxd.composer.editor.FXDInsertBreakAction;
+import org.netbeans.modules.visage.fxd.composer.editor.BracketCompletion;
+import org.netbeans.modules.visage.fxd.composer.editor.FXDInsertBreakAction;
 
 /**
  *

@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.ReturnTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXType;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.ReturnTree;
+import com.sun.visage.api.tree.Tree;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGType;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class ReturnEnvironment extends JavaFXCompletionEnvironment<ReturnTree> {
+public class ReturnEnvironment extends VisageCompletionEnvironment<ReturnTree> {
     
     private static final Logger logger = Logger.getLogger(ReturnEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -77,17 +77,17 @@ public class ReturnEnvironment extends JavaFXCompletionEnvironment<ReturnTree> {
     }
 
     private TypeMirror getSmartType(ReturnTree ui) {
-        JFXType r = null;
-        for (JavaFXTreePath tp = path; tp != null; tp = tp.getParentPath()) {
+        VSGType r = null;
+        for (VisageTreePath tp = path; tp != null; tp = tp.getParentPath()) {
             Tree t = tp.getLeaf();
-            if (LOGGABLE) log("  tree kind: " + t.getJavaFXKind()); // NOI18N
-            if (t instanceof JFXFunctionDefinition) {
-                JFXFunctionDefinition fDefTree = (JFXFunctionDefinition)t;
-                r = fDefTree.getJFXReturnType();
+            if (LOGGABLE) log("  tree kind: " + t.getVisageKind()); // NOI18N
+            if (t instanceof VSGFunctionDefinition) {
+                VSGFunctionDefinition fDefTree = (VSGFunctionDefinition)t;
+                r = fDefTree.getVSGReturnType();
                 if (LOGGABLE) log("   return type == " + r); // NOI18N
             }
         }
-        final JavaFXTreePath treePath = new JavaFXTreePath(path, r == null ? ui.getExpression() : r);
+        final VisageTreePath treePath = new VisageTreePath(path, r == null ? ui.getExpression() : r);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + treePath.getLeaf() + "  type == " + type); // NOI18N
         return type;

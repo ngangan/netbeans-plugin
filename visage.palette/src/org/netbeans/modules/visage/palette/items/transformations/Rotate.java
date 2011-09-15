@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.transformations;
+package org.netbeans.modules.visage.palette.items.transformations;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Rotate implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(Rotate.class, "TEMPLATE_Rotate", targetComponent, "javafx.scene.transform.Rotate"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(Rotate.class, "TEMPLATE_Rotate", targetComponent, "visage.scene.transform.Rotate"); //NOI18N;
     }
 }

@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -67,24 +67,24 @@ import org.openide.util.NbBundle;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.NodeActionsProvider.class } )
-public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
+public class VisageWatchesActionsProvider implements NodeActionsProvider {
 
     private static final Action NEW_WATCH_ACTION = new AbstractAction(
-        NbBundle.getBundle( JavaFXWatchesActionsProvider.class).getString( "CTL_WatchAction_AddNew" )) {
+        NbBundle.getBundle( VisageWatchesActionsProvider.class).getString( "CTL_WatchAction_AddNew" )) {
             public void actionPerformed( ActionEvent e ) {
                 newWatch();
             }
     };
     
     private static final Action DELETE_ALL_ACTION = new AbstractAction( 
-        NbBundle.getBundle( JavaFXWatchesActionsProvider.class ).getString( "CTL_WatchAction_DeleteAll" )) {
+        NbBundle.getBundle( VisageWatchesActionsProvider.class ).getString( "CTL_WatchAction_DeleteAll" )) {
             public void actionPerformed( ActionEvent e ) {
                 DebuggerManager.getDebuggerManager().removeAllWatches();
             }
     };
 
     private static final Action DELETE_ACTION = Models.createAction(
-        NbBundle.getBundle( JavaFXWatchesActionsProvider.class ).getString( "CTL_WatchAction_Delete" ),
+        NbBundle.getBundle( VisageWatchesActionsProvider.class ).getString( "CTL_WatchAction_Delete" ),
         new Models.ActionPerformer() {
             public boolean isEnabled( Object node ) {
                 return true;
@@ -93,7 +93,7 @@ public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
             public void perform( Object[] nodes ) {
                 int i, k = nodes.length;
                 for (i = 0; i < k; i++) {
-                    ((JavaFXWatch) nodes [i] ).getWatch().remove();
+                    ((VisageWatch) nodes [i] ).getWatch().remove();
                 }
             }
         },
@@ -108,20 +108,20 @@ public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
     };
     
     private static final Action CUSTOMIZE_ACTION = Models.createAction (
-        NbBundle.getBundle( JavaFXWatchesActionsProvider.class ).getString( "CTL_WatchAction_Customize" ),
+        NbBundle.getBundle( VisageWatchesActionsProvider.class ).getString( "CTL_WatchAction_Customize" ),
         new Models.ActionPerformer() {
             public boolean isEnabled( Object node ) {
                 return true;
             }
             public void perform( Object[] nodes ) {
-                customize(((JavaFXWatch) nodes[0] ).getWatch());
+                customize(((VisageWatch) nodes[0] ).getWatch());
             }
         },
         Models.MULTISELECTION_TYPE_EXACTLY_ONE
     );
 
     public Action[] getActions (Object node) throws UnknownTypeException {
-        if (node instanceof JavaFXWatch )
+        if (node instanceof VisageWatch )
             return new Action [] {
                 NEW_WATCH_ACTION,
                 null,
@@ -134,8 +134,8 @@ public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
     }
 
     public void performDefaultAction( Object node ) throws UnknownTypeException {
-        if( node instanceof JavaFXWatch ) {
-            customize(((JavaFXWatch) node).getWatch());
+        if( node instanceof VisageWatch ) {
+            customize(((VisageWatch) node).getWatch());
             return;
         }
         throw new UnknownTypeException( node );
@@ -153,7 +153,7 @@ public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
 
         org.openide.DialogDescriptor dd = new org.openide.DialogDescriptor(
             panel,
-            NbBundle.getMessage( JavaFXWatchesActionsProvider.class, "CTL_Edit_Watch_Dialog_Title", // NOI18N
+            NbBundle.getMessage( VisageWatchesActionsProvider.class, "CTL_Edit_Watch_Dialog_Title", // NOI18N
                                            w.getExpression())
         );
         dd.setHelpCtx( new HelpCtx( "debug.add.watch" ));
@@ -171,7 +171,7 @@ public class JavaFXWatchesActionsProvider implements NodeActionsProvider {
 
         org.openide.DialogDescriptor dd = new org.openide.DialogDescriptor (
             panel,
-            NbBundle.getMessage( JavaFXWatchesActionsProvider.class, "CTL_New_Watch_Dialog_Title" ) // NOI18N
+            NbBundle.getMessage( VisageWatchesActionsProvider.class, "CTL_New_Watch_Dialog_Title" ) // NOI18N
         );
         dd.setHelpCtx( new HelpCtx( "debug.new.watch" ));
         Dialog dialog = DialogDisplayer.getDefault().createDialog( dd );

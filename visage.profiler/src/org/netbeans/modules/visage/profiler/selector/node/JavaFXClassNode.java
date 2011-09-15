@@ -41,34 +41,34 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import java.util.Comparator;
 import javax.lang.model.element.Element;
 import org.netbeans.lib.profiler.client.ClientUtils;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 
 
 /**
  *
  * @author cms
  */
-public class JavaFXClassNode extends ContainerNode {
+public class VisageClassNode extends ContainerNode {
 
     private ClasspathInfo cpInfo;
     private ElementHandle<TypeElement> classHandle;
 
-    public JavaFXClassNode(ClasspathInfo cpInfo, Icon icon, TypeElement classElement, ContainerNode parent) {
+    public VisageClassNode(ClasspathInfo cpInfo, Icon icon, TypeElement classElement, ContainerNode parent) {
         super(classElement.getSimpleName().toString(), icon, parent);
         this.classElement = classElement;
         this.cpInfo = cpInfo;
-        signature = new ClientUtils.SourceCodeSelection(JavaFXProjectUtilities.getBinaryName(classElement, classElement.getEnclosingElement()), "*", ""); // NOI18N
+        signature = new ClientUtils.SourceCodeSelection(VisageProjectUtilities.getBinaryName(classElement, classElement.getEnclosingElement()), "*", ""); // NOI18N
         this.classHandle = ElementHandle.create(classElement);
     }
 
@@ -83,8 +83,8 @@ public class JavaFXClassNode extends ContainerNode {
         return cpInfo;
     }
 
-    public static final Comparator COMPARATOR = new Comparator<JavaFXClassNode>() {
-        public int compare(JavaFXClassNode o1, JavaFXClassNode o2) {
+    public static final Comparator COMPARATOR = new Comparator<VisageClassNode>() {
+        public int compare(VisageClassNode o1, VisageClassNode o2) {
             return o1.toString().compareTo(o2.toString());
         }
     };
@@ -97,14 +97,14 @@ public class JavaFXClassNode extends ContainerNode {
     public ClientUtils.SourceCodeSelection getSignature() {
         return signature;
 //        return new ClientUtils.SourceCodeSelection(((TypeElement)classElement).getQualifiedName().toString(),
-//                                                         JavaFXProjectUtilities.MAGIC_METHOD_NAME, JavaFXProjectUtilities.MAGIC_METHOD_SIGNATURE);
+//                                                         VisageProjectUtilities.MAGIC_METHOD_NAME, VisageProjectUtilities.MAGIC_METHOD_SIGNATURE);
     }
 
     protected SelectorChildren getChildren() {
         boolean isLibraryNode = false;
-        if (parent instanceof JavaFXPackageNode) {
-            isLibraryNode = ((JavaFXPackageNode)parent).isLibraryNode();
+        if (parent instanceof VisagePackageNode) {
+            isLibraryNode = ((VisagePackageNode)parent).isLibraryNode();
         }
-        return new JavaFXClassChildren(isLibraryNode);
+        return new VisageClassChildren(isLibraryNode);
     }    
 }

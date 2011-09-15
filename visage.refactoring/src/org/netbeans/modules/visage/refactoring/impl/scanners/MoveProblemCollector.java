@@ -42,21 +42,21 @@
  *  made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.scanners;
+package org.netbeans.modules.visage.refactoring.impl.scanners;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.FunctionInvocationTree;
+import com.sun.visage.api.tree.InstantiateTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.MemberSelectTree;
+import com.sun.visage.api.tree.ObjectLiteralPartTree;
+import com.sun.visage.api.tree.TypeClassTree;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.javafx.code.JavafxFlags;
-import com.sun.tools.javafx.tree.JFXInstanciate;
+import com.sun.tools.visage.code.JavafxFlags;
+import com.sun.tools.visage.tree.VSGInstanciate;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -66,8 +66,8 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.modules.visage.refactoring.impl.plugins.MoveRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.openide.util.NbBundle;
 
@@ -75,7 +75,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
-public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
+public class MoveProblemCollector<R, P> extends VisageTreePathScanner<R, P> {
     private interface MoveProblemCallback {
         Problem createProblem(String oldPkgName, String newPkgName, String srcTypeName, String targetTypeName, String feature, boolean outgoing);
     }
@@ -142,7 +142,7 @@ public class MoveProblemCollector<R, P> extends JavaFXTreePathScanner<R, P> {
 
     @Override
     public R visitInstantiate(InstantiateTree node, P p) {
-        TypeElement clzElement = (TypeElement)((JFXInstanciate)node).type.tsym;
+        TypeElement clzElement = (TypeElement)((VSGInstanciate)node).type.tsym;
         problem = chainProblems(problem,
             checkVisibilty(clzElement, new MoveProblemCallback() {
 

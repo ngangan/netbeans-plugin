@@ -40,24 +40,24 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.AssignmentTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.AssignmentTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import org.netbeans.api.lexer.TokenUtilities;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 /**
  *
  * @author David Strupl
  */
-public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<AssignmentTree> {
+public class AssignmentTreeEnvironment extends VisageCompletionEnvironment<AssignmentTree> {
 
     private static final Logger logger = Logger.getLogger(AssignmentTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -76,13 +76,13 @@ public class AssignmentTreeEnvironment extends JavaFXCompletionEnvironment<Assig
                     addValueKeywords();
                 }
             } else {
-                insideExpression(new JavaFXTreePath(path, expr));
+                insideExpression(new VisageTreePath(path, expr));
             }
         }
     }
 
     public TypeMirror getSmartType(AssignmentTree as) throws IOException {
-        TypeMirror type = controller.getTrees().getTypeMirror(new JavaFXTreePath(path, as.getVariable()));
+        TypeMirror type = controller.getTrees().getTypeMirror(new VisageTreePath(path, as.getVariable()));
         return type;
     }
 

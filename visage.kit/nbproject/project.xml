@@ -46,78 +46,78 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.kit</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.kit</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.bestpractices</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.bestpractices</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.debug</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.debug</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.debugger</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.debugger</code-name-base>
                     <run-dependency>
                         <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.editor</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.editor</code-name-base>
                     <run-dependency>
                         <specification-version>1.8.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.lexer</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.lexer</code-name-base>
                     <run-dependency>
                         <release-version>1</release-version>
                         <specification-version>1.9.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.navigation</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.navigation</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.palette</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.palette</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.project</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.project</code-name-base>
                     <run-dependency>
                         <specification-version>1.8.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.refactoring</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.refactoring</code-name-base>
                     <run-dependency>
                         <specification-version>1.0</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.sdksamples</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.sdksamples</code-name-base>
                     <run-dependency>
                         <specification-version>1.5.1</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.source</code-name-base>
                     <run-dependency>
                         <specification-version>1.7.1</specification-version>
                     </run-dependency>

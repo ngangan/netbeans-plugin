@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -60,7 +60,7 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.WeakListeners;
 
 /**
- * Finds Javadoc (if it is built) corresponding to binaries in JavaFX project.
+ * Finds Javadoc (if it is built) corresponding to binaries in Visage project.
  * @author David Konecny, Jesse Glick
  */
 public class JavadocForBinaryQueryImpl implements JavadocForBinaryQueryImplementation {

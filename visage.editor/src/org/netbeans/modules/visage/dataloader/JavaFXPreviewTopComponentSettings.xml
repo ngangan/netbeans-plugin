@@ -46,8 +46,8 @@ made subject to such option by the copyright holder.
 
 <!DOCTYPE settings PUBLIC "-//NetBeans//DTD Session settings 1.0//EN" "http://www.netbeans.org/dtds/sessionsettings-1_0.dtd">
 <settings version="1.0">
-    <module name="org.netbeans.modules.javafx.editor" spec="1.7"/>
+    <module name="org.netbeans.modules.visage.editor" spec="1.7"/>
     <instanceof class="org.openide.windows.TopComponent"/>
-    <instanceof class="org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent"/>
-    <instance class="org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent" method="getDefault"/>
+    <instanceof class="org.netbeans.modules.visage.editor.preview.VisagePreviewTopComponent"/>
+    <instance class="org.netbeans.modules.visage.editor.preview.VisagePreviewTopComponent" method="getDefault"/>
 </settings>

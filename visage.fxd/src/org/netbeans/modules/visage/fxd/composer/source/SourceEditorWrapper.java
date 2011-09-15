@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.source;
+package org.netbeans.modules.visage.fxd.composer.source;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -221,7 +221,7 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
     
     @Override
     public void setSize( Dimension dim) {
-        // an attempt to fix http://javafx-jira.kenai.com/browse/RT-4600
+        // an attempt to fix http://visage-jira.kenai.com/browse/RT-4600
         EditorLookupWrapper elw = findWrapper(m_delegate, false);
         if ( elw != null) {
             elw.setSize(dim.width, dim.height);
@@ -231,7 +231,7 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
 
     @Override
     public void setBounds( Rectangle r) {
-        // an attempt to fix http://javafx-jira.kenai.com/browse/RT-4600
+        // an attempt to fix http://visage-jira.kenai.com/browse/RT-4600
         EditorLookupWrapper elw = findWrapper(m_delegate, false);
         if ( elw != null) {
             elw.setSize(r.width, r.height);
@@ -241,7 +241,7 @@ public class SourceEditorWrapper extends JPanel implements CloneableEditorSuppor
 
     @Override
     public void setBounds( int x, int y, int w, int h) {
-        // an attempt to fix http://javafx-jira.kenai.com/browse/RT-4600
+        // an attempt to fix http://visage-jira.kenai.com/browse/RT-4600
         EditorLookupWrapper elw = findWrapper(m_delegate, false);
         if ( elw != null) {
             elw.setSize(w, h);

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package qa.javafx.functional.library.operator;
+package qa.visage.functional.library.operator;
 
 import java.awt.Component;
 import org.netbeans.jemmy.ComponentChooser;

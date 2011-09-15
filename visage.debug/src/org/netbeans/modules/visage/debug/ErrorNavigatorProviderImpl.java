@@ -28,7 +28,7 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
 import com.sun.source.util.TreePath;
 import java.awt.BorderLayout;
@@ -38,8 +38,8 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
@@ -63,7 +63,7 @@ public class ErrorNavigatorProviderImpl implements NavigatorPanel {
         manager.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (ExplorerManager.PROP_SELECTED_NODES.equals(evt.getPropertyName())) {
-                    TreeNavigatorProviderImpl.setHighlights(ElementNavigatorJavaFXSourceFactory.getInstance().getFile(), manager);
+                    TreeNavigatorProviderImpl.setHighlights(ElementNavigatorVisageSourceFactory.getInstance().getFile(), manager);
                 }
             }
         });
@@ -106,11 +106,11 @@ public class ErrorNavigatorProviderImpl implements NavigatorPanel {
     }
 
     public void panelActivated(Lookup context) {
-        ElementNavigatorJavaFXSourceFactory.getInstance().setLookup(context, new TaskImpl());
+        ElementNavigatorVisageSourceFactory.getInstance().setLookup(context, new TaskImpl());
     }
 
     public void panelDeactivated() {
-        ElementNavigatorJavaFXSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
+        ElementNavigatorVisageSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
     }
     
     private final class TaskImpl implements CancellableTask<CompilationInfo> {

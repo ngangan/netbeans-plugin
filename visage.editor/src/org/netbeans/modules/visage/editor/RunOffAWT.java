@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -56,10 +56,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -149,7 +149,7 @@ public class RunOffAWT {
         }
     }
 
-    public static <T> T computeOffAWT(Worker<T> w, String featureName, final JavaFXSource source, JavaFXSource.Phase phase) {
+    public static <T> T computeOffAWT(Worker<T> w, String featureName, final VisageSource source, VisageSource.Phase phase) {
         AtomicBoolean cancel = new AtomicBoolean();
         Compute<T> c = new Compute(cancel, source, phase, w);
 
@@ -161,12 +161,12 @@ public class RunOffAWT {
     private static final class Compute<T> implements Runnable, Task<CompilationController> {
 
         private final AtomicBoolean cancel;
-        private final JavaFXSource source;
-        private final JavaFXSource.Phase phase;
+        private final VisageSource source;
+        private final VisageSource.Phase phase;
         private final Worker<T> worker;
         private       T result;
 
-        public Compute(AtomicBoolean cancel, JavaFXSource source, JavaFXSource.Phase phase, Worker<T> worker) {
+        public Compute(AtomicBoolean cancel, VisageSource source, VisageSource.Phase phase, Worker<T> worker) {
             this.cancel = cancel;
             this.source = source;
             this.phase = phase;

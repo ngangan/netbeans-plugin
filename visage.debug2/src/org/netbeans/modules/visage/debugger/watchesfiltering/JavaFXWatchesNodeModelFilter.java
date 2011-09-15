@@ -43,9 +43,9 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
-import org.netbeans.modules.javafx.debugger.variablesfiltering.*;
+import org.netbeans.modules.visage.debugger.variablesfiltering.*;
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
 import java.util.Collection;
@@ -66,14 +66,14 @@ import org.openide.util.datatransfer.PasteType;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.NodeModelFilter.class } )
-public class JavaFXWatchesNodeModelFilter implements NodeModelFilter {
+public class VisageWatchesNodeModelFilter implements NodeModelFilter {
 
     private RequestProcessor evaluationRP;
     private final Collection<ModelListener> modelListeners = new HashSet<ModelListener>();
 
-    public JavaFXWatchesNodeModelFilter() {}
+    public VisageWatchesNodeModelFilter() {}
 
-    public JavaFXWatchesNodeModelFilter( ContextProvider lookupProvider ) {
+    public VisageWatchesNodeModelFilter( ContextProvider lookupProvider ) {
         evaluationRP = lookupProvider.lookupFirst( null, RequestProcessor.class );
     }
 

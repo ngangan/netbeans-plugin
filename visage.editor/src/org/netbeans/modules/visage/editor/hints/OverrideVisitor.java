@@ -42,24 +42,24 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationInfo;
 
 /**
  *
  * @author karol harezlak
  */
-final class OverrideVisitor extends JavaFXTreePathScanner<Void, Void> {
+final class OverrideVisitor extends VisageTreePathScanner<Void, Void> {
 
     private CompilationInfo compilationInfo;
     private Map<Element, List<MethodSymbol>> overriddenMethods;

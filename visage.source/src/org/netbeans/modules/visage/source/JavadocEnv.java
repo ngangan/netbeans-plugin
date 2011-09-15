@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.source;
+package org.netbeans.modules.visage.source;
 
 import com.sun.javadoc.ClassDoc;
 import com.sun.tools.mjavac.code.Flags;
@@ -54,33 +54,33 @@ import com.sun.tools.mjavac.code.Symbol.VarSymbol;
 import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.Name;
 import com.sun.tools.mjavac.util.Position;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXVar;
-import com.sun.tools.javafxdoc.ClassDocImpl;
-import com.sun.tools.javafxdoc.ConstructorDocImpl;
-import com.sun.tools.javafxdoc.DocEnv;
-import com.sun.tools.javafxdoc.ExecutableMemberDocImpl;
-import com.sun.tools.javafxdoc.FieldDocImpl;
-import com.sun.tools.javafxdoc.FunctionDocImpl;
-import com.sun.tools.javafxdoc.ModifierFilter;
-import com.sun.tools.javafxdoc.PackageDocImpl;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGVar;
+import com.sun.tools.visagedoc.ClassDocImpl;
+import com.sun.tools.visagedoc.ConstructorDocImpl;
+import com.sun.tools.visagedoc.DocEnv;
+import com.sun.tools.visagedoc.ExecutableMemberDocImpl;
+import com.sun.tools.visagedoc.FieldDocImpl;
+import com.sun.tools.visagedoc.FunctionDocImpl;
+import com.sun.tools.visagedoc.ModifierFilter;
+import com.sun.tools.visagedoc.PackageDocImpl;
 import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
 /**
  *
  * @author Dusan Balek
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
 public class JavadocEnv extends DocEnv {
 
@@ -115,7 +115,7 @@ public class JavadocEnv extends DocEnv {
     }
 
     @Override
-    protected void makeClassDoc(ClassSymbol clazz, String docComment, JFXClassDeclaration tree, Position.LineMap lineMap) {
+    protected void makeClassDoc(ClassSymbol clazz, String docComment, VSGClassDeclaration tree, Position.LineMap lineMap) {
         ClassDocImpl result = classMap.get(clazz);
         docComment = processDocComment(docComment);
         if (result != null) {
@@ -140,7 +140,7 @@ public class JavadocEnv extends DocEnv {
     }
 
     @Override
-    protected void makeFieldDoc(VarSymbol var, String docComment, JFXVar tree, Position.LineMap lineMap) {
+    protected void makeFieldDoc(VarSymbol var, String docComment, VSGVar tree, Position.LineMap lineMap) {
         FieldDocImpl result = fieldMap.get(var);
         docComment = processDocComment(docComment);
         if (result != null) {
@@ -169,7 +169,7 @@ public class JavadocEnv extends DocEnv {
     }
 
     @Override
-    protected void makeFunctionDoc(MethodSymbol meth, String docComment, JFXFunctionDefinition tree, Position.LineMap lineMap) {
+    protected void makeFunctionDoc(MethodSymbol meth, String docComment, VSGFunctionDefinition tree, Position.LineMap lineMap) {
         FunctionDocImpl result = (FunctionDocImpl) methodMap.get(meth);
         docComment = processDocComment(docComment);
         if (result != null) {
@@ -194,7 +194,7 @@ public class JavadocEnv extends DocEnv {
     }
 
     @Override
-    protected void makeConstructorDoc(MethodSymbol meth, String docComment, JFXFunctionDefinition tree, Position.LineMap lineMap) {
+    protected void makeConstructorDoc(MethodSymbol meth, String docComment, VSGFunctionDefinition tree, Position.LineMap lineMap) {
         ConstructorDocImpl result = (ConstructorDocImpl) methodMap.get(meth);
         docComment = processDocComment(docComment);
         if (result != null) {
@@ -237,9 +237,9 @@ public class JavadocEnv extends DocEnv {
 
     private String getRawCommentFor(Element element) {
         try {
-            FileObject fo = JavaFXSourceUtils.getFile(element, cpInfo);
+            FileObject fo = VisageSourceUtils.getFile(element, cpInfo);
             if (fo != null) {
-                JavaFXSource js = JavaFXSource.forFileObject(fo);
+                VisageSource js = VisageSource.forFileObject(fo);
                 if (js != null) {
                     final String[] ret = new String[1];
                     final ElementHandle<? extends Element> handle = ElementHandle.create(element);

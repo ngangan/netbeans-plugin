@@ -34,14 +34,14 @@
 
 package weatherfx;
 
-import javafx.scene.*;
-import javafx.scene.paint.*;
-import javafx.scene.effect.*;
-import javafx.scene.shape.*;
-import javafx.scene.text.*;
-import javafx.scene.transform.*;
-import javafx.scene.image.*;
-import javafx.animation.*;
+import visage.scene.*;
+import visage.scene.paint.*;
+import visage.scene.effect.*;
+import visage.scene.shape.*;
+import visage.scene.text.*;
+import visage.scene.transform.*;
+import visage.scene.image.*;
+import visage.animation.*;
 
 import java.lang.System;
 

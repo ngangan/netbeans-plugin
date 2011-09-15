@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl.ui;
+package org.netbeans.modules.visage.refactoring.impl.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -65,17 +65,17 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.UIResource;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.modules.javafx.refactoring.RefactoringModule;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.RefactoringModule;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 import org.openide.awt.Mnemonics;
 import org.openide.filesystems.FileObject;
@@ -125,7 +125,7 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
             allProjects = null;
         }
 
-        JavaFXSource source = JavaFXSource.forFileObject(sourceFo);
+        VisageSource source = VisageSource.forFileObject(sourceFo);
 
         Task<CompilationController> task =new Task<CompilationController>() {
             public void run(CompilationController info) throws Exception {
@@ -267,7 +267,7 @@ public class WhereUsedPanel extends JPanel implements CustomRefactoringPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 0, 0);
         methodsPanel.add(m_isBaseClass, gridBagConstraints);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/ui/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/refactoring/impl/ui/Bundle"); // NOI18N
         m_isBaseClass.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_isBaseClass")); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();

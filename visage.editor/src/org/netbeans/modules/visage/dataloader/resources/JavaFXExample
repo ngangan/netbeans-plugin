@@ -1,9 +1,9 @@
 
 /**
- * Javadoc comment for <code>JavaFXExample</code> class.
+ * Javadoc comment for <code>VisageExample</code> class.
  * @author Ivan Petrov
  */
-class JavaFXExample {
+class VisageExample {
 
     var a: String;
     function sample(): String {

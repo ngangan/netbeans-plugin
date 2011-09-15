@@ -41,22 +41,22 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.visage.api.tree.*;
+import com.sun.visage.api.tree.Tree.VisageKind;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.TreeUtilities;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.errorstripe.privatespi.Mark;
-import org.netbeans.modules.javafx.editor.options.MarkOccurencesSettings;
+import org.netbeans.modules.visage.editor.options.MarkOccurencesSettings;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -79,7 +79,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils;
 
 /**
  *
@@ -188,8 +188,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         UnitTree cu = info.getCompilationUnit();
 //        TreePath tp = info.getTreeUtilities().pathFor(caretPosition);
         TreeUtilities tu = TreeUtilities.create(info);
-        JavaFXTreePath tp = tu.pathFor(caretPosition);
-        JavaFXTreePath typePath = findTypePath(tp);
+        VisageTreePath tp = tu.pathFor(caretPosition);
+        VisageTreePath typePath = findTypePath(tp);
 
         if (isCancelled()) {
             return null;
@@ -198,18 +198,18 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         //detect caret inside the return type or throws clause:
         // manowar: a bit of FX magic
         if (typePath != null) {
-            JavaFXTreePath pTypePath = typePath.getParentPath();
+            VisageTreePath pTypePath = typePath.getParentPath();
             if (pTypePath != null) {
-                JavaFXTreePath gpTypePath = pTypePath.getParentPath();
+                VisageTreePath gpTypePath = pTypePath.getParentPath();
                 if (gpTypePath != null) {
-                    JavaFXTreePath ggpTypePath = gpTypePath.getParentPath();
-                    if (getJFXKind(ggpTypePath) == JavaFXKind.FUNCTION_DEFINITION &&
-                            getJFXKind(gpTypePath) == JavaFXKind.FUNCTION_VALUE &&
-                            getJFXKind(pTypePath) == JavaFXKind.TYPE_CLASS &&
-                            getJFXKind(typePath) == JavaFXKind.IDENTIFIER) {
+                    VisageTreePath ggpTypePath = gpTypePath.getParentPath();
+                    if (getVSGKind(ggpTypePath) == VisageKind.FUNCTION_DEFINITION &&
+                            getVSGKind(gpTypePath) == VisageKind.FUNCTION_VALUE &&
+                            getVSGKind(pTypePath) == VisageKind.TYPE_CLASS &&
+                            getVSGKind(typePath) == VisageKind.IDENTIFIER) {
 
-                        JFXFunctionDefinition decl = (JFXFunctionDefinition) ggpTypePath.getLeaf();
-                        Tree type = decl.getJFXReturnType();
+                        VSGFunctionDefinition decl = (VSGFunctionDefinition) ggpTypePath.getLeaf();
+                        Tree type = decl.getVSGReturnType();
 
                         if (pref.getBoolean(MarkOccurencesSettings.EXIT, true) && isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
                             MethodExitDetector med = new MethodExitDetector();
@@ -246,7 +246,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
         // extends/implements clause
         if (pref.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true)) {
-            if (typePath != null && getJFXKind(typePath) == JavaFXKind.TYPE_CLASS) {
+            if (typePath != null && getVSGKind(typePath) == VisageKind.TYPE_CLASS) {
                 boolean isExtends = true;
                 boolean isImplements = false;
 //                boolean isExtends = ctree.getExtendsClause() == typePath.getLeaf();
@@ -272,21 +272,21 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             if (isCancelled())
                 return null;
 
-            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            TokenSequence<VSGTokenId> ts = info.getTokenHierarchy().tokenSequence(VSGTokenId.language());
 
-            if (ts != null && tp.getLeaf().getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && typePath != null) {
+            if (ts != null && tp.getLeaf().getVisageKind() == VisageKind.CLASS_DECLARATION && typePath != null) {
                 int bodyStart = Utilities.findBodyStart(tp.getLeaf(), cu, info.getTrees().getSourcePositions(), doc);
 
                 if (caretPosition < bodyStart) {
                     ts.move(caretPosition);
 
                     if (ts.moveNext()) {
-                        if (pref.getBoolean(MarkOccurencesSettings.OVERRIDES, true) && ts.token().id() == JFXTokenId.EXTENDS) {
+                        if (pref.getBoolean(MarkOccurencesSettings.OVERRIDES, true) && ts.token().id() == VSGTokenId.EXTENDS) {
 //                            Tree superClass = ((ClassTree) tp.getLeaf()).getExtendsClause();
-                            Tree superClass = typePath.getParentPath() != null ? (JFXClassDeclaration) typePath.getParentPath().getLeaf() : null;
+                            Tree superClass = typePath.getParentPath() != null ? (VSGClassDeclaration) typePath.getParentPath().getLeaf() : null;
 
                             if (superClass != null) {
-                                Element superType = info.getTrees().getElement(new JavaFXTreePath(tp, superClass));
+                                Element superType = info.getTrees().getElement(new VisageTreePath(tp, superClass));
                                 Element thisType  = info.getTrees().getElement(tp);
 
                                 if (isClass(superType) && isClass(thisType))
@@ -294,7 +294,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                             }
                         }
 
-//                        if (pref.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true) && ts.token().id() == JFXTokenId.IMPLEMENTS) {
+//                        if (pref.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true) && ts.token().id() == VSGTokenId.IMPLEMENTS) {
 //                            List<? extends Tree> superClasses = ((ClassTree) tp.getLeaf()).getImplementsClause();
 //
 //                            if (superClasses != null) {
@@ -302,7 +302,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 //
 //                                for (Tree superTypeTree : superClasses) {
 //                                    if (superTypeTree != null) {
-//                                        Element superType = info.getTrees().getElement(new JavaFXTreePath(tp, superTypeTree));
+//                                        Element superType = info.getTrees().getElement(new VisageTreePath(tp, superTypeTree));
 //
 //                                        if (isClass(superType))
 //                                            superTypes.add((TypeElement) superType);
@@ -327,7 +327,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
         Tree tree = tp.getLeaf();
         if (pref.getBoolean(MarkOccurencesSettings.BREAK_CONTINUE, true) &&
-                (tree.getJavaFXKind() == JavaFXKind.BREAK || tree.getJavaFXKind() == JavaFXKind.CONTINUE)) {
+                (tree.getVisageKind() == VisageKind.BREAK || tree.getVisageKind() == VisageKind.CONTINUE)) {
             return detectBreakOrContinueTarget(info, doc, tp);
         }
 
@@ -340,8 +340,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         Element el = info.getTrees().getElement(tp);
 
         if (el != null && !Utilities.isKeyword(tree) && isEnabled(pref, el) &&
-                (tree.getJavaFXKind() != JavaFXKind.CLASS_DECLARATION || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp))) &&
-                (tree.getJavaFXKind() != JavaFXKind.FUNCTION_DEFINITION || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))) {
+                (tree.getVisageKind() != VisageKind.CLASS_DECLARATION || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp))) &&
+                (tree.getVisageKind() != VisageKind.FUNCTION_DEFINITION || isIn(caretPosition, Utilities.findIdentifierSpan(info, doc, tp)))) {
 
             FindLocalUsagesQuery fluq = new FindLocalUsagesQuery();
             setLocalUsages(fluq);
@@ -360,13 +360,13 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return null;
     }
     
-    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, JavaFXTreePath clazz, TypeElement superType, TypeElement thisType) {
+    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, VisageTreePath clazz, TypeElement superType, TypeElement thisType) {
         return detectMethodsForClass(info, document, clazz, Collections.singletonList(superType), thisType);
     }
 
-    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, JavaFXTreePath clazz, List<TypeElement> superTypes, TypeElement thisType) {
+    private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, VisageTreePath clazz, List<TypeElement> superTypes, TypeElement thisType) {
         List<int[]> highlights = new ArrayList<int[]>();
-        JFXClassDeclaration clazzTree = (JFXClassDeclaration) clazz.getLeaf();
+        VSGClassDeclaration clazzTree = (VSGClassDeclaration) clazz.getLeaf();
         TypeElement jlObject = info.getElements().getTypeElement("java.lang.Object"); // NOI18N
 
         OUTER: for (Tree member: clazzTree.getMembers()) {
@@ -374,8 +374,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                 return null;
             }
 
-            if (member.getJavaFXKind() == JavaFXKind.FUNCTION_DEFINITION) {
-                JavaFXTreePath path = new JavaFXTreePath(clazz, member);
+            if (member.getVisageKind() == VisageKind.FUNCTION_DEFINITION) {
+                VisageTreePath path = new VisageTreePath(clazz, member);
                 Element el = info.getTrees().getElement(path);
 
                 if (el.getKind() == ElementKind.METHOD) {
@@ -397,14 +397,14 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return highlights;
     }
 
-    private static final Set<JavaFXKind> TYPE_PATH_ELEMENT = EnumSet.of(JavaFXKind.IDENTIFIER, JavaFXKind.MEMBER_SELECT);
+    private static final Set<VisageKind> TYPE_PATH_ELEMENT = EnumSet.of(VisageKind.IDENTIFIER, VisageKind.MEMBER_SELECT);
 
-    private static JavaFXTreePath findTypePath(JavaFXTreePath tp) {
-        if (!TYPE_PATH_ELEMENT.contains(tp.getLeaf().getJavaFXKind())) {
+    private static VisageTreePath findTypePath(VisageTreePath tp) {
+        if (!TYPE_PATH_ELEMENT.contains(tp.getLeaf().getVisageKind())) {
             return null;
         }
 
-        while (TYPE_PATH_ELEMENT.contains(tp.getParentPath().getLeaf().getJavaFXKind())) {
+        while (TYPE_PATH_ELEMENT.contains(tp.getParentPath().getLeaf().getVisageKind())) {
             tp = tp.getParentPath();
         }
 
@@ -477,7 +477,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         canceled = false;
     }
 
-    private List<int[]> detectBreakOrContinueTarget(CompilationInfo info, Document document, JavaFXTreePath breakOrContinue) {
+    private List<int[]> detectBreakOrContinueTarget(CompilationInfo info, Document document, VisageTreePath breakOrContinue) {
         List<int[]> result = new ArrayList<int[]>();
         ExpressionTree target = TreeUtilities.create(info).getBreakContinueTarget(breakOrContinue);
 
@@ -485,7 +485,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             return null;
         }
 
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move((int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), target));
         if (ts.moveNext()) {
             result.add(new int[]{ts.offset(), ts.offset() + ts.token().length()});
@@ -494,14 +494,14 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         ExpressionTree statement = target;
         Tree block = null;
 
-        switch (statement.getJavaFXKind()) {
+        switch (statement.getVisageKind()) {
             case WHILE_LOOP:
-                if (((WhileLoopTree) statement).getBody().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                if (((WhileLoopTree) statement).getBody().getVisageKind() == VisageKind.BLOCK_EXPRESSION) {
                     block = ((WhileLoopTree) statement).getBody();
                 }
                 break;
             case FOR_EXPRESSION_FOR:
-                if (((ForExpressionTree) statement).getBodyExpression().getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                if (((ForExpressionTree) statement).getBodyExpression().getVisageKind() == VisageKind.BLOCK_EXPRESSION) {
                     block = ((ForExpressionTree) statement).getBodyExpression();
                 }
                 break;
@@ -510,7 +510,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         if (block != null) {
             ts.move((int) info.getTrees().getSourcePositions().getEndPosition(info.getCompilationUnit(), block));
 
-            if (ts.movePrevious() && ts.token().id() == JFXTokenId.RBRACE) {
+            if (ts.movePrevious() && ts.token().id() == VSGTokenId.RBRACE) {
                 result.add(new int[]{ts.offset(), ts.offset() + ts.token().length()});
             }
         }
@@ -541,8 +541,8 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return bag;
     }
     
-    private static JavaFXKind getJFXKind(JavaFXTreePath tp) {
-        return (tp == null || tp.getLeaf() == null) ? null : tp.getLeaf().getJavaFXKind();
+    private static VisageKind getVSGKind(VisageTreePath tp) {
+        return (tp == null || tp.getLeaf() == null) ? null : tp.getLeaf().getVisageKind();
     }
 
 }

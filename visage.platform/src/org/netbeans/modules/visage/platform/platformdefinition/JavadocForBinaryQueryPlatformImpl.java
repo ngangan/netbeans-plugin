@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

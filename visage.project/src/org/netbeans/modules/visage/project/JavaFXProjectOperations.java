@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,7 @@ import org.apache.tools.ant.module.api.support.ActionUtils;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.CopyOperationImplementation;
 import org.netbeans.spi.project.DeleteOperationImplementation;
@@ -71,9 +71,9 @@ import org.openide.util.NbBundle;
  *
  * @author ads
  */
-public class JavaFXProjectOperations implements DeleteOperationImplementation, CopyOperationImplementation, MoveOperationImplementation {
+public class VisageProjectOperations implements DeleteOperationImplementation, CopyOperationImplementation, MoveOperationImplementation {
     
-    private JavaFXProject project;
+    private VisageProject project;
     
     //RELY: Valid only on original project after the notifyMoving or notifyCopying was called
     private String appArgs;
@@ -85,7 +85,7 @@ public class JavaFXProjectOperations implements DeleteOperationImplementation, C
     //RELY: Valid only on original project after the notifyMoving or notifyCopying was called
     private File libraryFile;
     
-    public JavaFXProjectOperations(JavaFXProject project) {
+    public VisageProjectOperations(VisageProject project) {
         this.project = project;
     }
     
@@ -102,7 +102,7 @@ public class JavaFXProjectOperations implements DeleteOperationImplementation, C
         List<FileObject> files = new ArrayList<FileObject>();
         
         addFile(projectDirectory, "nbproject", files); // NOI18N
-        addFile(projectDirectory, JavaFXProjectUtil.getBuildXmlName(project), files); // NOI18N
+        addFile(projectDirectory, VisageProjectUtil.getBuildXmlName(project), files); // NOI18N
         addFile(projectDirectory, "xml-resources", files); //NOI18N
         addFile(projectDirectory, "catalog.xml", files); //NOI18N
         
@@ -119,13 +119,13 @@ public class JavaFXProjectOperations implements DeleteOperationImplementation, C
     }
     
     public void notifyDeleting() throws IOException {
-        JavaFXActionProvider ap = project.getLookup().lookup(JavaFXActionProvider.class);
+        VisageActionProvider ap = project.getLookup().lookup(VisageActionProvider.class);
         
         assert ap != null;
         
         Properties p = new Properties();
         String[] targetNames = ap.getTargetNames(ActionProvider.COMMAND_CLEAN, Lookup.EMPTY, p);
-        FileObject buildXML = JavaFXProjectUtil.getBuildXml(project);
+        FileObject buildXML = VisageProjectUtil.getBuildXml(project);
         
         assert targetNames != null;
         assert targetNames.length > 0;
@@ -155,7 +155,7 @@ public class JavaFXProjectOperations implements DeleteOperationImplementation, C
     
     public void notifyMoving() throws IOException {
         if (!this.project.getUpdateHelper().requestUpdate()) {
-            throw new IOException (NbBundle.getMessage(JavaFXProjectOperations.class,
+            throw new IOException (NbBundle.getMessage(VisageProjectOperations.class,
                 "MSG_OldProjectMetadata")); // NOI18N
         }
         rememberLibraryLocation();
@@ -207,8 +207,8 @@ public class JavaFXProjectOperations implements DeleteOperationImplementation, C
     private void readPrivateProperties () {
         ProjectManager.mutex().readAccess(new Runnable() {
             public void run () {
-                appArgs = project.getUpdateHelper().getProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH).getProperty(JavaFXProjectProperties.APPLICATION_ARGS);
-                workDir = project.getUpdateHelper().getProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH).getProperty(JavaFXProjectProperties.RUN_WORK_DIR);        
+                appArgs = project.getUpdateHelper().getProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH).getProperty(VisageProjectProperties.APPLICATION_ARGS);
+                workDir = project.getUpdateHelper().getProperties(AntProjectHelper.PRIVATE_PROPERTIES_PATH).getProperty(VisageProjectProperties.RUN_WORK_DIR);        
             }
         });
     }

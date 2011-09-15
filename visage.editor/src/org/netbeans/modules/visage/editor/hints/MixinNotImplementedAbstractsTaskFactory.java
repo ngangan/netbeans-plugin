@@ -43,19 +43,19 @@
  */
 
 //TODO Not is used anymore this issue has been resolved in compiler
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.tools.visage.code.JavafxClassSymbol;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
+import org.netbeans.api.visage.source.VisageSource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
@@ -63,7 +63,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
@@ -77,13 +77,13 @@ import org.openide.util.NbBundle;
  */
 
 //TODO Not in use anymore
-public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareVisageSourceTaskFactory {
 
-    private static final String HINTS_IDENT = "abstractmixinjavafx"; //NOI18N
+    private static final String HINTS_IDENT = "abstractmixinvisage"; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
 
     public MixinNotImplementedAbstractsTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     @Override
@@ -103,7 +103,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                 final Element[] mainClassElement = new Element[1];
                 final Document document = compilationInfo.getDocument();
 
-                JavaFXTreePathScanner<Void, Void> visitor = new JavaFXTreePathScanner<Void, Void>() {
+                VisageTreePathScanner<Void, Void> visitor = new VisageTreePathScanner<Void, Void>() {
 
                     @Override
                     public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
@@ -145,7 +145,7 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareJa
                         clear();
                         return;
                     }
-                    JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
+                    VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), mixin);
                     Element mixinElement = null;
                     try {
                         mixinElement = compilationInfo.getTrees().getElement(path);

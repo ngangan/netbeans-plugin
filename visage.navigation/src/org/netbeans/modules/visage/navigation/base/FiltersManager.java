@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.navigation.base;
+package org.netbeans.modules.visage.navigation.base;
 
 import java.awt.Dimension;
 import java.awt.Insets;
@@ -63,7 +63,7 @@ import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
-import org.netbeans.modules.javafx.navigation.NoBorderToolBar;
+import org.netbeans.modules.visage.navigation.NoBorderToolBar;
 import org.openide.util.NbPreferences;
 
 /** Handles creation and manipulation with boolean state filters. 

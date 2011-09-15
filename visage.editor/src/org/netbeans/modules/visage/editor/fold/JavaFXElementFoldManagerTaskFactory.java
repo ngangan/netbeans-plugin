@@ -41,28 +41,28 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.fold;
+package org.netbeans.modules.visage.editor.fold;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author Jan Lahoda
  */
-public class JavaFXElementFoldManagerTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class VisageElementFoldManagerTaskFactory extends EditorAwareVisageSourceTaskFactory {
 
-    /** Creates a new instance of JavaFXElementFoldManagerTaskFactory */
-    public JavaFXElementFoldManagerTaskFactory() {
+    /** Creates a new instance of VisageElementFoldManagerTaskFactory */
+    public VisageElementFoldManagerTaskFactory() {
         super(Phase.PARSED, Priority.NORMAL);
     }
 
     public CancellableTask<CompilationInfo> createTask(FileObject file) {
-        return JavaFXElementFoldManager.JavaFXElementFoldTask.getTask(file);
+        return VisageElementFoldManager.VisageElementFoldTask.getTask(file);
     }
     
 }

@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 /**
  * Phase in which source compilation currently is or which a client requests

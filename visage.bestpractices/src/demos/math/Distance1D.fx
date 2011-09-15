@@ -34,15 +34,15 @@
 
 package math;
 
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.input.MouseEvent;
+import visage.scene.Node;
+import visage.scene.CustomNode;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.paint.Color;
+import visage.scene.shape.Rectangle;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 /**
  * @author Michal Skvor

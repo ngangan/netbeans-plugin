@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor;
+package org.netbeans.modules.visage.fxd.composer.editor;
 
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
@@ -55,7 +55,7 @@ import javax.swing.text.JTextComponent;
 import java.util.logging.Logger;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.Indent;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)

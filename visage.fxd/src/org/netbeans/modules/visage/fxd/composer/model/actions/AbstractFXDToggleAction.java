@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.model.actions;
+package org.netbeans.modules.visage.fxd.composer.model.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.MissingResourceException;

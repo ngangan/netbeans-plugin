@@ -1,4 +1,4 @@
-package javafxapplication2;
+package visageapplication2;
 
 class Car {
 

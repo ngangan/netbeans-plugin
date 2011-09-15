@@ -41,13 +41,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.javafx.geom.Bounds2D;
+import com.sun.visage.geom.Bounds2D;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import org.netbeans.modules.javafx.fxd.composer.misc.GraphicUtils;
+import org.netbeans.modules.visage.fxd.composer.misc.GraphicUtils;
 
 /**
  *

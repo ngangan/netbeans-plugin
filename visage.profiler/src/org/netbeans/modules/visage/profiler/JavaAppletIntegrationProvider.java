@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.profiler;
+package org.netbeans.modules.visage.profiler;
 
 import org.netbeans.lib.profiler.common.AttachSettings;
 import org.netbeans.lib.profiler.common.integration.IntegrationUtils;
@@ -61,7 +61,7 @@ public class JavaAppletIntegrationProvider extends AbstractIntegrationProvider {
 
     // -----
     // I18N String constants
-    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.modules.javafx.profiler.Bundle"); // NOI18N
+    private static final ResourceBundle messages = ResourceBundle.getBundle("org.netbeans.modules.visage.profiler.Bundle"); // NOI18N
     private static final String APPLET_WORKDIR_WINDOWS_MESSAGE = messages.getString("JavaAppletIntegrationProvider_AppletWorkDirWindowsMessage"); // NOI18N
     private static final String APPLET_WORKDIR_UNIXES_MESSAGE = messages.getString("JavaAppletIntegrationProvider_AppletWorkDirUnixesMessage"); // NOI18N
     private static final String OPERA_REMOTE_ATTACH_WARNING_MESSAGE = messages.getString("JavaAppletIntegrationProvider_OperaRemoteAttachWarningMessage"); // NOI18N

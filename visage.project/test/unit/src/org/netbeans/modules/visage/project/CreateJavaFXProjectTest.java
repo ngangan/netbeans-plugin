@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ import org.openide.modules.SpecificationVersion;
 /**
  * @author answer
  */
-public class CreateJavaFXProjectTest extends NbTestCase {
+public class CreateVisageProjectTest extends NbTestCase {
 
     private static final String[] createdFiles = {
         "build.xml",
@@ -171,12 +171,12 @@ public class CreateJavaFXProjectTest extends NbTestCase {
         "FXBuild.class"
     };
 
-    public CreateJavaFXProjectTest(String testName) {
+    public CreateVisageProjectTest(String testName) {
         super(testName);
     }
 
     public static Test suite(){
-        TestSuite suite = new TestSuite(CreateJavaFXProjectTest.class);
+        TestSuite suite = new TestSuite(CreateVisageProjectTest.class);
         return suite;
     }
 
@@ -195,10 +195,10 @@ public class CreateJavaFXProjectTest extends NbTestCase {
     }
 
     public void testCreateEmptyProject() throws Exception{
-        String name = "TestJavaFXApp";
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = null; // FIXME (not compilable) JavaFXProjectGenerator.createProject(new File(getWorkDir(), name), name, null, "manifest.mf");
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        String name = "TestVisageApp";
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper aph = null; // FIXME (not compilable) VisageProjectGenerator.createProject(new File(getWorkDir(), name), name, null, "manifest.mf");
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
 
         FileObject fo = aph.getProjectDirectory();
@@ -215,11 +215,11 @@ public class CreateJavaFXProjectTest extends NbTestCase {
     }
 
     public void testCreateEmptyProjectWithMain() throws Exception{
-        String name = "TestJavaFXApp";
+        String name = "TestVisageApp";
         String mainClass = name.toLowerCase() + ".Main";
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = JavaFXProjectGenerator.createProject(new File(getWorkDir(), name), name, mainClass, "manifest.mf");
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper aph = VisageProjectGenerator.createProject(new File(getWorkDir(), name), name, mainClass, "manifest.mf");
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
 
         FileObject fo = aph.getProjectDirectory();
@@ -239,16 +239,16 @@ public class CreateJavaFXProjectTest extends NbTestCase {
 
     public void testCreateProjectFromSources() throws Exception{
         File root = getWorkDir();
-        String name = "TestJavaFXApp";
+        String name = "TestVisageApp";
         File proj = new File (root, name);
         proj.mkdir();
         File src1 = new File (root, "src1");
         src1.mkdir ();
         File test1 = new File (root, "test1");
         test1.mkdir();
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(proj, name, new File[]{src1}, new File[]{test1}, "manifest.mf");
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper aph = null; // FIXME (not compilable): VisageProjectGenerator.createProject(proj, name, new File[]{src1}, new File[]{test1}, "manifest.mf");
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
 
         FileObject fo = FileUtil.toFileObject(proj);

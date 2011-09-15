@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library;
+package qa.visage.functional.library;
 
 import org.netbeans.jellytools.JellyTestCase;
 
@@ -48,14 +48,14 @@ import org.netbeans.jellytools.JellyTestCase;
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
 
-public class JavaFXTestCase extends JellyTestCase {
+public class VisageTestCase extends JellyTestCase {
 
     public static final String PROJECT_NAME_HELLO_WORLD = "HelloWorld";
-    public static final String PREVIEW_FRAME_TITLE = "Hello World JavaFX";
+    public static final String PREVIEW_FRAME_TITLE = "Hello World Visage";
     public static final String BUILD_SUCCESSFUL = "BUILD SUCCESSFUL";
     public static final String BUILD_FAILED = "BUILD FAILED";
 
-    public JavaFXTestCase(String name) {
+    public VisageTestCase(String name) {
         super(name);
     }
 

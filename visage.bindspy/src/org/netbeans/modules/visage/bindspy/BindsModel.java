@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.bindspy;
+package org.netbeans.modules.visage.bindspy;
 
 import java.util.Collection;
 import java.util.HashMap;

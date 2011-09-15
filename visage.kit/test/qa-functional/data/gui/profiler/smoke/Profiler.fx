@@ -1,15 +1,15 @@
 package smokeprofiler;
 
-import javafx.stage.*;
+import visage.stage.*;
 
-import javafx.scene.*;
+import visage.scene.*;
 
-import javafx.scene.paint.*;
-import javafx.scene.shape.*;
-import javafx.scene.transform.*;
+import visage.scene.paint.*;
+import visage.scene.shape.*;
+import visage.scene.transform.*;
 
 
-import javafx.animation.*;
+import visage.animation.*;
 
 import java.lang.Math;
 

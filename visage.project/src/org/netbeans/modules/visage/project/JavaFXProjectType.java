@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.IOException;
 
@@ -51,18 +51,18 @@ import org.netbeans.spi.project.support.ant.AntBasedProjectType;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 
 /**
- * Constants describing JavaFX project type.
+ * Constants describing Visage project type.
  */
-public final class JavaFXProjectType {
+public final class VisageProjectType {
 
     public static final     String TYPE     
-                            = "org.netbeans.modules.javafx.project";                 // NOI18N
+                            = "org.netbeans.modules.visage.project";                 // NOI18N
     static final    String PROJECT_CONFIGURATION_NAME 
                             = "data";                                                // NOI18N
     public static final     String PROJECT_CONFIGURATION_NAMESPACE 
-                            = "http://www.netbeans.org/ns/javafx-project/3";         // NOI18N
+                            = "http://www.netbeans.org/ns/visage-project/3";         // NOI18N
     static final    String PRIVATE_CONFIGURATION_NAME 
                             = "data"; // NOI18N
     static final    String PRIVATE_CONFIGURATION_NAMESPACE 
-                            = "http://www.netbeans.org/ns/javafx-project-private/1"; // NOI18N    
+                            = "http://www.netbeans.org/ns/visage-project-private/1"; // NOI18N    
 }

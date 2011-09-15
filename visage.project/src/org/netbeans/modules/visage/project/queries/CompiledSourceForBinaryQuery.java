@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.io.File;
 import java.util.Arrays;
@@ -67,7 +67,7 @@ import org.openide.filesystems.URLMapper;
 import org.openide.util.ChangeSupport;
 
 /**
- * Finds sources corresponding to binaries in a JavaFX project.
+ * Finds sources corresponding to binaries in a Visage project.
  * @author Jesse Glick, Tomas Zezula
  */
 public class CompiledSourceForBinaryQuery implements SourceForBinaryQueryImplementation {

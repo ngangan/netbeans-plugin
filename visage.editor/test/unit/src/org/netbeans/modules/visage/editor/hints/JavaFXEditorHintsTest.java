@@ -41,19 +41,19 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import org.netbeans.spi.editor.hints.Severity;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.editor.TestUtilities;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.SourceTestBase;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.editor.TestUtilities;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.SourceTestBase;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.Fix;
@@ -69,9 +69,9 @@ import org.openide.util.Exceptions;
  *
  * @author Karol Harezlak
  */
-public class JavaFXEditorHintsTest extends SourceTestBase {
+public class VisageEditorHintsTest extends SourceTestBase {
 
-    public JavaFXEditorHintsTest(String testName) {
+    public VisageEditorHintsTest(String testName) {
         super(testName);
     }
 
@@ -107,7 +107,7 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
      * Test warnings - ExtImportWarningTaskFactory;
      */
     public void testExtImportAlert() {
-        String code = "import javafx.ext.swing.SwingButton; class Test{}";
+        String code = "import visage.ext.swing.SwingButton; class Test{}";
         //Starting env and creating functional hint.
         ExtImportWarningTaskFactory hint = new ExtImportWarningTaskFactory();
         try {
@@ -155,7 +155,7 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         String code = "class Test {function testFunction() {TestClass{}}}";
         String pattern = "\nclass TestClass {\n    //TODO Not implemented yet.\n}";
         defaultTestCall(new CreateElementTaskFactory(), code, pattern, CreateElementTaskFactory.Kind.LOCAL_CLASS);
-//        JavaFXAbstractEditorHint hint = new CreateElementTaskFactory();
+//        VisageAbstractEditorHint hint = new CreateElementTaskFactory();
 //        String codeExtends = "class Test extends NewClass {}";
 //        try {
 //            doTest(hint, codeExtends, null, false);
@@ -175,13 +175,13 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
 //        }
     }
 
-    //FIXME JavaFX templates not avialiable in test env.
+    //FIXME Visage templates not avialiable in test env.
     /**
      * Test Generate class - CreateElementTaskFactory;
      */
     public void DISABLEDtestClassGeneration() {
         String code = "class Test {function testFunction() {TestClass{}}}";
-        JavaFXAbstractEditorHint hint = new CreateElementTaskFactory();
+        VisageAbstractEditorHint hint = new CreateElementTaskFactory();
         try {
             doTest(hint, code, CreateElementTaskFactory.Kind.CLASS);
         } catch (Exception ex) {
@@ -207,11 +207,11 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         }
     }
 
-    public void defaultTestCall(JavaFXAbstractEditorHint hint, String code, String pattern) {
+    public void defaultTestCall(VisageAbstractEditorHint hint, String code, String pattern) {
         defaultTestCall(hint, code, pattern, null);
     }
 
-    public void defaultTestCall(JavaFXAbstractEditorHint hint, String code, String pattern, CreateElementTaskFactory.Kind kind) {
+    public void defaultTestCall(VisageAbstractEditorHint hint, String code, String pattern, CreateElementTaskFactory.Kind kind) {
         try {
             String result = doTest(hint, code, kind);
             assertNotNull(result);
@@ -221,13 +221,13 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         }
     }
 
-    protected String doTest(final JavaFXAbstractEditorHint hint, String code, final CreateElementTaskFactory.Kind kind) throws Exception {
+    protected String doTest(final VisageAbstractEditorHint hint, String code, final CreateElementTaskFactory.Kind kind) throws Exception {
         return doTest(hint, code, kind, true);
     }
 
 
-    protected String doTest(final JavaFXAbstractEditorHint hint, String code, final CreateElementTaskFactory.Kind kind, final boolean executeFixes) throws Exception {
-        JavaFXSource fXSource = getJavaFXSource(code);
+    protected String doTest(final VisageAbstractEditorHint hint, String code, final CreateElementTaskFactory.Kind kind, final boolean executeFixes) throws Exception {
+        VisageSource fXSource = getVisageSource(code);
         assertNotNull(fXSource);
 
         final String[] result = new String[1];
@@ -280,7 +280,7 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         return result[0];
     }
 
-    protected JavaFXSource getJavaFXSource(String code) throws Exception {
+    protected VisageSource getVisageSource(String code) throws Exception {
         File testSource = new File(getWorkDir(), "test/Test.fx");
         testSource.getParentFile().mkdirs();
         //testSource.createNewFile();
@@ -293,9 +293,9 @@ public class JavaFXEditorHintsTest extends SourceTestBase {
         assertNotNull(ec);
         final Document document = ec.openDocument();
         assertNotNull(document);
-        document.putProperty(Language.class, JFXTokenId.language());
+        document.putProperty(Language.class, VSGTokenId.language());
         document.putProperty("mimeType", "text/x-fx");
         LifecycleManager.getDefault().saveAll();
-        return JavaFXSource.forDocument(document);
+        return VisageSource.forDocument(document);
     }
 }

@@ -29,12 +29,12 @@
  * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.editor.imports.ui.FixImportsLayout;
-import org.netbeans.modules.javafx.editor.imports.ui.FixItem;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.editor.imports.ui.FixImportsLayout;
+import org.netbeans.modules.visage.editor.imports.ui.FixItem;
 import org.openide.util.NbBundle;
 
 import javax.lang.model.element.TypeElement;
@@ -66,7 +66,7 @@ final class ImportResolverImpl {
     private final Object LOCK = new Object();
     private static Logger log = Logger.getLogger(ImportResolverImpl.class.getName());
     private static final TypesComparator TYPES_COMPARATOR = new TypesComparator();
-    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/imports/Bundle");
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/visage/editor/imports/Bundle");
     private CompilationInfo ci;
     private int caret;
 
@@ -114,7 +114,7 @@ final class ImportResolverImpl {
     }
 
     /**
-     * @see ImportResolverImpl#resolve(org.netbeans.modules.javafx.editor.imports.ImportsModel)
+     * @see ImportResolverImpl#resolve(org.netbeans.modules.visage.editor.imports.ImportsModel)
      */
     private void doResolve(ImportsModel model) {
         for(final ImportsModel.Unresolved unresolved : model.getUnresolved()) {

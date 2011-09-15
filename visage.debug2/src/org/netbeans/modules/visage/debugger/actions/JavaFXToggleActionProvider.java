@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.actions;
+package org.netbeans.modules.visage.debugger.actions;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -55,8 +55,8 @@ import org.netbeans.api.debugger.ActionsManager;
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDADebugger;
-import org.netbeans.modules.javafx.debugger.Context;
-import org.netbeans.modules.javafx.debugger.breakpoints.JavaFXLineBreakpoint;
+import org.netbeans.modules.visage.debugger.Context;
+import org.netbeans.modules.visage.debugger.breakpoints.VisageLineBreakpoint;
 import org.netbeans.spi.debugger.ActionsProvider.Registration;
 import org.netbeans.spi.debugger.ActionsProviderSupport;
 import org.netbeans.spi.debugger.ContextProvider;
@@ -69,16 +69,16 @@ import org.openide.filesystems.URLMapper;
  * @author Michal Skvor
  */
 @Registration(path="")
-public class JavaFXToggleActionProvider extends ActionsProviderSupport implements PropertyChangeListener {
+public class VisageToggleActionProvider extends ActionsProviderSupport implements PropertyChangeListener {
 
     private JPDADebugger debugger;
 
-    public JavaFXToggleActionProvider() {
+    public VisageToggleActionProvider() {
         propertyChange( null );
         Context.addPropertyChangeListener( this );
     }
 
-    public JavaFXToggleActionProvider( ContextProvider contextProvider ) {
+    public VisageToggleActionProvider( ContextProvider contextProvider ) {
         debugger = contextProvider.lookupFirst(null, JPDADebugger.class);
         debugger.addPropertyChangeListener( JPDADebugger.PROP_STATE, this );
         Context.addPropertyChangeListener( this );
@@ -94,22 +94,22 @@ public class JavaFXToggleActionProvider extends ActionsProviderSupport implement
         if (url == null) return;
 
         // 2) find and remove existing line breakpoint
-        JavaFXLineBreakpoint lb = findBreakpoint( url, ln );
+        VisageLineBreakpoint lb = findBreakpoint( url, ln );
         if (lb != null) {
             d.removeBreakpoint( lb );
             return;
         }
-        lb = JavaFXLineBreakpoint.create( url, ln );
+        lb = VisageLineBreakpoint.create( url, ln );
         d.addBreakpoint( lb );
     }
 
-    static JavaFXLineBreakpoint findBreakpoint( String url, int lineNumber ) {
+    static VisageLineBreakpoint findBreakpoint( String url, int lineNumber ) {
         Breakpoint[] breakpoints = DebuggerManager.getDebuggerManager().getBreakpoints();
         for( int i = 0; i < breakpoints.length; i++ ) {
-            if( !( breakpoints[i] instanceof JavaFXLineBreakpoint )) {
+            if( !( breakpoints[i] instanceof VisageLineBreakpoint )) {
                 continue;
             }
-            JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint) breakpoints[i];
+            VisageLineBreakpoint lb = (VisageLineBreakpoint) breakpoints[i];
             if( !lb.getURL().equals( url )) continue;
             if( lb.getLineNumber() == lineNumber ) {
                 return lb;

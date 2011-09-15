@@ -43,20 +43,20 @@
  */
 
 
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TriggerTree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXExpression;
-import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXOverrideClassVar;
-import com.sun.tools.javafx.tree.JFXTypeClass;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.ImportTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.TriggerTree;
+import com.sun.visage.api.tree.TypeClassTree;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.tree.VSGExpression;
+import com.sun.tools.visage.tree.VSGIdent;
+import com.sun.tools.visage.tree.VSGOverrideClassVar;
+import com.sun.tools.visage.tree.VSGTypeClass;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,15 +66,15 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
 
 /**
  *
  * @author Jaroslav Bachorik
  */
-final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsModel> {
+final public class ImportsWalker extends VisageTreePathScanner<Void, ImportsModel> {
     final private EnumSet<ClassIndex.SearchScope> SCOPE = EnumSet.of(ClassIndex.SearchScope.DEPENDENCIES, ClassIndex.SearchScope.SOURCE);
     final private CompilationInfo ci;
     final private Set<String> variableNames = new HashSet<String>();
@@ -117,11 +117,11 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
             Element e = ci.getTrees().getElement(getCurrentPath());
 
             /**
-             * 183679: javafxc for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
+             * 183679: visagec for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
              * However, this information is available so we'll just grab it (with some null-checks, of course)
              */
             if (e == null) {
-                e = ((JFXIdent)node).type != null ? ((JFXIdent)node).type.tsym : null;
+                e = ((VSGIdent)node).type != null ? ((VSGIdent)node).type.tsym : null;
             }
             processItem(e, nodeName, node, model);
         }
@@ -139,11 +139,11 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
 
             Element e = ci.getTrees().getElement(getCurrentPath());
             /**
-             * 183679: javafxc for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
+             * 183679: visagec for its own reasons doesn't resolve symbol for the built-in classes (eg. java.lang.*)
              * However, this information is available so we'll just grab it (with some null-checks, of course)
              */
             if (e == null) {
-                JFXExpression clzName = ((JFXTypeClass)node).getClassName();
+                VSGExpression clzName = ((VSGTypeClass)node).getClassName();
                 if (clzName != null) {
                     e = clzName.type != null ? clzName.type.tsym : null;
                 }
@@ -167,7 +167,7 @@ final public class ImportsWalker extends JavaFXTreePathScanner<Void, ImportsMode
     @Override
     public Void visitTrigger(TriggerTree node, ImportsModel model) {
         if (node != null) {
-            Tree t = ((JFXOverrideClassVar)node).getInitializer();
+            Tree t = ((VSGOverrideClassVar)node).getInitializer();
             if (t != null) {
                 t.accept(this, model);
             }

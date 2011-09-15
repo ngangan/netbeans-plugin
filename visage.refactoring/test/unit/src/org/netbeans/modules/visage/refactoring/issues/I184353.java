@@ -43,14 +43,14 @@
  */
 
 
-package org.netbeans.modules.javafx.refactoring.issues;
+package org.netbeans.modules.visage.refactoring.issues;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.modules.javafx.refactoring.SourceTestBase;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.SourceTestBase;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
@@ -70,7 +70,7 @@ public class I184353 extends SourceTestBase {
         super.setUp();
         ClassModelFactory cmf = new ClassModelFactory();
         FileObject fo = FileUtil.toFileObject(getDataDir());
-        fo = fo.getFileObject("org/netbeans/modules/javafx/refactoring/issues/I184353.fx");
+        fo = fo.getFileObject("org/netbeans/modules/visage/refactoring/issues/I184353.fx");
         cm = cmf.classModelFor(fo);
     }
 

@@ -42,25 +42,25 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
 import org.netbeans.junit.NbTestCase;
 
-public class JavaFXCompletionItemTest extends NbTestCase {
+public class VisageCompletionItemTest extends NbTestCase {
 
-    public JavaFXCompletionItemTest() {
-        super("JavaFXCompletionItemTest");
+    public VisageCompletionItemTest() {
+        super("VisageCompletionItemTest");
     }
 
     @Test
     public void testCreateKeywordItem() {
-        Set<? super JavaFXCompletionItem> items = new HashSet<JavaFXCompletionItem>();
-        items.add(JavaFXCompletionItem.createKeywordItem(JavaFXCompletionQuery.FALSE_KEYWORD, null, 1, false));
-        items.add(JavaFXCompletionItem.createKeywordItem(JavaFXCompletionQuery.FALSE_KEYWORD, null, 2, false));
-        items.add(JavaFXCompletionItem.createKeywordItem(JavaFXCompletionQuery.TRUE_KEYWORD, null, 1, false));
+        Set<? super VisageCompletionItem> items = new HashSet<VisageCompletionItem>();
+        items.add(VisageCompletionItem.createKeywordItem(VisageCompletionQuery.FALSE_KEYWORD, null, 1, false));
+        items.add(VisageCompletionItem.createKeywordItem(VisageCompletionQuery.FALSE_KEYWORD, null, 2, false));
+        items.add(VisageCompletionItem.createKeywordItem(VisageCompletionQuery.TRUE_KEYWORD, null, 1, false));
         assertEquals("two items", 2, items.size());
     }
 

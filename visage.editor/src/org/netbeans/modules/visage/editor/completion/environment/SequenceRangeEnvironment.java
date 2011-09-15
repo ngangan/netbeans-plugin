@@ -40,12 +40,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXSequenceRange;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import com.sun.tools.visage.tree.VSGSequenceRange;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -57,7 +57,7 @@ import org.netbeans.api.lexer.TokenHierarchy;
  *
  * @author Miloslav Metelka
  */
-public class SequenceRangeEnvironment extends JavaFXCompletionEnvironment<JFXSequenceRange> {
+public class SequenceRangeEnvironment extends VisageCompletionEnvironment<VSGSequenceRange> {
 
     private static final Logger logger = Logger.getLogger(SequenceRangeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -71,9 +71,9 @@ public class SequenceRangeEnvironment extends JavaFXCompletionEnvironment<JFXSeq
     };
 
     @Override
-    protected void inside(JFXSequenceRange t) throws IOException {
+    protected void inside(VSGSequenceRange t) throws IOException {
         int start = (int)sourcePositions.getStartPosition(root, t);
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(start);
         State state = State.INIT;
         while (ts.moveNext() && ts.offset() <= offset) {

@@ -41,13 +41,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.Tree.VisageKind;
+import com.sun.visage.api.tree.UnitTree;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,10 +59,10 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.progress.ProgressUtils;
 import org.netbeans.editor.BaseAction;
 import org.openide.util.Exceptions;
@@ -86,8 +86,8 @@ final class SelectCodeElementAction extends BaseAction {
      *
      * @param name name of the action (should be one of
      *  <br>
-     *  <code>JavaFXEditorKit.selectNextElementAction</code>
-     *  <code>JavaFXEditorKit.selectPreviousElementAction</code>
+     *  <code>VisageEditorKit.selectNextElementAction</code>
+     *  <code>VisageEditorKit.selectPreviousElementAction</code>
      * @param selectNext <code>true</code> if the next element should be selected.
      *  <code>False</code> if the previous element should be selected.
      */
@@ -107,7 +107,7 @@ final class SelectCodeElementAction extends BaseAction {
         }
         String shortDesc;
         try {
-            shortDesc = NbBundle.getBundle(JavaFXEditorKit.class).getString(name); // NOI18N
+            shortDesc = NbBundle.getBundle(VisageEditorKit.class).getString(name); // NOI18N
         } catch (MissingResourceException mre) {
             shortDesc = name;
         }
@@ -152,7 +152,7 @@ final class SelectCodeElementAction extends BaseAction {
 
         public void selectNext() {
             if (selectionInfos == null) {
-                final JavaFXSource js = JavaFXSource.forDocument(target.getDocument());
+                final VisageSource js = VisageSource.forDocument(target.getDocument());
                 cancel = new AtomicBoolean();
                 ProgressUtils.runOffEventDispatchThread(new Runnable() {
 
@@ -214,10 +214,10 @@ final class SelectCodeElementAction extends BaseAction {
         private SelectionInfo[] initSelectionPath(JTextComponent target, CompilationController ci) {
             List<SelectionInfo> positions = new ArrayList<SelectionInfo>();
             SourcePositions sp = ci.getTrees().getSourcePositions();
-            JavaFXTreePath tp = ci.getTreeUtilities().pathFor(target.getCaretPosition());
+            VisageTreePath tp = ci.getTreeUtilities().pathFor(target.getCaretPosition());
             Tree tree = tp.getLeaf();
             final UnitTree compilationUnit = tp.getCompilationUnit();
-            while (tree.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
+            while (tree.getVisageKind() != VisageKind.COMPILATION_UNIT) {
                 int startPos = (int) sp.getStartPosition( compilationUnit, tree);
                 int endPos = (int) sp.getEndPosition( compilationUnit, tree);
                 positions.add(new SelectionInfo(startPos, endPos));

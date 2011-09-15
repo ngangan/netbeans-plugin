@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 import org.openide.util.NbBundle;
 
@@ -51,7 +51,7 @@ import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
 /**
- * Misnamed storage of information application to the new javafxproject wizard.
+ * Misnamed storage of information application to the new visageproject wizard.
  */
 public class FoldersListSettings {
     private static final FoldersListSettings INSTANCE = new FoldersListSettings();
@@ -75,7 +75,7 @@ public class FoldersListSettings {
     }
     
     public String displayName() {
-        return NbBundle.getMessage(FoldersListSettings.class, "TXT_JavaFXProjectFolderList"); // NOI18N
+        return NbBundle.getMessage(FoldersListSettings.class, "TXT_VisageProjectFolderList"); // NOI18N
     }
 
     public int getNewProjectCount () {

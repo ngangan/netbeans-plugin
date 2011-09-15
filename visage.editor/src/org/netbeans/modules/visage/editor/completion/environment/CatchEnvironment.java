@@ -40,16 +40,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.CatchTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXErroneousType;
+import com.sun.visage.api.tree.CatchTree;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.tree.VSGErroneousType;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -62,7 +62,7 @@ import org.openide.util.NbBundle;
  *
  * @author David Strupl
  */
-public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
+public class CatchEnvironment extends VisageCompletionEnvironment<CatchTree> {
 
     private static final Logger logger = Logger.getLogger(CatchEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -73,18 +73,18 @@ public class CatchEnvironment extends JavaFXCompletionEnvironment<CatchTree> {
         VariableTree var = t.getParameter();
         if (var != null) {
             Tree type = var.getType();
-            int typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+            int typePos = type.getVisageKind() == Tree.VisageKind.ERRONEOUS && ((VSGErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
             if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos); // NOI18N
             if (offset <= typePos) {
-                TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+                TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
                 if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-                if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
+                if ((last != null) && (last.token().id() == VSGTokenId.COLON)){
                     addLocalAndImportedTypes(null, null, null, false, getSmartType());
                 }
                 return;
             }
             // TODO:
-            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
+            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/environment/Bundle").getString("___NOT_IMPLEMENTED:_suggest_a_name?")); // NOI18N
         } else { // t.getParameter() may be null for CATCH - see #163767
             // Possibly show all exception classes
         }

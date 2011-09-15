@@ -42,11 +42,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.lexer;
+package org.netbeans.modules.visage.lexer;
 
 import java.io.File;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.SourceTestBase;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.SourceTestBase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
@@ -72,7 +72,7 @@ public class JavaFlyTokensTest extends SourceTestBase {
 
     public void testFlyweightTokens() throws Exception {
         String text = slurpDataFile("code.fx");
-        TokenHierarchy<?> hi = TokenHierarchy.create(text, JFXTokenId.language());
+        TokenHierarchy<?> hi = TokenHierarchy.create(text, VSGTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
         
         System.out.println("Flyweight tokens: " + LexerTestUtilities.flyweightTokenCount(ts)

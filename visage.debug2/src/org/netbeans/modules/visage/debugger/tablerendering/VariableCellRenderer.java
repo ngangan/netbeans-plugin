@@ -9,11 +9,11 @@
  * Created on Jun 7, 2010, 10:41:18 AM
  */
 
-package org.netbeans.modules.javafx.debugger.tablerendering;
+package org.netbeans.modules.visage.debugger.tablerendering;
 
-import com.sun.javafx.jdi.FXField;
-import com.sun.javafx.jdi.FXValue;
-import com.sun.javafx.jdi.FXSequenceReference;
+import com.sun.visage.jdi.FXField;
+import com.sun.visage.jdi.FXValue;
+import com.sun.visage.jdi.FXSequenceReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import java.awt.Component;
@@ -93,7 +93,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
         gridBagConstraints.weightx = 1.0;
         add(labelValue, gridBagConstraints);
 
-        buttonUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/netbeans/modules/javafx/debugger/resources/redo.png"))); // NOI18N
+        buttonUpdate.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/netbeans/modules/visage/debugger/resources/redo.png"))); // NOI18N
         buttonUpdate.setText(org.openide.util.NbBundle.getMessage(VariableCellRenderer.class, "VariableCellRenderer.buttonUpdate.text")); // NOI18N
         buttonUpdate.setToolTipText(org.openide.util.NbBundle.getMessage(VariableCellRenderer.class, "VariableCellRenderer.buttonUpdate.toolTipText")); // NOI18N
         buttonUpdate.setMaximumSize(new java.awt.Dimension(32, 32));

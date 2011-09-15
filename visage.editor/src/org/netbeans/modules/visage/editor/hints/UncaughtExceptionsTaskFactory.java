@@ -41,26 +41,26 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.CatchTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.visage.api.tree.CatchTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.spi.editor.hints.HintsController;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TryTree;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.TryTree;
 import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.modules.visage.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
@@ -72,13 +72,13 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
+public class UncaughtExceptionsTaskFactory extends VisageAbstractEditorHint {
 
-    private static final String HINTS_IDENT = "trycatchjavafx"; //NOI18N
+    private static final String HINTS_IDENT = "trycatchvisage"; //NOI18N
     private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public UncaughtExceptionsTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.NORMAL);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
         return ed;
     }
 
-    private static class UncaughtExceptionsVisitorResolver extends JavaFXTreePathScanner<Void, HintsModel> {
+    private static class UncaughtExceptionsVisitorResolver extends VisageTreePathScanner<Void, HintsModel> {
 
         @Override
         public Void visitTry(TryTree node, HintsModel model) {
@@ -146,7 +146,7 @@ public class UncaughtExceptionsTaskFactory extends JavaFXAbstractEditorHint {
                     if (hint.getTree() == node_) {
                         Collection<Type> hintTypes = new ArrayList<Type>(hint.getExceptions());
                         for (Type hintType : hintTypes) {
-                            //TODO JavaFXTypeClass does not provide full class name, it should use full class names not simple names
+                            //TODO VisageTypeClass does not provide full class name, it should use full class names not simple names
                             for (CatchTree catchType : node.getCatches()) {
                                 String hintTypeName = HintsUtils.getMethodName(hintType.toString());
                                 if (catchType.getParameter() == null) {

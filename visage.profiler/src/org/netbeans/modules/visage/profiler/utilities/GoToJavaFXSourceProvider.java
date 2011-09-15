@@ -40,46 +40,46 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.profiler.utilities;
+package org.netbeans.modules.visage.profiler.utilities;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.spi.GoToSourceProvider;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.lib.profiler.ProfilerLogger;
-import org.netbeans.api.javafx.editor.ElementOpen;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.editor.ElementOpen;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.openide.util.lookup.ServiceProvider;
 
 @ServiceProvider(service=GoToSourceProvider.class)
-public class GoToJavaFXSourceProvider extends GoToSourceProvider {
-    final private Logger LOGGER = Logger.getLogger(GoToJavaFXSourceProvider.class.getName());
+public class GoToVisageSourceProvider extends GoToSourceProvider {
+    final private Logger LOGGER = Logger.getLogger(GoToVisageSourceProvider.class.getName());
 
     // field to indicate whether source find was successfull
     final AtomicBoolean result = new AtomicBoolean(false);
 
     @Override
     public boolean openSource(final Project project, final String className, final String methodName, String signature, int line) {
-        if (!(project instanceof JavaFXProject))
+        if (!(project instanceof VisageProject))
             return false;
 
         final CountDownLatch latch = new CountDownLatch(1);
 
-        JavaFXSource source = JavaFXProjectUtilities.getSources((JavaFXProject)project);
+        VisageSource source = VisageProjectUtilities.getSources((VisageProject)project);
 
         // cut interface suffix out of the signature
-        final String sig = JavaFXProjectUtilities.cutIntfSuffix(signature);
+        final String sig = VisageProjectUtilities.cutIntfSuffix(signature);
 
         try {
             source.runUserActionTask(new Task<CompilationController>() {
@@ -91,7 +91,7 @@ public class GoToJavaFXSourceProvider extends GoToSourceProvider {
                         final ElementHandle[] eh = new ElementHandle[1];
                         String classTypeName = className;
                         TypeElement classType = null;
-                        while (classTypeName.length() > 0 && (classType = JavaFXProjectUtilities.resolveClassByName(classTypeName, controller)) == null) {
+                        while (classTypeName.length() > 0 && (classType = VisageProjectUtilities.resolveClassByName(classTypeName, controller)) == null) {
                             int anonSep = classTypeName.lastIndexOf("$");
                             if (anonSep > -1) {
                                 classTypeName = classTypeName.substring(0, anonSep);

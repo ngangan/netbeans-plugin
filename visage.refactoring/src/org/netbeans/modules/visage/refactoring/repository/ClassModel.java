@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.repository;
+package org.netbeans.modules.visage.refactoring.repository;
 
 import java.util.ArrayList;
 import java.util.Collection;

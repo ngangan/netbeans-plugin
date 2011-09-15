@@ -29,16 +29,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 
 import java.io.*;
 import java.util.HashMap;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
- * This class is for verification of grammar file vs. {@link org.netbeans.api.javafx.lexer.JFXTokenId} enum.
+ * This class is for verification of grammar file vs. {@link org.netbeans.api.visage.lexer.VSGTokenId} enum.
  *
  * @todo Change to implement Ant task in future.
  */
@@ -69,8 +69,8 @@ public class GrammarVerifier {
                 map.put(elements[0].trim(), Integer.parseInt(elements[1].trim()));
             }
 
-            final JFXTokenId[] tokenIds = JFXTokenId.values();
-            for (JFXTokenId id : tokenIds) {
+            final VSGTokenId[] tokenIds = VSGTokenId.values();
+            for (VSGTokenId id : tokenIds) {
                 if (map.containsKey(id.name())) {
                     final Integer integer = map.get(id.name());
                     if (id.getTokenType() != integer) {
@@ -78,13 +78,13 @@ public class GrammarVerifier {
                         System.exit(-100);
                     }
                     map.remove(id.name());
-                } else if (id != JFXTokenId.UNKNOWN) {
+                } else if (id != VSGTokenId.UNKNOWN) {
                     System.err.println("The token " + id + " has not been found."); // NOI18N
                     System.exit(-100);
                 } 
             }
             if (!map.isEmpty()) {
-                System.err.printf("There are tokens missing in %s enum. \n", JFXTokenId.class.getName()); // NOI18N
+                System.err.printf("There are tokens missing in %s enum. \n", VSGTokenId.class.getName()); // NOI18N
                 System.exit(-100);
             }
         } catch (FileNotFoundException e) {

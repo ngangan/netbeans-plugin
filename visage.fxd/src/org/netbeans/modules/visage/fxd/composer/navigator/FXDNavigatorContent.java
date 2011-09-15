@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -81,11 +81,11 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelListener;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.FXDElement;
+import org.netbeans.modules.visage.fxd.composer.model.actions.SelectActionFactory;
+import org.netbeans.modules.visage.fxd.composer.source.SourceTopComponent;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.cookies.EditorCookie;
 import org.openide.nodes.Node.Cookie;
 import org.openide.text.DataEditorSupport;
@@ -525,14 +525,14 @@ public class FXDNavigatorContent extends JPanel implements SelectActionFactory.S
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowAttributes"),     //NOI18N
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowAttributesTip"),     //NOI18N
                     FXDNavigatorTree.showAttributes,
-                    new ImageIcon(org.openide.util.ImageUtilities.loadImage("org/netbeans/modules/javafx/fxd/composer/resources/showAttribs.png")), //NOI18N
+                    new ImageIcon(org.openide.util.ImageUtilities.loadImage("org/netbeans/modules/visage/fxd/composer/resources/showAttribs.png")), //NOI18N
                     null
             );
             desc.addFilter(ID_FILTER,
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowId"),     //NOI18N
                     NbBundle.getMessage(FXDNavigatorContent.class, "LBL_ShowIdTip"),     //NOI18N
                     FXDNavigatorTree.showIdOnly,
-                    new ImageIcon(org.openide.util.ImageUtilities.loadImage("org/netbeans/modules/javafx/fxd/composer/resources/filterSignificant.png")), //NOI18N
+                    new ImageIcon(org.openide.util.ImageUtilities.loadImage("org/netbeans/modules/visage/fxd/composer/resources/filterSignificant.png")), //NOI18N
                     null
             );
             

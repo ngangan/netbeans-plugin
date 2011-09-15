@@ -1,4 +1,4 @@
 package fxprj2;
 
-import javafx.stage.Stage;import javafx.scene.Scene;import javafx.scene.shape.Circle;import javafx.scene.paint.Color;import javafx.scene.text.Text;
-import javafx.scene.text.Font;import javafx.scene.input.MouseEvent;
+import visage.stage.Stage;import visage.scene.Scene;import visage.scene.shape.Circle;import visage.scene.paint.Color;import visage.scene.text.Text;
+import visage.scene.text.Font;import visage.scene.input.MouseEvent;

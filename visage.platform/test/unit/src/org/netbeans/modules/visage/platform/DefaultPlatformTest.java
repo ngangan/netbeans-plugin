@@ -42,18 +42,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform;
+package org.netbeans.modules.visage.platform;
 
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 
-public class DefaultPlatformTest extends JavaFXTestBase {
+public class DefaultPlatformTest extends VisageTestBase {
 
     public DefaultPlatformTest(final String name) {
         super(name);
     }
 
     public void testDefaultPlatform() {
-        JavaFXPlatform platform = JavaFXPlatform.getDefaultFXPlatform();
+        VisagePlatform platform = VisagePlatform.getDefaultFXPlatform();
         assertNotNull("have default platform", platform);
     }
 

@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.profiler;
+package org.netbeans.modules.visage.profiler;
 
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
@@ -56,9 +56,9 @@ import org.netbeans.modules.profiler.AbstractProjectTypeProfiler;
 import org.netbeans.modules.profiler.ui.ProfilerDialogs;
 import org.netbeans.modules.profiler.utils.AppletSupport;
 import org.netbeans.modules.profiler.utils.ProjectUtilities;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.visage.source.VisageSourceUtils;
 import org.netbeans.spi.project.AuxiliaryConfiguration;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.PropertyProvider;
@@ -89,13 +89,13 @@ import javax.swing.JButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
-import org.netbeans.modules.javafx.project.api.JavaFXPropertyEvaluator;
-import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
+import org.netbeans.modules.visage.project.api.VisagePropertyEvaluator;
+import org.netbeans.modules.visage.project.classpath.ClassPathProviderImpl;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.ui.customizer.MainClassWarning;
+import org.netbeans.modules.visage.project.ui.customizer.MainClassWarning;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -105,7 +105,7 @@ import org.openide.awt.MouseUtils;
  * @author Tomas Hurka
  * @author Ian Formanek
  */
-public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler {
+public final class VisageProjectTypeProfiler extends AbstractProjectTypeProfiler {
     //~ Inner Classes ------------------------------------------------------------------------------------------------------------
 
     private static class MyPropertyProvider implements PropertyProvider {
@@ -134,23 +134,23 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     // -----
     // I18N String constants
-    private static final String MODIFY_BUILDSCRIPT_CAPTION = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_ModifyBuildScriptCaption"); // NOI18N
-    private static final String MODIFY_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_ModifyBuildScriptMsg"); // NOI18N
-    private static final String REGENERATE_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_RegenerateBuildScriptMsg"); // NOI18N
-    private static final String CANNOT_FIND_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_CannotFindBuildScriptMsg"); // NOI18N
-    private static final String CANNOT_BACKUP_BUILDSCRIPT_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_CannotBackupBuildScriptMsg"); // NOI18N
-    private static final String MODIFY_BUILDSCRIPT_MANUALLY_MSG = NbBundle.getMessage(JavaFXProjectTypeProfiler.class,
-            "JavaFXProjectTypeProfiler_ModifyBuildScriptManuallyMsg"); // NOI18N
+    private static final String MODIFY_BUILDSCRIPT_CAPTION = NbBundle.getMessage(VisageProjectTypeProfiler.class,
+            "VisageProjectTypeProfiler_ModifyBuildScriptCaption"); // NOI18N
+    private static final String MODIFY_BUILDSCRIPT_MSG = NbBundle.getMessage(VisageProjectTypeProfiler.class,
+            "VisageProjectTypeProfiler_ModifyBuildScriptMsg"); // NOI18N
+    private static final String REGENERATE_BUILDSCRIPT_MSG = NbBundle.getMessage(VisageProjectTypeProfiler.class,
+            "VisageProjectTypeProfiler_RegenerateBuildScriptMsg"); // NOI18N
+    private static final String CANNOT_FIND_BUILDSCRIPT_MSG = NbBundle.getMessage(VisageProjectTypeProfiler.class,
+            "VisageProjectTypeProfiler_CannotFindBuildScriptMsg"); // NOI18N
+    private static final String CANNOT_BACKUP_BUILDSCRIPT_MSG = NbBundle.getMessage(VisageProjectTypeProfiler.class,
+            "VisageProjectTypeProfiler_CannotBackupBuildScriptMsg"); // NOI18N
+    private static final String MODIFY_BUILDSCRIPT_MANUALLY_MSG = NbBundle.getMessage(VisageProjectTypeProfiler.class,
+            "VisageProjectTypeProfiler_ModifyBuildScriptManuallyMsg"); // NOI18N
     // -----
-    public static final ErrorManager err = ErrorManager.getDefault().getInstance("org.netbeans.modules.javafx.profiler"); // NOI18N
-    private static final String JavaFX_PROJECT_NAMESPACE_40 = "http://www.netbeans.org/ns/javafx-project/1"; // NOI18N
-    private static final String JavaFX_PROJECT_NAMESPACE_41 = "http://www.netbeans.org/ns/javafx-project/2"; // NOI18N
-    private static final String JavaFX_PROJECT_NAMESPACE_50 = "http://www.netbeans.org/ns/javafx-project/3"; // NOI18N
+    public static final ErrorManager err = ErrorManager.getDefault().getInstance("org.netbeans.modules.visage.profiler"); // NOI18N
+    private static final String Visage_PROJECT_NAMESPACE_40 = "http://www.netbeans.org/ns/visage-project/1"; // NOI18N
+    private static final String Visage_PROJECT_NAMESPACE_41 = "http://www.netbeans.org/ns/visage-project/2"; // NOI18N
+    private static final String Visage_PROJECT_NAMESPACE_50 = "http://www.netbeans.org/ns/visage-project/3"; // NOI18N
     private static final String STANDARD_IMPORT_STRING = "<import file=\"nbproject/build-impl.xml\"/>"; // NOI18N
     private static final String PROFILER_IMPORT_STRING = "<import file=\"nbproject/profiler-build-impl.xml\"/>"; // NOI18N
     private static final String PROFILE_VERSION_ATTRIBUTE = "version"; // NOI18N
@@ -169,7 +169,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             case TARGET_PROFILE_SINGLE:
 
                 if (SourceUtils.isApplet(profiledClassFile) ||
-                        JavaFXSourceUtils.isJavaFXApplet(profiledClassFile)) {
+                        VisageSourceUtils.isVisageApplet(profiledClassFile)) {
                     return "profile-applet"; // NOI18N
                 } else {
                     return "profile-single"; // NOI18N
@@ -185,10 +185,10 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     // --- ProjectTypeProfiler implementation ------------------------------------------------------------------------------
     public boolean isProfilingSupported(final Project project) {
-        JavaFXPropertyEvaluator evaluator = project.getLookup().lookup(JavaFXPropertyEvaluator.class);
-        if (evaluator == null) return false; // not a javafx project
+        VisagePropertyEvaluator evaluator = project.getLookup().lookup(VisagePropertyEvaluator.class);
+        if (evaluator == null) return false; // not a visage project
         
-        String profile = evaluator.evaluator().getProperty("javafx.profile");
+        String profile = evaluator.evaluator().getProperty("visage.profile");
         profile = profile != null ? profile : "desktop"; // some projects don't have the property set for "Standard"
 
         if (evaluator == null || !"desktop".equals(profile)) return false;
@@ -201,14 +201,14 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             return false;
         }
 
-        Element e = aux.getConfigurationFragment("data", JavaFX_PROJECT_NAMESPACE_40, true); // NOI18N
+        Element e = aux.getConfigurationFragment("data", Visage_PROJECT_NAMESPACE_40, true); // NOI18N
 
         if (e == null) {
-            e = aux.getConfigurationFragment("data", JavaFX_PROJECT_NAMESPACE_41, true); // NOI18N
+            e = aux.getConfigurationFragment("data", Visage_PROJECT_NAMESPACE_41, true); // NOI18N
         }
 
         if (e == null) {
-            e = aux.getConfigurationFragment("data", JavaFX_PROJECT_NAMESPACE_50, true); // NOI18N
+            e = aux.getConfigurationFragment("data", Visage_PROJECT_NAMESPACE_50, true); // NOI18N
         }
 
         return (e != null);
@@ -229,7 +229,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             return jpm.getDefaultPlatform();
         }
 
-        JavaPlatform[] platforms = jpm.getPlatforms(null, new Specification("javafx", null)); // NOI18N
+        JavaPlatform[] platforms = jpm.getPlatforms(null, new Specification("visage", null)); // NOI18N
 
         for (int i = 0; i < platforms.length; i++) {
             JavaPlatform platform = platforms[i];
@@ -245,7 +245,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     public boolean checkProjectCanBeProfiled(final Project project, final FileObject profiledClassFile) {
         if (profiledClassFile == null) {
-            String config = ((JavaFXProject)project).evaluator().getProperty("config"); // JavaFXConfigurationProvider.PROP_CONFIG
+            String config = ((VisageProject)project).evaluator().getProperty("config"); // VisageConfigurationProvider.PROP_CONFIG
             String path;
             if (config == null || config.length() == 0) {
                 path = AntProjectHelper.PROJECT_PROPERTIES_PATH;
@@ -258,21 +258,21 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             // Check whether main class is defined in this config. Note that we use the evaluator,
             // not ep.getProperty(MAIN_CLASS), since it is permissible for the default pseudoconfig
             // to define a main class - in this case an active config need not override it.
-            UpdateHelper helper = ((JavaFXProject)project).getUpdateHelper();
+            UpdateHelper helper = ((VisageProject)project).getUpdateHelper();
             EditableProperties ep = helper.getProperties(path);
 
-            String mainClass = ((JavaFXProject)project).evaluator().getProperty(JavaFXProjectProperties.MAIN_CLASS);
-            MainClassStatus result = isSetMainClass ((JavaFXProject)project, mainClass);
+            String mainClass = ((VisageProject)project).evaluator().getProperty(VisageProjectProperties.MAIN_CLASS);
+            MainClassStatus result = isSetMainClass ((VisageProject)project, mainClass);
   
             if (result != MainClassStatus.SET_AND_VALID) {
                 do {
                     // show warning, if cancel then return
-                    if (showMainClassWarning ((JavaFXProject)project, mainClass, ProjectUtils.getInformation(project).getDisplayName(), ep,result)) {
+                    if (showMainClassWarning ((VisageProject)project, mainClass, ProjectUtils.getInformation(project).getDisplayName(), ep,result)) {
                         return false;
                     }
                     // No longer use the evaluator: have not called putProperties yet so it would not work.
-                    mainClass = ep.get(JavaFXProjectProperties.MAIN_CLASS);
-                    result=isSetMainClass ((JavaFXProject)project, mainClass);
+                    mainClass = ep.get(VisageProjectProperties.MAIN_CLASS);
+                    result=isSetMainClass ((VisageProject)project, mainClass);
                 } while (result != MainClassStatus.SET_AND_VALID);
                 try {
                     if (helper.requestUpdate()) {
@@ -326,7 +326,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         // 3. the stylesheet changed (usually should be caught by 2.)
         final GeneratedFilesHelper gfh = new GeneratedFilesHelper(project.getProjectDirectory());
         int flags = gfh.getBuildScriptState("nbproject/profiler-build-impl.xml", // NOI18N
-                JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
+                VisageProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
 
         if (((flags & GeneratedFilesHelper.FLAG_MISSING) != 0) || ((flags & GeneratedFilesHelper.FLAG_OLD_STYLESHEET) != 0)) {
             try {
@@ -341,7 +341,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 }
 
                 gfh.generateBuildScriptFromStylesheet("nbproject/profiler-build-impl.xml", // NOI18N
-                        JavaFXProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
+                        VisageProjectTypeProfiler.class.getResource("profiler-build-impl.xsl")); // NOI18N
             } catch (IOException e1) {
                 err.notify(ErrorManager.WARNING, e1);
 
@@ -461,7 +461,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             // In case the class to profile is explicitely selected (profile-single)
             // 1. specify profiled class name
             if (SourceUtils.isApplet(profiledClassFile) ||
-                    JavaFXSourceUtils.isJavaFXApplet(profiledClassFile)) {
+                    VisageSourceUtils.isVisageApplet(profiledClassFile)) {
                 String jvmargs = props.getProperty("run.jvmargs"); // NOI18N
 
                 URL url = null;
@@ -506,9 +506,9 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                             profiledClassFile), profiledClassFile);
                     props.setProperty("javac.includes", clazz); //NOI18N
                 } else {
-                    if (project instanceof JavaFXProject) {
-                        JavaFXProject projectJFX = (JavaFXProject) project;
-                        String clazz = FileUtil.getRelativePath(JavaFXProjectUtilities.getRoot(projectJFX.getFOSourceRoots(), profiledClassFile), profiledClassFile);
+                    if (project instanceof VisageProject) {
+                        VisageProject projectVSG = (VisageProject) project;
+                        String clazz = FileUtil.getRelativePath(VisageProjectUtilities.getRoot(projectVSG.getFOSourceRoots(), profiledClassFile), profiledClassFile);
                         props.setProperty("javac.includes", clazz); // NOI18N
                         clazz = clazz.substring(0, clazz.length() - 3);
                         clazz = clazz.replace('/', '.'); // NOI18N
@@ -543,7 +543,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
 
     @Override
     public boolean supportsSettingsOverride() {
-        return true; // supported for JavaFX project
+        return true; // supported for Visage project
     }
 
     @Override
@@ -654,7 +654,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         return pe;
     }
 
-    // Copied over from JavaFXActionProvider
+    // Copied over from VisageActionProvider
     private static enum MainClassStatus {
         SET_AND_VALID,
         SET_BUT_INVALID,
@@ -662,13 +662,13 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
     }
 
     /**
-     * Copied over from JavaFXActionProvider
+     * Copied over from VisageActionProvider
      * Tests if the main class is set
      * @param sourcesRoots source roots
      * @param mainClass main class name
      * @return status code
      */
-    private MainClassStatus isSetMainClass(JavaFXProject project, String mainClass) {
+    private MainClassStatus isSetMainClass(VisageProject project, String mainClass) {
         FileObject[] sourcesRoots = project.getSourceRoots().getRoots();
         
         if (mainClass == null || mainClass.length () == 0) {
@@ -678,7 +678,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
             ClassPath bootPath = ClassPath.getClassPath (sourcesRoots[0], ClassPath.BOOT);        //Single compilation unit
             ClassPath compilePath = ClassPath.getClassPath (sourcesRoots[0], ClassPath.EXECUTE);
             ClassPath sourcePath = ClassPath.getClassPath(sourcesRoots[0], ClassPath.SOURCE);
-            if (JavaFXProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
+            if (VisageProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
                 return MainClassStatus.SET_AND_VALID;
             }
         }
@@ -688,7 +688,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
                 ClassPath bootPath = cpProvider.getProjectSourcesClassPath(ClassPath.BOOT);
                 ClassPath compilePath = cpProvider.getProjectSourcesClassPath(ClassPath.EXECUTE);
                 ClassPath sourcePath = cpProvider.getProjectSourcesClassPath(ClassPath.SOURCE);   //Empty ClassPath
-                if (JavaFXProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
+                if (VisageProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
                     return MainClassStatus.SET_AND_VALID;
                 }
             }
@@ -697,7 +697,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
     }
 
     /**
-     * Copied over from JavaFXActionProvider
+     * Copied over from VisageActionProvider
      * Asks user for name of main class
      * @param mainClass current main class
      * @param projectName the name of project
@@ -705,7 +705,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
      * @param messgeType type of dialog
      * @return true if user selected main class
      */
-    private boolean showMainClassWarning(JavaFXProject project, String mainClass, String projectName, EditableProperties ep, MainClassStatus messageType) {
+    private boolean showMainClassWarning(VisageProject project, String mainClass, String projectName, EditableProperties ep, MainClassStatus messageType) {
         boolean canceled;
         final JButton okButton = new JButton (NbBundle.getMessage (MainClassWarning.class, "LBL_MainClassWarning_ChooseMainClass_OK")); // NOI18N
         okButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (MainClassWarning.class, "AD_MainClassWarning_ChooseMainClass_OK")); // NOI18N
@@ -756,7 +756,7 @@ public final class JavaFXProjectTypeProfiler extends AbstractProjectTypeProfiler
         } else {
             mainClass = panel.getSelectedMainClass ();
             canceled = false;
-            ep.put(JavaFXProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass); // NOI18N
+            ep.put(VisageProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass); // NOI18N
         }
         dlg.dispose();
 

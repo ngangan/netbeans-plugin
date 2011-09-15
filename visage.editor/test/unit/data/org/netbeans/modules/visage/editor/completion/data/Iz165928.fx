@@ -1,4 +1,4 @@
-import javafx.scene.Scene;
+import visage.scene.Scene;
 
 var seq = [0..2];
 

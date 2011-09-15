@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -148,7 +148,7 @@ public class MainClassUpdater extends FileChangeAdapter implements PropertyChang
                         }                    
                         if (newMainClass != null && !newMainClass.equals(oldMainClass) && helper.requestUpdate() &&
                                 // XXX ##84806: ideally should update nbproject/configs/*.properties in this case:
-                            eval.getProperty(JavaFXConfigurationProvider.PROP_CONFIG) == null) {
+                            eval.getProperty(VisageConfigurationProvider.PROP_CONFIG) == null) {
                             final String newMainClassFinal = newMainClass;
                             ProjectManager.mutex().writeAccess(new Mutex.ExceptionAction<Void>() {
                                 public Void run() throws Exception {                                                                                    

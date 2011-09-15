@@ -43,9 +43,9 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.breakpoints;
+package org.netbeans.modules.visage.debugger.breakpoints;
 
-import org.netbeans.modules.javafx.debugger.Context;
+import org.netbeans.modules.visage.debugger.Context;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.openide.util.NbBundle;
 
@@ -58,7 +58,7 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="BreakpointsView", types={ org.netbeans.spi.viewmodel.NodeModel.class } )
-public class JavaFXBreakpointsNodeModel implements NodeModel {
+public class VisageBreakpointsNodeModel implements NodeModel {
 
     public static final String LINE_BREAKPOINT =
         "org/netbeans/modules/debugger/resources/breakpointsView/Breakpoint";
@@ -67,10 +67,10 @@ public class JavaFXBreakpointsNodeModel implements NodeModel {
         "org/netbeans/modules/debugger/resources/breakpointsView/DisabledBreakpoint";
 
     public String getDisplayName( Object o ) throws UnknownTypeException {
-        if( o instanceof JavaFXLineBreakpoint ) {
-            JavaFXLineBreakpoint b = (JavaFXLineBreakpoint) o;
-            return NbBundle.getMessage( JavaFXBreakpointsNodeModel.class,
-                    "CTL_JavaFX_Line_Breakpoint",
+        if( o instanceof VisageLineBreakpoint ) {
+            VisageLineBreakpoint b = (VisageLineBreakpoint) o;
+            return NbBundle.getMessage( VisageBreakpointsNodeModel.class,
+                    "CTL_Visage_Line_Breakpoint",
                     Context.getFileName( b ),
                     "" + b.getLineNumber()
                 );
@@ -79,20 +79,20 @@ public class JavaFXBreakpointsNodeModel implements NodeModel {
     }
 
     public String getShortDescription( Object o ) throws UnknownTypeException {
-        if( o instanceof JavaFXLineBreakpoint ) {
+        if( o instanceof VisageLineBreakpoint ) {
             return NbBundle.getMessage(
-                    JavaFXBreakpointsNodeModel.class,
-                    "CTL_JavaFX_Line_Breakpoint",
-                    Context.getFileName((JavaFXLineBreakpoint)o ),
-                    "" + ((JavaFXLineBreakpoint)o ).getLineNumber()
+                    VisageBreakpointsNodeModel.class,
+                    "CTL_Visage_Line_Breakpoint",
+                    Context.getFileName((VisageLineBreakpoint)o ),
+                    "" + ((VisageLineBreakpoint)o ).getLineNumber()
                 );
         }
         throw new UnknownTypeException( o );
     }
 
     public String getIconBase( Object o ) throws UnknownTypeException {
-        if( o instanceof JavaFXLineBreakpoint ) {
-            JavaFXLineBreakpoint breakpoint = (JavaFXLineBreakpoint)o;
+        if( o instanceof VisageLineBreakpoint ) {
+            VisageLineBreakpoint breakpoint = (VisageLineBreakpoint)o;
             if( breakpoint.isEnabled()) {
                 return LINE_BREAKPOINT;
             } else {

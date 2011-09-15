@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger;
+package org.netbeans.modules.visage.debugger;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -51,7 +51,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import org.netbeans.api.debugger.DebuggerManager;
-import org.netbeans.modules.javafx.debugger.breakpoints.JavaFXLineBreakpoint;
+import org.netbeans.modules.visage.debugger.breakpoints.VisageLineBreakpoint;
 import org.netbeans.spi.debugger.jpda.EditorContext;
 import org.netbeans.spi.debugger.ui.EditorContextDispatcher;
 import org.openide.filesystems.FileObject;
@@ -161,7 +161,7 @@ public class Context {
         getContext().disposeTimeStamp( timeStamp );
     }
 
-    public static String getFileName( JavaFXLineBreakpoint b ) {
+    public static String getFileName( VisageLineBreakpoint b ) {
         try {
             return new File( new URL( b.getURL()).getFile()).getName();
         } catch( MalformedURLException e ) {
@@ -173,7 +173,7 @@ public class Context {
         return getContext().getClassName( url, lineNumber );
     }
 
-    public static boolean showSource( JavaFXLineBreakpoint b ) {
+    public static boolean showSource( VisageLineBreakpoint b ) {
         if( b.getLineNumber () < 1 )
             return Context.showSource( b.getURL(), 1, null );
         return Context.showSource ( b.getURL(), b.getLineNumber(), null );
@@ -187,7 +187,7 @@ public class Context {
      * @return annotation or <code>null</code>, when the annotation can not be
      *         created at the url:line where the given breakpoint is set.
      */
-    public static Object annotate( JavaFXLineBreakpoint b ) {
+    public static Object annotate( VisageLineBreakpoint b ) {
         String url = b.getURL();
         int lineNumber = b.getLineNumber();
         if( lineNumber < 1 ) return null;

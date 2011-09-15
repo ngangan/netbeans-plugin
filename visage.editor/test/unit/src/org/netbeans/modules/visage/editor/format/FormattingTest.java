@@ -41,18 +41,18 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
 import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.java.lexer.JavaTokenId;
-import org.netbeans.api.javafx.editor.TestUtilities;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.editor.TestUtilities;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.modules.editor.indent.api.Reformat;
@@ -86,7 +86,7 @@ public class FormattingTest extends NbTestCase {
         // TODO move initialization part to separate method
         testFile = new File(getWorkDir(), "Test.fx");
         TestUtilities.copyStringToFile(testFile,
-                "package org.netbeans.javafx.test;\n\n" +
+                "package org.netbeans.visage.test;\n\n" +
                 "public class Test {\n" +
                 "   public def var1 : String = \"abc\";\n" +
                 "}\n");
@@ -99,20 +99,20 @@ public class FormattingTest extends NbTestCase {
         assertNotNull(ec);
         final Document doc = ec.openDocument();
         assertNotNull(doc);
-        doc.putProperty(Language.class, JFXTokenId.language());
+        doc.putProperty(Language.class, VSGTokenId.language());
         doc.putProperty("mimeType", "text/x-fx");
 
-        JavaFXSource src = JavaFXSource.forDocument(doc);
+        VisageSource src = VisageSource.forDocument(doc);
         src.runUserActionTask(new Task<CompilationController>() {
 
             public void run(CompilationController controller) throws Exception {
-                assertFalse(controller.toPhase(JavaFXSource.Phase.PARSED).lessThan(JavaFXSource.Phase.PARSED));
+                assertFalse(controller.toPhase(VisageSource.Phase.PARSED).lessThan(VisageSource.Phase.PARSED));
             }
         }, true);
 
-        // TODO use javafx preferences when will be available
+        // TODO use visage preferences when will be available
         Preferences preferences = MimeLookup.getLookup(JavaTokenId.language().mimeType()).lookup(Preferences.class);
-//        Preferences preferences = MimeLookup.getLookup(JFXTokenId.language().mimeType()).lookup(Preferences.class);
+//        Preferences preferences = MimeLookup.getLookup(VSGTokenId.language().mimeType()).lookup(Preferences.class);
         assertNotNull(preferences);
         preferences.putBoolean("placeNewLineAfterModifiers", false);
         preferences.putBoolean("spaceAroundAssignOps", true);
@@ -124,7 +124,7 @@ public class FormattingTest extends NbTestCase {
         System.err.println(res);
 
         String golden =
-                "package org.netbeans.javafx.test;\n\n" +
+                "package org.netbeans.visage.test;\n\n" +
                 "public class Test {\n" +
                 "   public def var1 : String = \"abc\";\n" +
                 "}\n";

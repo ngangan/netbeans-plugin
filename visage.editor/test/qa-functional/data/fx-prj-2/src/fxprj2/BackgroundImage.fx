@@ -29,17 +29,17 @@
 
 package image;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.scene.Group;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.scene.Scene;
-import javafx.scene.shape.Line;
-import javafx.scene.transform.Translate;
-import javafx.stage.Stage;
+import visage.animation.Interpolator;
+import visage.animation.KeyFrame;
+import visage.animation.Timeline;
+import visage.scene.Group;
+import visage.scene.image.Image;
+import visage.scene.image.ImageView;
+import visage.scene.paint.Color;
+import visage.scene.Scene;
+import visage.scene.shape.Line;
+import visage.scene.transform.Translate;
+import visage.stage.Stage;
 
 /**
  * @author Michal Skvor

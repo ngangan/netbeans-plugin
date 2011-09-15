@@ -28,19 +28,19 @@
  *
  * Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.task;
+package org.netbeans.modules.visage.editor.task;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.UnitTree;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.UnitTree;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.javafx.editor.JavaFXDocument;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.editor.VisageDocument;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
@@ -69,7 +69,7 @@ import org.openide.util.NbBundle;
  */
 class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
 
-    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/javafx/editor/task/Bundle"); // NOI18N
+    private static final ResourceBundle BUNDLE = NbBundle.getBundle("org/netbeans/modules/visage/editor/task/Bundle"); // NOI18N
     private static final String WRONG_PROJECT = "wrong-project"; // NOI18N
     private static final String WRONG_PACKAGE = "wrong-package"; // NOI18N
     private static final String EDITOR_WRONG_PROJECT = "Editor.wrongProject"; // NOI18N
@@ -107,8 +107,8 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             return;
         }
 
-        if (project instanceof JavaFXProject) {
-            JavaFXProject fxp = (JavaFXProject) project;
+        if (project instanceof VisageProject) {
+            VisageProject fxp = (VisageProject) project;
             FileObject[] sourceRoots = fxp.getFOSourceRoots();
             List<Fix> fixes = new ArrayList<Fix>(2);
 
@@ -147,7 +147,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
                     MessageFormat.format(BUNDLE.getString(EDITOR_WRONG_PACKAGE_PACKAGE), packageName),
                     fixes, file, sp, ep)));
         } else {
-// [pnejedly] disabling the error temporarily to allow comfortabe editing of real JavaFX sources under an NBM project type.
+// [pnejedly] disabling the error temporarily to allow comfortabe editing of real Visage sources under an NBM project type.
             // solving compilation error under J5
             //noinspection RedundantArrayCreation
 //            HintsController.setErrors(file, WRONG_PROJECT, Collections.<ErrorDescription>singletonList(
@@ -159,7 +159,7 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
         }
     }
 
-    private JavaFXDocument getDoc(FileObject file) {
+    private VisageDocument getDoc(FileObject file) {
         if (file == null || !file.isValid()) {
             return null;
         }
@@ -174,8 +174,8 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             return null;
         }
         Document doc = ec.getDocument();
-        if (doc instanceof JavaFXDocument) {
-            return (JavaFXDocument) doc;
+        if (doc instanceof VisageDocument) {
+            return (VisageDocument) doc;
         }
         return null;
     }
@@ -184,9 +184,9 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
 
         private CompilationInfo ci;
         private String newName;
-        private JavaFXDocument doc;
+        private VisageDocument doc;
 
-        public ReplacePackageNameFix(CompilationInfo ci, String newName, JavaFXDocument doc) {
+        public ReplacePackageNameFix(CompilationInfo ci, String newName, VisageDocument doc) {
             this.ci = ci;
             this.newName = newName;
             this.doc = doc;
@@ -219,9 +219,9 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
     private static class SetPackageToDefaultFix implements Fix {
 
         private final CompilationInfo ci;
-        private final JavaFXDocument doc;
+        private final VisageDocument doc;
 
-        private SetPackageToDefaultFix(CompilationInfo ci, JavaFXDocument doc) {
+        private SetPackageToDefaultFix(CompilationInfo ci, VisageDocument doc) {
             this.ci = ci;
             this.doc = doc;
         }
@@ -241,11 +241,11 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             int end = (int) sp.getEndPosition(cu, pn) + 1;
 
             //noinspection unchecked
-            TokenSequence<JFXTokenId> ts = ci.getTokenHierarchy().tokenSequence();
+            TokenSequence<VSGTokenId> ts = ci.getTokenHierarchy().tokenSequence();
             ts.move(start);
             boolean finish = false;
             while (ts.movePrevious() || !finish) {
-                JFXTokenId id = ts.token().id();
+                VSGTokenId id = ts.token().id();
                 switch (id) {
                     case PACKAGE: {
                         start = ts.offset();

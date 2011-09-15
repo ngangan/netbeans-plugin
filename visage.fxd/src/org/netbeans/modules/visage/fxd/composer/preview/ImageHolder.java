@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.preview;
+package org.netbeans.modules.visage.fxd.composer.preview;
 
 
 import java.awt.Color;
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.NbBundle;
 
 /**

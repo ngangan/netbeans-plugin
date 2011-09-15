@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.bindspy;
+package org.netbeans.modules.visage.bindspy;
 
 import java.io.File;
 import javax.swing.JEditorPane;
@@ -60,8 +60,8 @@ import org.netbeans.api.visual.widget.ConnectionWidget;
 import org.netbeans.api.visual.widget.LayerWidget;
 import org.netbeans.api.visual.widget.Widget;
 import org.netbeans.api.visual.widget.general.IconNodeWidget;
-import org.netbeans.modules.javafx.bindspy.BindsModel.BindConnection;
-import org.netbeans.modules.javafx.bindspy.BindsModel.BindVariable;
+import org.netbeans.modules.visage.bindspy.BindsModel.BindConnection;
+import org.netbeans.modules.visage.bindspy.BindsModel.BindVariable;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;

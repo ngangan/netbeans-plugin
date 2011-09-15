@@ -41,17 +41,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source.support;
+package org.netbeans.api.visage.source.support;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;
-//import org.netbeans.api.javafx.source.SourceUtils;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.VisageSourceTaskFactory;
+//import org.netbeans.api.visage.source.SourceUtils;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
@@ -60,7 +60,7 @@ import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 
-/**A {@link JavaFXSourceTaskFactorySupport} that registers tasks to all files that are
+/**A {@link VisageSourceTaskFactorySupport} that registers tasks to all files that are
  * found in the given {@link Lookup}.
  *
  * This factory searches for {@link FileObject}, {@link DataObject} and {@link Node}
@@ -69,7 +69,7 @@ import org.openide.util.LookupListener;
  *
  * @author Jan Lahoda
  */
-public abstract class LookupBasedJavaFXSourceTaskFactory extends JavaFXSourceTaskFactory {
+public abstract class LookupBasedVisageSourceTaskFactory extends VisageSourceTaskFactory {
 
     private Result<FileObject> fileObjectResult;
     private Result<DataObject> dataObjectResult;
@@ -80,22 +80,22 @@ public abstract class LookupBasedJavaFXSourceTaskFactory extends JavaFXSourceTas
     
     private String[] supportedMimeTypes;
 
-    /**Construct the LookupBasedJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the LookupBasedVisageSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      */
-    public LookupBasedJavaFXSourceTaskFactory(Phase phase, Priority priority) {
+    public LookupBasedVisageSourceTaskFactory(Phase phase, Priority priority) {
         this(phase, priority, (String[]) null);
     }
     
-    /**Construct the LookupBasedJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the LookupBasedVisageSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      * @since 0.21
      */
-    public LookupBasedJavaFXSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
+    public LookupBasedVisageSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
         super(phase, priority);
         currentFiles = Collections.emptyList();
         listener = new LookupListenerImpl();

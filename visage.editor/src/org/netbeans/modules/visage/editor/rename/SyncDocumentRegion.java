@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.rename;
+package org.netbeans.modules.visage.editor.rename;
 
 import java.util.ArrayList;
 import java.util.Collections;

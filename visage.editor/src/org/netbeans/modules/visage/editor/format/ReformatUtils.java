@@ -41,12 +41,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.visage.api.tree.*;
+import com.sun.visage.api.tree.Tree.VisageKind;
 import java.util.EnumSet;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 
 /**
  * Reformatter utilities.
@@ -55,55 +55,55 @@ import org.netbeans.api.javafx.lexer.JFXTokenId;
  */
 public final class ReformatUtils {
 
-    public static EnumSet<JFXTokenId> RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.ABSTRACT,
-            JFXTokenId.AFTER, JFXTokenId.AND, JFXTokenId.AS, JFXTokenId.ASSERT,
-            JFXTokenId.AT, JFXTokenId.ATTRIBUTE, JFXTokenId.BEFORE, JFXTokenId.BIND,
-            JFXTokenId.BOUND, JFXTokenId.BREAK, JFXTokenId.CATCH, JFXTokenId.CLASS,
-            JFXTokenId.CONTINUE, JFXTokenId.DEF, JFXTokenId.DELETE, JFXTokenId.ELSE,
-            JFXTokenId.EXCLUSIVE, JFXTokenId.EXTENDS, JFXTokenId.FALSE, JFXTokenId.FINALLY,
-            JFXTokenId.FOR, JFXTokenId.FROM, JFXTokenId.FUNCTION, JFXTokenId.IF,
-            JFXTokenId.IMPORT, JFXTokenId.INDEXOF, JFXTokenId.INSERT, JFXTokenId.INSTANCEOF,
-            JFXTokenId.LAZY, JFXTokenId.MIXIN, JFXTokenId.MOD, JFXTokenId.NATIVEARRAY,
-            JFXTokenId.NEW, JFXTokenId.NOT, JFXTokenId.NULL, JFXTokenId.OR,
-            JFXTokenId.OVERRIDE, JFXTokenId.PACKAGE, JFXTokenId.PRIVATE, JFXTokenId.PROTECTED,
-            JFXTokenId.PUBLIC, JFXTokenId.PUBLIC_INIT, JFXTokenId.PUBLIC_READ, JFXTokenId.RETURN,
-            JFXTokenId.REVERSE, JFXTokenId.SIZEOF, JFXTokenId.STATIC, JFXTokenId.SUPER,
-            JFXTokenId.THEN, JFXTokenId.THIS, JFXTokenId.THROW, JFXTokenId.TRUE,
-            JFXTokenId.TRY, JFXTokenId.TYPEOF, JFXTokenId.VAR, JFXTokenId.WHILE);
+    public static EnumSet<VSGTokenId> RESERVED_KEYWORDS = EnumSet.of(VSGTokenId.ABSTRACT,
+            VSGTokenId.AFTER, VSGTokenId.AND, VSGTokenId.AS, VSGTokenId.ASSERT,
+            VSGTokenId.AT, VSGTokenId.ATTRIBUTE, VSGTokenId.BEFORE, VSGTokenId.BIND,
+            VSGTokenId.BOUND, VSGTokenId.BREAK, VSGTokenId.CATCH, VSGTokenId.CLASS,
+            VSGTokenId.CONTINUE, VSGTokenId.DEF, VSGTokenId.DELETE, VSGTokenId.ELSE,
+            VSGTokenId.EXCLUSIVE, VSGTokenId.EXTENDS, VSGTokenId.FALSE, VSGTokenId.FINALLY,
+            VSGTokenId.FOR, VSGTokenId.FROM, VSGTokenId.FUNCTION, VSGTokenId.IF,
+            VSGTokenId.IMPORT, VSGTokenId.INDEXOF, VSGTokenId.INSERT, VSGTokenId.INSTANCEOF,
+            VSGTokenId.LAZY, VSGTokenId.MIXIN, VSGTokenId.MOD, VSGTokenId.NATIVEARRAY,
+            VSGTokenId.NEW, VSGTokenId.NOT, VSGTokenId.NULL, VSGTokenId.OR,
+            VSGTokenId.OVERRIDE, VSGTokenId.PACKAGE, VSGTokenId.PRIVATE, VSGTokenId.PROTECTED,
+            VSGTokenId.PUBLIC, VSGTokenId.PUBLIC_INIT, VSGTokenId.PUBLIC_READ, VSGTokenId.RETURN,
+            VSGTokenId.REVERSE, VSGTokenId.SIZEOF, VSGTokenId.STATIC, VSGTokenId.SUPER,
+            VSGTokenId.THEN, VSGTokenId.THIS, VSGTokenId.THROW, VSGTokenId.TRUE,
+            VSGTokenId.TRY, VSGTokenId.TYPEOF, VSGTokenId.VAR, VSGTokenId.WHILE);
 
-    public static EnumSet<JFXTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(JFXTokenId.FIRST,
-            JFXTokenId.IN, JFXTokenId.INIT, JFXTokenId.INTO, JFXTokenId.INVERSE,
-            JFXTokenId.LAST, JFXTokenId.ON, JFXTokenId.POSTINIT, JFXTokenId.REPLACE,
-            JFXTokenId.STEP, JFXTokenId.TRIGGER, JFXTokenId.TWEEN, JFXTokenId.WHERE,
-            JFXTokenId.WITH, JFXTokenId.INVALIDC);
+    public static EnumSet<VSGTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(VSGTokenId.FIRST,
+            VSGTokenId.IN, VSGTokenId.INIT, VSGTokenId.INTO, VSGTokenId.INVERSE,
+            VSGTokenId.LAST, VSGTokenId.ON, VSGTokenId.POSTINIT, VSGTokenId.REPLACE,
+            VSGTokenId.STEP, VSGTokenId.TRIGGER, VSGTokenId.TWEEN, VSGTokenId.WHERE,
+            VSGTokenId.WITH, VSGTokenId.INVALIDC);
 
-    public static EnumSet<JFXTokenId> MODIFIER_KEYWORDS = EnumSet.of(JFXTokenId.PRIVATE,
-            JFXTokenId.PACKAGE, JFXTokenId.PROTECTED, JFXTokenId.PUBLIC,
-            JFXTokenId.PUBLIC_READ, JFXTokenId.PUBLIC_INIT, JFXTokenId.STATIC,
-            JFXTokenId.ABSTRACT, JFXTokenId.NATIVEARRAY, JFXTokenId.MIXIN,
-            JFXTokenId.OVERRIDE, JFXTokenId.BOUND);
+    public static EnumSet<VSGTokenId> MODIFIER_KEYWORDS = EnumSet.of(VSGTokenId.PRIVATE,
+            VSGTokenId.PACKAGE, VSGTokenId.PROTECTED, VSGTokenId.PUBLIC,
+            VSGTokenId.PUBLIC_READ, VSGTokenId.PUBLIC_INIT, VSGTokenId.STATIC,
+            VSGTokenId.ABSTRACT, VSGTokenId.NATIVEARRAY, VSGTokenId.MIXIN,
+            VSGTokenId.OVERRIDE, VSGTokenId.BOUND);
 
-    public static EnumSet<JFXTokenId> NON_STRING_LITERALS = EnumSet.of(JFXTokenId.TRUE,
-            JFXTokenId.FALSE, JFXTokenId.NULL, JFXTokenId.DECIMAL_LITERAL,
-            JFXTokenId.FLOATING_POINT_LITERAL, JFXTokenId.HEX_LITERAL,
-            JFXTokenId.OCTAL_LITERAL);
+    public static EnumSet<VSGTokenId> NON_STRING_LITERALS = EnumSet.of(VSGTokenId.TRUE,
+            VSGTokenId.FALSE, VSGTokenId.NULL, VSGTokenId.DECIMAL_LITERAL,
+            VSGTokenId.FLOATING_POINT_LITERAL, VSGTokenId.HEX_LITERAL,
+            VSGTokenId.OCTAL_LITERAL);
 
-    public static EnumSet<JFXTokenId> STRING_LITERALS = EnumSet.of(JFXTokenId.STRING_LITERAL,
-            JFXTokenId.QUOTE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
-            JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+    public static EnumSet<VSGTokenId> STRING_LITERALS = EnumSet.of(VSGTokenId.STRING_LITERAL,
+            VSGTokenId.QUOTE_LBRACE_STRING_LITERAL, VSGTokenId.RBRACE_LBRACE_STRING_LITERAL,
+            VSGTokenId.RBRACE_QUOTE_STRING_LITERAL);
 
-    public static EnumSet<JFXTokenId> VARIABLE_KEYWORDS = EnumSet.of(JFXTokenId.VAR,
-            JFXTokenId.DEF, JFXTokenId.ATTRIBUTE);
+    public static EnumSet<VSGTokenId> VARIABLE_KEYWORDS = EnumSet.of(VSGTokenId.VAR,
+            VSGTokenId.DEF, VSGTokenId.ATTRIBUTE);
 
-    public static EnumSet<JFXTokenId> OPERATOR_KEYWORDS = EnumSet.of(JFXTokenId.AND,
-            JFXTokenId.OR, JFXTokenId.MOD);
+    public static EnumSet<VSGTokenId> OPERATOR_KEYWORDS = EnumSet.of(VSGTokenId.AND,
+            VSGTokenId.OR, VSGTokenId.MOD);
 
     public static boolean containsOneExpressionOnly(ExpressionTree tree) {
         if (tree == null) {
             return true;
         }
 
-        if (tree.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+        if (tree.getVisageKind() == VisageKind.BLOCK_EXPRESSION) {
             BlockExpressionTree bet = (BlockExpressionTree) tree;
 //                boolean hasValue = bet.getValue() != null;
             return bet.getStatements().size() == 1;
@@ -111,16 +111,16 @@ public final class ReformatUtils {
         return true;
     }
 
-    public static boolean isTreeInsideVar(JavaFXTreePath currentPath) {
+    public static boolean isTreeInsideVar(VisageTreePath currentPath) {
         if (currentPath == null) {
             return false;
         }
 
         boolean insideVar = false;
-        JavaFXTreePath parentPath = currentPath.getParentPath();
+        VisageTreePath parentPath = currentPath.getParentPath();
         Tree leaf = parentPath.getLeaf();
-        while (leaf.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
-            if (leaf.getJavaFXKind() == JavaFXKind.VARIABLE || leaf.getJavaFXKind() == JavaFXKind.SEQUENCE_EXPLICIT) {
+        while (leaf.getVisageKind() != VisageKind.COMPILATION_UNIT) {
+            if (leaf.getVisageKind() == VisageKind.VARIABLE || leaf.getVisageKind() == VisageKind.SEQUENCE_EXPLICIT) {
                 insideVar = true;
                 break;
             }
@@ -131,7 +131,7 @@ public final class ReformatUtils {
     }
 
     // TODO check flags when it will work
-    public static boolean hasModifiers(ModifiersTree mods, JFXTokenId firstToken) {
+    public static boolean hasModifiers(ModifiersTree mods, VSGTokenId firstToken) {
         if (!MODIFIER_KEYWORDS.contains(firstToken)) { //#179502
             return false;
         }

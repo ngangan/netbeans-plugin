@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
@@ -59,7 +59,7 @@ public class CustomizerApplication extends javax.swing.JPanel implements HelpCtx
     private File lastImageFolder;
     
     /** Creates new form CustomizerApplication */
-    public CustomizerApplication(JavaFXProjectProperties props) {
+    public CustomizerApplication(VisageProjectProperties props) {
         initComponents();
         titleTextField.setDocument(props.APPLICATION_TITLE_DOC);
         vendorTextField.setDocument(props.APPLICATION_VENDOR_DOC);

@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.charts;
+package org.netbeans.modules.visage.palette.items.charts;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class BarChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(BarChart.class, "TEMPLATE_BarChart", targetComponent, "javafx.scene.chart.BarChart", "javafx.scene.chart.part.CategoryAxis", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(BarChart.class, "TEMPLATE_BarChart", targetComponent, "visage.scene.chart.BarChart", "visage.scene.chart.part.CategoryAxis", "visage.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

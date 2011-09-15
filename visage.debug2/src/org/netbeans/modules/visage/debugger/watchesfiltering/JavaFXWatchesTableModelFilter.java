@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
@@ -58,9 +58,9 @@ import org.netbeans.spi.debugger.ui.Constants;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.TableModelFilter.class } )
-public class JavaFXWatchesTableModelFilter implements TableModelFilter {
+public class VisageWatchesTableModelFilter implements TableModelFilter {
 
-    public JavaFXWatchesTableModelFilter() { }
+    public VisageWatchesTableModelFilter() { }
 
     /**
      * Returns filterred value to be displayed in column <code>columnID</code>

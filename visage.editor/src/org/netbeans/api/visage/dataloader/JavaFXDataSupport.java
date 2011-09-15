@@ -42,22 +42,22 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.api.javafx.dataloader;
+package org.netbeans.api.visage.dataloader;
 
-import org.netbeans.modules.javafx.dataloader.*;
+import org.netbeans.modules.visage.dataloader.*;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.MultiDataObject;
 
 /**
- * This class contains helper methods necessary to write extensions of the JavaFX data support.
+ * This class contains helper methods necessary to write extensions of the Visage data support.
  *
  * @since 1.8.1
  * @author David Kaspar
  */
-public final class JavaFXDataSupport {
+public final class VisageDataSupport {
 
     /** singleton */
-    private JavaFXDataSupport() {
+    private VisageDataSupport() {
     }
     
     /**
@@ -69,8 +69,8 @@ public final class JavaFXDataSupport {
      * @return the file entry
      * @since 1.8.1
      */
-    public static MultiDataObject.Entry createJavaFXFileEntry(MultiDataObject mdo, FileObject fxfile) {
-        return new JavaFXDataLoader.JavaFXFileEntry(mdo, fxfile);
+    public static MultiDataObject.Entry createVisageFileEntry(MultiDataObject mdo, FileObject fxfile) {
+        return new VisageDataLoader.VisageFileEntry(mdo, fxfile);
     }
 
 }

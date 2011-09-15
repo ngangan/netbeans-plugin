@@ -34,13 +34,13 @@
 
 package motion;
 
-import javafx.scene.shape.Line;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.transform.Translate;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.shape.Line;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.transform.Translate;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 /**
  * @author Michal Skvor

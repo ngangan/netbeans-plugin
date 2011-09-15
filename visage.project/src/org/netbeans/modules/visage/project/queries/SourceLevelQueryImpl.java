@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
 import org.netbeans.spi.java.queries.SourceLevelQueryImplementation;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
@@ -65,7 +65,7 @@ public class SourceLevelQueryImpl implements SourceLevelQueryImplementation {
 
     public String getSourceLevel(FileObject javaFile) {        
         final String activePlatform = evaluator.getProperty ("platform.active");  //NOI18N        
-        if (JavaFXProjectUtil.getActivePlatform(activePlatform) != null) {
+        if (VisageProjectUtil.getActivePlatform(activePlatform) != null) {
             String sl = evaluator.getProperty("javac.source");  //NOI18N
             if (sl != null && sl.length() > 0) {
                 return sl;

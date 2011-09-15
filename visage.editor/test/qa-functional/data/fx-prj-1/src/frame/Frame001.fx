@@ -1,8 +1,8 @@
 
 package frame;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
+import visage.stage.Stage;
+import visage.scene.Scene;
 
 Stage {
     

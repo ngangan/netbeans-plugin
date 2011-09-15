@@ -52,18 +52,18 @@ made subject to such option by the copyright holder.
                 <folder name="x-fx">
                     <file name="TreeNavigatorProviderImpl.instance">
                         <attr name="position" intvalue="200"/>
-                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
                         <attr name="instanceOf" stringvalue="org.netbeans.spi.navigator.NavigatorPanel"/>
                     </file>
                     <file name="ElementNavigatorProviderImpl.instance">
                         <attr name="position" intvalue="300"/>
-                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
                         <attr name="instanceOf" stringvalue="org.netbeans.spi.navigator.NavigatorPanel"/>
                     </file>
                     <file name="ErrorNavigatorProviderImpl.instance">
                         <attr name="position" intvalue="400"/>
                         <attr name="instanceOf" stringvalue="org.netbeans.spi.navigator.NavigatorPanel"/>
-                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
+                        <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.debug.HighlightsLayerFactoryImpl.createNavigatorPanel" />
                     </file>
                 </folder>
             </folder>
@@ -72,7 +72,7 @@ made subject to such option by the copyright holder.
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fx">
-                <file name="org-netbeans-modules-javafx-debug-HighlightsLayerFactoryImpl.instance" />
+                <file name="org-netbeans-modules-visage-debug-HighlightsLayerFactoryImpl.instance" />
             </folder>
         </folder>
     </folder>

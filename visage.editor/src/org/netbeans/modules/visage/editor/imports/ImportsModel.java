@@ -43,12 +43,12 @@
  */
 
 
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
 import java.util.HashSet;
 import java.util.Set;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.ElementHandle;
 
 /**
  * This is a collector for all relevant information gathered during scanning for
@@ -116,8 +116,8 @@ public class ImportsModel {
             if (this.getResolvedName() != null && o.getResolvedName() == null) return -1;
             if (this.getResolvedName() == null && o.getResolvedName() == null) return 0;
 
-            if (this.getResolvedName().startsWith("javafx") && !o.getResolvedName().startsWith("javafx")) return -1;
-            if (!this.getResolvedName().startsWith("javafx") && o.getResolvedName().startsWith("javafx")) return 1;
+            if (this.getResolvedName().startsWith("visage") && !o.getResolvedName().startsWith("visage")) return -1;
+            if (!this.getResolvedName().startsWith("visage") && o.getResolvedName().startsWith("visage")) return 1;
 
             return this.getResolvedName().compareTo(o.getResolvedName());
         }

@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+package org.netbeans.api.visage.source;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 
 /**
  *
@@ -58,7 +58,7 @@ public class PathFinderTest extends SourceTestBase {
         testInsideSourceTask(
                 "/* Top comment */\n" +
                 "\n" +
-                "import javafx.ui.*;\n" +
+                "import visage.ui.*;\n" +
                 "/** @author nemo */\n" +
                 "\n" +
                 "Frame {\n" +
@@ -75,12 +75,12 @@ public class PathFinderTest extends SourceTestBase {
                                 "\nFree memory = "+Runtime.getRuntime().freeMemory());
                 }
                 int currentOffset = 73;
-                JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(currentOffset);
+                VisageTreePath currentPath = controller.getTreeUtilities().pathFor(currentOffset);
                 Tree tree = currentPath.getLeaf();
                 System.err.println("Tree is: "+ tree);
                 assertNotNull(tree);
                 // offset 73 falls in the middle of the "title:"
-                assertEquals(Tree.JavaFXKind.OBJECT_LITERAL_PART, tree.getJavaFXKind());
+                assertEquals(Tree.VisageKind.OBJECT_LITERAL_PART, tree.getVisageKind());
             }
         });
     }

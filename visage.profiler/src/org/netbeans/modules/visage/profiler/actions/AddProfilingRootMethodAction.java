@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.actions;
+package org.netbeans.modules.visage.profiler.actions;
 
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
@@ -62,7 +62,7 @@ import java.util.List;
 import javax.lang.model.element.ExecutableElement;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.EditorRegistry;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 
 /**
  * @author cms
@@ -128,7 +128,7 @@ public final class AddProfilingRootMethodAction extends NodeAction {
                     }
 
                     // Get method at cursor
-                    JavaFXProjectUtilities.ResolvedMethod resolvedMethod = JavaFXProjectUtilities.resolveMethodAtPosition(dobj.getPrimaryFile(),
+                    VisageProjectUtilities.ResolvedMethod resolvedMethod = VisageProjectUtilities.resolveMethodAtPosition(dobj.getPrimaryFile(),
                                                                                                     currentOffsetInEditor);
 
                     if (resolvedMethod == null) {

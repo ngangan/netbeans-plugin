@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.palette;
+package qa.visage.functional.palette;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
@@ -48,18 +48,18 @@ import org.netbeans.junit.NbModuleSuite;
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXPaletteChartsTest extends JavaFXPaletteTestCase {
+public class VisagePaletteChartsTest extends VisagePaletteTestCase {
 
 
     static final String CATEGORY = "Charts";
 
 
-    public JavaFXPaletteChartsTest(String name) {
+    public VisagePaletteChartsTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXPaletteChartsTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisagePaletteChartsTest.class, ".*", ".*", TESTS);
 
     }
 

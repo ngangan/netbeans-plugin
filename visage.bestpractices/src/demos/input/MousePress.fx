@@ -34,14 +34,14 @@
 
 package input;
 
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Group;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.transform.Translate;
-import javafx.scene.input.MouseButton;
+import visage.scene.input.MouseEvent;
+import visage.scene.Group;
+import visage.scene.shape.Rectangle;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.transform.Translate;
+import visage.scene.input.MouseButton;
 
 /**
  * @author Michal Skvor

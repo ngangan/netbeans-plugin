@@ -39,9 +39,9 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.fxd;
+package qa.visage.functional.fxd;
 
-import qa.javafx.functional.library.JavaFXTestCase;
+import qa.visage.functional.library.VisageTestCase;
 
 
 /**
@@ -49,9 +49,9 @@ import qa.javafx.functional.library.JavaFXTestCase;
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
 
-public class JavaFXFxdTestCase extends JavaFXTestCase {
+public class VisageFxdTestCase extends VisageTestCase {
     
-     public JavaFXFxdTestCase(String name) {
+     public VisageFxdTestCase(String name) {
         super(name);
     }
 

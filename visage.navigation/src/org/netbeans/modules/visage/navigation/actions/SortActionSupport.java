@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation.actions;
+package org.netbeans.modules.visage.navigation.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
@@ -49,7 +49,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
-import org.netbeans.modules.javafx.navigation.ClassMemberFilters;
+import org.netbeans.modules.visage.navigation.ClassMemberFilters;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.actions.Presenter;
@@ -92,7 +92,7 @@ public abstract class SortActionSupport extends AbstractAction implements Presen
         public SortByNameAction(ClassMemberFilters filters) {
             super(filters);
             putValue(Action.NAME, NbBundle.getMessage(SortByNameAction.class, "LBL_SortByName")); //NOI18N
-            putValue(Action.SMALL_ICON, new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/sortAlpha.png"))); //NOI18N
+            putValue(Action.SMALL_ICON, new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/sortAlpha.png"))); //NOI18N
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -113,7 +113,7 @@ public abstract class SortActionSupport extends AbstractAction implements Presen
         public SortBySourceAction(ClassMemberFilters filters) {
             super(filters);
             putValue(Action.NAME, NbBundle.getMessage(SortBySourceAction.class, "LBL_SortBySource")); //NOI18N
-            putValue(Action.SMALL_ICON, new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/sortPosition.png"))); //NOI18N
+            putValue(Action.SMALL_ICON, new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/sortPosition.png"))); //NOI18N
         }
 
         public void actionPerformed(ActionEvent e) {

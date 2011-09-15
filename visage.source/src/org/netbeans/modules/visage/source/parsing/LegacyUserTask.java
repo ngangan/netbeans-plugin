@@ -40,19 +40,19 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageParserResult;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
 
 public final class LegacyUserTask extends UserTask {
 
     private final ClasspathInfo classpathInfo;
-    private final org.netbeans.api.javafx.source.Task<? super CompilationController> delegateTask;
+    private final org.netbeans.api.visage.source.Task<? super CompilationController> delegateTask;
 
     public LegacyUserTask(ClasspathInfo classpathInfo, Task<? super CompilationController> task) {
         assert task != null;
@@ -66,7 +66,7 @@ public final class LegacyUserTask extends UserTask {
 
     @Override
     public void run(ResultIterator resultIterator) throws Exception {
-        JavaFXParserResult result = (JavaFXParserResult) resultIterator.getParserResult();
+        VisageParserResult result = (VisageParserResult) resultIterator.getParserResult();
         CompilationController compilationController = CompilationController.create(result);
         delegateTask.run(compilationController);
     }

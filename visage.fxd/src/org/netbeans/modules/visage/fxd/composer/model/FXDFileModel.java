@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.javafx.tools.fxd.FXDObjectElement;
+import com.sun.visage.tools.fxd.FXDObjectElement;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -56,14 +56,14 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelStateListener;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import com.sun.javafx.tools.fxd.FXDRootElement;
-import com.sun.javafx.tools.fxd.container.ContainerEntry;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import com.sun.visage.tools.fxd.FXDRootElement;
+import com.sun.visage.tools.fxd.container.ContainerEntry;
 import java.io.IOException;
 import javax.swing.text.Document;
-import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.visage.fxd.composer.misc.FXDComposerUtils;
+import org.netbeans.modules.visage.fxd.composer.source.FXDDocumentModelProvider;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZEditorSupport;
 /**
  *
  * @author Pavel Benes
@@ -380,7 +380,7 @@ public final class FXDFileModel implements DocumentModelStateListener {
     }
 
     /*
-    private static boolean checkEqual( final com.sun.javafx.tools.fxd.FXDElement elem1, final com.sun.javafx.tools.fxd.FXDElement elem2) {
+    private static boolean checkEqual( final com.sun.visage.tools.fxd.FXDElement elem1, final com.sun.visage.tools.fxd.FXDElement elem2) {
         if ( elem1.getKind() != elem2.getKind()) {
             System.err.println( String.format("Kind mismatch: %s - %s", elem1.toString(), elem2.toString()));
             return false;
@@ -408,8 +408,8 @@ public final class FXDFileModel implements DocumentModelStateListener {
                     return false;
                 }
                 
-                if ( v1 instanceof com.sun.javafx.tools.fxd.FXDElement) {
-                    if ( !(v2 instanceof com.sun.javafx.tools.fxd.FXDElement)) {
+                if ( v1 instanceof com.sun.visage.tools.fxd.FXDElement) {
+                    if ( !(v2 instanceof com.sun.visage.tools.fxd.FXDElement)) {
                         System.err.println( String.format("Different type for attribute %s", attrName));
                         return false;
                     }
@@ -422,8 +422,8 @@ public final class FXDFileModel implements DocumentModelStateListener {
             }
         }
             
-        Enumeration<com.sun.javafx.tools.fxd.FXDElement> children1 = elem1.children();
-        Enumeration<com.sun.javafx.tools.fxd.FXDElement> children2 = elem2.children();
+        Enumeration<com.sun.visage.tools.fxd.FXDElement> children1 = elem1.children();
+        Enumeration<com.sun.visage.tools.fxd.FXDElement> children2 = elem2.children();
 
         while( children1.hasMoreElements()) {
             if ( !children2.hasMoreElements()) {
@@ -452,11 +452,11 @@ public final class FXDFileModel implements DocumentModelStateListener {
             }
         }
     }
-    private static void collectChildren( final com.sun.javafx.tools.fxd.FXDElement elem, List<FXDNode> childrenList) {
-        Enumeration<com.sun.javafx.tools.fxd.FXDElement> children = elem.children();
+    private static void collectChildren( final com.sun.visage.tools.fxd.FXDElement elem, List<FXDNode> childrenList) {
+        Enumeration<com.sun.visage.tools.fxd.FXDElement> children = elem.children();
         
         while( children.hasMoreElements()) {
-            com.sun.javafx.tools.fxd.FXDElement child = children.nextElement();
+            com.sun.visage.tools.fxd.FXDElement child = children.nextElement();
             if ( child instanceof FXDNode) {
                 childrenList.add( (FXDNode) child);
             } else {

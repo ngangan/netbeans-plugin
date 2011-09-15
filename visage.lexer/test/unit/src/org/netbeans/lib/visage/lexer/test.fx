@@ -1,4 +1,4 @@
-import javafx.ui.*;
+import visage.ui.*;
 
 
         class HelloWorldModel {
@@ -10,7 +10,7 @@ import javafx.ui.*;
         };
 
         Frame {
-            title: "Hello World JavaFX"
+            title: "Hello World Visage"
             width: 200
 
             content: Label {

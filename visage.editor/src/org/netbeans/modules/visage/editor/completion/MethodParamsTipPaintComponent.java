@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
 import java.awt.*;
 import java.util.List;

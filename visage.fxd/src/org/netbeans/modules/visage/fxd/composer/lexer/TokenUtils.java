@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.lexer;
+package org.netbeans.modules.visage.fxd.composer.lexer;
 
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;

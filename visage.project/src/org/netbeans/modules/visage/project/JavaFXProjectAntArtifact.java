@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.net.URI;
@@ -53,9 +53,9 @@ import org.openide.ErrorManager;
  * todo: Create API
  * @author Tomas Zezula
  */
-public class JavaFXProjectAntArtifact extends AntArtifact {
+public class VisageProjectAntArtifact extends AntArtifact {
     
-    private final JavaFXProject project;
+    private final VisageProject project;
     private final String type;
     private final String locationProperty;  
     private final String targetName;
@@ -64,7 +64,7 @@ public class JavaFXProjectAntArtifact extends AntArtifact {
     /**
      * @see AntProjectHelper#createSimpleAntArtifact
      */
-    public JavaFXProjectAntArtifact(JavaFXProject project, String type, String locationProperty, String targetName, String cleanTargetName) {
+    public VisageProjectAntArtifact(VisageProject project, String type, String locationProperty, String targetName, String cleanTargetName) {
         this.project = project;
         this.type = type;
         this.locationProperty = locationProperty;
@@ -100,7 +100,7 @@ public class JavaFXProjectAntArtifact extends AntArtifact {
     }
     
     public File getScriptLocation() {
-        return this.project.getAntProjectHelper().resolveFile(JavaFXProjectUtil.getBuildXmlName(project));        
+        return this.project.getAntProjectHelper().resolveFile(VisageProjectUtil.getBuildXmlName(project));        
     }
     
     public String getTargetName() {

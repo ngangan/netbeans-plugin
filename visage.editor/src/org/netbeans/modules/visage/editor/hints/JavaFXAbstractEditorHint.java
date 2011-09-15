@@ -42,11 +42,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
 import java.util.*;
-import org.netbeans.api.javafx.source.*;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.*;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.openide.filesystems.FileObject;
 
@@ -54,9 +54,9 @@ import org.openide.filesystems.FileObject;
  *
  * @author karol harezlak
  */
-abstract class JavaFXAbstractEditorHint extends EditorAwareJavaFXSourceTaskFactory {
+abstract class VisageAbstractEditorHint extends EditorAwareVisageSourceTaskFactory {
 
-    public JavaFXAbstractEditorHint(JavaFXSource.Phase phase, JavaFXSource.Priority priority) {
+    public VisageAbstractEditorHint(VisageSource.Phase phase, VisageSource.Priority priority) {
         super(phase, priority);
     }
 

@@ -40,19 +40,19 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
+package org.netbeans.api.visage.source;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.VariableTree;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.netbeans.api.lexer.Language;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;

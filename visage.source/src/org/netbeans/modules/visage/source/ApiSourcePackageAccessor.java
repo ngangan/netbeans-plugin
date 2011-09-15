@@ -42,15 +42,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.source;
+package org.netbeans.modules.visage.source;
 
-import com.sun.tools.javafx.api.JavafxcTool;
+import com.sun.tools.visage.api.JavafxcTool;
 import javax.tools.JavaFileManager;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
-import org.netbeans.api.javafx.source.TreeUtilities;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.VisageParserResult;
+import org.netbeans.api.visage.source.TreeUtilities;
+import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 
 /**
  * Accessor for the package-private functionality.
@@ -66,7 +66,7 @@ public abstract class ApiSourcePackageAccessor {
         if (INSTANCE == null) {
             // Enforce the static initializer in Context class to be run
             try {
-                Class.forName(JavaFXParserResult.class.getName(), true, JavaFXParserResult.class.getClassLoader());
+                Class.forName(VisageParserResult.class.getName(), true, VisageParserResult.class.getClassLoader());
             } catch (ClassNotFoundException e) { }
         }
         return INSTANCE;
@@ -79,13 +79,13 @@ public abstract class ApiSourcePackageAccessor {
         INSTANCE = accessor;
     }
 
-    public abstract JavaFXParserResult createResult(JavaFXParserResultImpl impl);
+    public abstract VisageParserResult createResult(VisageParserResultImpl impl);
     
     public abstract JavaFileManager getFileManager(ClasspathInfo cpInfo, JavafxcTool tool);
 
-    public abstract ElementUtilities createElementUtilities(JavaFXParserResultImpl resultImpl);
+    public abstract ElementUtilities createElementUtilities(VisageParserResultImpl resultImpl);
 
-    public abstract TreeUtilities createTreeUtilities(JavaFXParserResultImpl resultImpl);
+    public abstract TreeUtilities createTreeUtilities(VisageParserResultImpl resultImpl);
 
     public abstract void registerSourceTaskFactoryManager();
 }

@@ -5,53 +5,53 @@
 <toc version="2.0">
 	<tocitem text="IDE Basics">
 		<tocitem text="Getting Started">
-			<tocitem text="JavaFX Applications" target="javafx_proj_process_top" />
+			<tocitem text="Visage Applications" target="visage_proj_process_top" />
 		</tocitem>
 	</tocitem>
-	<tocitem text="JavaFX Applications" expand="false">
-		<tocitem text="About JavaFX Applications" target="javafx_app_about" />
-		<tocitem text="JavaFX Project Setup and Configuration" expand="false">
-			<tocitem text="About JavaFX Projects" target="javafx_proj_about" />
-			<tocitem text="Working With JavaFX Projects" target="javafx_proj_process" />
-			<tocitem text="JavaFX Project Tasks: Quick Reference" target="javafx_proj_quickref" />
-			<tocitem text="Deleting a JavaFX Project" target="javafx_proj_deleting" />
-			<tocitem text="Moving, Copying, and Renaming a JavaFX Project" target="javafx_proj_move_copy_rename" />
-			<tocitem text="Setting the Target JavaFX SDK in a JavaFX Project" target="javafx_proj_sdk" />
-			<tocitem text="Customizing JavaFX Syntax Settings" target="javafx_options" />
+	<tocitem text="Visage Applications" expand="false">
+		<tocitem text="About Visage Applications" target="visage_app_about" />
+		<tocitem text="Visage Project Setup and Configuration" expand="false">
+			<tocitem text="About Visage Projects" target="visage_proj_about" />
+			<tocitem text="Working With Visage Projects" target="visage_proj_process" />
+			<tocitem text="Visage Project Tasks: Quick Reference" target="visage_proj_quickref" />
+			<tocitem text="Deleting a Visage Project" target="visage_proj_deleting" />
+			<tocitem text="Moving, Copying, and Renaming a Visage Project" target="visage_proj_move_copy_rename" />
+			<tocitem text="Setting the Target Visage SDK in a Visage Project" target="visage_proj_sdk" />
+			<tocitem text="Customizing Visage Syntax Settings" target="visage_options" />
 		</tocitem>
-		<tocitem text="Editing JavaFX Source Files" expand="false">
-			<tocitem text="Editing JavaFX Source Files" target="javafx_editing_source" />
-			<tocitem text="About the JavaFX Palette" target="javafx_editing_palette" />
-			<tocitem text="Using the Navigator Window" target="javafx_nav_window" />
-			<tocitem text="Using the JavaFX Preview Feature" target="javafx_using_javafxpreview" />
+		<tocitem text="Editing Visage Source Files" expand="false">
+			<tocitem text="Editing Visage Source Files" target="visage_editing_source" />
+			<tocitem text="About the Visage Palette" target="visage_editing_palette" />
+			<tocitem text="Using the Navigator Window" target="visage_nav_window" />
+			<tocitem text="Using the Visage Preview Feature" target="visage_using_visagepreview" />
 		</tocitem>
-		<tocitem text="Refactoring JavaFX Source">
-			<tocitem text="About Refactoring JavaFX Code" target="javafx_refactor_about_javafx_refactoring" />
-			<tocitem text="Refactoring: Quick Reference" target="javafx_refactor_refactor_quick_ref" />
-			<tocitem text="Undoing Refactoring Changes" target="javafx_refactor_undo_refactor_changes" />
-			<tocitem text="Renaming a Class" target="javafx_refactor_rename_class" />
-			<tocitem text="Renaming a Function or Variable" target="javafx_refactor_rename_function_var" />
-			<tocitem text="Moving a Class" target="javafx_refactor_move_class" />
-			<tocitem text="Copying a Class" target="javafx_refactor_copy_class" />
-			<tocitem text="Safely Deleting JavaFX Code" target="javafx_refactor_safely_delete" />
+		<tocitem text="Refactoring Visage Source">
+			<tocitem text="About Refactoring Visage Code" target="visage_refactor_about_visage_refactoring" />
+			<tocitem text="Refactoring: Quick Reference" target="visage_refactor_refactor_quick_ref" />
+			<tocitem text="Undoing Refactoring Changes" target="visage_refactor_undo_refactor_changes" />
+			<tocitem text="Renaming a Class" target="visage_refactor_rename_class" />
+			<tocitem text="Renaming a Function or Variable" target="visage_refactor_rename_function_var" />
+			<tocitem text="Moving a Class" target="visage_refactor_move_class" />
+			<tocitem text="Copying a Class" target="visage_refactor_copy_class" />
+			<tocitem text="Safely Deleting Visage Code" target="visage_refactor_safely_delete" />
 		</tocitem>
-		<tocitem text="Building JavaFX Applications" expand="false">
-			<tocitem text="About Building JavaFX Applications" target="javafx_comp_about" />
-			<tocitem text="Working with JavaFX Project Builds" target="javafx_comp_process" />
-			<tocitem text="Building a JavaFX Project" target="javafx_comp_project" />
-			<tocitem text="Managing the Classpath of JavaFX Projects" target="javafx_comp_classpath" />
+		<tocitem text="Building Visage Applications" expand="false">
+			<tocitem text="About Building Visage Applications" target="visage_comp_about" />
+			<tocitem text="Working with Visage Project Builds" target="visage_comp_process" />
+			<tocitem text="Building a Visage Project" target="visage_comp_project" />
+			<tocitem text="Managing the Classpath of Visage Projects" target="visage_comp_classpath" />
 		</tocitem>
-		<tocitem text="Running JavaFX Applications" expand="false">
-			<tocitem text="Working with JavaFX Project Execution" target="javafx_run_process" />
-			<tocitem text="Running a JavaFX Application" target="javafx_run_app" />
-			<tocitem text="Setting the Main JavaFX Class and Runtime Arguments" target="javafx_run_args" />
+		<tocitem text="Running Visage Applications" expand="false">
+			<tocitem text="Working with Visage Project Execution" target="visage_run_process" />
+			<tocitem text="Running a Visage Application" target="visage_run_app" />
+			<tocitem text="Setting the Main Visage Class and Runtime Arguments" target="visage_run_args" />
 		</tocitem>
-		<tocitem text="Working With Graphics Exported From the JavaFX Production Suite">
-			<tocitem text="Viewing JavaFX Graphics " target="javafx_fxz_viewing_fxz_files" />
-			<tocitem text="Generating a UI Stub File for a JavaFX Graphic" target="javafx_fxz_generating_ui_stub_file" />
+		<tocitem text="Working With Graphics Exported From the Visage Production Suite">
+			<tocitem text="Viewing Visage Graphics " target="visage_fxz_viewing_fxz_files" />
+			<tocitem text="Generating a UI Stub File for a Visage Graphic" target="visage_fxz_generating_ui_stub_file" />
 		</tocitem>
-		<tocitem text="Debugging JavaFX Applications" target="javafx_debug_about" />
-		<tocitem text="Profiling JavaFX Applications" target="javafx_profile_about" />
-		<tocitem text="Preparing JavaFX Applications for Deployment" target="javafx_deploy_prep" />
+		<tocitem text="Debugging Visage Applications" target="visage_debug_about" />
+		<tocitem text="Profiling Visage Applications" target="visage_profile_about" />
+		<tocitem text="Preparing Visage Applications for Deployment" target="visage_deploy_prep" />
 	</tocitem>
 </toc>

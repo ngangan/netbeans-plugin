@@ -41,11 +41,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import java.util.Collection;
 import javax.swing.JComponent;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;

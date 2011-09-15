@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.preview;
+package org.netbeans.modules.visage.fxd.composer.preview;
 
 import java.awt.Color;
 import java.awt.Dimension;

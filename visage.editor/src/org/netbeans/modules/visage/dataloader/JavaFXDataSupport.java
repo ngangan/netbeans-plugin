@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,10 +60,10 @@ import org.openide.nodes.Node;
  *
  * @author Jan Pokorsky
  */
-public final class JavaFXDataSupport {
+public final class VisageDataSupport {
 
     /** singleton */
-    private JavaFXDataSupport() {
+    private VisageDataSupport() {
     }
     
     /**
@@ -75,7 +75,7 @@ public final class JavaFXDataSupport {
      * @return the java entry
      */
     public static MultiDataObject.Entry createJavaFileEntry(MultiDataObject mdo, FileObject fxfile) {
-        return new JavaFXDataLoader.JavaFXFileEntry(mdo, fxfile);
+        return new VisageDataLoader.VisageFileEntry(mdo, fxfile);
     }
 
     /**
@@ -83,12 +83,12 @@ public final class JavaFXDataSupport {
      * @param javafile the java file object to represent
      * @return the node
      */
-    public static Node createJavaFXNode(FileObject javafile) {
+    public static Node createVisageNode(FileObject javafile) {
         try {
             DataObject jdo = DataObject.find(javafile);
-            return new JavaFXDataNode(jdo, true);
+            return new VisageDataNode(jdo, true);
         } catch (DataObjectNotFoundException ex) {
-            Logger.getLogger(JavaFXDataSupport.class.getName()).log(Level.INFO, null, ex);
+            Logger.getLogger(VisageDataSupport.class.getName()).log(Level.INFO, null, ex);
             return new AbstractNode(Children.LEAF);
         }
     }

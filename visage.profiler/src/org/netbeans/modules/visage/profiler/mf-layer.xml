@@ -48,8 +48,8 @@ made subject to such option by the copyright holder.
     <folder name="Actions">
         <folder name="BpelNodes">
             <folder name="Profile">
-                <file name="org-netbeans-modules-javafx-profiler-actions-AddProfilingRootMethodAction.instance"/>
-                <file name="org-netbeans-modules-javafx-profiler-actions-SelectJavaFXRootMethodsAction.instance"/>
+                <file name="org-netbeans-modules-visage-profiler-actions-AddProfilingRootMethodAction.instance"/>
+                <file name="org-netbeans-modules-visage-profiler-actions-SelectVisageRootMethodsAction.instance"/>
             </folder>
         </folder>
     </folder>
@@ -58,16 +58,16 @@ made subject to such option by the copyright holder.
             <folder name="x-fx">
                 <folder name="Popup">
                     <folder name="Profiling">
-                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.profiler.Bundle"/>
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.profiler.Bundle"/>
                         <attr name="position" intvalue="1956"/>
-                        <file name="org-netbeans-modules-javafx-profiler-actions-AddProfilingRootMethodAction.shadow">
-                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.profiler.Bundle"/>
-                            <attr name="originalFile" stringvalue="Actions/BpelNodes/Profile/org-netbeans-modules-javafx-profiler-actions-AddProfilingRootMethodAction.instance"/>
+                        <file name="org-netbeans-modules-visage-profiler-actions-AddProfilingRootMethodAction.shadow">
+                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.profiler.Bundle"/>
+                            <attr name="originalFile" stringvalue="Actions/BpelNodes/Profile/org-netbeans-modules-visage-profiler-actions-AddProfilingRootMethodAction.instance"/>
                             <attr name="position" intvalue="100"/>
                         </file>
-                        <file name="org-netbeans-modules-javafx-profiler-actions-SelectJavaFXRootMethodsAction.shadow">
-                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.profiler.Bundle"/>
-                            <attr name="originalFile" stringvalue="Actions/BpelNodes/Profile/org-netbeans-modules-javafx-profiler-actions-SelectJavaFXRootMethodsAction.instance"/>
+                        <file name="org-netbeans-modules-visage-profiler-actions-SelectVisageRootMethodsAction.shadow">
+                            <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.profiler.Bundle"/>
+                            <attr name="originalFile" stringvalue="Actions/BpelNodes/Profile/org-netbeans-modules-visage-profiler-actions-SelectVisageRootMethodsAction.instance"/>
                             <attr name="position" intvalue="200"/>
                         </file>
                     </folder>
@@ -76,21 +76,21 @@ made subject to such option by the copyright holder.
         </folder>
     </folder>
     <folder name="Projects">
-    <folder name="org-netbeans-modules-javafx-project">
+    <folder name="org-netbeans-modules-visage-project">
       <folder name="Lookup">
           <!--
-        <file name="org-netbeans-modules-javafx-profiler-impl-FXProfilingSupport.instance">
+        <file name="org-netbeans-modules-visage-profiler-impl-FXProfilingSupport.instance">
             <attr methodvalue="org.netbeans.modules.projectapi.LazyLookupProviders.forProjectServiceProvider" name="instanceCreate"/>
-            <attr name="class" stringvalue="org.netbeans.modules.javafx.profiler.impl.FXProfilingSupport"/>
+            <attr name="class" stringvalue="org.netbeans.modules.visage.profiler.impl.FXProfilingSupport"/>
             <attr name="service" stringvalue="org.netbeans.modules.profiler.spi.ProjectProfilingSupport"/>
         </file>
-        <file name="org-netbeans-modules-javafx-profiler-selector-JavaFXSelectionTreeBuilder.instance">
+        <file name="org-netbeans-modules-visage-profiler-selector-VisageSelectionTreeBuilder.instance">
             <attr methodvalue="org.netbeans.modules.projectapi.LazyLookupProviders.forProjectServiceProvider" name="instanceCreate"/>
-            <attr name="class" stringvalue="org.netbeans.modules.javafx.profiler.selector.JavaFXSelectionTreeBuilderImpl"/>
+            <attr name="class" stringvalue="org.netbeans.modules.visage.profiler.selector.VisageSelectionTreeBuilderImpl"/>
             <attr name="service" stringvalue="org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder"/>
         </file>
         -->
-        <file name="org.netbeans.modules.javafx.profiler.LookupProviderImpl.instance"/>
+        <file name="org.netbeans.modules.visage.profiler.LookupProviderImpl.instance"/>
       </folder>
     </folder>
   </folder>    

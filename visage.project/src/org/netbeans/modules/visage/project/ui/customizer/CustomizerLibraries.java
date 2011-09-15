@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
-import org.netbeans.modules.javafx.platform.PlatformUiSupport;
+import org.netbeans.modules.visage.platform.PlatformUiSupport;
 import java.util.Iterator;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
@@ -52,8 +52,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.PlatformsCustomizer;
-import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
-import org.netbeans.modules.javafx.project.ui.JavaFXLogicalViewProvider;
+import org.netbeans.modules.visage.project.classpath.ClassPathSupport;
+import org.netbeans.modules.visage.project.ui.VisageLogicalViewProvider;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -68,13 +68,13 @@ public class CustomizerLibraries extends JPanel implements HelpCtx.Provider, Lis
     public static final String COMPILE_TESTS = "COMPILE_TESTS"; //NOI18N
     public final String RUN_TESTS = "RUN_TESTS";  //NOI18N        
     
-    private final JavaFXProjectProperties uiProperties;    
+    private final VisageProjectProperties uiProperties;    
     
-    public CustomizerLibraries( JavaFXProjectProperties uiProperties, CustomizerProviderImpl.SubCategoryProvider subcat ) {
+    public CustomizerLibraries( VisageProjectProperties uiProperties, CustomizerProviderImpl.SubCategoryProvider subcat ) {
         this.uiProperties = uiProperties;        
         initComponents();        
         
-        this.putClientProperty( "HelpID", "JavaFX_CustomizerGeneral" ); // NOI18N
+        this.putClientProperty( "HelpID", "Visage_CustomizerGeneral" ); // NOI18N
 
         
         // Hide unused edit buttons
@@ -82,7 +82,7 @@ public class CustomizerLibraries extends JPanel implements HelpCtx.Provider, Lis
         
         jListCpC.setModel( uiProperties.JAVAC_CLASSPATH_MODEL );
         jListCpC.setCellRenderer( uiProperties.CLASS_PATH_LIST_RENDERER );
-        JavaFXClassPathUi.EditMediator.register( uiProperties.getProject(),
+        VisageClassPathUi.EditMediator.register( uiProperties.getProject(),
                                                jListCpC, 
                                                uiProperties.JAVAC_CLASSPATH_MODEL, 
                                                jButtonAddJarC.getModel(), 
@@ -137,7 +137,7 @@ public class CustomizerLibraries extends JPanel implements HelpCtx.Provider, Lis
         else {
             jLabelErrorMessage.setText( " " ); // NOI18N
         }
-        JavaFXLogicalViewProvider viewProvider = (JavaFXLogicalViewProvider) uiProperties.getProject().getLookup().lookup(JavaFXLogicalViewProvider.class);
+        VisageLogicalViewProvider viewProvider = (VisageLogicalViewProvider) uiProperties.getProject().getLookup().lookup(VisageLogicalViewProvider.class);
         //Update the state of project's node if needed
         viewProvider.testBroken();
     }
@@ -309,7 +309,7 @@ public class CustomizerLibraries extends JPanel implements HelpCtx.Provider, Lis
         jButtonMoveDownC.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(CustomizerLibraries.class, "ACSD_CustomizerLibraries_jButtonMoveDown")); // NOI18N
 
         jLabel1.setLabelFor(jListCpC);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle"); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, bundle.getString("MSG_CustomizerLibraries_CompileCpMessage")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 8;

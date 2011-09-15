@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
 import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import com.sun.tools.mjavac.util.Log;
 import com.sun.tools.mjavac.util.Convert;
-import com.sun.tools.javafx.util.MsgSym;
+import com.sun.tools.visage.util.MsgSym;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ import java.util.logging.Logger;
 
 /**
  * Lexer base class provide user code for grammar. This code is called from antlr generated lexer. The main
- * purpose is to cover differences between javafxc lexer customizations and this module.
+ * purpose is to cover differences between visagec lexer customizations and this module.
  *
  * @author Rastislav Komara (<a href="mailto:rastislav .komara@sun.com">RKo</a>)
  */
@@ -242,11 +242,11 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
 
     /**
      * Overrides the standard ANTLR 3.1 lexer error message generator
-     * to provide a message that will make more sense to JavaFX programmers.
+     * to provide a message that will make more sense to Visage programmers.
      * @param e The exception that the lexer raised because it could not decode
      *          what to do next.
      * @param tokenNames The ANTLR supplied list of token names as used in the lexer.
-     * @return The string that shuold be used as the error message by the JavaFX compiler
+     * @return The string that shuold be used as the error message by the Visage compiler
      */
     @Override
     public String getErrorMessage(RecognitionException e, String[] tokenNames) {
@@ -283,7 +283,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
                 // is used as belt and braces protection.
                 //
                 mb.append("Sorry, but the character " + getCharErrorDisplay(e.c));
-                mb.append("is not allowed in a JavaFX script. Well at least, not here.");
+                mb.append("is not allowed in a Visage script. Well at least, not here.");
             }
 
         } else {
@@ -301,7 +301,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
 
     /**
      * Override for the ANTLR 3.x message display routine so that we can log
-     * errors within the JavaFX compiler infrastructure.
+     * errors within the Visage compiler infrastructure.
      *
      * @param tokenNames ANTLR provided array of the lexer token names
      * @param e The excpetion that was raised by the lexer, for further action.

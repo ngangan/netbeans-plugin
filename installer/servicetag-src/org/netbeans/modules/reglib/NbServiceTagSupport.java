@@ -306,27 +306,27 @@ public class NbServiceTagSupport {
     }
     
     /**
-     * First look in registration data if JavaFX service tag exists.
+     * First look in registration data if Visage service tag exists.
      * If not then create new service tag.
      *
      * @param source client who creates service tag eg.: "NetBeans IDE 6.0.1 Installer"
      * or "NetBeans IDE 6.0.1"
      * @param javaVersion IDE will provides java version on which IDE is running ie. value of system
      * property java.version. Installer will provide java version selected to run IDE
-     * @return service tag instance for JavaFX
+     * @return service tag instance for Visage
      * @throws java.io.IOException
      */
-    public static ServiceTag createJavaFXServiceTag (String source, String javaVersion) throws IOException {
+    public static ServiceTag createVisageServiceTag (String source, String javaVersion) throws IOException {
         if (!inited) {
             init();
         }
-        LOG.log(Level.FINE,"Creating JavaFX service tag");
+        LOG.log(Level.FINE,"Creating Visage service tag");
 
-        ServiceTag st = getJavaFXServiceTag();
+        ServiceTag st = getVisageServiceTag();
         // New service tag entry if not created
         if (st == null) {
             LOG.log(Level.FINE,"Creating new service tag");
-            st = newJavaFXServiceTag(source, javaVersion);
+            st = newVisageServiceTag(source, javaVersion);
             // Add the service tag to the registration data in NB
             getRegistrationData().addServiceTag(st);
             writeRegistrationXml();
@@ -343,27 +343,27 @@ public class NbServiceTagSupport {
     }
 
     /**
-     * First look in registration data if JavaFX SDK service tag exists.
+     * First look in registration data if Visage SDK service tag exists.
      * If not then create new service tag.
      *
      * @param source client who creates service tag eg.: "NetBeans IDE 6.0.1 Installer"
      * or "NetBeans IDE 6.0.1"
      * @param javaVersion IDE will provides java version on which IDE is running ie. value of system
      * property java.version. Installer will provide java version selected to run IDE
-     * @return service tag instance for JavaFX SDK
+     * @return service tag instance for Visage SDK
      * @throws java.io.IOException
      */
-    public static ServiceTag createJavaFXSdkServiceTag (String source, String javaVersion) throws IOException {
+    public static ServiceTag createVisageSdkServiceTag (String source, String javaVersion) throws IOException {
         if (!inited) {
             init();
         }
-        LOG.log(Level.FINE,"Creating JavaFX SDK service tag");
+        LOG.log(Level.FINE,"Creating Visage SDK service tag");
 
-        ServiceTag st = getJavaFXSdkServiceTag();
+        ServiceTag st = getVisageSdkServiceTag();
         // New service tag entry if not created
         if (st == null) {
             LOG.log(Level.FINE,"Creating new service tag");
-            st = newJavaFXSdkServiceTag(source, javaVersion);
+            st = newVisageSdkServiceTag(source, javaVersion);
             // Add the service tag to the registration data in NB
             getRegistrationData().addServiceTag(st);
             writeRegistrationXml();
@@ -666,22 +666,22 @@ public class NbServiceTagSupport {
     }
 
     /**
-     * Create new service tag instance for JavaFX
+     * Create new service tag instance for Visage
      * @param svcTagSource
      * @return
      * @throws java.io.IOException
      */
-    private static ServiceTag newJavaFXServiceTag (String svcTagSource, String javaVersion) throws IOException {
+    private static ServiceTag newVisageServiceTag (String svcTagSource, String javaVersion) throws IOException {
         // Determine the product URN and name
         String productURN, productName, productVersion, parentURN, parentName;
 
-        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.urn");
-        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.name");
+        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visage.urn");
+        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visage.name");
 
-        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.version");
+        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visage.version");
 
-        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.parent.urn");
-        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.parent.name");
+        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visage.parent.urn");
+        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visage.parent.name");
 
         return ServiceTag.newInstance(ServiceTag.generateInstanceURN(),
                                       productName,
@@ -697,22 +697,22 @@ public class NbServiceTagSupport {
     }
 
     /**
-     * Create new service tag instance for JavaFX SDK
+     * Create new service tag instance for Visage SDK
      * @param svcTagSource
      * @return
      * @throws java.io.IOException
      */
-    private static ServiceTag newJavaFXSdkServiceTag (String svcTagSource, String javaVersion) throws IOException {
+    private static ServiceTag newVisageSdkServiceTag (String svcTagSource, String javaVersion) throws IOException {
         // Determine the product URN and name
         String productURN, productName, productVersion, parentURN, parentName;
 
-        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.urn");
-        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.name");
+        productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visagesdk.urn");
+        productName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visagesdk.name");
 
-        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.version");
+        productVersion = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visagesdk.version");
 
-        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.parent.urn");
-        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.parent.name");
+        parentURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visagesdk.parent.urn");
+        parentName = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visagesdk.parent.name");
 
         return ServiceTag.newInstance(ServiceTag.generateInstanceURN(),
                                       productName,
@@ -809,13 +809,13 @@ public class NbServiceTagSupport {
     }
     
     /**
-     * Return the JavaFX service tag from local registration data.
+     * Return the Visage service tag from local registration data.
      * Return null if srevice tag is not found.
      *
      * @return a service tag for
      */
-    private static ServiceTag getJavaFXServiceTag () throws IOException {
-        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafx.urn");
+    private static ServiceTag getVisageServiceTag () throws IOException {
+        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visage.urn");
         RegistrationData regData = getRegistrationData();
         Collection<ServiceTag> svcTags = regData.getServiceTags();
         for (ServiceTag st : svcTags) {
@@ -827,13 +827,13 @@ public class NbServiceTagSupport {
     }
 
     /**
-     * Return the JavaFX SDK service tag from local registration data.
+     * Return the Visage SDK service tag from local registration data.
      * Return null if service tag is not found.
      *
      * @return a service tag for
      */
-    private static ServiceTag getJavaFXSdkServiceTag () throws IOException {
-        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.javafxsdk.urn");
+    private static ServiceTag getVisageSdkServiceTag () throws IOException {
+        String productURN = NbBundle.getMessage(NbServiceTagSupport.class,"servicetag.visagesdk.urn");
         RegistrationData regData = getRegistrationData();
         Collection<ServiceTag> svcTags = regData.getServiceTags();
         for (ServiceTag st : svcTags) {

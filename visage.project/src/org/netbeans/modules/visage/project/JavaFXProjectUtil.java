@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -59,23 +59,23 @@ import org.netbeans.api.java.platform.Specification;
 import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.api.java.source.SourceUtils;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
-import org.netbeans.modules.javafx.project.ui.customizer.MainClassChooser;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.MainClassChooser;
 import org.netbeans.spi.project.support.ant.GeneratedFilesHelper;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
 /**
- * Miscellaneous utilities for the javafx/project module.
+ * Miscellaneous utilities for the visage/project module.
  * @author  Jiri Rechtacek
  */
-public class JavaFXProjectUtil {
-    private JavaFXProjectUtil () {}
+public class VisageProjectUtil {
+    private VisageProjectUtil () {}
     
     /**
-     * Returns the property value evaluated by JavaFXProject's PropertyEvaluator.
+     * Returns the property value evaluated by VisageProject's PropertyEvaluator.
      *
      * @param p project
      * @param value of property
@@ -86,9 +86,9 @@ public class JavaFXProjectUtil {
         if (value == null) {
             return null;
         }
-        JavaFXProject javafxprj = (JavaFXProject) p.getLookup().lookup(JavaFXProject.class);
-        if (javafxprj != null) {
-            return javafxprj.evaluator().evaluate(value);
+        VisageProject visageprj = (VisageProject) p.getLookup().lookup(VisageProject.class);
+        if (visageprj != null) {
+            return visageprj.evaluator().evaluate(value);
         } else {
             return null;
         }
@@ -185,33 +185,33 @@ public class JavaFXProjectUtil {
      * @return active {@link JavaPlatform} or null if the project's platform
      * is broken
      */
-    public static JavaFXPlatform getActivePlatform (final String activePlatformId) {
+    public static VisagePlatform getActivePlatform (final String activePlatformId) {
         final JavaPlatformManager pm = JavaPlatformManager.getDefault();
         if (activePlatformId == null) {
-            return JavaFXPlatform.getDefaultFXPlatform();
+            return VisagePlatform.getDefaultFXPlatform();
         }
         else {
-            JavaPlatform[] installedPlatforms = pm.getPlatforms(null, new Specification ("JavaFX",null));   //NOI18N
+            JavaPlatform[] installedPlatforms = pm.getPlatforms(null, new Specification ("Visage",null));   //NOI18N
             for (int i=0; i<installedPlatforms.length; i++) {
                 String antName = (String) installedPlatforms[i].getProperties().get("platform.ant.name");        //NOI18N
-                if (installedPlatforms[i] instanceof JavaFXPlatform && antName != null && antName.equals(activePlatformId)) {
-                    return (JavaFXPlatform)installedPlatforms[i];
+                if (installedPlatforms[i] instanceof VisagePlatform && antName != null && antName.equals(activePlatformId)) {
+                    return (VisagePlatform)installedPlatforms[i];
                 }
             }
             return null;
         }
     }
     
-    public static String getBuildXmlName (final JavaFXProject project) {
+    public static String getBuildXmlName (final VisageProject project) {
         assert project != null;
-        String buildScriptPath = project.evaluator().getProperty(JavaFXProjectProperties.BUILD_SCRIPT);
+        String buildScriptPath = project.evaluator().getProperty(VisageProjectProperties.BUILD_SCRIPT);
         if (buildScriptPath == null) {
             buildScriptPath = GeneratedFilesHelper.BUILD_XML_PATH;
         }
         return buildScriptPath;
     }
     
-    public static FileObject getBuildXml (final JavaFXProject project) {
+    public static FileObject getBuildXml (final VisageProject project) {
         return project.getProjectDirectory().getFileObject (getBuildXmlName(project));
     }
 }

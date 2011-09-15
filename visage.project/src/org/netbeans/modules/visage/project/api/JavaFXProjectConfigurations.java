@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.api;
+package org.netbeans.modules.visage.project.api;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,9 +66,9 @@ import org.openide.util.MutexException;
  * @author Milan Kubec
  * @since 1.10
  */
-public final class JavaFXProjectConfigurations {
+public final class VisageProjectConfigurations {
     
-    JavaFXProjectConfigurations() {}
+    VisageProjectConfigurations() {}
     
     /**
      * Creates property files for run configuration and writes passed properties.

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -52,7 +52,7 @@ import org.netbeans.api.queries.FileBuiltQuery;
 import org.netbeans.spi.queries.FileBuiltQueryImplementation;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 
 
 
@@ -92,7 +92,7 @@ public class JavaFxFileBuiltQuery implements FileBuiltQueryImplementation, Prope
         String[] to = new String [srcRoots.length + tstRoots.length];
         for (int i=0; i< srcRoots.length; i++) {
             from[i] = "${" + srcRoots[i] + "}/*.java"; // NOI18N
-            to[i] = "${" + JavaFXProjectProperties.BUILD_CLASSES_DIR + "}/*.class"; // NOI18N
+            to[i] = "${" + VisageProjectProperties.BUILD_CLASSES_DIR + "}/*.class"; // NOI18N
         }
         return helper.createGlobFileBuiltQuery(evaluator, from, to);    //Safe to pass APH
     }

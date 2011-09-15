@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +52,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import org.netbeans.modules.javafx.project.ui.FoldersListSettings;
+import org.netbeans.modules.visage.project.ui.FoldersListSettings;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -70,9 +70,9 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
     public static final String PROP_PROJECT_NAME = "projectName";      //NOI18N
     
     private PanelConfigureProject panel;
-    private NewJavaFXProjectWizardIterator.WizardType type;
+    private NewVisageProjectWizardIterator.WizardType type;
         
-    public PanelProjectLocationVisual(PanelConfigureProject panel, NewJavaFXProjectWizardIterator.WizardType type) {
+    public PanelProjectLocationVisual(PanelConfigureProject panel, NewVisageProjectWizardIterator.WizardType type) {
         initComponents();
         this.panel = panel;
         this.type = type;
@@ -291,14 +291,14 @@ public class PanelProjectLocationVisual extends SettingsPanel implements Documen
                 String formatter = NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaApplication"); // NOI18N
                 while ((projectName=validFreeProjectName(projectLocation, formatter, baseCount))==null)
                     baseCount++;                
-                settings.putProperty (NewJavaFXProjectWizardIterator.PROP_NAME_INDEX, new Integer(baseCount));
+                settings.putProperty (NewVisageProjectWizardIterator.PROP_NAME_INDEX, new Integer(baseCount));
                 break;
             default:
                 baseCount = FoldersListSettings.getDefault().getNewLibraryCount() + 1;
                 formatter = NbBundle.getMessage(PanelSourceFolders.class,"TXT_JavaLibrary"); // NOI18N
                 while ((projectName=validFreeProjectName(projectLocation, formatter, baseCount))==null)
                     baseCount++;                
-                settings.putProperty (NewJavaFXProjectWizardIterator.PROP_NAME_INDEX, new Integer(baseCount));
+                settings.putProperty (NewVisageProjectWizardIterator.PROP_NAME_INDEX, new Integer(baseCount));
             }            
         }
         this.projectNameTextField.setText (projectName);                

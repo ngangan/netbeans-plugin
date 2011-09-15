@@ -41,15 +41,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.visage.api.tree.SourcePositions;
 import com.sun.tools.mjavac.code.Type;
 import java.util.Iterator;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.editor.hints.HintsModel.Hint;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.modules.visage.editor.hints.HintsModel.Hint;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.Fix;
 import org.openide.util.Exceptions;

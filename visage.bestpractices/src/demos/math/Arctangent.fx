@@ -34,17 +34,17 @@
 
 package math;
 
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.scene.Group;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.transform.Translate;
-import javafx.scene.transform.Rotate;
+import visage.scene.input.MouseEvent;
+import visage.scene.Node;
+import visage.scene.CustomNode;
+import visage.scene.Group;
+import visage.scene.paint.Color;
+import visage.scene.shape.Rectangle;
+import visage.scene.shape.Circle;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.transform.Translate;
+import visage.scene.transform.Rotate;
 
 import java.lang.Math;
 

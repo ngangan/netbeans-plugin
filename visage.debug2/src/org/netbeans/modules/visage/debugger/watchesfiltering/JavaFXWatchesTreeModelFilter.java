@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -69,17 +69,17 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.TreeModelFilter.class } )
-public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
+public class VisageWatchesTreeModelFilter implements TreeModelFilter {
 
     private final JPDADebugger debugger;
-    private final Map<Watch, JavaFXWatch> watch2JavaFXWatch = new HashMap<Watch, JavaFXWatch>();
+    private final Map<Watch, VisageWatch> watch2VisageWatch = new HashMap<Watch, VisageWatch>();
     private DebuggerListener listener;
 
-    public JavaFXWatchesTreeModelFilter() {
+    public VisageWatchesTreeModelFilter() {
         debugger = null;
     }
 
-    public JavaFXWatchesTreeModelFilter( ContextProvider lookupProvider ) {
+    public VisageWatchesTreeModelFilter( ContextProvider lookupProvider ) {
         debugger = (JPDADebugger)lookupProvider.lookupFirst( null, JPDADebugger.class );
     }
 
@@ -97,15 +97,15 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
             Object[] ch = new Object[result.length];
             System.arraycopy( result, 0, ch, 0, result.length );
 
-            synchronized( watch2JavaFXWatch ) {
+            synchronized( watch2VisageWatch ) {
                 for( int i = from; i < allWatches.length; i++ ) {
                     Watch w = allWatches[i];
                     String expression = w.getExpression();
-                    if( isJavaFXexpression( expression )) {
-                        JavaFXWatch jw = watch2JavaFXWatch.get( w );
+                    if( isVisageexpression( expression )) {
+                        VisageWatch jw = watch2VisageWatch.get( w );
                         if( jw == null ) {
-                            jw = new JavaFXWatch( w, debugger );
-                            watch2JavaFXWatch.put( w, jw );
+                            jw = new VisageWatch( w, debugger );
+                            watch2VisageWatch.put( w, jw );
                         }
                         ch[i - from] = jw;
                     }
@@ -117,8 +117,8 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
             }
 
             return ch;
-        } else if( parent instanceof JavaFXWatch ) {
-            JavaFXWatch w = (JavaFXWatch)parent;
+        } else if( parent instanceof VisageWatch ) {
+            VisageWatch w = (VisageWatch)parent;
             // Filter variables
             Object children[] = original.getChildren( w.getVariable(), from, to );
             List vc = new ArrayList();
@@ -143,8 +143,8 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
     public int getChildrenCount( TreeModel original, Object node ) throws UnknownTypeException {
         if( node == original.getRoot() && listener == null ) {
             listener = new DebuggerListener( this, debugger );
-        } else if( node instanceof JavaFXWatch ) {
-            JavaFXWatch w = (JavaFXWatch)node;
+        } else if( node instanceof VisageWatch ) {
+            VisageWatch w = (VisageWatch)node;
             if( w.getValue() != null && w.getVariable() != null )
                 return original.getChildrenCount( w.getVariable());
         }
@@ -155,8 +155,8 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
         boolean il = true;
         if( node == original.getRoot()) {
             il = false;
-        } else if( node instanceof JavaFXWatch ) {
-            JavaFXWatch w = (JavaFXWatch)node;
+        } else if( node instanceof VisageWatch ) {
+            VisageWatch w = (VisageWatch)node;
             il = false;
 //            if( w.getVariable() != null )
 //                il = original.isLeaf( w.getVariable());
@@ -164,7 +164,7 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
         return il;
     }
 
-    private boolean isJavaFXexpression( String expression ) {
+    private boolean isVisageexpression( String expression ) {
         return true;
     }
 
@@ -175,20 +175,20 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
     }
 
     void fireTreeChanged() {
-        synchronized( watch2JavaFXWatch ) {
-            for( JavaFXWatch javafxWatch : watch2JavaFXWatch.values()) {
-                javafxWatch.setUnevaluated();
+        synchronized( watch2VisageWatch ) {
+            for( VisageWatch visageWatch : watch2VisageWatch.values()) {
+                visageWatch.setUnevaluated();
             }
         }
     }
 
     private static class DebuggerListener implements PropertyChangeListener {
 
-        WeakReference<JavaFXWatchesTreeModelFilter> javafxWatchesFilterRef;
+        WeakReference<VisageWatchesTreeModelFilter> visageWatchesFilterRef;
         WeakReference<JPDADebugger> debuggerRef;
 
-        DebuggerListener( JavaFXWatchesTreeModelFilter javafxWatchesFilter, JPDADebugger debugger ) {
-            javafxWatchesFilterRef = new WeakReference<JavaFXWatchesTreeModelFilter>( javafxWatchesFilter );
+        DebuggerListener( VisageWatchesTreeModelFilter visageWatchesFilter, JPDADebugger debugger ) {
+            visageWatchesFilterRef = new WeakReference<VisageWatchesTreeModelFilter>( visageWatchesFilter );
             debuggerRef = new WeakReference<JPDADebugger>( debugger );
             debugger.addPropertyChangeListener( this );
         }
@@ -203,18 +203,18 @@ public class JavaFXWatchesTreeModelFilter implements TreeModelFilter {
                 return;
             }
 
-            final JavaFXWatchesTreeModelFilter javafxWatchesFilter = getJavaFXWatchesFilter();
-            if( javafxWatchesFilter != null ) {
-                javafxWatchesFilter.fireTreeChanged();
+            final VisageWatchesTreeModelFilter visageWatchesFilter = getVisageWatchesFilter();
+            if( visageWatchesFilter != null ) {
+                visageWatchesFilter.fireTreeChanged();
             }
         }
 
-        private JavaFXWatchesTreeModelFilter getJavaFXWatchesFilter() {
-            JavaFXWatchesTreeModelFilter javafxWatchesFilter = javafxWatchesFilterRef.get();
-            if( javafxWatchesFilter == null ) {
+        private VisageWatchesTreeModelFilter getVisageWatchesFilter() {
+            VisageWatchesTreeModelFilter visageWatchesFilter = visageWatchesFilterRef.get();
+            if( visageWatchesFilter == null ) {
                 destroy();
             }
-            return javafxWatchesFilter;
+            return visageWatchesFilter;
         }
 
         private void destroy() {

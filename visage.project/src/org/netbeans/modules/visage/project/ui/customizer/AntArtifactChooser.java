@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -64,7 +64,7 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.ant.AntArtifact;
 import org.netbeans.api.project.ant.AntArtifactQuery;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
-import org.netbeans.modules.javafx.project.ui.FoldersListSettings;
+import org.netbeans.modules.visage.project.ui.FoldersListSettings;
 import org.openide.DialogDisplayer;
 import org.openide.ErrorManager;
 import org.openide.NotifyDescriptor;
@@ -123,7 +123,7 @@ public class AntArtifactChooser extends JPanel implements PropertyChangeListener
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 12, 6, 0);
         add(jTextFieldName, gridBagConstraints);
-        jTextFieldName.getAccessibleContext().setAccessibleDescription(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("AD_AACH_ProjectName_JLabel"));
+        jTextFieldName.getAccessibleContext().setAccessibleDescription(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("AD_AACH_ProjectName_JLabel"));
 
         jLabelJarFiles.setLabelFor(jListArtifacts);
         org.openide.awt.Mnemonics.setLocalizedText(jLabelJarFiles, org.openide.util.NbBundle.getMessage(AntArtifactChooser.class, "LBL_AACH_ProjectJarFiles_JLabel"));
@@ -134,7 +134,7 @@ public class AntArtifactChooser extends JPanel implements PropertyChangeListener
         add(jLabelJarFiles, gridBagConstraints);
 
         jScrollPane1.setViewportView(jListArtifacts);
-        jListArtifacts.getAccessibleContext().setAccessibleDescription(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("AD_AACH_ProjectJarFiles_JLabel"));
+        jListArtifacts.getAccessibleContext().setAccessibleDescription(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("AD_AACH_ProjectJarFiles_JLabel"));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;

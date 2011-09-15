@@ -42,34 +42,34 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform;
+package org.netbeans.modules.visage.platform;
 
 import org.openide.util.NbBundle;
-import org.netbeans.modules.javafx.platform.wizard.JavaFXWizardIterator;
+import org.netbeans.modules.visage.platform.wizard.VisageWizardIterator;
 
 
 import org.netbeans.spi.java.platform.CustomPlatformInstall;
 import org.openide.WizardDescriptor;
 
 /**
- * Installer factory for standard JavaFX Platforms
+ * Installer factory for standard Visage Platforms
  *
  * @author Svatopluk Dedic
  */
-class JavaFXPlatformInstall extends CustomPlatformInstall {
+class VisagePlatformInstall extends CustomPlatformInstall {
 
-    JavaFXPlatformInstall() {
+    VisagePlatformInstall() {
     }
     
-    static JavaFXPlatformInstall create() {        
-        return new JavaFXPlatformInstall();
+    static VisagePlatformInstall create() {        
+        return new VisagePlatformInstall();
     }
     
     public WizardDescriptor.InstantiatingIterator<WizardDescriptor> createIterator() {
-        return JavaFXWizardIterator.getDefault();
+        return VisageWizardIterator.getDefault();
     }
 
     public String getDisplayName() {
-        return NbBundle.getMessage(JavaFXPlatformInstall.class, "TXT_JavaFXPlatform"); // NOI18N
+        return NbBundle.getMessage(VisagePlatformInstall.class, "TXT_VisagePlatform"); // NOI18N
     }
 }

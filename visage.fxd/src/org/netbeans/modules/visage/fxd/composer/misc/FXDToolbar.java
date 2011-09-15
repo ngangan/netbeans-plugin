@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.misc;
+package org.netbeans.modules.visage.fxd.composer.misc;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -60,7 +60,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDToggleAction;
+import org.netbeans.modules.visage.fxd.composer.model.actions.AbstractFXDToggleAction;
 import org.openide.awt.MouseUtils;
 
 /**

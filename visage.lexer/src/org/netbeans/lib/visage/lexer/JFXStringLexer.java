@@ -29,9 +29,9 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
-import org.netbeans.api.javafx.lexer.JFXStringTokenId;
+import org.netbeans.api.visage.lexer.VSGStringTokenId;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerInput;
@@ -48,17 +48,17 @@ import java.util.logging.Logger;
  * @version 1.00
  */
 
-public class JFXStringLexer implements Lexer<JFXStringTokenId> {
-    private static Logger log = Logger.getLogger(JFXStringLexer.class.getName());
+public class VSGStringLexer implements Lexer<VSGStringTokenId> {
+    private static Logger log = Logger.getLogger(VSGStringLexer.class.getName());
     private static final int EOF = LexerInput.EOF;
 
     private LexerInput input;
 
-    private TokenFactory<JFXStringTokenId> tokenFactory;
+    private TokenFactory<VSGStringTokenId> tokenFactory;
     private final boolean forceStringLiteralOnly;
     private boolean rl_slStartPossible = false; // represent possible start of RBRACE_LBRACE_STRING_LITERAL.
 
-    public JFXStringLexer(LexerRestartInfo<JFXStringTokenId> info, boolean forceStringLiteralOnly) {
+    public VSGStringLexer(LexerRestartInfo<VSGStringTokenId> info, boolean forceStringLiteralOnly) {
         this.forceStringLiteralOnly = forceStringLiteralOnly;
         this.input = info.input();
         this.tokenFactory = info.tokenFactory();
@@ -69,7 +69,7 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
         return null;
     }
 
-    public Token<JFXStringTokenId> nextToken() {
+    public Token<VSGStringTokenId> nextToken() {
         while (true) {
             int ch = input.read();
             if (log.isLoggable(Level.FINE))
@@ -77,35 +77,35 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
             switch (ch) {
                 case EOF:
                     if (input.readLength() > 0)
-                        return token(JFXStringTokenId.TEXT);
+                        return token(VSGStringTokenId.TEXT);
                     else
                         return null;
                 case '\\': //NOI18N
                     if (input.readLength() > 1) {// already read some text
                         input.backup(1);
-                        return tokenFactory.createToken(JFXStringTokenId.TEXT, input.readLength());
+                        return tokenFactory.createToken(VSGStringTokenId.TEXT, input.readLength());
                     }
                     switch (ch = input.read()) {
                         case '{': //NOI18N
-                            return token(JFXStringTokenId.CODE_OPENING_BRACE_ESCAPE);
+                            return token(VSGStringTokenId.CODE_OPENING_BRACE_ESCAPE);
                         case '}': //NOI18N
-                            return token(JFXStringTokenId.CODE_ENCLOSING_BRACE_ESCAPE);
+                            return token(VSGStringTokenId.CODE_ENCLOSING_BRACE_ESCAPE);
                         case 'b': //NOI18N
-                            return token(JFXStringTokenId.BACKSPACE);
+                            return token(VSGStringTokenId.BACKSPACE);
                         case 'f': //NOI18N
-                            return token(JFXStringTokenId.FORM_FEED);
+                            return token(VSGStringTokenId.FORM_FEED);
                         case 'n': //NOI18N
-                            return token(JFXStringTokenId.NEWLINE);
+                            return token(VSGStringTokenId.NEWLINE);
                         case 'r': //NOI18N
-                            return token(JFXStringTokenId.CR);
+                            return token(VSGStringTokenId.CR);
                         case 't': //NOI18N
-                            return token(JFXStringTokenId.TAB);
+                            return token(VSGStringTokenId.TAB);
                         case '\'': //NOI18N
-                            return token(JFXStringTokenId.SINGLE_QUOTE);
+                            return token(VSGStringTokenId.SINGLE_QUOTE);
                         case '"': //NOI18N
-                            return token(JFXStringTokenId.DOUBLE_QUOTE);
+                            return token(VSGStringTokenId.DOUBLE_QUOTE);
                         case '\\': //NOI18N
-                            return token(JFXStringTokenId.BACKSLASH);
+                            return token(VSGStringTokenId.BACKSLASH);
                         case 'u': //NOI18N
                             while ('u' == (ch = input.read())) {
                             }//NOI18N
@@ -115,11 +115,11 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
 
                                 if ((ch < '0' || ch > '9') && (ch < 'a' || ch > 'f')) { //NOI18N
                                     input.backup(1);
-                                    return token(JFXStringTokenId.UNICODE_ESCAPE_INVALID);
+                                    return token(VSGStringTokenId.UNICODE_ESCAPE_INVALID);
                                 }
 
                                 if (i == 3) { // four digits checked, valid sequence
-                                    return token(JFXStringTokenId.UNICODE_ESCAPE);
+                                    return token(VSGStringTokenId.UNICODE_ESCAPE);
                                 }
 
                                 ch = input.read();
@@ -147,38 +147,38 @@ public class JFXStringLexer implements Lexer<JFXStringTokenId> {
                                         case '5':
                                         case '6':
                                         case '7': //NOI18N
-                                            return token(JFXStringTokenId.OCTAL_ESCAPE);
+                                            return token(VSGStringTokenId.OCTAL_ESCAPE);
                                     }
                                     input.backup(1);
-                                    return token(JFXStringTokenId.OCTAL_ESCAPE_INVALID);
+                                    return token(VSGStringTokenId.OCTAL_ESCAPE_INVALID);
                             }
                             input.backup(1);
-                            return token(JFXStringTokenId.OCTAL_ESCAPE_INVALID);
+                            return token(VSGStringTokenId.OCTAL_ESCAPE_INVALID);
                     }
                     input.backup(1);
-                    return token(JFXStringTokenId.ESCAPE_SEQUENCE_INVALID);
+                    return token(VSGStringTokenId.ESCAPE_SEQUENCE_INVALID);
                 case '{':
                     if (input.readLength() > 1 || forceStringLiteralOnly) {// already read some text
                         input.backup(1);
-                        return tokenFactory.createToken(JFXStringTokenId.TEXT, input.readLength());
+                        return tokenFactory.createToken(VSGStringTokenId.TEXT, input.readLength());
                     }
                     rl_slStartPossible = false;
-                    return tokenFactory.createToken(JFXStringTokenId.CODE_OPENING_BRACE, input.readLength());
+                    return tokenFactory.createToken(VSGStringTokenId.CODE_OPENING_BRACE, input.readLength());
 
                 case '}':
                     if (input.readLength() > 1 || forceStringLiteralOnly || rl_slStartPossible) {
-                        return tokenFactory.createToken(JFXStringTokenId.TEXT, input.readLength());
+                        return tokenFactory.createToken(VSGStringTokenId.TEXT, input.readLength());
                     } else {
                         //this character is code enclosing bracket only if it is first read character!
                         rl_slStartPossible = true;
-                        return tokenFactory.createToken(JFXStringTokenId.CODE_ENCLOSING_BRACE, input.readLength());
+                        return tokenFactory.createToken(VSGStringTokenId.CODE_ENCLOSING_BRACE, input.readLength());
                     }
 
             } // end of switch (ch)
         } // end of while(true)
     }
 
-    private Token<JFXStringTokenId> token(JFXStringTokenId id) {
+    private Token<VSGStringTokenId> token(VSGStringTokenId id) {
         return tokenFactory.createToken(id);
     }
 

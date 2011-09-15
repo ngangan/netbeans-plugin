@@ -39,33 +39,33 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.source.indexing;
+package org.netbeans.modules.visage.source.indexing;
 
-import com.sun.javafx.api.JavafxcTask;
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
-import com.sun.tools.javafx.api.JavafxcTool;
+import com.sun.visage.api.JavafxcTask;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.FunctionInvocationTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.ImportTree;
+import com.sun.visage.api.tree.InstantiateTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.MemberSelectTree;
+import com.sun.visage.api.tree.ObjectLiteralPartTree;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.TypeClassTree;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.api.JavafxcTaskImpl;
+import com.sun.tools.visage.api.JavafxcTool;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symbol.TypeSymbol;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.tree.VSGIdent;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.JavafxTreeInfo;
 import com.sun.tools.mjavac.util.Abort;
 import java.io.File;
 import java.io.IOException;
@@ -102,15 +102,15 @@ import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
-import org.netbeans.modules.javafx.source.classpath.SourceFileObject;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParser;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClassIndex.SearchKind;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.modules.visage.source.ApiSourcePackageAccessor;
+import org.netbeans.modules.visage.source.classpath.SourceFileObject;
+import org.netbeans.modules.visage.source.parsing.VisageParser;
 import org.netbeans.modules.parsing.spi.indexing.Context;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexer;
 import org.netbeans.modules.parsing.spi.indexing.CustomIndexerFactory;
@@ -128,9 +128,9 @@ import org.openide.filesystems.FileUtil;
  *
  * @author Jaroslav Bachorik
  */
-public class JavaFXIndexer extends CustomIndexer {
+public class VisageIndexer extends CustomIndexer {
 
-    final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(JavaFXIndexer.class.getName());
+    final private static java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(VisageIndexer.class.getName());
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
     final public static String NAME = "fx";
     final public static int VERSION = 6;
@@ -173,7 +173,7 @@ public class JavaFXIndexer extends CustomIndexer {
         }
     };
 
-    private class IndexingVisitor extends JavaFXTreePathScanner<Void, IndexDocument> {
+    private class IndexingVisitor extends VisageTreePathScanner<Void, IndexDocument> {
         final private JavafxcTrees trees;
         final private Elements elements;
         final private FileObject fo;
@@ -201,8 +201,8 @@ public class JavaFXIndexer extends CustomIndexer {
             }
             Element e = null;
             while (e == null) {
-                e = JavafxTreeInfo.symbolFor((JFXTree)jfxIdent);
-                if (e == null && jfxIdent.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                e = JavafxTreeInfo.symbolFor((VSGTree)jfxIdent);
+                if (e == null && jfxIdent.getVisageKind() == Tree.VisageKind.MEMBER_SELECT) {
                     jfxIdent = ((MemberSelectTree)jfxIdent).getExpression();
                 } else {
                     break;
@@ -249,7 +249,7 @@ public class JavaFXIndexer extends CustomIndexer {
                 List<ExpressionTree> superTypes = node.getSupertypeList();
                 if (superTypes != null) {
                     for (ExpressionTree et : superTypes) {
-                        JavaFXTreePath tp = JavafxcTrees.getPath(getCurrentPath(), et);
+                        VisageTreePath tp = JavafxcTrees.getPath(getCurrentPath(), et);
                         if (tp != null) {
                             TypeElement supr = (TypeElement) trees.getElement(tp);
                             if (supr != null) {
@@ -275,7 +275,7 @@ public class JavaFXIndexer extends CustomIndexer {
                         }
                     }
                 } catch (NullPointerException npe) {
-                    // #183260: javafxc throwing a NPE for certaing uncompilable sources
+                    // #183260: visagec throwing a NPE for certaing uncompilable sources
                     LOG.log(Level.FINE, fqn, npe);
                 } catch (Abort a) {
                     LOG.log(Level.FINE, fo.getPath() + " : " + fqn, a);
@@ -338,8 +338,8 @@ public class JavaFXIndexer extends CustomIndexer {
                     if (e.asType() == null) {
                         return super.visitFunctionDefinition(node, document); // workaround for NPE in Symbol$MethodSymbol
                     }
-                    // skip the synthetic "$javafx$run$" method generated for javafx scripts
-                    if (e.getReturnType() != null && e.getReturnType().getKind() != TypeKind.OTHER && !e.getSimpleName().contentEquals("javafx$run$")) { //NOI18N
+                    // skip the synthetic "$visage$run$" method generated for visage scripts
+                    if (e.getReturnType() != null && e.getReturnType().getKind() != TypeKind.OTHER && !e.getSimpleName().contentEquals("visage$run$")) { //NOI18N
                         ElementHandle eh = ElementHandle.create(e);
                         if (eh == null) {
                             if (DEBUG) {
@@ -378,7 +378,7 @@ public class JavaFXIndexer extends CustomIndexer {
             }
             if (el.getKind() == ElementKind.METHOD) {
                 ExecutableElement e = (ExecutableElement) el;
-                Collection<ExecutableElement> overridenMethods = JavaFXSourceUtils.getOverridenMethods(e, elements);
+                Collection<ExecutableElement> overridenMethods = VisageSourceUtils.getOverridenMethods(e, elements);
                 Collection<ExecutableElement> methods = new ArrayList<ExecutableElement>();
 
                 methods.add(e);
@@ -403,7 +403,7 @@ public class JavaFXIndexer extends CustomIndexer {
                         }
                         index(document, IndexKey.TYPE_REF, indexVal);
                     } else {
-                        LOG.log(Level.FINE, "Can not determine function owner inv type for: {0}", node != null ? node.getJavaFXKind() : "null"); //NOI18N
+                        LOG.log(Level.FINE, "Can not determine function owner inv type for: {0}", node != null ? node.getVisageKind() : "null"); //NOI18N
                     }
                     indexVal = e.asType() != null ? e.asType().toString() : null;
                     if (indexVal != null) {
@@ -412,7 +412,7 @@ public class JavaFXIndexer extends CustomIndexer {
                         }
                         index(document, IndexKey.TYPE_REF, indexVal);
                     } else {
-                        LOG.log(Level.FINE, "Can not determine function inv return type for: {0}", node != null ? node.getJavaFXKind() : "null"); //NOI18N
+                        LOG.log(Level.FINE, "Can not determine function inv return type for: {0}", node != null ? node.getVisageKind() : "null"); //NOI18N
                     }
                 }
             }
@@ -452,9 +452,9 @@ public class JavaFXIndexer extends CustomIndexer {
         @Override
         public Void visitMemberSelect(MemberSelectTree node, IndexDocument document) {
             ExpressionTree expression = node.getExpression();
-            if (expression instanceof JFXIdent) {
+            if (expression instanceof VSGIdent) {
                 Name memberName = node.getIdentifier();
-                Type type = ((JFXIdent) expression).type;
+                Type type = ((VSGIdent) expression).type;
                 if (type == null) {
                     return super.visitMemberSelect(node, document);
                 }
@@ -472,7 +472,7 @@ public class JavaFXIndexer extends CustomIndexer {
                  * Workaround for NPEs thrown from the javac when calling ts.getEnclosedElements()
                  * The NPE is the result of the source not being compilable
                  *
-                 * Unfortunately, we can not check for compilation errors before indexing because due to http://javafx-jira.kenai.com/browse/JFXC-3468
+                 * Unfortunately, we can not check for compilation errors before indexing because due to http://visage-jira.kenai.com/browse/VSGC-3468
                  * many compilable sources are falsly marked as non-compilable
                  *
                  * Just ignore the exception - nothing else to do than may be log it
@@ -622,17 +622,17 @@ public class JavaFXIndexer extends CustomIndexer {
     // <editor-fold defaultstate="collapsed" desc="Indexer Factory">
     @PathRecognizerRegistration(sourcePathIds={ClasspathInfo.FX_SOURCE}, mimeTypes={"text/x-fx"})
     public static class Factory extends CustomIndexerFactory {
-        private static AtomicBoolean javafxTaskFactoriesInitialized = new AtomicBoolean(false);
+        private static AtomicBoolean visageTaskFactoriesInitialized = new AtomicBoolean(false);
 
         public Factory() {
-            if (!javafxTaskFactoriesInitialized.getAndSet(true)) {
+            if (!visageTaskFactoriesInitialized.getAndSet(true)) {
                 ApiSourcePackageAccessor.get().registerSourceTaskFactoryManager();
             }
         }
 
         @Override
         public CustomIndexer createIndexer() {
-            return new JavaFXIndexer();
+            return new VisageIndexer();
         }
 
         @Override
@@ -680,7 +680,7 @@ public class JavaFXIndexer extends CustomIndexer {
     @Override
     protected void index(Iterable<? extends Indexable> itrbl, final Context cntxt) {
         if (cntxt == null || cntxt.getRoot() == null) return; // #187177: No idea why but this can happen
-        if (!JavaFXSourceUtils.isPlatformOk(cntxt.getRoot())) return; // don't try to index files in a project with broken javafx platform
+        if (!VisageSourceUtils.isPlatformOk(cntxt.getRoot())) return; // don't try to index files in a project with broken visage platform
 
         cancelled.set(false);
 
@@ -781,14 +781,14 @@ public class JavaFXIndexer extends CustomIndexer {
         document.addPair(key.toString(), value, true, true);
     }
 
-    // the following methods and classes are copies from JavaFXSource
+    // the following methods and classes are copies from VisageSource
 
     /**
-     * Copied over from {@linkplain  JavaFXParser} class<br/>
-     * <p>Need to bypass the parsing api for performance sakes - creating {@linkplain JavaFXSource} instances
+     * Copied over from {@linkplain  VisageParser} class<br/>
+     * <p>Need to bypass the parsing api for performance sakes - creating {@linkplain VisageSource} instances
      * for each indexable file sequentially is terribly slow and the standard parsing.api way allows for no
      * other option</p>
-     * @see JavaFXParser#createJavafxcTaskImpl() 
+     * @see VisageParser#createJavafxcTaskImpl() 
      */
     private JavafxcTaskImpl createJavafxcTaskImpl(ClasspathInfo cpInfo, Map<JavaFileObject, Indexable> indexables) {
         boolean brokenPlatform = false;
@@ -810,7 +810,7 @@ public class JavaFXIndexer extends CustomIndexer {
         //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
         options.add("-XDdisableStringFolding"); //NOI18N
 
-        // required for code formatting (and completion I believe), see JFXC-3528
+        // required for code formatting (and completion I believe), see VSGC-3528
         options.add("-XDpreserveTrees"); //NOI18N
 
         diagnosticListener = new DiagnosticListenerImpl();
@@ -845,12 +845,12 @@ public class JavaFXIndexer extends CustomIndexer {
 
         assert trees != null;
         List<? extends Tree> typeDecls = cu.getTypeDecls();
-        JavaFXTreePath cuPath = new JavaFXTreePath(cu);
+        VisageTreePath cuPath = new VisageTreePath(cu);
         for (Tree t : typeDecls) {
             if (t == null) {
                 continue;
             }
-            JavaFXTreePath p = new JavaFXTreePath(cuPath, t);
+            VisageTreePath p = new VisageTreePath(cuPath, t);
             Element e = trees.getElement(p);
             if (e != null && (e.getKind().isClass() || e.getKind().isInterface())) {
                 result.add((TypeElement) e);

@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.visage.code.JavafxTypes;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
@@ -61,14 +61,14 @@ import javax.lang.model.type.TypeKind;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
-import org.netbeans.api.javafx.editor.ElementOpen;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.editor.FXSourceUtils.URLResult;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.editor.ElementOpen;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils.URLResult;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -115,7 +115,7 @@ public class GoToSupport {
         if (fo == null)
             return null;
 
-        final JavaFXSource js = JavaFXSource.forFileObject(fo);
+        final VisageSource js = VisageSource.forFileObject(fo);
 
         if (js == null)
             return null;
@@ -132,7 +132,7 @@ public class GoToSupport {
                                 return;
 
                             @SuppressWarnings("unchecked")
-                            Token<JFXTokenId>[] token = new Token[1];
+                            Token<VSGTokenId>[] token = new Token[1];
                             int[] span = getIdentifierSpan(doc, off, token);
 
                             if (span == null) {
@@ -141,7 +141,7 @@ public class GoToSupport {
                             }
 
                             final int offset = span[0] + 1;
-                            JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
+                            VisageTreePath path = controller.getTreeUtilities().pathFor(offset);
 
                             Tree leaf = path.getLeaf();
                             if (leaf == null) return;
@@ -179,7 +179,7 @@ public class GoToSupport {
                                     }
                                 }
 
-                                JavaFXTreePath elpath = controller.getPath(el);
+                                VisageTreePath elpath = controller.getPath(el);
                                 Tree tree = elpath != null && path.getCompilationUnit() == elpath.getCompilationUnit()? elpath.getLeaf(): null;
 
                                 if (!cancelled.get()) {
@@ -223,9 +223,9 @@ public class GoToSupport {
     }
     
     
-    private static final Set<JFXTokenId> USABLE_TOKEN_IDS = EnumSet.of(JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
+    private static final Set<VSGTokenId> USABLE_TOKEN_IDS = EnumSet.of(VSGTokenId.IDENTIFIER, VSGTokenId.THIS, VSGTokenId.SUPER);
 
-    public static int[] getIdentifierSpan(Document doc, int offset, Token<JFXTokenId>[] token) {
+    public static int[] getIdentifierSpan(Document doc, int offset, Token<VSGTokenId>[] token) {
         if (getFileObject(doc) == null) {
             //do nothing if FO is not attached to the document - the goto would not work anyway:
             return null;
@@ -233,7 +233,7 @@ public class GoToSupport {
         
         TokenHierarchy th = TokenHierarchy.get(doc);
         @SuppressWarnings("unchecked")
-        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) th.tokenSequence();
+        TokenSequence<VSGTokenId> ts = (TokenSequence<VSGTokenId>) th.tokenSequence();
 
         if (ts == null)
             return null;
@@ -242,7 +242,7 @@ public class GoToSupport {
         if (!ts.moveNext())
             return null;
         
-        Token<JFXTokenId> t = ts.token();
+        Token<VSGTokenId> t = ts.token();
         
         if (!USABLE_TOKEN_IDS.contains(t.id())) {
             ts.move(offset - 1);

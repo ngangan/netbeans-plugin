@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.io.File;
 import java.io.IOException;
 import org.netbeans.api.java.queries.BinaryForSourceQuery;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.openide.filesystems.FileUtil;
 import org.openide.modules.SpecificationVersion;
@@ -75,12 +75,12 @@ public class BinaryForSourceQueryImplTest extends NbTestCase {
     }
 
     public void testFindBinaryRoots() throws IOException{
-        String name = "TestJavaFXApp";
+        String name = "TestVisageApp";
         File proj = new File (getWorkDir(), name);
         proj.mkdir();
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(proj, name, null, null);
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper aph = null; // FIXME (not compilable): VisageProjectGenerator.createProject(proj, name, null, null);
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         assertNotNull(aph);
 
         File someOut = new File (getWorkDir(), "SomeFolder");

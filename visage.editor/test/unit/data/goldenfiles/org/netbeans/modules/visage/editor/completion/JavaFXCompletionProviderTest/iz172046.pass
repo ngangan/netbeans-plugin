@@ -1,7 +1,7 @@
-com.sun.javafx.runtime.sequence.Sequence<? extends java.lang.Object> elem
+com.sun.visage.runtime.sequence.Sequence<? extends java.lang.Object> elem
 int index
-com.sun.javafx.runtime.sequence.Sequence<? extends java.lang.Integer> seq
-com.sun.javafx.runtime.FXBase super
+com.sun.visage.runtime.sequence.Sequence<? extends java.lang.Integer> seq
+com.sun.visage.runtime.FXBase super
 Test this
 public static boolean isInitialized(arg0 : java.lang.Object)
 public static boolean isReadOnly(arg0 : java.lang.Object)
@@ -22,7 +22,7 @@ Test
 com
 java
 javacard
-javafx
+visage
 javax
 org
 sun

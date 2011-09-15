@@ -42,12 +42,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import java.io.File;
 import javax.swing.JFileChooser;
-import org.netbeans.modules.javafx.project.ui.wizards.PanelSourceFolders;
-import org.netbeans.modules.javafx.project.ui.wizards.SettingsPanel;
+import org.netbeans.modules.visage.project.ui.wizards.PanelSourceFolders;
+import org.netbeans.modules.visage.project.ui.wizards.SettingsPanel;
 import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -105,7 +105,7 @@ public class PanelProjectTypesVisual extends SettingsPanel {
             ((FolderList)sourcePanel).setLastUsedDir(currentDirectory);
         }
         
-        switch ((NewJavaFXProjectWizardIterator.WizardType)wd.getProperty("projectType")) { // NOI18N
+        switch ((NewVisageProjectWizardIterator.WizardType)wd.getProperty("projectType")) { // NOI18N
         case APP:
             jRadioButton1.setSelected(true);
             break;
@@ -123,9 +123,9 @@ public class PanelProjectTypesVisual extends SettingsPanel {
         File[] sourceRoots = ((FolderList)this.sourcePanel).getFiles();
         wd.putProperty ("sourceRoot",sourceRoots);    //NOI18N
         
-        NewJavaFXProjectWizardIterator.WizardType projectType;
-        if (jRadioButton1.isSelected()) projectType = NewJavaFXProjectWizardIterator.WizardType.APP;
-            else projectType = NewJavaFXProjectWizardIterator.WizardType.EXT;
+        NewVisageProjectWizardIterator.WizardType projectType;
+        if (jRadioButton1.isSelected()) projectType = NewVisageProjectWizardIterator.WizardType.APP;
+            else projectType = NewVisageProjectWizardIterator.WizardType.EXT;
         wd.putProperty("projectType", projectType); // NOI18N
     }
     

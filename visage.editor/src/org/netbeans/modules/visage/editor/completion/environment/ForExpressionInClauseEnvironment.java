@@ -40,36 +40,36 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXForExpressionInClause;
+import com.sun.tools.visage.tree.VSGForExpressionInClause;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 /**
  *
  * @author David Strupl
  */
-public class ForExpressionInClauseEnvironment extends JavaFXCompletionEnvironment<JFXForExpressionInClause> {
+public class ForExpressionInClauseEnvironment extends VisageCompletionEnvironment<VSGForExpressionInClause> {
     
     private static final Logger logger = Logger.getLogger(ForExpressionInClauseEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXForExpressionInClause feic) throws IOException {
-        if (LOGGABLE) log("inside JFXForExpressionInClause " + feic); // NOI18N
+    protected void inside(VSGForExpressionInClause feic) throws IOException {
+        if (LOGGABLE) log("inside VSGForExpressionInClause " + feic); // NOI18N
         if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, feic);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(start);
         boolean afterLBracket = false;
         loop: while (ts.moveNext()) {

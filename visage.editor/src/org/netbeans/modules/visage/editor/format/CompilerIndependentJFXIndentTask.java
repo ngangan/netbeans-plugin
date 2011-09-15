@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
 import java.util.List;
 import javax.swing.text.BadLocationException;
@@ -57,11 +57,11 @@ import org.netbeans.modules.editor.indent.spi.IndentTask;
  *
  * @author Anton Chechel
  */
-public class CompilerIndependentJFXIndentTask implements IndentTask {
+public class CompilerIndependentVSGIndentTask implements IndentTask {
 
     private final Context context;
 
-    public CompilerIndependentJFXIndentTask(Context context) {
+    public CompilerIndependentVSGIndentTask(Context context) {
         this.context = context;
     }
 
@@ -98,7 +98,7 @@ public class CompilerIndependentJFXIndentTask implements IndentTask {
 
     public ExtraLock indentLock() {
         // #183791
-//        return JavaFXReformatExtraLock.getInstance();
+//        return VisageReformatExtraLock.getInstance();
         return null;
     }
 

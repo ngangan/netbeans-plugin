@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import java.awt.Component;
 import java.awt.Image;
@@ -55,7 +55,7 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 import org.openide.awt.HtmlRenderer;
 import org.openide.util.ImageUtilities;
 
@@ -72,7 +72,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
       GRAY
     };
     
-    private static final String IMAGE_BASE     = "org/netbeans/modules/javafx/fxd/composer/resources/";  //NOI18N
+    private static final String IMAGE_BASE     = "org/netbeans/modules/visage/fxd/composer/resources/";  //NOI18N
     private static final String ELEMENT        = IMAGE_BASE + "node_element.png";  //NOI18N
     private static final String NODE_ATTR      = IMAGE_BASE + "node_attr.png";  //NOI18N
     private static final String NODE_GENERAL   = IMAGE_BASE + "node_node.png";  //NOI18N
@@ -102,7 +102,7 @@ final class FXDNavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
     private final Icon[] NODE_ICON         = createIcons(ELEMENT);
     private final Icon[] ATTR_ICON         = createIcons(NODE_ATTR);
     private final Icon[] NODE_GENERAL_ICON = createIcons(NODE_GENERAL);
-    private final Icon[] FILE_ICON         = createIcons( "org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"); //NOI18N
+    private final Icon[] FILE_ICON         = createIcons( "org/netbeans/modules/visage/fxd/dataloader/resources/fxdFile16.png"); //NOI18N
     
     private final HtmlRenderer.Renderer renderer;
     

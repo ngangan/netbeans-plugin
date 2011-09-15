@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -53,14 +53,14 @@ import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.WhereUsedElement;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.Usage;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.WhereUsedElement;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.Usage;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.java.api.WhereUsedQueryConstants;
@@ -71,7 +71,7 @@ import org.openide.filesystems.FileObject;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
+public class WhereUsedQueryPlugin extends VisageRefactoringPlugin {
     private WhereUsedQuery refactoring;
 
     public WhereUsedQueryPlugin(WhereUsedQuery refactoring) {
@@ -148,7 +148,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
                 fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
                 for(FileObject fo : files)  {
                     fireProgressListenerStep();
-                    if (!SourceUtils.isJavaFXFile(fo)) continue;
+                    if (!SourceUtils.isVisageFile(fo)) continue;
                     
                     ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                     for(Usage usg : cm.getUsages(checking)) {
@@ -175,7 +175,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
                 fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
                 for(FileObject fo : files) {
                     fireProgressListenerStep();
-                    if (!SourceUtils.isJavaFXFile(fo)) continue;
+                    if (!SourceUtils.isVisageFile(fo)) continue;
                     ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fo);
                     for(ElementDef refDef : cm.getElementDefs(EnumSet.of(edef.getKind()))) {
                         if (refDef.overrides(edef)) {
@@ -220,7 +220,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
         for(FileObject ref : references) {
             if (isCancelled()) return;
             fireProgressListenerStep();
-            if (!SourceUtils.isJavaFXFile(ref)) continue;
+            if (!SourceUtils.isVisageFile(ref)) continue;
             ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
 
             if (isFindUsages()) {
@@ -265,7 +265,7 @@ public class WhereUsedQueryPlugin extends JavaFXRefactoringPlugin {
             fireProgressListenerStart(WhereUsedQuery.PREPARE, files.size());
             for(FileObject ref : files) {
                 fireProgressListenerStep();
-                if (!SourceUtils.isJavaFXFile(ref)) continue;
+                if (!SourceUtils.isVisageFile(ref)) continue;
                 
                 ClassModel refcm = RefactoringSupport.classModelFactory(refactoring).classModelFor(ref);
 

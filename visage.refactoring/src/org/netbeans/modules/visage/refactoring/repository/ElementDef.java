@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.repository;
+package org.netbeans.modules.visage.refactoring.repository;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,10 +52,10 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 
 /**
  *
@@ -181,7 +181,7 @@ abstract public class ElementDef implements Referencable {
         
         final Element[] rslt = new Element[1];
         try {
-            JavaFXSource.forFileObject(enclosing.getSourceFile()).runUserActionTask(new Task<CompilationController>() {
+            VisageSource.forFileObject(enclosing.getSourceFile()).runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
                     rslt[0] = resolveElement(cc);

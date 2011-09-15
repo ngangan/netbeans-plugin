@@ -39,15 +39,15 @@
  *
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.api.javafx.source.ClassIndex.NameKind;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.ClassIndex.NameKind;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
 
 public class ClassIndexTest extends SourceTestBase {
 
@@ -61,23 +61,23 @@ public class ClassIndexTest extends SourceTestBase {
 
         final Set<String> expectedTypes = new HashSet<String>();
         expectedTypes.addAll(Arrays.asList(new String[]{
-            "com.sun.javafx.scene.control.caspian.ColorTransition",
-            "com.sun.javafx.scene.paint.MultipleGradientPaint.ColorSpaceType",
+            "com.sun.visage.scene.control.caspian.ColorTransition",
+            "com.sun.visage.scene.paint.MultipleGradientPaint.ColorSpaceType",
             "com.sun.scenario.effect.ColorAdjust",
-            "com.sun.javafx.tools.fxd.reflector.javafx.scene.effect.ColorAdjustReflector",
-            "com.sun.javafx.tools.fxd.reflector.javafx.scene.paint.ColorReflector",
+            "com.sun.visage.tools.fxd.reflector.visage.scene.effect.ColorAdjustReflector",
+            "com.sun.visage.tools.fxd.reflector.visage.scene.paint.ColorReflector",
             "com.sun.stylesheet.types.ColorConverter",
-            "javafx.scene.effect.ColorAdjust",
+            "visage.scene.effect.ColorAdjust",
             "com.sun.scenario.effect.Color4f",
-            "javafx.scene.paint.Color.ColorMap",
-            "javafx.scene.paint.Color"
+            "visage.scene.paint.Color.ColorMap",
+            "visage.scene.paint.Color"
         }));
         final Set<ElementHandle<TypeElement>> types = new HashSet<ElementHandle<TypeElement>>();
         testInsideSourceTask("",
                 new Task<CompilationController>() {
                     public void run(CompilationController controller) throws Exception {
-                        JavaFXSource.Phase p = controller.toPhase(JavaFXSource.Phase.ANALYZED);
-                        assertFalse(p.lessThan(JavaFXSource.Phase.ANALYZED));
+                        VisageSource.Phase p = controller.toPhase(VisageSource.Phase.ANALYZED);
+                        assertFalse(p.lessThan(VisageSource.Phase.ANALYZED));
                         types.addAll(controller.getClasspathInfo().getClassIndex().getDeclaredTypes(
                                 "Color",
                                 NameKind.PREFIX,

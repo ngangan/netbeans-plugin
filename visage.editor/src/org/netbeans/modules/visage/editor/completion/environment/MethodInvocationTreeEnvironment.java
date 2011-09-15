@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.*;
+import com.sun.visage.api.tree.*;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -59,7 +59,7 @@ import javax.lang.model.element.ElementKind;
  *
  * @author David Strupl
  */
-public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment<FunctionInvocationTree> {
+public class MethodInvocationTreeEnvironment extends VisageCompletionEnvironment<FunctionInvocationTree> {
 
     private static final Logger logger = Logger.getLogger(MethodInvocationTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -68,18 +68,18 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
     protected void inside(FunctionInvocationTree t) throws IOException {
         if (LOGGABLE) log("inside MethodInvocationTree " + t); // NOI18N
         FunctionInvocationTree mi = t;
-        TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(mi, offset);
-        if (ts == null || (ts.token().id() != JFXTokenId.LPAREN && ts.token().id() != JFXTokenId.COMMA)) {
+        TokenSequence<VSGTokenId> ts = findLastNonWhitespaceToken(mi, offset);
+        if (ts == null || (ts.token().id() != VSGTokenId.LPAREN && ts.token().id() != VSGTokenId.COMMA)) {
             SourcePositions sp = getSourcePositions();
             int lastTokenEndOffset = ts.offset() + ts.token().length();
             for (ExpressionTree arg : mi.getArguments()) {
                 int pos = (int) sp.getEndPosition(root, arg);
                 if (lastTokenEndOffset == pos) {
-                    insideExpression(new JavaFXTreePath(path, arg));
+                    insideExpression(new VisageTreePath(path, arg));
                     break;
                 }
                 if (offset <= pos) {
-                    if (arg.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS) {
+                    if (arg.getVisageKind() == Tree.VisageKind.ERRONEOUS) {
                         tryToUseSanitizedSource2();
                     }
                     break;
@@ -99,7 +99,7 @@ public class MethodInvocationTreeEnvironment extends JavaFXCompletionEnvironment
 
     private TypeMirror getSmartType(FunctionInvocationTree mi) throws IOException {
         Tree argType = getArgumentUpToPos(mi.getArguments(), (int) sourcePositions.getEndPosition(root, mi.getMethodSelect()), offset);
-        return argType != null ? controller.getTrees().getTypeMirror(new JavaFXTreePath(path, argType)) : null;
+        return argType != null ? controller.getTrees().getTypeMirror(new VisageTreePath(path, argType)) : null;
     }
 
     private static void log(String s) {

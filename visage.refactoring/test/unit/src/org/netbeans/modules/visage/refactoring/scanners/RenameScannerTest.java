@@ -42,11 +42,11 @@
  *  made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.scanners;
+package org.netbeans.modules.visage.refactoring.scanners;
 
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.refactoring.SourceTestBase;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.Task;
+import org.netbeans.modules.visage.refactoring.SourceTestBase;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 
@@ -61,7 +61,7 @@ public class RenameScannerTest extends SourceTestBase {
 
     public void testCheck() throws Exception {
         FileObject fo = FileUtil.toFileObject(getDataDir());
-        fo = fo.getFileObject("org/netbeans/api/javafx/source/TreeUtilitiesTest.fx");
+        fo = fo.getFileObject("org/netbeans/api/visage/source/TreeUtilitiesTest.fx");
         testInsideSourceTask(fo,
           new Task<CompilationController>() {
             public void run(CompilationController controller) throws Exception {

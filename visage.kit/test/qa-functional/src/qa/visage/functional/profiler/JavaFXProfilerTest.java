@@ -39,13 +39,13 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.profiler;
+package qa.visage.functional.profiler;
 
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.Constant;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
@@ -57,26 +57,26 @@ import org.netbeans.junit.NbTestSuite;
  *
  * @author andromeda
  */
-public class JavaFXProfilerTest extends JavaFXTestCase {
+public class VisageProfilerTest extends VisageTestCase {
 
     static final String[] TESTS = {
         "testProfiler",
     };
 
 
-    public JavaFXProfilerTest(String name) {
+    public VisageProfilerTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXProfilerTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageProfilerTest.class, ".*", ".*", TESTS);
 
     }
 
 
     public void testProfiler() {
         
-        JavaFXProject profilerProject  = JavaFXProject.createProject("SmokeProfiler");
+        VisageProject profilerProject  = VisageProject.createProject("SmokeProfiler");
         EditorOperator main = profilerProject.openMainFile();
         String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
         main.setText(code);

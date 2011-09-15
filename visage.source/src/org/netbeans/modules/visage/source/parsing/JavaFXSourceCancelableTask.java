@@ -40,32 +40,32 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.CompilationPhase;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationPhase;
+import org.netbeans.api.visage.source.VisageParserResult;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.openide.util.Exceptions;
 
 /**
- * JavaFX specific version of the {@link ParserResultTask}. In addition to the
- * {@link ParserResultTask} it adds a support for javafxc phases.
+ * Visage specific version of the {@link ParserResultTask}. In addition to the
+ * {@link ParserResultTask} it adds a support for visagec phases.
  */
-public final class JavaFXSourceCancelableTask extends ParserResultTask<JavaFXParserResult> {
+public final class VisageSourceCancelableTask extends ParserResultTask<VisageParserResult> {
 
-    private final JavaFXSource javaFXSource;
+    private final VisageSource javaFXSource;
     private final CancellableTask<CompilationInfo> task;
     private final CompilationPhase phase;
     private final int priority;
 
-    protected JavaFXSourceCancelableTask(JavaFXSource javaFXSource,
+    protected VisageSourceCancelableTask(VisageSource javaFXSource,
             CancellableTask<CompilationInfo> task,
             CompilationPhase phase, int priority)
     {
@@ -99,7 +99,7 @@ public final class JavaFXSourceCancelableTask extends ParserResultTask<JavaFXPar
     }
 
     @Override
-    public void run(JavaFXParserResult result, SchedulerEvent event) {
+    public void run(VisageParserResult result, SchedulerEvent event) {
         final CompilationController compilationController = CompilationController.create(result);
         assert compilationController != null;
         try {

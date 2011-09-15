@@ -42,11 +42,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import javax.lang.model.element.Element;
 import javax.swing.JComponent;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -54,7 +54,7 @@ import org.openide.util.NbBundle;
 /**
  *
  * @author Tomas Zezula
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
 public class ClassMemberPanel implements NavigatorPanel {
 
@@ -68,18 +68,18 @@ public class ClassMemberPanel implements NavigatorPanel {
     public void panelActivated(Lookup context) {
         assert context != null;
         INSTANCE = this;
-        final ClassMemberNavigatorJavaFXSourceFactory instance = ClassMemberNavigatorJavaFXSourceFactory.getInstance();
+        final ClassMemberNavigatorVisageSourceFactory instance = ClassMemberNavigatorVisageSourceFactory.getInstance();
         if (instance != null) {
             instance.setLookup(context, getClassMemberPanelUI());
             getClassMemberPanelUI().showWaitNode();
         } else {
-            System.err.println("Can't instantiate ClassMemberNavigatorJavaFXSourceFactory ! No navigator will be available."); // NOI18N
+            System.err.println("Can't instantiate ClassMemberNavigatorVisageSourceFactory ! No navigator will be available."); // NOI18N
         }
     }
 
     public void panelDeactivated() {
         getClassMemberPanelUI().showWaitNode(); // To clear the ui
-        final ClassMemberNavigatorJavaFXSourceFactory instance = ClassMemberNavigatorJavaFXSourceFactory.getInstance();
+        final ClassMemberNavigatorVisageSourceFactory instance = ClassMemberNavigatorVisageSourceFactory.getInstance();
         if (instance != null) {
             instance.setLookup(Lookup.EMPTY, null);
         }

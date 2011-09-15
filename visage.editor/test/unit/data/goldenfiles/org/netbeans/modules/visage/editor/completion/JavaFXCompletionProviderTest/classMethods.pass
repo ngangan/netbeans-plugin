@@ -1,16 +1,16 @@
 int INDEFINITE
 boolean autoReverse
 float currentRate
-javafx.lang.Duration cycleDuration
+visage.lang.Duration cycleDuration
 float framerate
 boolean interpolate
-com.sun.javafx.runtime.sequence.Sequence<? extends javafx.animation.KeyFrame> keyFrames
+com.sun.visage.runtime.sequence.Sequence<? extends visage.animation.KeyFrame> keyFrames
 boolean paused
 float rate
 float repeatCount
 boolean running
-javafx.lang.Duration time
-javafx.lang.Duration totalDuration
+visage.lang.Duration time
+visage.lang.Duration totalDuration
 public boolean equals(arg0 : java.lang.Object)
 public void evaluateKeyValues()
 public final native java.lang.Class<?> getClass()

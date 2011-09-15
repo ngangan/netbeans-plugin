@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger;
+package org.netbeans.modules.visage.debugger;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -67,7 +67,7 @@ import org.netbeans.api.debugger.jpda.FieldBreakpoint;
 import org.netbeans.api.debugger.jpda.JPDABreakpoint;
 import org.netbeans.api.debugger.jpda.LineBreakpoint;
 import org.netbeans.api.debugger.jpda.MethodBreakpoint;
-import org.netbeans.modules.javafx.debugger.breakpoints.JavaFXLineBreakpoint;
+import org.netbeans.modules.visage.debugger.breakpoints.VisageLineBreakpoint;
 import org.netbeans.spi.debugger.jpda.EditorContext;
 
 import org.openide.cookies.LineCookie;
@@ -89,15 +89,15 @@ import org.openide.util.WeakSet;
  * @author Admin
  */
 @org.openide.util.lookup.ServiceProvider( service=org.openide.text.AnnotationProvider.class )
-public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, DebuggerManagerListener {
+public class VisageBreakpointAnnotationProvider implements AnnotationProvider, DebuggerManagerListener {
 
-    private final Map<JavaFXLineBreakpoint, Set<Annotation>> breakpointToAnnotations =
-            new IdentityHashMap<JavaFXLineBreakpoint, Set<Annotation>>();
+    private final Map<VisageLineBreakpoint, Set<Annotation>> breakpointToAnnotations =
+            new IdentityHashMap<VisageLineBreakpoint, Set<Annotation>>();
     private final Set<FileObject> annotatedFiles = new WeakSet<FileObject>();
     private Set<PropertyChangeListener> dataObjectListeners;
     private boolean attachManagerListener = true;
     
-    private static RequestProcessor rp = new RequestProcessor( "JavaFXBreakpointAnnotationProvider" );
+    private static RequestProcessor rp = new RequestProcessor( "VisageBreakpointAnnotationProvider" );
 
     public void annotate (Line.Set set, Lookup lookup) {
         final FileObject fo = lookup.lookup(FileObject.class);
@@ -134,10 +134,10 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
                 // Already annotated
                 return ;
             }
-            Set<JavaFXLineBreakpoint> annotatedBreakpoints = breakpointToAnnotations.keySet();
+            Set<VisageLineBreakpoint> annotatedBreakpoints = breakpointToAnnotations.keySet();
             for( Breakpoint breakpoint : DebuggerManager.getDebuggerManager().getBreakpoints()) {
                 if( isAnnotatable( breakpoint )) {
-                    JavaFXLineBreakpoint b = (JavaFXLineBreakpoint) breakpoint;
+                    VisageLineBreakpoint b = (VisageLineBreakpoint) breakpoint;
                     if( !annotatedBreakpoints.contains( b )) {
                         b.addPropertyChangeListener( this );
                         breakpointToAnnotations.put( b, new WeakSet<Annotation>());
@@ -159,12 +159,12 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
 
     public void breakpointAdded(Breakpoint breakpoint) {
         if( isAnnotatable( breakpoint )) {
-            JavaFXLineBreakpoint b = (JavaFXLineBreakpoint) breakpoint;
+            VisageLineBreakpoint b = (VisageLineBreakpoint) breakpoint;
 //            JPDABreakpoint b = (JPDABreakpoint) breakpoint;
             b.addPropertyChangeListener (this);
             RequestProcessor.getDefault().post( new AnnotationRefresh( b, false, true ));
 //            if( b instanceof LineBreakpoint ) {
-                JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint) breakpoint;
+                VisageLineBreakpoint lb = (VisageLineBreakpoint) breakpoint;
                 LineTranslations.getTranslations().registerForLineUpdates( lb );
 //            }
         }
@@ -172,13 +172,13 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
 
     public void breakpointRemoved(Breakpoint breakpoint) {
         if( isAnnotatable( breakpoint )) {
-            JavaFXLineBreakpoint b = (JavaFXLineBreakpoint) breakpoint;
+            VisageLineBreakpoint b = (VisageLineBreakpoint) breakpoint;
 //            JPDABreakpoint b = (JPDABreakpoint) breakpoint;
             b.removePropertyChangeListener( this );
             RequestProcessor.getDefault().post(new AnnotationRefresh( b, true, false));
 //            if (b instanceof LineBreakpoint) {
 //                LineBreakpoint lb = (LineBreakpoint) b;
-                JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint) breakpoint;
+                VisageLineBreakpoint lb = (VisageLineBreakpoint) breakpoint;
                 LineTranslations.getTranslations().unregisterFromLineUpdates(lb);
 //            }
         }
@@ -201,7 +201,7 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
 
         ) return;
 //        JPDABreakpoint b = (JPDABreakpoint) evt.getSource();
-        JavaFXLineBreakpoint b = (JavaFXLineBreakpoint) evt.getSource();
+        VisageLineBreakpoint b = (VisageLineBreakpoint) evt.getSource();
         DebuggerManager manager = DebuggerManager.getDebuggerManager();
         Breakpoint[] bkpts = manager.getBreakpoints();
         boolean found = false;
@@ -220,10 +220,10 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
 
     private final class AnnotationRefresh implements Runnable {
 
-        private JavaFXLineBreakpoint b;
+        private VisageLineBreakpoint b;
         private boolean remove, add;
 
-        public AnnotationRefresh( JavaFXLineBreakpoint b, boolean remove, boolean add ) {
+        public AnnotationRefresh( VisageLineBreakpoint b, boolean remove, boolean add ) {
             this.b = b;
             this.remove = remove;
             this.add = add;
@@ -250,13 +250,13 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
 //                b instanceof FieldBreakpoint ||
 //                b instanceof MethodBreakpoint ) &&
 //               !((JPDABreakpoint) b).isHidden();
-        return ( b instanceof JavaFXLineBreakpoint );
+        return ( b instanceof VisageLineBreakpoint );
     }
 
-    private static String getAnnotationType( JavaFXLineBreakpoint b, boolean isConditional) {
+    private static String getAnnotationType( VisageLineBreakpoint b, boolean isConditional) {
         boolean isInvalid = b.getValidity() == VALIDITY.INVALID;
         String annotationType;
-        if( b instanceof JavaFXLineBreakpoint ) {
+        if( b instanceof VisageLineBreakpoint ) {
             annotationType = b.isEnabled () ?
             (isConditional ? EditorContext.CONDITIONAL_BREAKPOINT_ANNOTATION_TYPE :
                              EditorContext.BREAKPOINT_ANNOTATION_TYPE) :
@@ -278,9 +278,9 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
     }
 
     /** @return The annotation lines or <code>null</code>. */
-    private static int[] getAnnotationLines( JavaFXLineBreakpoint b, FileObject fo) {
-        if( b instanceof JavaFXLineBreakpoint) {
-            JavaFXLineBreakpoint lb = (JavaFXLineBreakpoint) b;
+    private static int[] getAnnotationLines( VisageLineBreakpoint b, FileObject fo) {
+        if( b instanceof VisageLineBreakpoint) {
+            VisageLineBreakpoint lb = (VisageLineBreakpoint) b;
             try {
                 if (fo.getURL().equals(new URL(lb.getURL()))) {
                     return new int[] { lb.getLineNumber() };
@@ -325,14 +325,14 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
     }
 
     // Is called under synchronized (breakpointToAnnotations)
-    private void addAnnotationTo( JavaFXLineBreakpoint b, FileObject fo ) {
+    private void addAnnotationTo( VisageLineBreakpoint b, FileObject fo ) {
         int[] lines = getAnnotationLines(b, fo);
         if (lines == null || lines.length == 0) {
             return ;
         }
         String condition;
-        if( b instanceof JavaFXLineBreakpoint ) {
-            condition = ((JavaFXLineBreakpoint) b).getCondition();
+        if( b instanceof VisageLineBreakpoint ) {
+            condition = ((VisageLineBreakpoint) b).getCondition();
 //        } else if (b instanceof FieldBreakpoint) {
 //            condition = ((FieldBreakpoint) b).getCondition();
 //        } else if (b instanceof MethodBreakpoint) {
@@ -374,7 +374,7 @@ public class JavaFXBreakpointAnnotationProvider implements AnnotationProvider, D
     }
 
     // Is called under synchronized (breakpointToAnnotations)
-    private void removeAnnotations( JavaFXLineBreakpoint b ) {
+    private void removeAnnotations( VisageLineBreakpoint b ) {
         Set<Annotation> annotations = breakpointToAnnotations.remove( b );
         if (annotations == null) return ;
         for (Annotation a : annotations) {

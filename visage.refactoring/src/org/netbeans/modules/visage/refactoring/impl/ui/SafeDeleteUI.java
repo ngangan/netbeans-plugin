@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.ui;
+package org.netbeans.modules.visage.refactoring.impl.ui;
 
 import java.io.IOException;
 import java.util.Collection;

@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -61,27 +61,27 @@ import java.util.Set;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixImportsElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.MoveProblemCollector;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.ImportEntry;
-import org.netbeans.modules.javafx.refactoring.repository.ImportSet;
-import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
-import org.netbeans.modules.javafx.refactoring.repository.Usage;
-import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.FixImportsElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.RenameOccurencesElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
+import org.netbeans.modules.visage.refactoring.impl.scanners.MoveProblemCollector;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.ImportEntry;
+import org.netbeans.modules.visage.refactoring.repository.ImportSet;
+import org.netbeans.modules.visage.refactoring.repository.PackageDef;
+import org.netbeans.modules.visage.refactoring.repository.Usage;
+import org.netbeans.modules.visage.refactoring.transformations.InsertTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.RemoveTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.ReplaceTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
@@ -94,7 +94,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
+public class MoveRefactoringPlugin extends VisageRefactoringPlugin {
     private MoveRefactoring refactoring;
 
     private Map<FileObject, Set<ElementDef>> movingDefs = null;
@@ -129,8 +129,8 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         
         fireProgressListenerStart(MoveRefactoring.PARAMETERS_CHECK, allFiles.size());
         for(FileObject f : allFiles) {
-            if (!SourceUtils.isJavaFXFile(f)) continue;
-            JavaFXSource jfxs = JavaFXSource.forFileObject(f);
+            if (!SourceUtils.isVisageFile(f)) continue;
+            VisageSource jfxs = VisageSource.forFileObject(f);
             try {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
@@ -155,7 +155,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         Problem p = null;
         try {
             for (FileObject f: refactoring.getRefactoringSource().lookupAll(FileObject.class)) {
-                if (!SourceUtils.isJavaFXFile(f))
+                if (!SourceUtils.isVisageFile(f))
                     continue;
                 String targetPackageName = getNewPackageName();
                 if (!SourceUtils.isValidPackageName(targetPackageName)) {
@@ -245,7 +245,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
 
             fireProgressListenerStep();
 
-            if (SourceUtils.isJavaFXFile(file)) {
+            if (SourceUtils.isVisageFile(file)) {
                 final ClassModel cm =RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
 
                 BaseRefactoringElementImplementation ref = null;
@@ -324,7 +324,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
             if (isCancelled()) return;
 
             final Set<ElementDef> edefs = new HashSet<ElementDef>();
-            if (SourceUtils.isJavaFXFile(file)) {
+            if (SourceUtils.isVisageFile(file)) {
                 ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
                 edefs.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
             } else {
@@ -369,7 +369,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
             for(ElementDef edef : edefs) {
                 if (isCancelled()) return;
                 
-                org.netbeans.api.javafx.source.ElementHandle eh = edef.createHandle();
+                org.netbeans.api.visage.source.ElementHandle eh = edef.createHandle();
                 Set<FileObject> fileRelated = ci.getResources(eh, EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES, ClassIndex.SearchKind.IMPLEMENTORS), EnumSet.allOf(ClassIndex.SearchScope.class));
                 String fqn = eh.getQualifiedName();
                 String newFqn = null;
@@ -402,7 +402,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
             fireProgressListenerStep();
             for(FileObject refFo : entry.getValue()) {
                 if (isCancelled()) return null;
-                if (!SourceUtils.isJavaFXFile(refFo)) continue;
+                if (!SourceUtils.isVisageFile(refFo)) continue;
                 RenameOccurencesElement updateRefs = new RenameOccurencesElement(entry.getKey(), newName, refFo, session) {
 
                     @Override
@@ -430,7 +430,7 @@ public class MoveRefactoringPlugin extends JavaFXRefactoringPlugin {
         Collection<BaseRefactoringElementImplementation> refelems = new HashSet<BaseRefactoringElementImplementation>();
         for(FileObject refFo : related) {
             if (isCancelled()) return null;
-            if (!SourceUtils.isJavaFXFile(refFo)) continue;
+            if (!SourceUtils.isVisageFile(refFo)) continue;
             
             fireProgressListenerStep();
             FixImportsElement fixImports = new FixImportsElement(refFo, session) {

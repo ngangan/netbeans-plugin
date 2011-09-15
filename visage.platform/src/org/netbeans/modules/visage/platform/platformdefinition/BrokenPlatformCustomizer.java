@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -60,10 +60,10 @@ import org.openide.util.NbBundle;
  */
 public class BrokenPlatformCustomizer extends javax.swing.JPanel {
 
-    private JavaFXPlatformImpl platform;
+    private VisagePlatformImpl platform;
 
     /** Creates new form BrokenPlatformCustomizer */
-    public BrokenPlatformCustomizer(JavaFXPlatformImpl platform) {
+    public BrokenPlatformCustomizer(VisagePlatformImpl platform) {
         this.platform = platform;
         initComponents();
         postInitComponents ();
@@ -85,9 +85,9 @@ public class BrokenPlatformCustomizer extends javax.swing.JPanel {
 
         setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/platform/platformdefinition/Bundle").getString("MNE_PlatformName").charAt(0));
+        jLabel1.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/platform/platformdefinition/Bundle").getString("MNE_PlatformName").charAt(0));
         jLabel1.setLabelFor(platformName);
-        jLabel1.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/platform/platformdefinition/Bundle").getString("CTL_PlatformName"));
+        jLabel1.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/platform/platformdefinition/Bundle").getString("CTL_PlatformName"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 6);
@@ -102,9 +102,9 @@ public class BrokenPlatformCustomizer extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 12);
         add(platformName, gridBagConstraints);
 
-        jLabel2.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/platform/platformdefinition/Bundle").getString("MNE_PlatformHome").charAt(0));
+        jLabel2.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/platform/platformdefinition/Bundle").getString("MNE_PlatformHome").charAt(0));
         jLabel2.setLabelFor(platformHome);
-        jLabel2.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/platform/platformdefinition/Bundle").getString("CTL_PlatformHome"));
+        jLabel2.setText(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/platform/platformdefinition/Bundle").getString("CTL_PlatformHome"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 0, 6);

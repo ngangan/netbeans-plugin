@@ -42,15 +42,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.archive;
+package org.netbeans.modules.visage.fxd.composer.archive;
 
 import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import javax.swing.JComponent;
-import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.FXZArchive;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.awt.UndoRedo;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;

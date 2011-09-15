@@ -41,12 +41,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation.actions;
+package org.netbeans.modules.visage.navigation.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
-import org.netbeans.modules.javafx.navigation.JavafxdocTopComponent;
+import org.netbeans.modules.visage.navigation.JavafxdocTopComponent;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;

@@ -2,8 +2,8 @@
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="javafx" basedir="." default="default-build">
-    <description>Builds the module suite javafx.</description>
+<project name="visage" basedir="." default="default-build">
+    <description>Builds the module suite visage.</description>
 
     <available file="../nbbuild/netbeans/harness" type="dir" property="harness.dir.default" value="${basedir}/../nbbuild/netbeans/harness"/>
 
@@ -116,30 +116,30 @@
             </sequential>
             <sequential>
                 <!-- TODO: get visage.zip -->
-                <unzip src="visage.zip" dest="build/netbeans/javafx/javafx-sdk"/>
+                <unzip src="visage.zip" dest="build/netbeans/visage/visage-sdk"/>
             </sequential>
         </parallel>
         <antcall target="get-ergonomics"/>
     </target>
 
     <target name="get-sdk-win" if="isWin">
-        <mkdir dir="javafx.sdk.win/external"/>
-        <get src="${javafx-sdk.win.url}" dest="javafx.sdk.win/external/javafx_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <mkdir dir="visage.sdk.win/external"/>
+        <get src="${visage-sdk.win.url}" dest="visage.sdk.win/external/visage_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="get-sdk-mac" if="isMacOSX">
-        <mkdir dir="javafx.sdk.mac/external"/>
-        <get src="${javafx-sdk.mac.url}" dest="javafx.sdk.mac/external/javafx_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <mkdir dir="visage.sdk.mac/external"/>
+        <get src="${visage-sdk.mac.url}" dest="visage.sdk.mac/external/visage_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="get-sdk-lin" if="isLin">
-        <mkdir dir="javafx.sdk.lin/external"/>
-        <get src="${javafx-sdk.lin.url}" dest="javafx.sdk.lin/external/javafx_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <mkdir dir="visage.sdk.lin/external"/>
+        <get src="${visage-sdk.lin.url}" dest="visage.sdk.lin/external/visage_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="get-sdk-sol" if="isSol">
-        <mkdir dir="javafx.sdk.sol/external"/>
-        <get src="${javafx-sdk.sol.url}" dest="javafx.sdk.sol/external/javafx_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <mkdir dir="visage.sdk.sol/external"/>
+        <get src="${visage-sdk.sol.url}" dest="visage.sdk.sol/external/visage_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="files-init" depends="-release.files,-pre-build"/>
@@ -201,7 +201,7 @@
 -->
 <!--        </parallel>-->
         <concat>
-           <filelist dir="build/netbeans/javafx/javafx-sdk" files="timestamp"/>
+           <filelist dir="build/netbeans/visage/visage-sdk" files="timestamp"/>
         </concat>
         
     </target>
@@ -240,47 +240,47 @@
 
     <target name="jar-windows" if="isWin">
       <jar destfile="build/clusters/windows.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
-          <exclude name="javafx-sdk/**"/>
+        <zipfileset dir="build/netbeans/visage" prefix="visage">
+          <exclude name="visage-sdk/**"/>
           <include name="**/*-win.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.win/release" prefix="javafx"/>
+        <zipfileset dir="visage.sdk.win/release" prefix="visage"/>
       </jar>
     </target>
 
     <target name="jar-linux" if="isLin">
-      <property prefix="javafxsdk.lin." file="javafx.sdk.lin/nbproject/project.properties"/>
+      <property prefix="visagesdk.lin." file="visage.sdk.lin/nbproject/project.properties"/>
       <jar destfile="build/clusters/linux.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
-          <exclude name="javafx-sdk/**"/>
+        <zipfileset dir="build/netbeans/visage" prefix="visage">
+          <exclude name="visage-sdk/**"/>
           <include name="**/*-lin.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.lin/release" filemode="755" prefix="javafx" includes="${javafxsdk.lin.nbm.executable.files}"/>
-        <zipfileset dir="javafx.sdk.lin/release"                prefix="javafx" excludes="${javafxsdk.lin.nbm.executable.files}"/>
+        <zipfileset dir="visage.sdk.lin/release" filemode="755" prefix="visage" includes="${visagesdk.lin.nbm.executable.files}"/>
+        <zipfileset dir="visage.sdk.lin/release"                prefix="visage" excludes="${visagesdk.lin.nbm.executable.files}"/>
       </jar>
     </target>
 
     <target name="jar-solaris" if="isSol">
-      <property prefix="javafxsdk.sol." file="javafx.sdk.sol/nbproject/project.properties"/>
+      <property prefix="visagesdk.sol." file="visage.sdk.sol/nbproject/project.properties"/>
       <jar destfile="build/clusters/solaris.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
-          <exclude name="javafx-sdk/**"/>
+        <zipfileset dir="build/netbeans/visage" prefix="visage">
+          <exclude name="visage-sdk/**"/>
           <include name="**/*-sol.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.sol/release" filemode="755" prefix="javafx" includes="${javafxsdk.sol.nbm.executable.files}"/>
-        <zipfileset dir="javafx.sdk.sol/release"                prefix="javafx" excludes="${javafxsdk.sol.nbm.executable.files}"/>
+        <zipfileset dir="visage.sdk.sol/release" filemode="755" prefix="visage" includes="${visagesdk.sol.nbm.executable.files}"/>
+        <zipfileset dir="visage.sdk.sol/release"                prefix="visage" excludes="${visagesdk.sol.nbm.executable.files}"/>
       </jar>
     </target>
 
     <target name="jar-macosx" if="isMacOSX">
-      <property prefix="javafxsdk.mac." file="javafx.sdk.mac/nbproject/project.properties"/>
+      <property prefix="visagesdk.mac." file="visage.sdk.mac/nbproject/project.properties"/>
       <jar destfile="build/clusters/mac.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
-          <exclude name="javafx-sdk/**"/>
+        <zipfileset dir="build/netbeans/visage" prefix="visage">
+          <exclude name="visage-sdk/**"/>
           <include name="**/*-mac.*"/>
         </zipfileset>
-        <zipfileset dir="javafx.sdk.mac/release" filemode="755" prefix="javafx" includes="${javafxsdk.mac.nbm.executable.files}"/>
-        <zipfileset dir="javafx.sdk.mac/release"                prefix="javafx" excludes="${javafxsdk.mac.nbm.executable.files}"/>
+        <zipfileset dir="visage.sdk.mac/release" filemode="755" prefix="visage" includes="${visagesdk.mac.nbm.executable.files}"/>
+        <zipfileset dir="visage.sdk.mac/release"                prefix="visage" excludes="${visagesdk.mac.nbm.executable.files}"/>
       </jar>
     </target>
 
@@ -296,8 +296,8 @@
     <target name="-zip-clusters" depends="-init-zip-clusters" if="do.zip.clusters">
       <mkdir dir="build/clusters"/>
       <jar destfile="build/clusters/common.jar" compress="true" level="9">
-        <zipfileset dir="build/netbeans/javafx" prefix="javafx">
-          <exclude name="javafx-sdk/**"/>
+        <zipfileset dir="build/netbeans/visage" prefix="visage">
+          <exclude name="visage-sdk/**"/>
           <exclude name="**/*-mac.*"/>
           <exclude name="**/*-sol.*"/>
           <exclude name="**/*-win.*"/>
@@ -310,8 +310,8 @@
       <antcall target="jar-macosx" />
     </target>
 
-    <target name="runtests" description="Run JavaFX tests">
-      <subant buildpath="javafx.editor:javafx.lexer"
+    <target name="runtests" description="Run Visage tests">
+      <subant buildpath="visage.editor:visage.lexer"
           target="test"
           inheritall="false"
           inheritrefs="false">
@@ -321,17 +321,17 @@
 
 
     <target name="runtests-report" depends="runtests"
-      description="Run JavaFX tests and generates test report">
+      description="Run Visage tests and generates test report">
       <!-- Collects JUnit results -->
-      <property name="javafx.test.results" location="${nbroot}/build/test/results" />
+      <property name="visage.test.results" location="${nbroot}/build/test/results" />
       <property name="module.results" value="build/test/unit/results/TEST-*.xml" />
-      <mkdir dir="${javafx.test.results}"/>
-      <junitreport todir="${javafx.test.results}">
+      <mkdir dir="${visage.test.results}"/>
+      <junitreport todir="${visage.test.results}">
         <fileset dir="${nbroot}">
-          <include name="javafx.editor/${module.results}"/>
-          <include name="javafx.lexer/${module.results}"/>
+          <include name="visage.editor/${module.results}"/>
+          <include name="visage.lexer/${module.results}"/>
         </fileset>
-        <report format="frames" todir="${javafx.test.results}"/>
+        <report format="frames" todir="${visage.test.results}"/>
       </junitreport>
       <echo message="Unit Test Results: ${nbroot}/build/test/results/index.html"/>
     </target>
@@ -349,7 +349,7 @@
     </target>
 
     <target name="build-ergonomics" depends="-taskdefs">
-        <property name="cluster" value="build/netbeans/javafx"/>
+        <property name="cluster" value="build/netbeans/visage"/>
         <property name="ergonomics.cluster" value="build/netbeans/ergonomics"/>
         <property name="harness.dir" value="build/netbeans/harness"/>
 

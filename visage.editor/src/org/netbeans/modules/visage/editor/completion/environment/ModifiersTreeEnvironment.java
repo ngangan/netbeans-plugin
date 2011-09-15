@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.ModifiersTree;
-import com.sun.javafx.api.tree.Tree;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.ModifiersTree;
+import com.sun.visage.api.tree.Tree;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.Modifier;
 import static javax.lang.model.element.Modifier.*;
@@ -61,7 +61,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<ModifiersTree> {
+public class ModifiersTreeEnvironment extends VisageCompletionEnvironment<ModifiersTree> {
     
     private static final Logger logger = Logger.getLogger(ModifiersTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -71,8 +71,8 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
         if (LOGGABLE) log("inside ModifiersTree " + t); // NOI18N
         ModifiersTree mods = t;
         Set<Modifier> m = EnumSet.noneOf(Modifier.class);
-        final TokenSequence<JFXTokenId> ts = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
-        JFXTokenId lastNonWhitespaceTokenId = null;
+        final TokenSequence<VSGTokenId> ts = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
+        VSGTokenId lastNonWhitespaceTokenId = null;
         while (ts.moveNext() && ts.offset() < offset) {
             lastNonWhitespaceTokenId = ts.token().id();
             switch (lastNonWhitespaceTokenId) {
@@ -93,17 +93,17 @@ public class ModifiersTreeEnvironment extends JavaFXCompletionEnvironment<Modifi
                     break;
             }
         }
-        JavaFXTreePath parentPath = path.getParentPath();
+        VisageTreePath parentPath = path.getParentPath();
         Tree parent = parentPath.getLeaf();
-        JavaFXTreePath grandParentPath = parentPath.getParentPath();
+        VisageTreePath grandParentPath = parentPath.getParentPath();
         Tree grandParent = grandParentPath != null ? grandParentPath.getLeaf() : null;
-        if (parent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+        if (parent.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
             addAccessModifiers(m);
             addClassModifiers(m);
-        } else if (parent.getJavaFXKind() != Tree.JavaFXKind.VARIABLE || grandParent == null || grandParent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+        } else if (parent.getVisageKind() != Tree.VisageKind.VARIABLE || grandParent == null || grandParent.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
             addAccessModifiers(m);
             addVarAccessModifiers(m, false);
-        } else if (parent.getJavaFXKind() == Tree.JavaFXKind.VARIABLE && grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
+        } else if (parent.getVisageKind() == Tree.VisageKind.VARIABLE && grandParent.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION) {
             // no access modifiers for local variables within a function
         } else {
             localResult(null);

@@ -40,26 +40,26 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.VisageParserResult;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
 
-public final class JavaFXParserTask extends UserTask {
+public final class VisageParserTask extends UserTask {
 
     private final ClasspathInfo classpathInfo;
 
-    private JavaFXParserResult result;
+    private VisageParserResult result;
 
-    public JavaFXParserTask(ClasspathInfo classpathInfo) {
+    public VisageParserTask(ClasspathInfo classpathInfo) {
         this.classpathInfo = classpathInfo;
     }
 
     @Override
     public void run(ResultIterator resultIterator) throws Exception {
-        result = (JavaFXParserResult) resultIterator.getParserResult();
+        result = (VisageParserResult) resultIterator.getParserResult();
         assert result != null;
     }
 
@@ -67,7 +67,7 @@ public final class JavaFXParserTask extends UserTask {
         return classpathInfo;
     }
 
-    public JavaFXParserResult result() {
+    public VisageParserResult result() {
         assert result != null;
         return result;
     }

@@ -40,9 +40,9 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.visage.api.tree.Tree.VisageKind;
 import java.util.EnumSet;
 import junit.framework.TestCase;
 
@@ -50,9 +50,9 @@ import junit.framework.TestCase;
  *
  * @author David Strupl
  */
-public class JavaFXCompletionQueryTest extends TestCase {
+public class VisageCompletionQueryTest extends TestCase {
     
-    public JavaFXCompletionQueryTest(String testName) {
+    public VisageCompletionQueryTest(String testName) {
         super(testName);
     }
 
@@ -61,10 +61,10 @@ public class JavaFXCompletionQueryTest extends TestCase {
     
     // XXX: disabled now, cf. issue #175440
     public void DISABLED_testCreateEnvironment() {
-        EnumSet<JavaFXKind> wrongKinds = EnumSet.noneOf(JavaFXKind.class);
-        for (JavaFXKind k : JavaFXKind.values()) {
-            JavaFXCompletionEnvironment e = JavaFXCompletionQuery.createEnvironment(k);
-            if (e.getClass().getName().equals(JavaFXCompletionEnvironment.class.getName())) {
+        EnumSet<VisageKind> wrongKinds = EnumSet.noneOf(VisageKind.class);
+        for (VisageKind k : VisageKind.values()) {
+            VisageCompletionEnvironment e = VisageCompletionQuery.createEnvironment(k);
+            if (e.getClass().getName().equals(VisageCompletionEnvironment.class.getName())) {
                 wrongKinds.add(k);
             }
         }

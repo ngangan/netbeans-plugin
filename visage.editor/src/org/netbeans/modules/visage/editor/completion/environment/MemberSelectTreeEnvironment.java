@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.tools.javafx.api.JavafxcScope;
+import com.sun.visage.api.tree.*;
+import com.sun.tools.visage.api.JavafxcScope;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.logging.Level;
@@ -56,17 +56,17 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.ClassIndex.NameKind;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.ClassIndex.NameKind;
+import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 /**
  * @author David Strupl
  */
-public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<MemberSelectTree> {
+public class MemberSelectTreeEnvironment extends VisageCompletionEnvironment<MemberSelectTree> {
 
     private static final Logger logger = Logger.getLogger(MemberSelectTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -77,8 +77,8 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         if (LOGGABLE) log("inside MemberSelectTree " + fa); // NOI18N
         int expEndPos = (int)sourcePositions.getEndPosition(root, fa.getExpression());
         boolean afterDot = false;
-        JFXTokenId lastNonWhitespaceTokenId = null;
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        VSGTokenId lastNonWhitespaceTokenId = null;
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(expEndPos);
         while (ts.moveNext()) {
             if (ts.offset() >= offset) {
@@ -102,20 +102,20 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
         }
         if (!afterDot) {
             if (expEndPos <= offset) {
-                insideExpression(new JavaFXTreePath(path, fa.getExpression()));
+                insideExpression(new VisageTreePath(path, fa.getExpression()));
             }
             addPackages(""); // NOI18N
             if (LOGGABLE) log("  returning as afterDot==false"); // NOI18N
             return;
         }
 
-        if (lastNonWhitespaceTokenId != JFXTokenId.STAR) {
-            JavaFXTreePath parentPath = path.getParentPath();
+        if (lastNonWhitespaceTokenId != VSGTokenId.STAR) {
+            VisageTreePath parentPath = path.getParentPath();
             Tree parent = parentPath != null ? parentPath.getLeaf() : null;
             if (LOGGABLE) log("  parent == " + parent); // NOI18N
             ExpressionTree exp = fa.getExpression();
             if (LOGGABLE) log("   exp == " + exp); // NOI18N
-            JavaFXTreePath expPath = new JavaFXTreePath(path, exp);
+            VisageTreePath expPath = new VisageTreePath(path, exp);
             TypeMirror type = controller.getTrees().getTypeMirror(expPath);
             if (type != null && type.getKind() == TypeKind.ERROR) {
                 tryToUseSanitizedSource();
@@ -142,7 +142,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                     case LONG:
                     case SHORT:
                     case VOID:
-                        addMembers(type, true, true, null, getScope(), true, !isStatic(el), parent.getJavaFXKind() == Tree.JavaFXKind.IMPORT);
+                        addMembers(type, true, true, null, getScope(), true, !isStatic(el), parent.getVisageKind() == Tree.VisageKind.IMPORT);
                         break;
                     case PACKAGE:
                         addPackages(fullName(exp)+"."); // NOI18N
@@ -158,7 +158,7 @@ public class MemberSelectTreeEnvironment extends JavaFXCompletionEnvironment<Mem
                             addPossibleMembers(el, qualifiedName);
                         }
                 }
-            } else if (parent.getJavaFXKind() == Tree.JavaFXKind.COMPILATION_UNIT && ((UnitTree)parent).getPackageName() == fa) {
+            } else if (parent.getVisageKind() == Tree.VisageKind.COMPILATION_UNIT && ((UnitTree)parent).getPackageName() == fa) {
                 PackageElement pe = controller.getElements().getPackageElement(fullName(exp));
                 if (pe != null) {
                     addPackageContent(pe, EnumSet.of(ElementKind.PACKAGE), null, false);

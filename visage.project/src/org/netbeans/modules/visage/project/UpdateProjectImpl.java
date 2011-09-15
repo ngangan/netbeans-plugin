@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.IOException;
 import javax.swing.JButton;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.modules.java.api.common.ant.UpdateImplementation;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.AuxiliaryConfiguration;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -69,7 +69,7 @@ import org.w3c.dom.Text;
  */
 public class UpdateProjectImpl implements UpdateImplementation {
 
-    private static final boolean TRANSPARENT_UPDATE = Boolean.getBoolean("javafxproject.transparentUpdate"); // NOI18N
+    private static final boolean TRANSPARENT_UPDATE = Boolean.getBoolean("visageproject.transparentUpdate"); // NOI18N
     private static final String BUILD_NUMBER = System.getProperty("netbeans.buildnumber"); // NOI18N
     private static final String MINIMUM_ANT_VERSION_ELEMENT = "minimum-ant-version"; // NOI18N
 
@@ -104,8 +104,8 @@ public class UpdateProjectImpl implements UpdateImplementation {
             public Boolean run() {
                 synchronized (this) {
                     if (isCurrent == null) {
-                        if ((cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/1",true) != null) || // NOI18N
-                        (cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/2",true) != null)) { // NOI18N
+                        if ((cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/1",true) != null) || // NOI18N
+                        (cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/2",true) != null)) { // NOI18N
                             isCurrent = Boolean.FALSE;
                         } else {
                             isCurrent = Boolean.TRUE;
@@ -141,8 +141,8 @@ public class UpdateProjectImpl implements UpdateImplementation {
 
     public void saveUpdate(final EditableProperties props) throws IOException {
         this.helper.putPrimaryConfigurationData(getUpdatedSharedConfigurationData(),true);
-        this.cfg.removeConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/1",true); //NOI18N
-        this.cfg.removeConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/2",true); //NOI18N
+        this.cfg.removeConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/1",true); //NOI18N
+        this.cfg.removeConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/2",true); //NOI18N
         ProjectManager.getDefault().saveProject (this.project);
         synchronized(this) {
             this.isCurrent = Boolean.TRUE;
@@ -151,27 +151,27 @@ public class UpdateProjectImpl implements UpdateImplementation {
 
     public synchronized Element getUpdatedSharedConfigurationData () {
         if (cachedElement == null) {
-            Element  oldRoot = this.cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/1",true);    //NOI18N
+            Element  oldRoot = this.cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/1",true);    //NOI18N
             if (oldRoot != null) {
                 Document doc = oldRoot.getOwnerDocument();
-                Element newRoot = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"data"); //NOI18N
+                Element newRoot = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"data"); //NOI18N
                 copyDocument (doc, oldRoot, newRoot);
-                Element sourceRoots = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");  //NOI18N
-                Element root = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
+                Element sourceRoots = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");  //NOI18N
+                Element root = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
                 root.setAttribute ("id","src.dir");   //NOI18N
                 sourceRoots.appendChild(root);
                 newRoot.appendChild (sourceRoots);
-                Element testRoots = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"test-roots");  //NOI18N
-                root = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
+                Element testRoots = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"test-roots");  //NOI18N
+                root = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
                 root.setAttribute ("id","test.src.dir");   //NOI18N
                 testRoots.appendChild (root);
                 newRoot.appendChild (testRoots);
                 cachedElement = updateMinAntVersion (newRoot, doc);
             } else {
-                oldRoot = this.cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/javafx-project/2",true);    //NOI18N
+                oldRoot = this.cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/2",true);    //NOI18N
                 if (oldRoot != null) {
                     Document doc = oldRoot.getOwnerDocument();
-                    Element newRoot = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"data"); //NOI18N
+                    Element newRoot = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"data"); //NOI18N
                     copyDocument (doc, oldRoot, newRoot);
                     cachedElement = updateMinAntVersion (newRoot, doc);
                     }
@@ -183,8 +183,8 @@ public class UpdateProjectImpl implements UpdateImplementation {
     public synchronized EditableProperties getUpdatedProjectProperties () {
         EditableProperties cachedProperties = this.helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
         //The javadoc.additionalparam was not in NB 4.0
-        if (cachedProperties.get (JavaFXProjectProperties.JAVADOC_ADDITIONALPARAM)==null) {
-            cachedProperties.put (JavaFXProjectProperties.JAVADOC_ADDITIONALPARAM,"");    //NOI18N
+        if (cachedProperties.get (VisageProjectProperties.JAVADOC_ADDITIONALPARAM)==null) {
+            cachedProperties.put (VisageProjectProperties.JAVADOC_ADDITIONALPARAM,"");    //NOI18N
         }
         if (cachedProperties.get ("build.generated.dir")==null) { //NOI18N
             cachedProperties.put ("build.generated.dir","${build.dir}/generated"); //NOI18N
@@ -204,7 +204,7 @@ public class UpdateProjectImpl implements UpdateImplementation {
             switch (node.getNodeType()) {
                 case Node.ELEMENT_NODE:
                     Element oldElement = (Element) node;
-                    newNode = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,oldElement.getTagName());
+                    newNode = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,oldElement.getTagName());
                     NamedNodeMap m = oldElement.getAttributes();
                     Element newElement = (Element) newNode;
                     for (int index = 0; index < m.getLength(); index++) {
@@ -229,12 +229,12 @@ public class UpdateProjectImpl implements UpdateImplementation {
     }
 
     private static Element updateMinAntVersion (final Element root, final Document doc) {
-        NodeList list = root.getElementsByTagNameNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,MINIMUM_ANT_VERSION_ELEMENT);
+        NodeList list = root.getElementsByTagNameNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,MINIMUM_ANT_VERSION_ELEMENT);
         if (list.getLength() == 1) {
             Element me = (Element) list.item(0);
             list = me.getChildNodes();
             if (list.getLength() == 1) {
-                me.replaceChild (doc.createTextNode(JavaFXProjectGenerator.MINIMUM_ANT_VERSION), list.item(0));
+                me.replaceChild (doc.createTextNode(VisageProjectGenerator.MINIMUM_ANT_VERSION), list.item(0));
                 return root;
             }
         }

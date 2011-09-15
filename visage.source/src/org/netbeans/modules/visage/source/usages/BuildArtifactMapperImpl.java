@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.usages;
+package org.netbeans.modules.visage.source.usages;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -39,18 +39,18 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.*;
+import com.sun.visage.api.tree.*;
 
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.TreeUtilities;
-import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.TreeUtilities;
+import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.filesystems.FileObject;
@@ -106,7 +106,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         identifiers.clear(); // clear cache
         List<Result> result = new ArrayList<Result>();
         UnitTree compilationUnit = info.getCompilationUnit();
-        JavaFXThreeVisitor javaFXThreeVisitor = new JavaFXThreeVisitor(info, doc, cancel);
+        VisageThreeVisitor javaFXThreeVisitor = new VisageThreeVisitor(info, doc, cancel);
         javaFXThreeVisitor.scan(compilationUnit, result);
         if (cancel.get()) {
             return true;
@@ -193,13 +193,13 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         }
     }
 
-    private class JavaFXThreeVisitor extends CancellableTreePathScanner<Void, List<Result>> {
+    private class VisageThreeVisitor extends CancellableTreePathScanner<Void, List<Result>> {
 
         private CompilationInfo info;
         private Document doc;
         private TreeUtilities tu;
 
-        public JavaFXThreeVisitor(final CompilationInfo info, final Document doc, final AtomicBoolean cancel) {
+        public VisageThreeVisitor(final CompilationInfo info, final Document doc, final AtomicBoolean cancel) {
             super(cancel);
             this.info = info;
             this.doc = doc;
@@ -208,7 +208,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
         @Override
         public Void visitFunctionDefinition(FunctionDefinitionTree tree, List<Result> list) {
-//            String name = ((JFXFunctionDefinition) tree).getName().toString();
+//            String name = ((VSGFunctionDefinition) tree).getName().toString();
 
             SourcePositions sourcePositions = info.getTrees().getSourcePositions();
             long start = sourcePositions.getStartPosition(info.getCompilationUnit(), getCurrentPath().getLeaf());
@@ -221,10 +221,10 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 Token t = ts.token();
-                if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
+                if (VSGTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
 
@@ -259,7 +259,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
             Token name = null;
 
             ts.moveEnd();
@@ -267,12 +267,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             while (ts.movePrevious()) {
                 Token t = ts.token();
                 if (!metLBrace) {
-                    metLBrace = JFXTokenId.LPAREN.equals(t.id());
+                    metLBrace = VSGTokenId.LPAREN.equals(t.id());
                     if (!metLBrace) {
                         continue;
                     }
                 }
-                if (JFXTokenId.IDENTIFIER.equals(t.id())) {
+                if (VSGTokenId.IDENTIFIER.equals(t.id())) {
                     start = ts.offset();
                     name = t; // last identifier followed left parenthis is a name
                     break;
@@ -311,7 +311,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 // do not highlight parameters and local variables
                 if (element != null && !element.getKind().isField()) {
@@ -319,7 +319,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 }
 
                 Token t = ts.token();
-                if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
+                if (VSGTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
 
@@ -354,7 +354,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 // do not highlight parameters, local variables and packages
                 if (element == null || (element != null && !element.getKind().isField())) {
@@ -362,7 +362,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 }
 
                 Token t = ts.token();
-                if (JFXTokenId.IDENTIFIER.equals(t.id())) {
+                if (VSGTokenId.IDENTIFIER.equals(t.id())) {
                     start = ts.offset();
                     end = start + t.length();
 
@@ -397,10 +397,10 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             Element element = info.getTrees().getElement(getCurrentPath());
             Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
 
-            TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 Token t = ts.token();
-                if (JFXTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
+                if (VSGTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
 
@@ -435,15 +435,15 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             boolean handled = false;
             Element element = info.getTrees().getElement(getCurrentPath());
             if (element != null) {
-                TokenSequence<JFXTokenId> ts = tu.tokensFor(tree);
+                TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
 
                 while (ts.moveNext()) {
                     Token t = ts.token();
                     String tokenStr = t.text().toString();
 
-                    if (JFXTokenId.IDENTIFIER.equals(t.id())) {
+                    if (VSGTokenId.IDENTIFIER.equals(t.id())) {
                         start = ts.offset();
-                        JavaFXTreePath subPath = tu.pathFor(getCurrentPath(), (int) start);
+                        VisageTreePath subPath = tu.pathFor(getCurrentPath(), (int) start);
                         Element subElement = info.getTrees().getElement(subPath);
 
                         if (subElement != null) {

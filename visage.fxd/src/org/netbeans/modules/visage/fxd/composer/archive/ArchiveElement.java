@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.archive;
+package org.netbeans.modules.visage.fxd.composer.archive;
 
 import java.io.Serializable;
 import javax.swing.Action;
@@ -51,8 +51,8 @@ import org.netbeans.core.spi.multiview.CloseOperationState;
 import org.netbeans.core.spi.multiview.MultiViewElement;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.awt.UndoRedo;
 import org.openide.util.Lookup;
 

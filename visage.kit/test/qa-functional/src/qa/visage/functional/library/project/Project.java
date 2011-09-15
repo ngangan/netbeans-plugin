@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package qa.javafx.functional.library.project;
+package qa.visage.functional.library.project;
 
 import org.netbeans.jellytools.MainWindowOperator;
 import org.netbeans.jellytools.nodes.Node;
@@ -48,8 +48,8 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
-import qa.javafx.functional.library.FXTestException;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.FXTestException;
+import qa.visage.functional.library.Util;
 
 /**
  *

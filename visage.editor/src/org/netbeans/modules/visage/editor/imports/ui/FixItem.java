@@ -29,7 +29,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.imports.ui;
+package org.netbeans.modules.visage.editor.imports.ui;
 
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -77,7 +77,7 @@ public class FixItem implements CompletionItem {
         this.element = element;
         this.LOCK = lock;        
         elementHTMLForm = ITEM_COLOR + element + ITEM_END;
-        sortPriority = element.startsWith("javafx.") ? JAVAFX : NORMAL; // NOI18N
+        sortPriority = element.startsWith("visage.") ? JAVAFX : NORMAL; // NOI18N
     }
 
     /**

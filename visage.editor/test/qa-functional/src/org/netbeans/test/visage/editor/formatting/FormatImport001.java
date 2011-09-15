@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.test.javafx.editor.formatting;
+package org.netbeans.test.visage.editor.formatting;
 
 /**
  *
@@ -53,21 +53,21 @@ import org.netbeans.jellytools.actions.SaveAction;
 import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.JEditorPaneOperator;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.test.javafx.editor.lib.JavaFXTestCase;
-import org.netbeans.test.javafx.editor.lib.Util;
+import org.netbeans.test.visage.editor.lib.VisageTestCase;
+import org.netbeans.test.visage.editor.lib.Util;
 import org.openide.filesystems.FileObject;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.junit.diff.LineDiff;
 
-public class FormatImport001 extends JavaFXTestCase {
+public class FormatImport001 extends VisageTestCase {
 
     static String[] TESTS = {
         "testOpenProject",
         "FormatImport001",
         "BackgroundImage",
         "testCloseProject"}; //, "testIDELogForErrors"};
-    public static String _bundle = "org.netbeans.test.javafx.editor.lib.Bundle";
+    public static String _bundle = "org.netbeans.test.visage.editor.lib.Bundle";
 
     protected static final String PROJECT_NAME = "fx-prj-2";
     protected final String DATA_DIR = this.getDataDirAsString();

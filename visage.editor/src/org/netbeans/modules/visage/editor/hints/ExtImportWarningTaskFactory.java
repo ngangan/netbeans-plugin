@@ -41,16 +41,16 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
+import com.sun.visage.api.tree.ImportTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
 import java.util.*;
 import javax.swing.text.Position;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -59,14 +59,14 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class ExtImportWarningTaskFactory extends JavaFXAbstractEditorHint {
+public final class ExtImportWarningTaskFactory extends VisageAbstractEditorHint {
 
-    private static final String HINTS_IDENT = "extimportjavafx"; //NOI18N
-    private static final String IMPORT_NAME_EXT = "javafx.ext."; //NOI18N
+    private static final String HINTS_IDENT = "extimportvisage"; //NOI18N
+    private static final String IMPORT_NAME_EXT = "visage.ext."; //NOI18N
     private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public ExtImportWarningTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     @Override
@@ -86,7 +86,7 @@ public final class ExtImportWarningTaskFactory extends JavaFXAbstractEditorHint 
                 }
 
                 final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-                new JavaFXTreePathScanner<Void, Void>() {
+                new VisageTreePathScanner<Void, Void>() {
 
                     @Override
                     public Void visitImport(final ImportTree node, Void p) {

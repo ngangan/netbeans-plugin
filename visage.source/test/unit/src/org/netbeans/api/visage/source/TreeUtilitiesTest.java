@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import static org.junit.Assert.*;
@@ -65,7 +65,7 @@ public class TreeUtilitiesTest extends SourceTestBase {
     public void testIsSynthetic() throws Exception {
         System.out.println("isSynthetic");
         testInsideSourceTask(
-                "import javafx.scene.shape.Circle;\n" +
+                "import visage.scene.shape.Circle;\n" +
                 "Circle {\n" +
                 "}",
           new Task<CompilationController>() {
@@ -74,7 +74,7 @@ public class TreeUtilitiesTest extends SourceTestBase {
                     throw new Exception("Unable to resolve");
                 }
 
-                JavaFXTreePath currentPath = controller.getTreeUtilities().pathFor(42);
+                VisageTreePath currentPath = controller.getTreeUtilities().pathFor(42);
                 assertFalse( "Tree " + currentPath.getLeaf() + " should not be synthetic.",
                         controller.getTreeUtilities().isSynthetic(currentPath));
 
@@ -88,35 +88,35 @@ public class TreeUtilitiesTest extends SourceTestBase {
     }
 
     public void testPathFor() throws Exception {
-        final Map<Integer, Tree.JavaFXKind> kindMap = new HashMap<Integer, Tree.JavaFXKind>();
-        kindMap.put(0, Tree.JavaFXKind.CLASS_DECLARATION);
-        kindMap.put(176, Tree.JavaFXKind.MEMBER_SELECT);
-        kindMap.put(251, Tree.JavaFXKind.CLASS_DECLARATION);
-        kindMap.put(261, Tree.JavaFXKind.CLASS_DECLARATION);
-        kindMap.put(275, Tree.JavaFXKind.IDENTIFIER);
-        kindMap.put(294, Tree.JavaFXKind.FUNCTION_DEFINITION);
-        kindMap.put(320, Tree.JavaFXKind.FUNCTION_DEFINITION);
-        kindMap.put(349, Tree.JavaFXKind.IDENTIFIER);
-        kindMap.put(365, Tree.JavaFXKind.IDENTIFIER);
-        kindMap.put(376, Tree.JavaFXKind.OBJECT_LITERAL_PART);
-        kindMap.put(187, Tree.JavaFXKind.VARIABLE);
-        kindMap.put(225, Tree.JavaFXKind.VARIABLE);
-        kindMap.put(235, Tree.JavaFXKind.IDENTIFIER);
-        kindMap.put(408, Tree.JavaFXKind.OBJECT_LITERAL_PART);
-        kindMap.put(485, Tree.JavaFXKind.IDENTIFIER);
-        kindMap.put(421, Tree.JavaFXKind.IDENTIFIER);
+        final Map<Integer, Tree.VisageKind> kindMap = new HashMap<Integer, Tree.VisageKind>();
+        kindMap.put(0, Tree.VisageKind.CLASS_DECLARATION);
+        kindMap.put(176, Tree.VisageKind.MEMBER_SELECT);
+        kindMap.put(251, Tree.VisageKind.CLASS_DECLARATION);
+        kindMap.put(261, Tree.VisageKind.CLASS_DECLARATION);
+        kindMap.put(275, Tree.VisageKind.IDENTIFIER);
+        kindMap.put(294, Tree.VisageKind.FUNCTION_DEFINITION);
+        kindMap.put(320, Tree.VisageKind.FUNCTION_DEFINITION);
+        kindMap.put(349, Tree.VisageKind.IDENTIFIER);
+        kindMap.put(365, Tree.VisageKind.IDENTIFIER);
+        kindMap.put(376, Tree.VisageKind.OBJECT_LITERAL_PART);
+        kindMap.put(187, Tree.VisageKind.VARIABLE);
+        kindMap.put(225, Tree.VisageKind.VARIABLE);
+        kindMap.put(235, Tree.VisageKind.IDENTIFIER);
+        kindMap.put(408, Tree.VisageKind.OBJECT_LITERAL_PART);
+        kindMap.put(485, Tree.VisageKind.IDENTIFIER);
+        kindMap.put(421, Tree.VisageKind.IDENTIFIER);
         
         System.out.println("pathFor(pos)");
         FileObject fo = FileUtil.toFileObject(getDataDir());
-        fo = fo.getFileObject("org/netbeans/api/javafx/source/TreeUtilitiesTest.fx");
+        fo = fo.getFileObject("org/netbeans/api/visage/source/TreeUtilitiesTest.fx");
         testInsideSourceTask(fo,
           new Task<CompilationController>() {
             public void run(CompilationController controller) throws Exception {
                 TreeUtilities tu = controller.getTreeUtilities();
-                for(Map.Entry<Integer, Tree.JavaFXKind> entry : kindMap.entrySet()) {
-                    JavaFXTreePath tp = tu.pathFor(entry.getKey());
+                for(Map.Entry<Integer, Tree.VisageKind> entry : kindMap.entrySet()) {
+                    VisageTreePath tp = tu.pathFor(entry.getKey());
                     assertNotNull(tp);
-                    assertEquals("Wrong path @" + entry.getKey() + " " + tp.getLeaf(), entry.getValue(), tp.getLeaf().getJavaFXKind());
+                    assertEquals("Wrong path @" + entry.getKey() + " " + tp.getLeaf(), entry.getValue(), tp.getLeaf().getVisageKind());
                 }
             }
         });

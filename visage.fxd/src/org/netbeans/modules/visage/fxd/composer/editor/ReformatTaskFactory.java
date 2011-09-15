@@ -42,17 +42,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor;
+package org.netbeans.modules.visage.fxd.composer.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.fxd.composer.editor.format.FXDReformatTask;
+import org.netbeans.modules.visage.fxd.composer.editor.format.FXDReformatTask;
 
 /**
- * copied from org.netbeans.modules.javafx.editor
+ * copied from org.netbeans.modules.visage.editor
  * 
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  * @author Andrey Korostelev
@@ -68,7 +68,7 @@ public class ReformatTaskFactory implements ReformatTask.Factory{
      * @return reformatting task or null if the factory cannot handle the given context.
      */
     public ReformatTask createTask(Context context) {
-        if (log.isLoggable(Level.FINE)) log.fine(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/fxd/composer/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
+        if (log.isLoggable(Level.FINE)) log.fine(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/fxd/composer/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
         return new FXDReformatTask(context);
     }
 }

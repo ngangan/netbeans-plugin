@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import java.util.*;
 

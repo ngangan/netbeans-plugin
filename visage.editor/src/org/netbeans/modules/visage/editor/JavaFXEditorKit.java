@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import org.netbeans.api.java.queries.SourceLevelQuery;
 import org.netbeans.editor.BaseAction;
@@ -50,7 +50,7 @@ import org.netbeans.editor.BaseKit;
 import org.netbeans.editor.LocaleSupport;
 import org.netbeans.modules.editor.NbEditorKit;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.javafx.editor.imports.JavaFXImports;
+import org.netbeans.modules.visage.editor.imports.VisageImports;
 import org.openide.loaders.DataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
@@ -60,15 +60,15 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
 import java.awt.event.ActionEvent;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
-import org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent;
-import org.netbeans.modules.javafx.editor.rename.InstantRenameAction;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionProvider;
+import org.netbeans.modules.visage.editor.preview.VisagePreviewTopComponent;
+import org.netbeans.modules.visage.editor.rename.InstantRenameAction;
 import org.openide.util.ImageUtilities;
 
 /**
  * @author answer
  */
-public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.HelpCtx.Provider {
+public class VisageEditorKit extends NbEditorKit implements org.openide.util.HelpCtx.Provider {
 
     private static final String toggleFXPreviewExecution = "toggle-fx-preview-execution";               //NOI18N
     private static final String buttonResetFXPreviewExecution = "toggle-reset-fx-preview-execution";    //NOI18N
@@ -78,9 +78,9 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
     public static final String FX_MIME_TYPE = "text/x-fx";                                              //NOI18N
 
-    private static Logger log = Logger.getLogger(JavaFXEditorKit.class.getName());
+    private static Logger log = Logger.getLogger(VisageEditorKit.class.getName());
 
-    public JavaFXEditorKit() {
+    public VisageEditorKit() {
         super();
     }
 
@@ -92,7 +92,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
     @Override
     public Document createDefaultDocument() {
-        Document doc = new JavaFXDocument(FX_MIME_TYPE);
+        Document doc = new VisageDocument(FX_MIME_TYPE);
         Object mimeType = doc.getProperty("mimeType");                          //NOI18N
         if (mimeType == null) {
             doc.putProperty("mimeType", getContentType());                      //NOI18N
@@ -103,26 +103,26 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     @Override
     protected Action[] createActions() {
         Action[] superActions = super.createActions();
-        Action[] javafxActions = new Action[]{
+        Action[] visageActions = new Action[]{
                 new CommentAction("//"),                                        //NOI18N
                 new UncommentAction("//"),                                      //NOI18N
                 new ToggleCommentAction("//"),                                  //NOI18N
-                new org.netbeans.modules.javafx.editor.semantic.GoToMarkOccurrencesAction(false),
-                new org.netbeans.modules.javafx.editor.semantic.GoToMarkOccurrencesAction(true),
+                new org.netbeans.modules.visage.editor.semantic.GoToMarkOccurrencesAction(false),
+                new org.netbeans.modules.visage.editor.semantic.GoToMarkOccurrencesAction(true),
                 new ToggleFXPreviewExecution(),
-                new JavaFXDefaultKeyTypedAction(),
-                new JavaFXDeleteCharAction(deletePrevCharAction, false),
-                new JavaFXGoToDeclarationAction(),
+                new VisageDefaultKeyTypedAction(),
+                new VisageDeleteCharAction(deletePrevCharAction, false),
+                new VisageGoToDeclarationAction(),
                 new InstantRenameAction(),
-                new JavaFXGoToSourceAction(),
-                new JavaFXGotoHelpAction(),
+                new VisageGoToSourceAction(),
+                new VisageGotoHelpAction(),
                 new SelectCodeElementAction(selectNextElementAction, true),
                 new SelectCodeElementAction(selectPreviousElementAction, false),
-                JavaFXImports.getInstance(),
-//                new JavaFXFormatAction(),
-                new JavaFXInsertBreakAction()
+                VisageImports.getInstance(),
+//                new VisageFormatAction(),
+                new VisageInsertBreakAction()
         };
-        return TextAction.augmentList(superActions, javafxActions);
+        return TextAction.augmentList(superActions, visageActions);
     }
 
 
@@ -135,12 +135,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         public ToggleFXPreviewExecution() {
             super(toggleFXPreviewExecution);
-            putValue(Action.SMALL_ICON, new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/javafx/editor/resources/preview.png"))); // NOI18N
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("toggle-fx-preview-execution")); // NOI18N
+            putValue(Action.SMALL_ICON, new ImageIcon(ImageUtilities.loadImage("org/netbeans/modules/visage/editor/resources/preview.png"))); // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(VisageEditorKit.class).getString("toggle-fx-preview-execution")); // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            JavaFXPreviewTopComponent tc = JavaFXPreviewTopComponent.findInstance();
+            VisagePreviewTopComponent tc = VisagePreviewTopComponent.findInstance();
             if (tc.isOpened()) {
                 tc.close();
             } else {
@@ -155,7 +155,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
             b.setAction(this);
 //            b.setEnabled(Bridge.isStarted());
             b.putClientProperty("enablePreviewMark", Boolean.TRUE);             //NOI18N
-            b.setText(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("preview_toolbar")); // NOI18N
+            b.setText(NbBundle.getBundle("org/netbeans/modules/visage/editor/Bundle").getString("preview_toolbar")); // NOI18N
             return b;
         }
 
@@ -210,7 +210,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
     }
 
-    public static class JavaFXDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
+    public static class VisageDefaultKeyTypedAction extends ExtDefaultKeyTypedAction {
 
         /**
          * Check whether there was any important character typed
@@ -304,9 +304,9 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 //                }
 //            } else {
 //                try {
-//                    TokenSequence<JFXTokenId> seq = BracketCompletion.getTokenSequence(doc, dotPos);
-//                    JFXTokenId id = seq.moveNext() ? seq.token().id() : null;
-//                    if ((id == JFXTokenId.COMMENT || id == JFXTokenId.DOC_COMMENT) && seq.offset() < dotPos) {
+//                    TokenSequence<VSGTokenId> seq = BracketCompletion.getTokenSequence(doc, dotPos);
+//                    VSGTokenId id = seq.moveNext() ? seq.token().id() : null;
+//                    if ((id == VSGTokenId.COMMENT || id == VSGTokenId.DOC_COMMENT) && seq.offset() < dotPos) {
 //                        doc.insertString(dotPos, "* ", null);                       // NOI18N
 //                        caret.setDot(dotPos);
 //                        return dotPos + 3;
@@ -383,9 +383,9 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 //
 //    }
 
-    public static class JavaFXDeleteCharAction extends ExtDeleteCharAction {
+    public static class VisageDeleteCharAction extends ExtDeleteCharAction {
 
-        public JavaFXDeleteCharAction(String nm, boolean nextChar) {
+        public VisageDeleteCharAction(String nm, boolean nextChar) {
             super(nm, nextChar);
         }
 
@@ -397,12 +397,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         @Override
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
-            target.putClientProperty(JavaFXDeleteCharAction.class, this);
+            target.putClientProperty(VisageDeleteCharAction.class, this);
 
             try {
                 super.actionPerformed(evt, target);
             } finally {
-                target.putClientProperty(JavaFXDeleteCharAction.class, null);
+                target.putClientProperty(VisageDeleteCharAction.class, null);
             }
         }
 
@@ -411,7 +411,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
     }
 
-    private static class JavaFXGoToDeclarationAction extends GotoDeclarationAction {
+    private static class VisageGoToDeclarationAction extends GotoDeclarationAction {
         public
         @Override
         boolean gotoDeclaration(JTextComponent target) {
@@ -422,12 +422,12 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
         }
     }
 
-    private static class JavaFXGoToSourceAction extends BaseAction {
+    private static class VisageGoToSourceAction extends BaseAction {
 
         static final long serialVersionUID = -6440495023918097760L;
 
         @SuppressWarnings("deprecation")
-        public JavaFXGoToSourceAction() {
+        public VisageGoToSourceAction() {
             super(gotoSourceAction,
                     ABBREV_RESET | MAGIC_POSITION_RESET | UNDO_MERGE_RESET
                             | SAVE_POSITION
@@ -443,7 +443,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         @Override
         public String getPopupMenuText(JTextComponent target) {
-            return NbBundle.getBundle(JavaFXEditorKit.class).getString("goto_source_open_source_not_formatted"); //NOI18N
+            return NbBundle.getBundle(VisageEditorKit.class).getString("goto_source_open_source_not_formatted"); //NOI18N
         }
 
         @Override
@@ -458,26 +458,26 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
     }
 
     public HelpCtx getHelpCtx() {
-        return new org.openide.util.HelpCtx(JavaFXEditorKit.class);
+        return new org.openide.util.HelpCtx(VisageEditorKit.class);
     }
 
     // TODO do it trough new annotation registration
 //    @EditorActionRegistration(name = BaseKit.formatAction, mimeType = FX_MIME_TYPE)
-//    private static class JavaFXFormatAction extends FormatAction {
-//        public JavaFXFormatAction() {
+//    private static class VisageFormatAction extends FormatAction {
+//        public VisageFormatAction() {
 //            putValue(Action.NAME, BaseKit.formatAction);
 //            setEnabled(false);
 //        }
 //    }
 
-    private static class JavaFXGotoHelpAction extends BaseAction {
+    private static class VisageGotoHelpAction extends BaseAction {
 
-        public JavaFXGotoHelpAction() {
+        public VisageGotoHelpAction() {
             super(gotoHelpAction, ABBREV_RESET | MAGIC_POSITION_RESET
                     | UNDO_MERGE_RESET |SAVE_POSITION);
-            putValue ("helpID", JavaFXGotoHelpAction.class.getName ()); // NOI18N
+            putValue ("helpID", VisageGotoHelpAction.class.getName ()); // NOI18N
             // fix of #25090; [PENDING] there should be more systematic solution for this problem
-            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(JavaFXEditorKit.class).getString("javafx-desc-goto-help")); // NOI18N
+            putValue(SHORT_DESCRIPTION, NbBundle.getBundle(VisageEditorKit.class).getString("visage-desc-goto-help")); // NOI18N
         }
 
         public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -488,7 +488,7 @@ public class JavaFXEditorKit extends NbEditorKit implements org.openide.util.Hel
 
         @Override
         public String getPopupMenuText(JTextComponent target) {
-            return NbBundle.getBundle(JavaFXEditorKit.class).getString("show_javadoc"); // NOI18N
+            return NbBundle.getBundle(VisageEditorKit.class).getString("show_javadoc"); // NOI18N
         }
 
     }

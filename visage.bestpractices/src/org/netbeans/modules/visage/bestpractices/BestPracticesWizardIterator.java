@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.bestpractices;
+package org.netbeans.modules.visage.bestpractices;
 
 import java.awt.Component;
 import java.io.File;
@@ -53,7 +53,7 @@ import java.util.Set;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
@@ -102,7 +102,7 @@ public class BestPracticesWizardIterator implements WizardDescriptor.Instantiati
        
         FileObject mainFile = Repository.getDefault().getDefaultFileSystem().findResource((String) file.getAttribute( "file" )); // NOI18N
         String path = mainFile.getPath().substring( "demos/".length()); // NOI18N
-        AntProjectHelper helper = JavaFXProjectGenerator.createProject( dirF, (String)wizard.getProperty(PROJECT_NAME), 
+        AntProjectHelper helper = VisageProjectGenerator.createProject( dirF, (String)wizard.getProperty(PROJECT_NAME), 
                 new File[] { new File( dirF, "src" ) }, null );
         EditableProperties props = helper.getProperties( AntProjectHelper.PROJECT_PROPERTIES_PATH );
         

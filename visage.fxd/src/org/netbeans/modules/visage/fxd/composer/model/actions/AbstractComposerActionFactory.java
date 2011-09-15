@@ -41,14 +41,14 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model.actions;
+package org.netbeans.modules.visage.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.FXDComposerController;
+import org.netbeans.modules.visage.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *

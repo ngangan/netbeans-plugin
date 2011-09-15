@@ -42,21 +42,21 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.model.actions;
+package org.netbeans.modules.visage.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import javax.swing.Action;
-import org.netbeans.modules.javafx.fxd.composer.model.*;
+import org.netbeans.modules.visage.fxd.composer.model.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import javax.swing.JComponent;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
-import org.netbeans.modules.javafx.fxd.composer.uistub.UIStubGenerator;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookup;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookupUtils;
+import org.netbeans.modules.visage.fxd.composer.uistub.UIStubGenerator;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 
 /**
  *

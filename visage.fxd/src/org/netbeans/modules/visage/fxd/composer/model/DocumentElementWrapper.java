@@ -42,14 +42,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.javafx.tools.fxd.FXDArrayElement;
-import com.sun.javafx.tools.fxd.FXDObjectElement;
-import com.sun.javafx.tools.fxd.FXDReference;
-import com.sun.javafx.tools.fxd.FXDRootElement;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
+import com.sun.visage.tools.fxd.FXDArrayElement;
+import com.sun.visage.tools.fxd.FXDObjectElement;
+import com.sun.visage.tools.fxd.FXDReference;
+import com.sun.visage.tools.fxd.FXDRootElement;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDException;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.lang.reflect.Method;
@@ -60,15 +60,15 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import com.sun.javafx.tools.fxd.container.ContainerEntry;
+import com.sun.visage.tools.fxd.container.ContainerEntry;
 
-import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
+import com.sun.visage.tools.fxd.container.scene.fxd.ContentHandler;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDParser;
 import java.io.Reader;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
+import org.netbeans.modules.visage.fxd.schemamodel.FXDSchemaHelper;
 import org.openide.util.Exceptions;
 
 /**
@@ -78,7 +78,7 @@ import org.openide.util.Exceptions;
 final class DocumentElementWrapper {
     private DocumentElementWrapper() {}
 
-    private static abstract class FXDElementWrapper implements com.sun.javafx.tools.fxd.FXDElement {
+    private static abstract class FXDElementWrapper implements com.sun.visage.tools.fxd.FXDElement {
         protected DocumentElement m_de;
         protected WrappingInfo m_info;
         protected List<DocumentElement> m_children;
@@ -188,15 +188,15 @@ final class DocumentElementWrapper {
     private static class FXDExtendedNodeWrapper extends FXDNodeWrapper {
 
         private FXDReference m_reference;
-        private com.sun.javafx.tools.fxd.FXDObjectElement m_refObj;
+        private com.sun.visage.tools.fxd.FXDObjectElement m_refObj;
         private String m_typeName;
 
-        public FXDExtendedNodeWrapper(WrappingInfo info, final DocumentElement de, com.sun.javafx.tools.fxd.FXDElement parent) {
+        public FXDExtendedNodeWrapper(WrappingInfo info, final DocumentElement de, com.sun.visage.tools.fxd.FXDElement parent) {
             super(info, de);
             initReference(parent);
         }
 
-        private void initReference(com.sun.javafx.tools.fxd.FXDElement parent) {
+        private void initReference(com.sun.visage.tools.fxd.FXDElement parent) {
             try {
                 m_reference = FXDReference.parse(m_de.getName(), parent);
                 m_reference.setResolutionListener(new FXDReference.ResolutionListener() {
@@ -380,7 +380,7 @@ final class DocumentElementWrapper {
         }
 
         public int getKind() {
-            return com.sun.javafx.tools.fxd.FXDElement.KIND_OBJECT;
+            return com.sun.visage.tools.fxd.FXDElement.KIND_OBJECT;
         }
 
         public boolean isLeaf() {            
@@ -514,7 +514,7 @@ final class DocumentElementWrapper {
         }
 
         public int getKind() {
-            return com.sun.javafx.tools.fxd.FXDElement.KIND_ARRAY;
+            return com.sun.visage.tools.fxd.FXDElement.KIND_ARRAY;
         }
 
         public boolean isLeaf() {
@@ -533,7 +533,7 @@ final class DocumentElementWrapper {
                     if ( m_index >= m_children.size()) {
                         throw new NoSuchElementException();
                     }
-                    com.sun.javafx.tools.fxd.FXDElement elem =
+                    com.sun.visage.tools.fxd.FXDElement elem =
                             wrap( m_info, m_children.get(m_index), FXDNodeArrayWrapper.this);
                     m_index = advance(m_index+1);
                     return elem;
@@ -551,24 +551,24 @@ final class DocumentElementWrapper {
     }
 
     /**
-     * wraps root DocumentElemnt into com.sun.javafx.tools.fxd.FXDElement.
+     * wraps root DocumentElemnt into com.sun.visage.tools.fxd.FXDElement.
      * If you want to wrap non-root element, use wrap( DocumentElement, FXDElement) method.
      * @param de root DocumentElement
      * @return FXDElement
      */
-    public static com.sun.javafx.tools.fxd.FXDElement wrap( ContainerEntry ce, DocumentElement de) {
+    public static com.sun.visage.tools.fxd.FXDElement wrap( ContainerEntry ce, DocumentElement de) {
         return wrap(new WrappingInfo(ce, null), de, null);
     }
 
     /**
-     * wraps non-root DocumentElemnt into com.sun.javafx.tools.fxd.FXDElement.
+     * wraps non-root DocumentElemnt into com.sun.visage.tools.fxd.FXDElement.
      * Providing parent FXDElement is necessary.
      * @param de root DocumentElement
      * @param parent parent FXDElement. If null, de is wrapped as root element
      * @return FXDElement
      */
-    static com.sun.javafx.tools.fxd.FXDElement wrap(WrappingInfo info,
-            final DocumentElement de, com.sun.javafx.tools.fxd.FXDElement parent) {
+    static com.sun.visage.tools.fxd.FXDElement wrap(WrappingInfo info,
+            final DocumentElement de, com.sun.visage.tools.fxd.FXDElement parent) {
         if (info.isUnresolved(de)){
             //Logger.getLogger(DocumentElementWrapper.class.getName()).
             //        info("skip wrapping of unresolved refenence in DE: "+de);
@@ -690,7 +690,7 @@ final class DocumentElementWrapper {
             return null;
         }
 
-        public com.sun.javafx.tools.fxd.FXDReference createReference(String string) throws FXDException {
+        public com.sun.visage.tools.fxd.FXDReference createReference(String string) throws FXDException {
             // TODO if we have
             // TODO support references?
             return null;

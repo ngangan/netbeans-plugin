@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
 import com.sun.tools.mjavac.code.Symbol;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.LazyCompletionItem;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
@@ -68,7 +68,7 @@ import org.openide.util.NbBundle;
  *
  * @author Dusan Balek & David Strupl
  */
-public class LazyTypeCompletionItem extends JavaFXCompletionItem implements LazyCompletionItem {
+public class LazyTypeCompletionItem extends VisageCompletionItem implements LazyCompletionItem {
     private static final Logger logger = Logger.getLogger(LazyTypeCompletionItem.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
     
@@ -83,7 +83,7 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
     private String name;
     private String simpleName;
     private String pkgName;
-    private JavaFXCompletionItem delegate = null;
+    private VisageCompletionItem delegate = null;
     private CharSequence sortText;
     private int prefWidth = -1;
     
@@ -111,19 +111,19 @@ public class LazyTypeCompletionItem extends JavaFXCompletionItem implements Lazy
                 compilationController.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(CompilationController controller) throws Exception {
-                        controller.toPhase(JavaFXSource.Phase.ANALYZED);
+                        controller.toPhase(VisageSource.Phase.ANALYZED);
                         if (!isAnnonInner()) {
                             TypeElement e = null;
                             try {
                                 e = handle.resolve(controller);
                             } catch (Exception ex) {
                                 if (LOGGABLE) {
-                                    logger.log(Level.FINE, NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex); // NOI18N
+                                    logger.log(Level.FINE, NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/Bundle").getString("Cannot_resolve_") + handle + " name: " + handle.getQualifiedName(), ex); // NOI18N
                                 }
                             }
                             if (e != null) {
-                                boolean isFx = controller.getJavafxTypes().isJFXClass((Symbol) e);
-                                delegate = JavaFXCompletionItem.createTypeItem(
+                                boolean isFx = controller.getJavafxTypes().isVSGClass((Symbol) e);
+                                delegate = VisageCompletionItem.createTypeItem(
                                     e, (DeclaredType)e.asType(),
                                     substitutionOffset,
                                     controller.getElements().isDeprecated(e),

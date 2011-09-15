@@ -1,17 +1,17 @@
-org.netbeans.modules.javafx.editor.fold.JavaFXElementFoldManagerTaskFactory
-org.netbeans.modules.javafx.editor.semantic.JavaFXSourceHighlightingTaskFactory
-org.netbeans.modules.javafx.editor.semantic.UpToDateTaskFactory
-org.netbeans.modules.javafx.editor.semantic.MarkOccurrencesHighlighterFactory
-org.netbeans.modules.javafx.editor.imports.MarkUnusedImportsTaskFactory
-org.netbeans.modules.javafx.editor.task.WrongPackageStatmentTaskFactory
-org.netbeans.modules.javafx.editor.hints.UncaughtExceptionsTaskFactory
-org.netbeans.modules.javafx.editor.semantic.MarkUnusedElementsTaskFactory
-org.netbeans.modules.javafx.editor.hints.OverrideAllTaskFactory
-#org.netbeans.modules.javafx.editor.hints.MixinNotImplementedAbstractsTaskFactory
-org.netbeans.modules.javafx.editor.hints.MarkOverriddenTaskFactory
-org.netbeans.modules.javafx.editor.hints.AddImportTaskFactory
-org.netbeans.modules.javafx.editor.hints.CreateElementTaskFactory
-org.netbeans.modules.javafx.editor.hints.ExtImportWarningTaskFactory
+org.netbeans.modules.visage.editor.fold.VisageElementFoldManagerTaskFactory
+org.netbeans.modules.visage.editor.semantic.VisageSourceHighlightingTaskFactory
+org.netbeans.modules.visage.editor.semantic.UpToDateTaskFactory
+org.netbeans.modules.visage.editor.semantic.MarkOccurrencesHighlighterFactory
+org.netbeans.modules.visage.editor.imports.MarkUnusedImportsTaskFactory
+org.netbeans.modules.visage.editor.task.WrongPackageStatmentTaskFactory
+org.netbeans.modules.visage.editor.hints.UncaughtExceptionsTaskFactory
+org.netbeans.modules.visage.editor.semantic.MarkUnusedElementsTaskFactory
+org.netbeans.modules.visage.editor.hints.OverrideAllTaskFactory
+#org.netbeans.modules.visage.editor.hints.MixinNotImplementedAbstractsTaskFactory
+org.netbeans.modules.visage.editor.hints.MarkOverriddenTaskFactory
+org.netbeans.modules.visage.editor.hints.AddImportTaskFactory
+org.netbeans.modules.visage.editor.hints.CreateElementTaskFactory
+org.netbeans.modules.visage.editor.hints.ExtImportWarningTaskFactory
 
 
-#org.netbeans.modules.javafx.preview.JavaFXSourcePreviewTaskFactory
+#org.netbeans.modules.visage.preview.VisageSourcePreviewTaskFactory

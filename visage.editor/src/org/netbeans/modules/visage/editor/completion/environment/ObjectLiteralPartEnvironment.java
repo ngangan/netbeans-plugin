@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.tools.javafx.tree.JFXErroneous;
-import com.sun.tools.javafx.tree.JFXObjectLiteralPart;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.tools.visage.tree.VSGErroneous;
+import com.sun.tools.visage.tree.VSGObjectLiteralPart;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
@@ -56,22 +56,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.DeclaredType;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionItem;
 
 /**
  * @author David Strupl
  */
-public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JFXObjectLiteralPart> {
+public class ObjectLiteralPartEnvironment extends VisageCompletionEnvironment<VSGObjectLiteralPart> {
 
-    // -J-Dorg.netbeans.modules.javafx.editor.completion.environment.ObjectLiteralPartEnvironment.level=FINE
+    // -J-Dorg.netbeans.modules.visage.editor.completion.environment.ObjectLiteralPartEnvironment.level=FINE
     private static final Logger logger = Logger.getLogger(ObjectLiteralPartEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXObjectLiteralPart t) throws IOException {
-        if (LOGGABLE) log("inside JFXObjectLiteralPart " + t + "  offset == " + offset); // NOI18N
+    protected void inside(VSGObjectLiteralPart t) throws IOException {
+        if (LOGGABLE) log("inside VSGObjectLiteralPart " + t + "  offset == " + offset); // NOI18N
 
-        if (t.getExpression() instanceof JFXErroneous
+        if (t.getExpression() instanceof VSGErroneous
                 && tryToUseSanitizedSource()) {
             return;
         }
@@ -84,7 +84,7 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
                 if (type.getKind() == TypeKind.DECLARED) {
                     TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
                     if ("java.lang.String".contentEquals(element.getQualifiedName())) { // NOI18N
-                        addResult(JavaFXCompletionItem.createConstantItem(
+                        addResult(VisageCompletionItem.createConstantItem(
                                 query.getComponent().getCaretPosition(), "\"\"", 1)); // NOI18N
                     }
                 }
@@ -96,12 +96,12 @@ public class ObjectLiteralPartEnvironment extends JavaFXCompletionEnvironment<JF
 
     }
 
-    private TypeMirror getSmartType(JFXObjectLiteralPart t) throws IOException {
+    private TypeMirror getSmartType(VSGObjectLiteralPart t) throws IOException {
         if (t.getExpression() == null) {
             return null;
         }
         // note: this is probably wrong
-        TypeMirror type = controller.getTrees().getTypeMirror(new JavaFXTreePath(path, t.getExpression()));
+        TypeMirror type = controller.getTrees().getTypeMirror(new VisageTreePath(path, t.getExpression()));
         // it should instead extract the name of the attribute and extract
         //   the type from the named attribute
         if (LOGGABLE) log("  smart == " + type); // NOI18N

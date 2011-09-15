@@ -42,11 +42,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.ANTLRReaderStream;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.PartType;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.lexer.LexerInput;
@@ -63,23 +63,23 @@ import java.util.logging.Logger;
  *
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  */
-public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
+public class VSGLexer implements org.netbeans.spi.lexer.Lexer<VSGTokenId> {
 
-    private static Logger log = Logger.getLogger(JFXLexer.class.getName());
+    private static Logger log = Logger.getLogger(VSGLexer.class.getName());
     private Lexer lexer;
-    private TokenFactory<JFXTokenId> tokenFactory;
+    private TokenFactory<VSGTokenId> tokenFactory;
     protected LexerInput lexerInput;
-    private LexerRestartInfo<JFXTokenId> info;
+    private LexerRestartInfo<VSGTokenId> info;
     private long st;
 
-    public JFXLexer(LexerRestartInfo<JFXTokenId> info) throws IOException {
+    public VSGLexer(LexerRestartInfo<VSGTokenId> info) throws IOException {
         super();
         if (log.isLoggable(Level.FINE)) log.fine("Creating new lexer"); // NOI18N
         this.lexer = new v4Lexer();
         this.info = info;
     }
 
-    private void configureLexer(LexerRestartInfo<JFXTokenId> info) {
+    private void configureLexer(LexerRestartInfo<VSGTokenId> info) {
         try {
             lexerInput = info.input();
             final LexerInputStream reader = new LexerInputStream();
@@ -101,7 +101,7 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
         }
     }
 
-    public Token<JFXTokenId> nextToken() {
+    public Token<VSGTokenId> nextToken() {
         if (lexer == null) {
             throw new IllegalStateException("Internal implementation of lexer is null. You need to create new instance first!"); // NOI18N
         }
@@ -118,15 +118,15 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
             if (rl > 0) {
                 if (log.isLoggable(Level.WARNING))
                     log.warning("There are still " + rl + " characters unparsed."); // NOI18N
-                return tokenFactory.createToken(JFXTokenId.UNKNOWN, rl);
+                return tokenFactory.createToken(VSGTokenId.UNKNOWN, rl);
             } else {
                 return null;
             }
         }
         String text = token.getText();
-        JFXTokenId id = getId(token);
-        if (JFXTokenId.COMMENT == id && text.startsWith("/**")) { // NOI18N
-            id = JFXTokenId.DOC_COMMENT;
+        VSGTokenId id = getId(token);
+        if (VSGTokenId.COMMENT == id && text.startsWith("/**")) { // NOI18N
+            id = VSGTokenId.DOC_COMMENT;
         }
         assert id != null;
         String fixedText = id.getFixedText();
@@ -138,8 +138,8 @@ public class JFXLexer implements org.netbeans.spi.lexer.Lexer<JFXTokenId> {
                     lexer.getSharedState().failed ? PartType.START : PartType.COMPLETE);
     }
 
-    private JFXTokenId getId(org.antlr.runtime.Token token) {
-        return JFXTokenId.getId(token.getType());
+    private VSGTokenId getId(org.antlr.runtime.Token token) {
+        return VSGTokenId.getId(token.getType());
     }
 
     public Object state() {

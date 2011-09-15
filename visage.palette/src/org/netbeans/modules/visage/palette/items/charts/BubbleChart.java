@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.charts;
+package org.netbeans.modules.visage.palette.items.charts;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class BubbleChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(BubbleChart.class, "TEMPLATE_BubbleChart", targetComponent, "javafx.scene.chart.BubbleChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(BubbleChart.class, "TEMPLATE_BubbleChart", targetComponent, "visage.scene.chart.BubbleChart", "visage.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

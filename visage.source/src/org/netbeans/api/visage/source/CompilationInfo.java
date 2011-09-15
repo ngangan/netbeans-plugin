@@ -39,24 +39,24 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import org.netbeans.modules.javafx.source.CompilationInfoImpl;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
+import org.netbeans.modules.visage.source.CompilationInfoImpl;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.comp.JavafxEnter;
-import com.sun.tools.javafx.comp.JavafxEnv;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXScript;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JFXVar;
-import com.sun.tools.javafx.tree.JavafxTreeScanner;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.code.JavafxTypes;
+import com.sun.tools.visage.comp.JavafxEnter;
+import com.sun.tools.visage.comp.JavafxEnv;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGScript;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.VSGVar;
+import com.sun.tools.visage.tree.JavafxTreeScanner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,7 +68,7 @@ import javax.lang.model.util.Types;
 import javax.swing.text.Document;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.openide.filesystems.FileObject;
@@ -117,17 +117,17 @@ public class CompilationInfo {
         this.impl = impl;
     }
 
-    public JavaFXSource.Phase getPhase() {
+    public VisageSource.Phase getPhase() {
         return impl.getPhase();
     }
     
-    public JavaFXSource.Phase moveToPhase(Phase phase) throws IOException {
+    public VisageSource.Phase moveToPhase(Phase phase) throws IOException {
         return impl.toPhase(phase);
     }
     
     /**
-     * Return the {@link com.sun.tools.javafx.api.JavafxcTrees} service of the javafxc represented by this {@link CompilationInfo}.
-     * @return javafxc Trees service
+     * Return the {@link com.sun.tools.visage.api.JavafxcTrees} service of the visagec represented by this {@link CompilationInfo}.
+     * @return visagec Trees service
      */
     public JavafxcTrees getTrees() {
         return JavafxcTrees.instance(impl.getJavafxcTaskImpl());
@@ -138,8 +138,8 @@ public class CompilationInfo {
     }
 
     // XXX: hack around lack of support in compiler
-    public JavaFXTreePath getPath(Element e) {
-        JFXTree tree = (JFXTree)getTree(e);
+    public VisageTreePath getPath(Element e) {
+        VSGTree tree = (VSGTree)getTree(e);
         return tree == null ? null : getTrees().getPath(getCompilationUnit(), tree);
     }
 
@@ -153,19 +153,19 @@ public class CompilationInfo {
         return declarationFor(sym, env.tree);
     }
 
-    private static JFXTree declarationFor(final Symbol sym, final JFXTree tree) {
+    private static VSGTree declarationFor(final Symbol sym, final VSGTree tree) {
 
         class DeclScanner extends JavafxTreeScanner {
 
-            JFXTree result = null;
+            VSGTree result = null;
 
-            public @Override void scan(JFXTree tree) {
+            public @Override void scan(VSGTree tree) {
                 if (tree != null && result == null) {
                     tree.accept(this);
                 }
             }
 
-            public @Override void visitScript( JFXScript that) {
+            public @Override void visitScript( VSGScript that) {
                 if (that.packge == sym) {
                     result = that;
                 } else {
@@ -175,7 +175,7 @@ public class CompilationInfo {
 
             public 
             @Override
-            void visitClassDeclaration( JFXClassDeclaration that) {
+            void visitClassDeclaration( VSGClassDeclaration that) {
                 if (that.sym == sym) {
                     result = that;
                 } else {
@@ -185,7 +185,7 @@ public class CompilationInfo {
 
             public 
             @Override
-            void visitFunctionDefinition( JFXFunctionDefinition that) {
+            void visitFunctionDefinition( VSGFunctionDefinition that) {
                 if (that.sym == sym) {
                     result = that;
                 } else {
@@ -196,7 +196,7 @@ public class CompilationInfo {
 
             public 
             @Override
-            void visitVar( JFXVar that) {
+            void visitVar( VSGVar that) {
                 if (that.sym == sym) {
                     result = that;
                 } else {
@@ -224,11 +224,11 @@ public class CompilationInfo {
     }
 
     /**
-     * Returns the javafxc tree representing the source file.
+     * Returns the visagec tree representing the source file.
      * @return {@link CompilationUnitTree} the compilation unit cantaining the top level classes contained in the,
-     * javafx source file.
+     * visage source file.
      * 
-     * @throws java.lang.IllegalStateException  when the phase is less than {@link JavaFXSource.Phase#PARSED}
+     * @throws java.lang.IllegalStateException  when the phase is less than {@link VisageSource.Phase#PARSED}
      */
     public UnitTree getCompilationUnit() {
         return impl.getCompilationUnit();
@@ -276,12 +276,12 @@ public class CompilationInfo {
         final JavafxcTrees trees = getTrees();
         assert trees != null;
         List<? extends Tree> typeDecls = cu.getTypeDecls();
-        JavaFXTreePath cuPath = new JavaFXTreePath(cu);
+        VisageTreePath cuPath = new VisageTreePath(cu);
         for (Tree t : typeDecls) {
             if (t == null) {
                 continue;
             }
-            JavaFXTreePath p = new JavaFXTreePath(cuPath, t);
+            VisageTreePath p = new VisageTreePath(cuPath, t);
             Element e = trees.getElement(p);
             if (e != null && (e.getKind().isClass() || e.getKind().isInterface())) {
                 result.add((TypeElement) e);

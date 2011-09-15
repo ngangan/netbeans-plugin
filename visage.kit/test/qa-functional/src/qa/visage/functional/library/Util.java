@@ -43,7 +43,7 @@
  */
 
 
-package qa.javafx.functional.library;
+package qa.visage.functional.library;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -108,7 +108,7 @@ public class Util {
     }
 
     public static File getXtestNBMsPath() {
-        return new File(new File(XTEST_DATA_PATH).getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile(), "nbbuild/nbms/javafx");
+        return new File(new File(XTEST_DATA_PATH).getParentFile().getParentFile().getParentFile().getParentFile().getParentFile().getParentFile(), "nbbuild/nbms/visage");
     }
 
     public static String getSampleText(String example) {

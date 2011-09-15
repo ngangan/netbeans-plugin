@@ -42,10 +42,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -69,7 +69,7 @@ public class LexerTestBase {
     private TokenSequence<?> ts;
 
     protected void setUp() {
-        initJavaFXDocument();
+        initVisageDocument();
     }
 
     protected void tearDown() {
@@ -78,7 +78,7 @@ public class LexerTestBase {
         ts = null;
     }
 
-    protected void assertNextTokenIs(JFXTokenId id, String text, int offset) {
+    protected void assertNextTokenIs(VSGTokenId id, String text, int offset) {
         assertTrue(ts.moveNext());
         LexerTestUtilities.assertTokenEquals(ts,id, text, offset);
     }
@@ -120,11 +120,11 @@ public class LexerTestBase {
         initTokenSequence();
     }
 
-    private void initJavaFXDocument() {
+    private void initVisageDocument() {
         doc = new ModificationTextDocument();
         assertNotNull(doc );
         // Assign a language to the document
-        doc.putProperty(Language.class,JFXTokenId.language());
+        doc.putProperty(Language.class,VSGTokenId.language());
     }
     
     private void initTokenSequence() {

@@ -42,25 +42,25 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.util.*;
 import javax.lang.model.element.ElementKind;
 import javax.swing.Action;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
-import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.Usage;
-import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.api.visage.source.ClassIndex.SearchKind;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.ui.WhereUsedQueryUI;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.Usage;
+import org.netbeans.modules.visage.refactoring.transformations.RemoveTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.*;
 import org.netbeans.modules.refactoring.java.api.WhereUsedQueryConstants;
 import org.netbeans.modules.refactoring.spi.*;
@@ -80,7 +80,7 @@ import org.openide.util.lookup.Lookups;
  *
  * Copied over from the java implementation
  */
-public class SafeDeleteRefactoringPlugin extends JavaFXRefactoringPlugin {
+public class SafeDeleteRefactoringPlugin extends VisageRefactoringPlugin {
     private SafeDeleteRefactoring refactoring;
     private WhereUsedQuery[] whereUsedQueries;
     
@@ -129,7 +129,7 @@ public class SafeDeleteRefactoringPlugin extends JavaFXRefactoringPlugin {
         //This class expects too many details from SafeDeleteRefactoring
         //But there's no other go I guess.
         grips.clear();
-        for (final FileObject f: lookupJavaFXFileObjects()) {
+        for (final FileObject f: lookupVisageFileObjects()) {
             ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(f);
 
             grips.addAll(cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM)));
@@ -221,7 +221,7 @@ public class SafeDeleteRefactoringPlugin extends JavaFXRefactoringPlugin {
         }
 
         if (isCancelled()) return null;
-        if (lookupJavaFXFileObjects().isEmpty()) { // element deletion; no associated file
+        if (lookupVisageFileObjects().isEmpty()) { // element deletion; no associated file
             for(ElementDef refdef : refactoring.getRefactoringSource().lookupAll(ElementDef.class)) {
                 if (isCancelled()) return null;
                 
@@ -271,17 +271,17 @@ public class SafeDeleteRefactoringPlugin extends JavaFXRefactoringPlugin {
         return objs;
     }
 
-    private Collection<? extends FileObject> lookupJavaFXFileObjects() {
+    private Collection<? extends FileObject> lookupVisageFileObjects() {
         Lookup lkp = refactoring.getRefactoringSource();
         Collection<? extends FileObject> javaFXFiles = null;
         NonRecursiveFolder folder = lkp.lookup(NonRecursiveFolder.class);
         if (folder != null) {
-            javaFXFiles = getJavaFXFileObjects(folder.getFolder(), false);
+            javaFXFiles = getVisageFileObjects(folder.getFolder(), false);
         } else {
             Collection<FileObject> javaFXFileObjects =  new ArrayList<FileObject>();
             for (FileObject fileObject : lkp.lookupAll(FileObject.class)) {
                 if (fileObject.isFolder()) {
-                    javaFXFileObjects.addAll(getJavaFXFileObjects(fileObject, true));
+                    javaFXFileObjects.addAll(getVisageFileObjects(fileObject, true));
                 }else if (SourceUtils.isRefactorable(fileObject)) {
                     javaFXFileObjects.add(fileObject);
                 }
@@ -291,7 +291,7 @@ public class SafeDeleteRefactoringPlugin extends JavaFXRefactoringPlugin {
         return javaFXFiles;
     }
 
-     private static Collection<FileObject> getJavaFXFileObjects(FileObject dirFileObject, boolean isRecursive){
+     private static Collection<FileObject> getVisageFileObjects(FileObject dirFileObject, boolean isRecursive){
         Collection<FileObject> javaSrcFiles = new ArrayList<FileObject>();
         addSourcesInDir(dirFileObject, isRecursive, javaSrcFiles);
         return javaSrcFiles;

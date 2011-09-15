@@ -41,13 +41,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl.ui;
+package org.netbeans.modules.visage.refactoring.impl.ui;
 
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 import javax.swing.event.ChangeListener;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.WhereUsedQuery;
 import org.netbeans.modules.refactoring.java.api.WhereUsedQueryConstants;

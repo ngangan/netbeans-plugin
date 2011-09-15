@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -54,9 +54,9 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.ui.customizer.CustomizerLibraries;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.ui.customizer.CustomizerLibraries;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.ReferenceHelper;
 import org.netbeans.spi.project.ui.support.NodeFactory;
@@ -76,7 +76,7 @@ public final class LibrariesNodeFactory implements NodeFactory {
     }
 
     public NodeList createNodes(Project p) {
-        JavaFXProject project = (JavaFXProject)p.getLookup().lookup(JavaFXProject.class);
+        VisageProject project = (VisageProject)p.getLookup().lookup(VisageProject.class);
         assert project != null;
         return new LibrariesNodeList(project);
     }
@@ -86,17 +86,17 @@ public final class LibrariesNodeFactory implements NodeFactory {
         private static final String TEST_LIBRARIES = "TestLibs"; //NOI18N
 
         private SourceRoots testSources;
-        private JavaFXProject project;
+        private VisageProject project;
         private final ChangeSupport changeSupport = new ChangeSupport(this);
 
         private PropertyEvaluator evaluator;
         private UpdateHelper helper;
         private ReferenceHelper resolver;
         
-        LibrariesNodeList(JavaFXProject proj) {
+        LibrariesNodeList(VisageProject proj) {
             project = proj;
             testSources = project.getTestSourceRoots();
-            JavaFXLogicalViewProvider logView = (JavaFXLogicalViewProvider)project.getLookup().lookup(JavaFXLogicalViewProvider.class);
+            VisageLogicalViewProvider logView = (VisageLogicalViewProvider)project.getLookup().lookup(VisageLogicalViewProvider.class);
             assert logView != null;
             evaluator = logView.getEvaluator();
             helper = logView.getUpdateHelper();
@@ -133,14 +133,14 @@ public final class LibrariesNodeFactory implements NodeFactory {
             if (key == LIBRARIES) {
                 //Libraries Node
                 return  
-                    new LibrariesNode(NbBundle.getMessage(JavaFXLogicalViewProvider.class,"CTL_LibrariesNode"), // NOI18N
-                        project, evaluator, helper, resolver, JavaFXProjectProperties.RUN_CLASSPATH,
-                        new String[] {JavaFXProjectProperties.BUILD_CLASSES_DIR},
+                    new LibrariesNode(NbBundle.getMessage(VisageLogicalViewProvider.class,"CTL_LibrariesNode"), // NOI18N
+                        project, evaluator, helper, resolver, VisageProjectProperties.RUN_CLASSPATH,
+                        new String[] {VisageProjectProperties.BUILD_CLASSES_DIR},
                         "platform.active", // NOI18N
                         new Action[] {
-                            LibrariesNode.createAddProjectAction(project, JavaFXProjectProperties.JAVAC_CLASSPATH),
-                            LibrariesNode.createAddLibraryAction(project, JavaFXProjectProperties.JAVAC_CLASSPATH),
-                            LibrariesNode.createAddFolderAction(project, JavaFXProjectProperties.JAVAC_CLASSPATH),
+                            LibrariesNode.createAddProjectAction(project, VisageProjectProperties.JAVAC_CLASSPATH),
+                            LibrariesNode.createAddLibraryAction(project, VisageProjectProperties.JAVAC_CLASSPATH),
+                            LibrariesNode.createAddFolderAction(project, VisageProjectProperties.JAVAC_CLASSPATH),
                             null,
                             new SourceNodeFactory.PreselectPropertiesAction(project, "Libraries", CustomizerLibraries.COMPILE), // NOI18N
                         }

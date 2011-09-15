@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.beans.PropertyChangeListener;
 import org.netbeans.api.java.platform.JavaPlatform;
@@ -49,7 +49,7 @@ import org.netbeans.modules.java.platform.JavaPlatformProvider;
 
 
 @org.openide.util.lookup.ServiceProvider(service=org.netbeans.modules.java.platform.JavaPlatformProvider.class)
-public class JavaFXTestPlatformProvider implements JavaPlatformProvider {
+public class VisageTestPlatformProvider implements JavaPlatformProvider {
 
     public JavaPlatform[] getInstalledPlatforms() {
         return new JavaPlatform[] {

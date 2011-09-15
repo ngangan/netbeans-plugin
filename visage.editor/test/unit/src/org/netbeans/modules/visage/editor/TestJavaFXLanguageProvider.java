@@ -41,9 +41,9 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.InputAttributes;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.LanguagePath;
@@ -51,11 +51,11 @@ import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.lexer.LanguageEmbedding;
 import org.netbeans.spi.lexer.LanguageProvider;
 
-public class TestJavaFXLanguageProvider extends LanguageProvider {
+public class TestVisageLanguageProvider extends LanguageProvider {
 
     @Override
     public Language<?> findLanguage(String mimeType) {
-        return JFXTokenId.language();
+        return VSGTokenId.language();
     }
 
     @Override

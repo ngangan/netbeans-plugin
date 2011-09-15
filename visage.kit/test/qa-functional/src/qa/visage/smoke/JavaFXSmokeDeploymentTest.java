@@ -39,24 +39,24 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.smoke;
+package qa.visage.smoke;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.DeploymentType;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.DeploymentType;
+import qa.visage.functional.library.project.VisageProject;
 
 /**
  *
  * @author andromeda
  */
-public class JavaFXSmokeDeploymentTest extends JavaFXTestCase {
+public class VisageSmokeDeploymentTest extends VisageTestCase {
 
-    public JavaFXSmokeDeploymentTest(String name) {
+    public VisageSmokeDeploymentTest(String name) {
         super(name);
     }
     static String[] TESTS = {
@@ -64,16 +64,16 @@ public class JavaFXSmokeDeploymentTest extends JavaFXTestCase {
     };
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXSmokeDeploymentTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageSmokeDeploymentTest.class, ".*", ".*", TESTS);
 
     }
 
     public static void main(String[] args) {
-        TestRunner.run(new NbTestSuite(JavaFXSmokeDeploymentTest.class));
+        TestRunner.run(new NbTestSuite(VisageSmokeDeploymentTest.class));
     }
 
     public void testDeploymentMobile() {
-        JavaFXProject project = JavaFXProject.createProject("SmokeDeploymentMobile", DeploymentType.MOBILE);
+        VisageProject project = VisageProject.createProject("SmokeDeploymentMobile", DeploymentType.MOBILE);
         try{
             project.deploy();
             //assertTrue(project.getOutput().getText(), project.isDeployPass());

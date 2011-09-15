@@ -41,15 +41,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import com.sun.tools.visage.code.JavafxClassSymbol;
+import com.sun.tools.visage.code.JavafxTypes;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Symbol.VarSymbol;
@@ -63,8 +63,8 @@ import javax.lang.model.element.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.source.CancellableTask;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
@@ -73,18 +73,18 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
+public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
 
     private static final String ERROR_CODE1 = "compiler.err.does.not.override.abstract"; //NOI18N
     private static final String ERROR_CODE2 = "compiler.err.abstract.cant.be.instantiated"; //NOI18N
-    private static final String HINT_IDENT = "overridejavafx"; //NOI18N
+    private static final String HINT_IDENT = "overridevisage"; //NOI18N
     private static final String NATIVE_STRING = "nativearray of "; //NOI18N
     private final AtomicBoolean cancel = new AtomicBoolean();
     private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
     //private final static Logger LOG = Logger.getAnonymousLogger();
 
     public OverrideAllTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.NORMAL);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.NORMAL);
     }
 
     @Override
@@ -126,11 +126,11 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
         final ClassSymbol classSymbol = getClassSymbol(diagnostic);
 
         final boolean[] active = new boolean[1];
-        new JavaFXTreePathScanner<Void, Void>() {
+        new VisageTreePathScanner<Void, Void>() {
 
             @Override
             public Void visitClassDeclaration(ClassDeclarationTree node, Void v) {
-                JavaFXTreePath path = getCurrentPath();
+                VisageTreePath path = getCurrentPath();
                 Element element = compilationInfo.getTrees().getElement(path);
                 if (element == classSymbol && !node.getMixins().isEmpty()) {
                     active[0] = true;
@@ -398,7 +398,7 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
 
     private static String getTypeString(Type type, JavafxTypes types) {
         type = erasureType(type, types);
-        String typeString = types.toJavaFXString(type);
+        String typeString = types.toVisageString(type);
         if (types.isArray(type)) {
             typeString = getNativeArrayClassSimpleName(typeString);
         } else {
@@ -414,7 +414,7 @@ public final class OverrideAllTaskFactory extends JavaFXAbstractEditorHint {
     }
 
     private static Collection<? extends Element> getAllMembers(CompilationInfo compilationInfo, Element element) {
-//        JavaFXTreePath path = compilationInfo.getTreeUtilities().pathFor(position);
+//        VisageTreePath path = compilationInfo.getTreeUtilities().pathFor(position);
 //        Element element = compilationInfo.getTrees().getElement(path);
 //        ClassSymbol classSymbol = null;
 //        if (element instanceof ClassSymbol) {

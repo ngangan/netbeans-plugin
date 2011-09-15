@@ -40,23 +40,23 @@
  * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.OverrideClassVarTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.VariableTree;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.OverrideClassVarTree;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.VariableTree;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXErroneousType;
+import com.sun.tools.visage.code.JavafxTypes;
+import com.sun.tools.visage.tree.VSGErroneousType;
 
-import com.sun.tools.javafx.tree.JFXSelect;
+import com.sun.tools.visage.tree.VSGSelect;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.LAZY_KEYWORD;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.LAZY_KEYWORD;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -67,7 +67,7 @@ import javax.lang.model.element.TypeElement;
 /**
  * @author David Strupl
  */
-public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<VariableTree> {
+public class VariableTreeEnvironment extends VisageCompletionEnvironment<VariableTree> {
 
     private static final Logger logger = Logger.getLogger(VariableTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -75,7 +75,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
     @Override
     protected void inside(VariableTree t) throws IOException {
         if (LOGGABLE) log("inside VariableTree " + t + "  offset == " + offset); // NOI18N
-        boolean isLocal = path.getParentPath().getLeaf().getJavaFXKind() != Tree.JavaFXKind.CLASS_DECLARATION;
+        boolean isLocal = path.getParentPath().getLeaf().getVisageKind() != Tree.VisageKind.CLASS_DECLARATION;
         boolean isOverride = t instanceof OverrideClassVarTree;
 
         if (isOverride & !isLocal) {
@@ -93,32 +93,32 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
         if (type == null) {
             typePos = 0;
         } else {
-            typePos = type.getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS && ((JFXErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+            typePos = type.getVisageKind() == Tree.VisageKind.ERRONEOUS && ((VSGErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
         }
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos); // NOI18N
         if (offset <= typePos) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-            if ((last != null) && (last.token().id() == JFXTokenId.COLON)){
+            if ((last != null) && (last.token().id() == VSGTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
                 addBasicTypes();
             }
             return;
         }
-        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
+        TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
         if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id())); // NOI18N
-        if ((last != null) && (last.token().id() == JFXTokenId.EQ ||
-                last.token().id() == JFXTokenId.BIND  ||
-                last.token().id() == JFXTokenId.LAZY)) {
+        if ((last != null) && (last.token().id() == VSGTokenId.EQ ||
+                last.token().id() == VSGTokenId.BIND  ||
+                last.token().id() == VSGTokenId.LAZY)) {
             localResult(getSmartType(t));
             addValueKeywords();
-            if (last.token().id() == JFXTokenId.BIND) {
+            if (last.token().id() == VSGTokenId.BIND) {
                 addKeyword(LAZY_KEYWORD, null, false);
             }
         }
         ExpressionTree initializer = t.getInitializer();
-        if (initializer instanceof JFXSelect) {
-            String typeS = ((JFXSelect) initializer).getExpression().toString();
+        if (initializer instanceof VSGSelect) {
+            String typeS = ((VSGSelect) initializer).getExpression().toString();
             addAllTypes(null, false, typeS);
         }
         addLocalMembersAndVars(getSmartType(t));
@@ -131,7 +131,7 @@ public class VariableTreeEnvironment extends JavaFXCompletionEnvironment<Variabl
             if (LOGGABLE) log("  getSmartType no initializer"); // NOI18N
             return null;
         }
-        final JavaFXTreePath treePath = new JavaFXTreePath(path, t.getInitializer());
+        final VisageTreePath treePath = new VisageTreePath(path, t.getInitializer());
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type); // NOI18N
         if (type == null) {

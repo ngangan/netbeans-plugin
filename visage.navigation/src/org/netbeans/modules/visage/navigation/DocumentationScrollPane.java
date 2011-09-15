@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -64,7 +64,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 import javax.swing.text.html.HTMLDocument;
 
-import org.netbeans.api.javafx.editor.ElementJavadoc;
+import org.netbeans.api.visage.editor.ElementJavadoc;
 import org.netbeans.editor.*;
 
 import org.openide.awt.HtmlBrowser;
@@ -77,10 +77,10 @@ import org.openide.util.NbBundle;
  */
 public class DocumentationScrollPane extends JScrollPane {
 
-    private static final String BACK = "org/netbeans/modules/javafx/navigation/resources/back.png"; //NOI18N
-    private static final String FORWARD = "org/netbeans/modules/javafx/navigation/resources/forward.png"; //NOI18N
-    private static final String GOTO_SOURCE = "org/netbeans/modules/javafx/navigation/resources/open_source_in_editor.png"; //NOI18N
-    private static final String SHOW_WEB = "org/netbeans/modules/javafx/navigation/resources/open_in_external_browser.png"; //NOI18N
+    private static final String BACK = "org/netbeans/modules/visage/navigation/resources/back.png"; //NOI18N
+    private static final String FORWARD = "org/netbeans/modules/visage/navigation/resources/forward.png"; //NOI18N
+    private static final String GOTO_SOURCE = "org/netbeans/modules/visage/navigation/resources/open_source_in_editor.png"; //NOI18N
+    private static final String SHOW_WEB = "org/netbeans/modules/visage/navigation/resources/open_in_external_browser.png"; //NOI18N
 
     private static final String JAVADOC_BACK = "javadoc-back"; //NOI18N
     private static final String JAVADOC_FORWARD = "javadoc-forward"; //NOI18N    

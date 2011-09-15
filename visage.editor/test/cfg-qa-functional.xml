@@ -59,7 +59,7 @@ made subject to such option by the copyright holder.
     <testbag testattribs="completion,all,stable" name="Completion-Validation" compiler="qa-functional-compiler-completion" >
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/editor/completion/*CCTests.class"/>
+                <include name="org/netbeans/test/visage/editor/completion/*CCTests.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -67,7 +67,7 @@ made subject to such option by the copyright holder.
     <testbag testattribs="completiongui,all" name="Completion GUI tests" compiler="qa-functional-compiler-completion" >
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/editor/completiongui/*Test.class"/>
+                <include name="org/netbeans/test/visage/editor/completiongui/*Test.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -75,7 +75,7 @@ made subject to such option by the copyright holder.
     <testbag testattribs="devel" name="Testcases under development" compiler="qa-functional-compiler-completion">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/editor/completion/SmartCCTests.class"/>
+                <include name="org/netbeans/test/visage/editor/completion/SmartCCTests.class"/>
             </patternset>
         </testset>
     </testbag>

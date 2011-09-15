@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -69,7 +69,7 @@ import org.openide.text.IndentEngine;
  */
 public abstract class IndentFileEntry extends FileEntry.Format {
     private static final String NEWLINE = "\n"; // NOI18N
-    private static final String EA_PREFORMATTED = "org-netbeans-modules-javafx-preformattedSource"; // NOI18N
+    private static final String EA_PREFORMATTED = "org-netbeans-modules-visage-preformattedSource"; // NOI18N
 
     private ThreadLocal<IndentEngine> indentEngine;
     

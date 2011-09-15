@@ -42,11 +42,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.beans.PropertyChangeEvent;
 
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
 import org.netbeans.spi.java.classpath.ClassPathImplementation;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
@@ -57,7 +57,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.util.RequestProcessor;
 import org.openide.util.WeakListeners;
@@ -66,7 +66,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
 
     private static final String PLATFORM_ACTIVE = "platform.active";        //NOI18N
     private static final String ANT_NAME = "platform.ant.name";             //NOI18N
-    private static final String JAVAFX_PROFILE = "javafx.profile";          //NOI18N
+    private static final String JAVAFX_PROFILE = "visage.profile";          //NOI18N
 
     private final PropertyEvaluator evaluator;
     private JavaPlatformManager platformManager;
@@ -87,7 +87,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
         //using local copy of reference instead of synchronized section to prevent deadlocks
         List<PathResourceImplementation> rc = this.resourcesCache;
         if (rc == null) {
-            JavaFXPlatform jp = findActivePlatform ();
+            VisagePlatform jp = findActivePlatform ();
             if (jp != null) {
                 //TODO: May also listen on CP, but from Platform it should be fixed.
                 List<PathResourceImplementation> result = new ArrayList<PathResourceImplementation>();                
@@ -111,32 +111,32 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
         this.support.removePropertyChangeListener (listener);
     }
 
-    private JavaFXPlatform findActivePlatform () {
+    private VisagePlatform findActivePlatform () {
         if (this.platformManager == null) {
             this.platformManager = JavaPlatformManager.getDefault();
             this.platformManager.addPropertyChangeListener(WeakListeners.propertyChange(this, this.platformManager));
         }                
         this.activePlatformName = evaluator.getProperty(PLATFORM_ACTIVE);
-        final JavaFXPlatform activePlatform = JavaFXProjectUtil.getActivePlatform (this.activePlatformName);
+        final VisagePlatform activePlatform = VisageProjectUtil.getActivePlatform (this.activePlatformName);
         this.isActivePlatformValid = activePlatform != null;
         return activePlatform;
     }
     
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == this.evaluator && (evt.getPropertyName().equals(PLATFORM_ACTIVE) || evt.getPropertyName().equals(JAVAFX_PROFILE))) {
-            //Active platform or JavaFX profile was changed
+            //Active platform or Visage profile was changed
             resetCache ();
         }
         else if (evt.getSource() == this.platformManager && JavaPlatformManager.PROP_INSTALLED_PLATFORMS.equals(evt.getPropertyName()) && activePlatformName != null) {
             //Platform definitions were changed, check if the platform was not resolved or deleted
             if (this.isActivePlatformValid) {
-                if (JavaFXProjectUtil.getActivePlatform (this.activePlatformName) == null) {
+                if (VisageProjectUtil.getActivePlatform (this.activePlatformName) == null) {
                     //the platform was not removed
                     this.resetCache();
                 }
             }
             else {
-                if (JavaFXProjectUtil.getActivePlatform (this.activePlatformName) != null) {
+                if (VisageProjectUtil.getActivePlatform (this.activePlatformName) != null) {
                     this.resetCache();
                 }
             }

@@ -40,21 +40,21 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source;
+package org.netbeans.modules.visage.source;
 
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
+import com.sun.tools.visage.api.JavafxcTaskImpl;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 import org.netbeans.modules.parsing.api.Snapshot;
 
 /**
@@ -65,10 +65,10 @@ public class CompilationInfoImpl {
 
     static final Logger LOGGER = Logger.getLogger(CompilationInfoImpl.class.getName());
     
-    //final JavaFXSource source;
-    private final JavaFXParserResultImpl parserResultImpl;
+    //final VisageSource source;
+    private final VisageParserResultImpl parserResultImpl;
 
-    public CompilationInfoImpl(JavaFXParserResultImpl parserResult) {
+    public CompilationInfoImpl(VisageParserResultImpl parserResult) {
         this.parserResultImpl = parserResult;
     }
 
@@ -77,19 +77,19 @@ public class CompilationInfoImpl {
     }
 
     /**
-     * Returns the current phase of the {@link JavaFXSource}.
-     * @return {@link JavaFXSource.Phase} the state which was reached by the {@link JavaFXSource}.
+     * Returns the current phase of the {@link VisageSource}.
+     * @return {@link VisageSource.Phase} the state which was reached by the {@link VisageSource}.
      */
-    public JavaFXSource.Phase getPhase() {
-        return JavaFXSource.Phase.from(parserResultImpl.getPhase());
+    public VisageSource.Phase getPhase() {
+        return VisageSource.Phase.from(parserResultImpl.getPhase());
     }
 
     /**
-     * Returns the javafxc tree representing the source file.
+     * Returns the visagec tree representing the source file.
      * @return {@link CompilationUnitTree} the compilation unit containing
-     * the top level classes contained in the, javafx source file.
+     * the top level classes contained in the, visage source file.
      * 
-     * @throws java.lang.IllegalStateException  when the phase is less than {@link JavaFXSource.Phase#PARSED}
+     * @throws java.lang.IllegalStateException  when the phase is less than {@link VisageSource.Phase#PARSED}
      */
     public UnitTree getCompilationUnit() {
         return parserResultImpl.getCompilationUnit();
@@ -120,8 +120,8 @@ public class CompilationInfoImpl {
      *         reached using this method
      * @throws IOException when the file cannot be red
      */    
-    public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase) throws IOException {
-        return JavaFXSource.Phase.from(parserResultImpl.toPhase(phase.toCompilationPhase()));
+    public VisageSource.Phase toPhase(VisageSource.Phase phase) throws IOException {
+        return VisageSource.Phase.from(parserResultImpl.toPhase(phase.toCompilationPhase()));
     }
 
     public Context getContext() {
@@ -144,7 +144,7 @@ public class CompilationInfoImpl {
         return parserResultImpl.getClassBytes();
     }
 
-    public JavaFXParserResultImpl parserResultImpl() {
+    public VisageParserResultImpl parserResultImpl() {
         return parserResultImpl;
     }
 

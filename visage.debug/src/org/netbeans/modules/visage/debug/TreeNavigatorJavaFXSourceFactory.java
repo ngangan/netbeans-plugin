@@ -41,17 +41,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;
-import org.netbeans.api.javafx.source.support.LookupBasedJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.VisageSourceTaskFactory;
+import org.netbeans.api.visage.source.support.LookupBasedVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
@@ -59,18 +59,18 @@ import org.openide.util.Lookup;
  *
  * @author Jan Lahoda
  */
-public final class TreeNavigatorJavaFXSourceFactory extends LookupBasedJavaFXSourceTaskFactory {
+public final class TreeNavigatorVisageSourceFactory extends LookupBasedVisageSourceTaskFactory {
     
     private CancellableTask<CompilationInfo> task;
     
-    static TreeNavigatorJavaFXSourceFactory getInstance() {
-        Collection c = Lookup.getDefault().lookupAll(JavaFXSourceTaskFactory.class);
-        TreeNavigatorJavaFXSourceFactory res = Lookup.getDefault().lookup(TreeNavigatorJavaFXSourceFactory.class);
+    static TreeNavigatorVisageSourceFactory getInstance() {
+        Collection c = Lookup.getDefault().lookupAll(VisageSourceTaskFactory.class);
+        TreeNavigatorVisageSourceFactory res = Lookup.getDefault().lookup(TreeNavigatorVisageSourceFactory.class);
         assert res != null;
         return res;
     }
     
-    public TreeNavigatorJavaFXSourceFactory() {
+    public TreeNavigatorVisageSourceFactory() {
         super(Phase.UP_TO_DATE, Priority.NORMAL);
     }
 

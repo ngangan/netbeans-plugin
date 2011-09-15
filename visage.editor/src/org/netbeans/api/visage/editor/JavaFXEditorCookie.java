@@ -39,12 +39,12 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.editor;
+package org.netbeans.api.visage.editor;
 
 /**
  *
  * @author Adam
  */
-public interface JavaFXEditorCookie {
+public interface VisageEditorCookie {
 
 }

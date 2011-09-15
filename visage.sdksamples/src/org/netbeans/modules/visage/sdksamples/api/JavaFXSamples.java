@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.sdksamples.api;
+package org.netbeans.modules.visage.sdksamples.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -55,7 +55,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.PACKAGE)
-public @interface JavaFXSamples {
+public @interface VisageSamples {
     /**
      * A path to the folder containing samples. The path is resolved
      * against the source file annotated with this annotation, so it should

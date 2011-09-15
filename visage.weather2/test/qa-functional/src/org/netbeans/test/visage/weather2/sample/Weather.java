@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.test.javafx.weather2.sample;
+package org.netbeans.test.visage.weather2.sample;
 
 /**
  *
@@ -49,12 +49,12 @@ package org.netbeans.test.javafx.weather2.sample;
 import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.test.javafx.weather2.sample.lib.JavaFXTestCase;
-import org.netbeans.test.javafx.weather2.sample.lib.Util;
+import org.netbeans.test.visage.weather2.sample.lib.VisageTestCase;
+import org.netbeans.test.visage.weather2.sample.lib.Util;
 
-public class Weather extends JavaFXTestCase {
+public class Weather extends VisageTestCase {
 
-    public String _project = "JavaFX Weather Application";
+    public String _project = "Visage Weather Application";
     public String _projectName = "WeatherFXApplication";
     public String _projectPath = "WeatherFXApplication|Source Packages|weatherfx|WeatherApp.fx";
     static String[] TESTS = {"testCreate", "testCompile", "testCloseProject"};

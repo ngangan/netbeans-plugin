@@ -1,13 +1,13 @@
 package helloworld;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.text.Text;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.text.Text;
 
 
 
 Stage {
-    title: "Hello World JavaFX!"
+    title: "Hello World Visage!"
     width: 300
     height: 200
     onClose: function() { java.lang.System.exit( 0 ); }

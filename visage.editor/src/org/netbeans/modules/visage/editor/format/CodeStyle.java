@@ -42,14 +42,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
 import java.util.prefs.Preferences;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.javafx.editor.format.ui.FmtOptions;
-import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.*;
+import org.netbeans.modules.visage.editor.format.ui.FmtOptions;
+import static org.netbeans.modules.visage.editor.format.ui.FmtOptions.*;
 import org.netbeans.modules.editor.indent.spi.CodeStylePreferences;
 import org.openide.filesystems.FileObject;
 
@@ -57,7 +57,7 @@ import org.openide.filesystems.FileObject;
  * Code style settings registry for reformatting
  * 
  * @author Dusan Balek
- * @author Anton Chechel - javafx changes
+ * @author Anton Chechel - visage changes
  */
 public final class CodeStyle {
     

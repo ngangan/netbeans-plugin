@@ -13,16 +13,16 @@ Other names may be trademarks of their respective owners.
 
 
 <helpset version="2.0">
-	<title>JavaFX Script Help</title>
+	<title>Visage Script Help</title>
 	<maps>
-		<homeID>javafx_about_javafx</homeID>
-		<mapref location="javafx-map.jhm"/>
+		<homeID>visage_about_visage</homeID>
+		<mapref location="visage-map.jhm"/>
 	</maps>
 	<view>
 		<name>TOC</name>
 		<label>Contents</label>
 		<type>javax.help.TOCView</type>
-		<data>javafx-toc.xml</data>
+		<data>visage-toc.xml</data>
 	</view>
 	<view>
 		<name>Search</name>

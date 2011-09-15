@@ -41,7 +41,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -52,14 +52,14 @@ import java.util.List;
  *
  * @author cms
  */
-public class JavaFXClassChildren extends SelectorChildren<JavaFXClassNode> {
+public class VisageClassChildren extends SelectorChildren<VisageClassNode> {
     private final boolean isLibraryNode;
 
-    public JavaFXClassChildren(final boolean isLibraryNode) {
+    public VisageClassChildren(final boolean isLibraryNode) {
         this.isLibraryNode = isLibraryNode;
     }
 
-    protected List<SelectorNode> prepareChildren(final JavaFXClassNode parent) {
+    protected List<SelectorNode> prepareChildren(final VisageClassNode parent) {
         List<SelectorNode> contents = new ArrayList<SelectorNode>();
         // TODO support classes-level only for library nodes so far due to 
         // restrictions from compiler
@@ -68,13 +68,13 @@ public class JavaFXClassChildren extends SelectorChildren<JavaFXClassNode> {
 
         SelectorNode content = null;
 
-        content = new JavaFXFunctionsNode(parent.getCpInfo(), parent);
+        content = new VisageFunctionsNode(parent.getCpInfo(), parent);
 
         if (!content.isLeaf()) {
             contents.add(content);
         }
 
-        content = new JavaFXInnerClassesNode(parent.getCpInfo(), parent);
+        content = new VisageInnerClassesNode(parent.getCpInfo(), parent);
 
         if (!content.isLeaf()) {
             contents.add(content);

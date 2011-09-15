@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source.support;
+package org.netbeans.api.visage.source.support;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,13 +53,13 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.JavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.VisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 import org.openide.util.RequestProcessor;
 
-/**A {@link JavaFXSourceTaskFactorySupport} that registers tasks to all files that are
+/**A {@link VisageSourceTaskFactorySupport} that registers tasks to all files that are
  * opened in the editor and are visible. This factory also listens on the selection in
  * opened and visible JTextComponents and reschedules the tasks as necessary.
  *
@@ -69,7 +69,7 @@ import org.openide.util.RequestProcessor;
  * 
  * @author Jan Lahoda
  */
-public abstract class SelectionAwareJavaFXSourceTaskFactory extends JavaFXSourceTaskFactory {
+public abstract class SelectionAwareVisageSourceTaskFactory extends VisageSourceTaskFactory {
     
     private static final int DEFAULT_RESCHEDULE_TIMEOUT = 300;
     private static final RequestProcessor WORKER = new RequestProcessor("SelectionAwareJavaSourceTaskFactory worker"); // NOI18N
@@ -77,23 +77,23 @@ public abstract class SelectionAwareJavaFXSourceTaskFactory extends JavaFXSource
     private int timeout;
     private String[] supportedMimeTypes;
     
-    /**Construct the SelectionAwareJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the SelectionAwareVisageSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      */
-    public SelectionAwareJavaFXSourceTaskFactory(Phase phase, Priority priority) {
+    public SelectionAwareVisageSourceTaskFactory(Phase phase, Priority priority) {
         this(phase, priority, (String []) null);
     }
     
-    /**Construct the SelectionAwareJavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the SelectionAwareVisageSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      * @param supportedMimeTypes a list of mime types on which the tasks created by this factory should be run
      * @since 0.22
      */
-    public SelectionAwareJavaFXSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
+    public SelectionAwareVisageSourceTaskFactory(Phase phase, Priority priority, String... supportedMimeTypes) {
         super(phase, priority);
         //XXX: weak, or something like this:
         OpenedEditors.getDefault().addChangeListener(new ChangeListenerImpl());
@@ -108,7 +108,7 @@ public abstract class SelectionAwareJavaFXSourceTaskFactory extends JavaFXSource
         return files;
     }
 
-    private Map<JTextComponent, ComponentListener> component2Listener = new HashMap<JTextComponent, SelectionAwareJavaFXSourceTaskFactory.ComponentListener>();
+    private Map<JTextComponent, ComponentListener> component2Listener = new HashMap<JTextComponent, SelectionAwareVisageSourceTaskFactory.ComponentListener>();
     private static Map<FileObject, Integer> file2SelectionStartPosition = new WeakHashMap<FileObject, Integer>();
     private static Map<FileObject, Integer> file2SelectionEndPosition = new WeakHashMap<FileObject, Integer>();
     

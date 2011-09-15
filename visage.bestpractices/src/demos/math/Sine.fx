@@ -34,15 +34,15 @@
 
 package math;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.shape.Circle;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Translate;
-import javafx.scene.transform.Rotate;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.animation.Interpolator;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.shape.Circle;
+import visage.scene.paint.Color;
+import visage.scene.transform.Translate;
+import visage.scene.transform.Rotate;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
+import visage.animation.Interpolator;
 
 import java.lang.Math;
 

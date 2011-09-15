@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor;
+package org.netbeans.modules.visage.fxd.composer.editor;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
@@ -49,7 +49,7 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.ext.ExtKit.ExtDefaultKeyTypedAction;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
+import org.netbeans.modules.visage.fxd.composer.editor.BracketCompletion;
 
 public class FXDKeyTypedAction extends ExtDefaultKeyTypedAction {
 

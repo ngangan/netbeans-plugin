@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.queries.FileEncodingQuery;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.ProjectGenerator;
@@ -75,16 +75,16 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Creates a JavaFXProject from scratch according to some initial configuration.
+ * Creates a VisageProject from scratch according to some initial configuration.
  */
-public class JavaFXProjectGenerator {
+public class VisageProjectGenerator {
     
     static final String MINIMUM_ANT_VERSION = "1.6.5"; // NOI18N
     
-    private JavaFXProjectGenerator() {}
+    private VisageProjectGenerator() {}
 
     /**
-     * Create a new empty JavaFX project.
+     * Create a new empty Visage project.
      * @param dir the top-level directory (need not yet exist but if it does it must be empty)
      * @param name the name for the project
      * @return the helper object permitting it to be further customized
@@ -118,14 +118,14 @@ public class JavaFXProjectGenerator {
         dirFO.getFileSystem().runAtomicAction(new FileSystem.AtomicAction() {
             public void run () throws IOException {
                 h[0] = createProject(dirFO, name, null, null, manifestFile, false);
-                final JavaFXProject p = (JavaFXProject) ProjectManager.getDefault().findProject(dirFO);
+                final VisageProject p = (VisageProject) ProjectManager.getDefault().findProject(dirFO);
                 final ReferenceHelper refHelper = p.getReferenceHelper();
                 try {
                     ProjectManager.mutex().writeAccess(new Mutex.ExceptionAction<Void>() {
                     public Void run() throws Exception {
                         Element data = h[0].getPrimaryConfigurationData(true);
                         Document doc = data.getOwnerDocument();
-                        NodeList nl = data.getElementsByTagNameNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots"); // NOI18N
+                        NodeList nl = data.getElementsByTagNameNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots"); // NOI18N
                         assert nl.getLength() == 1;
                         Element sourceRoots = (Element) nl.item(0);
                         for (int i=0; i<sourceFolders.length; i++) {
@@ -146,7 +146,7 @@ public class JavaFXProjectGenerator {
                                 propName = name + rootIndex + ".dir";   //NOI18N
                             }
                             String srcReference = refHelper.createForeignFileReference(sourceFolders[i], JavaProjectConstants.SOURCES_TYPE_JAVA);
-                            Element root = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
+                            Element root = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
                             root.setAttribute ("id",propName);   //NOI18N
                             sourceRoots.appendChild(root);
                             props = h[0].getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
@@ -169,19 +169,19 @@ public class JavaFXProjectGenerator {
 
     private static AntProjectHelper createProject(FileObject dirFO, String name,
                                                   String srcRoot, String mainClass, String manifestFile, boolean isLibrary) throws IOException {
-        AntProjectHelper h = ProjectGenerator.createProject(dirFO, JavaFXProjectType.TYPE);
+        AntProjectHelper h = ProjectGenerator.createProject(dirFO, VisageProjectType.TYPE);
         Element data = h.getPrimaryConfigurationData(true);
         Document doc = data.getOwnerDocument();
-        Element nameEl = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
+        Element nameEl = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "name"); // NOI18N
         nameEl.appendChild(doc.createTextNode(name));
         data.appendChild(nameEl);
-        Element minant = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, "minimum-ant-version"); // NOI18N
+        Element minant = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, "minimum-ant-version"); // NOI18N
         minant.appendChild(doc.createTextNode(MINIMUM_ANT_VERSION)); // NOI18N
         data.appendChild(minant);
         EditableProperties ep = h.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-        Element sourceRoots = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");  //NOI18N
+        Element sourceRoots = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");  //NOI18N
         if (srcRoot != null) {
-            Element root = doc.createElementNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
+            Element root = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");   //NOI18N
             root.setAttribute ("id","src.dir");   //NOI18N
             sourceRoots.appendChild(root);
             ep.setProperty("src.dir", srcRoot); // NOI18N
@@ -190,11 +190,11 @@ public class JavaFXProjectGenerator {
         
         h.putPrimaryConfigurationData(data, true);
         ep.setProperty("dist.dir", "dist"); // NOI18N
-        ep.setComment("dist.dir", new String[] {"# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_dist.dir")}, false); // NOI18N
+        ep.setComment("dist.dir", new String[] {"# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_dist.dir")}, false); // NOI18N
         ep.setProperty("dist.jar", "${dist.dir}/" + PropertyUtils.getUsablePropertyName(name) + ".jar"); // NOI18N
         ep.setProperty("javac.classpath", new String[0]); // NOI18N
         ep.setProperty("build.sysclasspath", "ignore"); // NOI18N
-        ep.setComment("build.sysclasspath", new String[] {"# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_build.sysclasspath")}, false); // NOI18N
+        ep.setComment("build.sysclasspath", new String[] {"# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_build.sysclasspath")}, false); // NOI18N
         ep.setProperty("run.classpath", new String[] { // NOI18N
             "${javac.classpath}:", // NOI18N
             "${build.classes.dir}:", // NOI18N
@@ -214,7 +214,7 @@ public class JavaFXProjectGenerator {
         
         ep.setProperty("javac.compilerargs", ""); // NOI18N
         ep.setComment("javac.compilerargs", new String[] { // NOI18N
-            "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_javac.compilerargs"), // NOI18N
+            "# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_javac.compilerargs"), // NOI18N
         }, false);
         SpecificationVersion sourceLevel = getDefaultSourceLevel();
         ep.setProperty("javac.source", sourceLevel.toString()); // NOI18N
@@ -223,23 +223,23 @@ public class JavaFXProjectGenerator {
         ep.setProperty("build.generated.dir", "${build.dir}/generated"); // NOI18N
         
         ep.setProperty("build.dir", "build"); // NOI18N
-        ep.setComment("build.dir", new String[] {"# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_build.dir")}, false); // NOI18N
+        ep.setComment("build.dir", new String[] {"# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_build.dir")}, false); // NOI18N
         ep.setProperty("build.classes.excludes", "**/*.java,**/*.form,**/*.fx"); // NOI18N
         ep.setProperty("dist.javadoc.dir", "${dist.dir}/javadoc"); // NOI18N
         ep.setProperty("platform.active", "default_fx_platform"); // NOI18N
 
         ep.setProperty("run.jvmargs", ""); // NOI18N
         ep.setComment("run.jvmargs", new String[] { // NOI18N
-            "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs"), // NOI18N
-            "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs_2"), // NOI18N
-            "# " + NbBundle.getMessage(JavaFXProjectGenerator.class, "COMMENT_run.jvmargs_3"), // NOI18N
+            "# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_run.jvmargs"), // NOI18N
+            "# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_run.jvmargs_2"), // NOI18N
+            "# " + NbBundle.getMessage(VisageProjectGenerator.class, "COMMENT_run.jvmargs_3"), // NOI18N
         }, false);
 
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_PRIVATE, "true"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_AUTHOR, "true"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_VERSION, "false"); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_ENCODING, ""); // NOI18N
-        ep.setProperty(JavaFXProjectProperties.JAVADOC_ADDITIONALPARAM, ""); // NOI18N
+        ep.setProperty(VisageProjectProperties.JAVADOC_PRIVATE, "true"); // NOI18N
+        ep.setProperty(VisageProjectProperties.JAVADOC_AUTHOR, "true"); // NOI18N
+        ep.setProperty(VisageProjectProperties.JAVADOC_VERSION, "false"); // NOI18N
+        ep.setProperty(VisageProjectProperties.JAVADOC_ENCODING, ""); // NOI18N
+        ep.setProperty(VisageProjectProperties.JAVADOC_ADDITIONALPARAM, ""); // NOI18N
         ep.setProperty("jnlp.codebase.type", "local"); // NOI18N
         ep.setProperty("jnlp.offline-allowed", "true"); // NOI18N
         ep.setProperty("jnlp.packEnabled", "false"); // NOI18N
@@ -248,11 +248,11 @@ public class JavaFXProjectGenerator {
         ep.setProperty("applet.height", "200"); // NOI18N
         ep.setProperty("applet.width", "200"); // NOI18N
         ep.setProperty("pack200.jar.compress", "true"); // NOI18N
-        ep.setProperty("javafx.profile", "desktop"); // NOI18N
+        ep.setProperty("visage.profile", "desktop"); // NOI18N
         ep.setProperty("application.title", PropertyUtils.getUsablePropertyName(name)); // NOI18N
 
         Charset enc = FileEncodingQuery.getDefaultEncoding();
-        ep.setProperty(JavaFXProjectProperties.SOURCE_ENCODING, enc.name());
+        ep.setProperty(VisageProjectProperties.SOURCE_ENCODING, enc.name());
         h.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);        
         return h;
     }
@@ -277,7 +277,7 @@ public class JavaFXProjectGenerator {
         }
         
         FileObject mainTemplate = Repository.getDefault().getDefaultFileSystem().
-            findResource( "Templates/JavaFX/JavaFXStage.fx" ); // NOI18N
+            findResource( "Templates/Visage/VisageStage.fx" ); // NOI18N
 
         if ( mainTemplate == null ) {
             return; // Don't know the template

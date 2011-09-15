@@ -34,12 +34,12 @@
 
 package transform;
 
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.shape.Rectangle;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;
@@ -84,8 +84,8 @@ Stage {
         // Create Rectangle and bind rotation angle to angle variable
         content : Rectangle {
             transforms : [
-                javafx.scene.transform.Rotate { angle : bind angle, pivotX : 100, pivotY : 100 },
-                javafx.scene.transform.Translate { x : 43, y : 43 }
+                visage.scene.transform.Rotate { angle : bind angle, pivotX : 100, pivotY : 100 },
+                visage.scene.transform.Translate { x : 43, y : 43 }
             ]
             width : 114, height : 114
             fill : Color.WHITE

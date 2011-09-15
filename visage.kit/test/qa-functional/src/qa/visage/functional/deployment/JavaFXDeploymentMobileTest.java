@@ -39,27 +39,27 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.deployment;
+package qa.visage.functional.deployment;
 
-import qa.javafx.smoke.*;
+import qa.visage.smoke.*;
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.DeploymentType;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.DeploymentType;
+import qa.visage.functional.library.project.VisageProject;
 
 /**
  *
  * @author andromeda
  */
-public class JavaFXDeploymentMobileTest extends JavaFXDeploymentTestCase {
+public class VisageDeploymentMobileTest extends VisageDeploymentTestCase {
 
     static DeploymentType type = DeploymentType.MOBILE;
 
-    public JavaFXDeploymentMobileTest(String name) {
+    public VisageDeploymentMobileTest(String name) {
         super(name);
     }
     static String[] TESTS = {
@@ -67,7 +67,7 @@ public class JavaFXDeploymentMobileTest extends JavaFXDeploymentTestCase {
     };
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXDeploymentMobileTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageDeploymentMobileTest.class, ".*", ".*", TESTS);
 
     }
 

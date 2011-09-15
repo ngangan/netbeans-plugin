@@ -49,8 +49,8 @@ made subject to such option by the copyright holder.
 <filesystem>
     <folder name="Actions">
         <folder name="Other">
-            <file name="org-netbeans-modules-javafx-fxd-composer-uistub-GenerateUIStubAction.instance">
-                <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.uistub.GenerateUIStubAction"/>
+            <file name="org-netbeans-modules-visage-fxd-composer-uistub-GenerateUIStubAction.instance">
+                <attr name="instanceClass" stringvalue="org.netbeans.modules.visage.fxd.composer.uistub.GenerateUIStubAction"/>
             </file>
         </folder>
     </folder>
@@ -60,18 +60,18 @@ made subject to such option by the copyright holder.
         <folder name="Hidden">
         <file name="FXZEditorSupportRedirector.instance">
         <attr name="instanceClass"
-            stringvalue="org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupportRedirector"/>
+            stringvalue="org.netbeans.modules.visage.fxd.dataloader.fxz.FXZEditorSupportRedirector"/>
         </file>
         </folder>
         -->
 
         <folder name="MIMEResolver">
             <file name="FXZResolver.xml" url="FXZResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.Bundle"/>
                 <attr name="position" intvalue="125"/>
             </file>
             <file name="FXDResolver.xml" url="FXDResolver.xml">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.Bundle"/>
                 <attr name="position" intvalue="135"/>
             </file>
         </folder>
@@ -81,8 +81,8 @@ made subject to such option by the copyright holder.
         <folder name="text">
             <folder name="x-fxd">      
                 <folder name="Factories">
-                    <file name="org-netbeans-modules-javafx-fxd-dataloader-fxd-FXDDataLoader.instance">
-                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.fxd.Bundle"/>
+                    <file name="org-netbeans-modules-visage-fxd-dataloader-fxd-FXDDataLoader.instance">
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.fxd.Bundle"/>
                     </file>
                 </folder>
 
@@ -142,8 +142,8 @@ made subject to such option by the copyright holder.
         <folder name="multipart">
             <folder name="x-fxz">                
                 <folder name="Factories">
-                    <file name="org-netbeans-modules-javafx-fxd-dataloader-fxz-FXZDataLoader.instance">
-                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.fxz.Bundle"/>
+                    <file name="org-netbeans-modules-visage-fxd-dataloader-fxz-FXZDataLoader.instance">
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.fxz.Bundle"/>
                     </file>
                 </folder>
 
@@ -189,7 +189,7 @@ made subject to such option by the copyright holder.
                         <attr name="position" intvalue="1000"/>
                     </file>
                     <file name="GenerateUIStubAction.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Other/org-netbeans-modules-javafx-fxd-composer-uistub-GenerateUIStubAction.instance"/>
+                        <attr name="originalFile" stringvalue="Actions/Other/org-netbeans-modules-visage-fxd-composer-uistub-GenerateUIStubAction.instance"/>
                         <attr name="position" intvalue="1100"/>
                     </file>
                     <file name="Separator4.instance">
@@ -216,31 +216,31 @@ made subject to such option by the copyright holder.
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fxd">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.Bundle"/>
                 <file name="EditorKit.instance">
-                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
-                    <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.visage.fxd.composer.source.FXDKit"/>
+                    <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.visage.fxd.composer.source.FXDKit"/>
                     <attr name="beaninfo" boolvalue="false"/>
                 </file>
-                <file name="org-netbeans-modules-javafx-fxd-dataloader-FXDFileEncodingQueryImplementation.instance" />
+                <file name="org-netbeans-modules-visage-fxd-dataloader-FXDFileEncodingQueryImplementation.instance" />
 
                 <folder name="DocumentModel">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
+                    <file name="org-netbeans-modules-visage-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
                 <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId.language"/>
                     <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
                 </file>
 
                 <!-- indentation and formatting -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-IndentTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-ReformatTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-IndentTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-ReformatTaskFactory.instance"/>
                 <!-- syntax Error -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
                 <!-- code completion -->
                 <folder name="CompletionProviders">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
+                    <file name="org-netbeans-modules-visage-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
                 </folder>
 
                 <folder name="Toolbars">
@@ -256,8 +256,8 @@ made subject to such option by the copyright holder.
                 <folder name="FontsColors">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
+                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/visage/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.composer.editor.resources.Bundle"/>
                             </file>
                         </folder>
                     </folder>
@@ -266,32 +266,32 @@ made subject to such option by the copyright holder.
         </folder>
         <folder name="multipart">
             <folder name="x-fxz">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.Bundle"/>
                 <file name="EditorKit.instance">
-                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
-                    <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.javafx.fxd.composer.source.FXDKit"/>
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.visage.fxd.composer.source.FXDKit"/>
+                    <attr name="instanceOf" stringvalue="javax.swing.text.EditorKit,org.netbeans.modules.visage.fxd.composer.source.FXDKit"/>
                     <attr name="beaninfo" boolvalue="false"/>
                 </file>
-                <file name="org-netbeans-modules-javafx-fxd-dataloader-FXDFileEncodingQueryImplementation.instance" />
+                <file name="org-netbeans-modules-visage-fxd-dataloader-FXDFileEncodingQueryImplementation.instance" />
                 
                 <folder name="DocumentModel">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-source-FXDDocumentModelProvider.instance"/>
+                    <file name="org-netbeans-modules-visage-fxd-composer-source-FXDDocumentModelProvider.instance"/>
                 </folder>                
                 <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId.language"/>
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId.language"/>
                     <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
                 </file>
 
 
                 <!-- indentation and formatting -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-IndentTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-ReformatTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-IndentTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-ReformatTaskFactory.instance"/>
                 <!-- syntax Error -->
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-SyntaxErrorsHighlightingTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-fxd-composer-editor-parser-FXDSyntaxErrorParserFactory.instance"/>
                 <!-- code completion -->
                 <folder name="CompletionProviders">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
+                    <file name="org-netbeans-modules-visage-fxd-composer-editor-completion-FXDCompletionProvider.instance"/>
                 </folder>
 
                 <folder name="Toolbars">
@@ -307,8 +307,8 @@ made subject to such option by the copyright holder.
                 <folder name="FontsColors">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.composer.editor.resources.Bundle"/>
+                            <file name="colorings.xml" url="nbres:/org/netbeans/modules/visage/fxd/composer/editor/resources/NetBeans-FXD-fontsColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.composer.editor.resources.Bundle"/>
                             </file>
                         </folder>
                     </folder>
@@ -320,7 +320,7 @@ made subject to such option by the copyright holder.
     <folder name="OptionsDialog">
         <folder name="PreviewExamples">
             <folder name="text">
-                <file name="x-fxd" url="nbres:/org/netbeans/modules/javafx/fxd/composer/editor/resources/example.fxd"/>
+                <file name="x-fxd" url="nbres:/org/netbeans/modules/visage/fxd/composer/editor/resources/example.fxd"/>
             </folder>
         </folder>
     </folder>
@@ -329,34 +329,34 @@ made subject to such option by the copyright holder.
         <folder name="Panels">
             <folder name="text">
                 <folder name="x-fxd">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
+                    <file name="org-netbeans-modules-visage-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
                 </folder>
             </folder>
             <folder name="multipart">
                 <folder name="x-fxz">
-                    <file name="org-netbeans-modules-javafx-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
+                    <file name="org-netbeans-modules-visage-fxd-composer-navigator-FXDNavigatorPanel.instance"/>
                 </folder>
             </folder>
         </folder>
     </folder>
     
     <folder name="Templates">
-        <folder name="JavaFX">
-            <file name="FXDTemplate.fxd" url="nbres:/org/netbeans/modules/javafx/fxd/dataloader/fxd/FXDTemplate.fxd">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+        <folder name="Visage">
+            <file name="FXDTemplate.fxd" url="nbres:/org/netbeans/modules/visage/fxd/dataloader/fxd/FXDTemplate.fxd">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.Bundle"/>
                 <attr name="template" boolvalue="true"/>
 		<attr name="position" intvalue="251"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxdFile16.png"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/fxd/FXDTemplateHelp.html"/>
-                <attr name="templateCategory" stringvalue="javafx"/>                
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/visage/fxd/dataloader/resources/fxdFile16.png"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/visage/fxd/dataloader/fxd/FXDTemplateHelp.html"/>
+                <attr name="templateCategory" stringvalue="visage"/>                
             </file>
-            <file name="FXZTemplate.fxz" url="nbres:/org/netbeans/modules/javafx/fxd/dataloader/fxz/FXZTemplate.fxz">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.fxd.dataloader.Bundle"/>
+            <file name="FXZTemplate.fxz" url="nbres:/org/netbeans/modules/visage/fxd/dataloader/fxz/FXZTemplate.fxz">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.fxd.dataloader.Bundle"/>
                 <attr name="template" boolvalue="true"/>
 		<attr name="position" intvalue="252"/>
-                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/resources/fxzFile16.png"/>
-                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/javafx/fxd/dataloader/fxz/FXZTemplateHelp.html"/>
-                <attr name="templateCategory" stringvalue="javafx"/>                
+                <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/visage/fxd/dataloader/resources/fxzFile16.png"/>
+                <attr name="templateWizardURL" urlvalue="nbresloc:/org/netbeans/modules/visage/fxd/dataloader/fxz/FXZTemplateHelp.html"/>
+                <attr name="templateCategory" stringvalue="visage"/>                
             </file>
         </folder>
     </folder>

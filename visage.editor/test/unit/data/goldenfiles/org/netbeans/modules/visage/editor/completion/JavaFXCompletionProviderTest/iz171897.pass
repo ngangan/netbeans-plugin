@@ -1,12 +1,12 @@
-javafx.geometry.Rectangle2D bounds
+visage.geometry.Rectangle2D bounds
 float dpi
-javafx.stage.Screen primary
-com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> screens
-javafx.geometry.Rectangle2D visualBounds
+visage.stage.Screen primary
+com.sun.visage.runtime.sequence.Sequence<? extends visage.stage.Screen> screens
+visage.geometry.Rectangle2D visualBounds
 public boolean equals(arg0 : java.lang.Object)
 public final native java.lang.Class<?> getClass()
-public static com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> getScreensForRectangle(arg0 : javafx.geometry.Rectangle2D)
-public static com.sun.javafx.runtime.sequence.Sequence<? extends javafx.stage.Screen> getScreensForRectangle(arg0 : float, arg1 : float, arg2 : float, arg3 : float)
+public static com.sun.visage.runtime.sequence.Sequence<? extends visage.stage.Screen> getScreensForRectangle(arg0 : visage.geometry.Rectangle2D)
+public static com.sun.visage.runtime.sequence.Sequence<? extends visage.stage.Screen> getScreensForRectangle(arg0 : float, arg1 : float, arg2 : float, arg3 : float)
 public int hashCode()
 public final native void notify()
 public final native void notifyAll()

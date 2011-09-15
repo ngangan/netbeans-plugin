@@ -41,27 +41,27 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.TypeClassTree;
-import com.sun.javafx.api.tree.VariableTree;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.FunctionInvocationTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.InstantiateTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.MemberSelectTree;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.TypeClassTree;
+import com.sun.visage.api.tree.VariableTree;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import javax.lang.model.element.Element;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 
 /**
@@ -94,11 +94,11 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
         return usages;
     }
 
-    private void handlePotentialVariable(JavaFXTreePath tree) {
+    private void handlePotentialVariable(VisageTreePath tree) {
         Element el = info.getTrees().getElement(tree);
 
         if (toFind.equals(el)) {
-            Token<JFXTokenId> t = Utilities.getToken(info, doc, tree);
+            Token<VSGTokenId> t = Utilities.getToken(info, doc, tree);
 
             if (t != null)
                 usages.add(t);
@@ -178,7 +178,7 @@ public class FindLocalUsagesQuery extends CancellableTreePathScanner<Void, Stack
         Element el = info.getTrees().getElement(getCurrentPath());
 
         if (toFind.equals(el) && node.getIdentifier() != null) {
-            Token<JFXTokenId> t = Utilities.getToken(info, doc, new JavaFXTreePath(getCurrentPath(), node.getIdentifier()));
+            Token<VSGTokenId> t = Utilities.getToken(info, doc, new VisageTreePath(getCurrentPath(), node.getIdentifier()));
 
             if (t != null)
                 usages.add(t);

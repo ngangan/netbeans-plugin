@@ -34,20 +34,20 @@
 
 package particles;
 
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.scene.Group;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Line;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.transform.Translate;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.input.MouseEvent;
+import visage.scene.Node;
+import visage.scene.CustomNode;
+import visage.scene.Group;
+import visage.scene.shape.Rectangle;
+import visage.scene.shape.Line;
+import visage.scene.image.Image;
+import visage.scene.image.ImageView;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.transform.Translate;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 import java.lang.Math;
 import java.util.Random;

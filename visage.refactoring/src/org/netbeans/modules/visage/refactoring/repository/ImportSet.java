@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.repository;
+package org.netbeans.modules.visage.refactoring.repository;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,7 +50,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
 
 /**
  *
@@ -159,7 +159,7 @@ public class ImportSet {
                     TypeImportEntry tie = new TypeImportEntry(fqnPkg, typeFQN);
                     TypeImportEntry tieOrig = new TypeImportEntry(fqnOrigPkg, typeOrigFQN);
 
-                    if (fqnPkg.startsWith("java.lang") || fqnPkg.startsWith("javafx.lang")) continue; // NOI18N
+                    if (fqnPkg.startsWith("java.lang") || fqnPkg.startsWith("visage.lang")) continue; // NOI18N
 
                     if (renames.containsKey(fqnPkg)) {
                         fqnPkg = renames.get(fqnPkg);

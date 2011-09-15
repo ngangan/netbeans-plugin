@@ -40,9 +40,9 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package qa.javafx.functional.library.project;
+package qa.visage.functional.library.project;
 
-import qa.javafx.functional.library.Constant;
+import qa.visage.functional.library.Constant;
 
 public enum ProjectType {
 

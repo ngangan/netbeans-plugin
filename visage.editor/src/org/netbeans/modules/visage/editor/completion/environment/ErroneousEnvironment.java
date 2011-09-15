@@ -40,35 +40,35 @@
  * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javafx.tree.JFXErroneous;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.tools.visage.tree.VSGErroneous;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.*;
 
 /**
  * @author David Strupl
  */
-public class ErroneousEnvironment extends JavaFXCompletionEnvironment<JFXErroneous> {
+public class ErroneousEnvironment extends VisageCompletionEnvironment<VSGErroneous> {
     
     private static final Logger logger = Logger.getLogger(ErroneousEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXErroneous t) {
-        if (LOGGABLE) log("inside JFXErroneous " + t); // NOI18N
+    protected void inside(VSGErroneous t) {
+        if (LOGGABLE) log("inside VSGErroneous " + t); // NOI18N
         SourcePositions pos = controller.getTrees().getSourcePositions();
         long s = pos.getStartPosition(root, t);
         long e = pos.getEndPosition(root, t);
         if (LOGGABLE) log("   s = " + s + "  e == " + e); // NOI18N
-        JavaFXTreePath p = JavaFXTreePath.getPath(root, t);
+        VisageTreePath p = VisageTreePath.getPath(root, t);
         
         if (t.getErrorTrees().isEmpty()) {
             useSanitizedSource();

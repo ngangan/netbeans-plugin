@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.Image;
 import java.awt.datatransfer.Transferable;
@@ -55,11 +55,11 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.swing.Action;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.modules.javafx.navigation.actions.OpenAction;
-import org.netbeans.modules.javafx.source.ui.Icons;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.modules.visage.navigation.actions.OpenAction;
+import org.netbeans.modules.visage.source.ui.Icons;
 import org.openide.filesystems.FileObject;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
@@ -72,7 +72,7 @@ import org.openide.util.datatransfer.PasteType;
  * Node representing an Element
  *
  * @author Petr Hrebejk
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
 public class ElementNode extends AbstractNode {
 
@@ -412,7 +412,7 @@ public class ElementNode extends AbstractNode {
 
     private static class WaitNode extends AbstractNode {
 
-        private Image waitIcon = Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/wait.gif"); // NOI18N
+        private Image waitIcon = Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/wait.gif"); // NOI18N
 
         WaitNode() {
             super(Children.LEAF);

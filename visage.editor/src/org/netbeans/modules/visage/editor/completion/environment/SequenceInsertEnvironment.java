@@ -40,13 +40,13 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
 
-import com.sun.tools.javafx.tree.JFXSequenceInsert;
+import com.sun.tools.visage.tree.VSGSequenceInsert;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -58,22 +58,22 @@ import javax.lang.model.type.TypeKind;
  *
  * @author Petr Nejedly
  */
-public class SequenceInsertEnvironment extends JavaFXCompletionEnvironment<JFXSequenceInsert> {
+public class SequenceInsertEnvironment extends VisageCompletionEnvironment<VSGSequenceInsert> {
 
     private static final Logger logger = Logger.getLogger(SequenceInsertEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXSequenceInsert t) throws IOException {
+    protected void inside(VSGSequenceInsert t) throws IOException {
         if (LOGGABLE) {
-            logger.fine("inside JFXSequenceInsert " + t + "  offset == " + offset); // NOI18N
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("inside VSGSequenceInsert " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
         localResult(getSmartType(t));
     }
 
-    private TypeMirror getSmartType(JFXSequenceInsert t) throws IOException {
+    private TypeMirror getSmartType(VSGSequenceInsert t) throws IOException {
         TypeMirror type = null;
         return type;
     }

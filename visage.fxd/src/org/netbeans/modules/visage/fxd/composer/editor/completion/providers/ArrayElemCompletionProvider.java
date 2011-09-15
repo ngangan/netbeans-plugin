@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
+package org.netbeans.modules.visage.fxd.composer.editor.completion.providers;
 
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
-import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.lexer.TokenUtils;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**

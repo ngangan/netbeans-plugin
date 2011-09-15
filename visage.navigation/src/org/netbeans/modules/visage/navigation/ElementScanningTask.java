@@ -41,22 +41,22 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.InitDefinitionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.OverrideClassVarTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.VariableTree;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.InitDefinitionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.OverrideClassVarTree;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.visage.api.tree.VariableTree;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.javafx.api.JavafxcScope;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.visage.api.JavafxcScope;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.code.JavafxTypes;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -69,11 +69,11 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.navigation.ElementNode.Description;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.navigation.ElementNode.Description;
 
 /** 
  *
@@ -133,7 +133,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 }
             }
 
-            // elements from magic javafx$run$ method, should be top level as well
+            // elements from magic visage$run$ method, should be top level as well
             if (magicRunMethod != null) {
                 addMembers((ExecutableElement) magicRunMethod, rootDescription, info, pos);
             }
@@ -144,7 +144,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
     }
 
-    private static class PositionVisitor extends JavaFXTreePathScanner<Void, Map<Element, Long>> {
+    private static class PositionVisitor extends VisageTreePathScanner<Void, Map<Element, Long>> {
 
         private final CompilationInfo info;
         private final JavafxcTrees trees;
@@ -188,7 +188,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 if (SpaceMagicUtils.isSpiritualMethod(e)) {
                     List<Element> spiritualMembers = SpaceMagicUtils.getSpiritualMembers(info);
                     for (Element sm : spiritualMembers) {
-                        JavaFXTreePath smPath = info.getPath(sm);
+                        VisageTreePath smPath = info.getPath(sm);
                         Tree smTree = smPath != null ? smPath.getLeaf() : null;
 
                         if (smTree != null) {
@@ -313,7 +313,7 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
         }
 
         Description d = new Description(ui, name, eh, spaceMagicKind, inherited);
-        final JavafxTypes javafxTypes = info.getJavafxTypes();
+        final JavafxTypes visageTypes = info.getJavafxTypes();
         final boolean isDeprecated = info.getElements().isDeprecated(e);
 
         if (e instanceof TypeElement) {
@@ -325,17 +325,17 @@ public class ElementScanningTask implements CancellableTask<CompilationInfo> {
                 }
             }
             d.subs = new HashSet<Description>();
-            d.htmlHeader = FXSourceUtils.typeElementToString(javafxTypes, (TypeElement) e, isDeprecated, d.isInherited);
+            d.htmlHeader = FXSourceUtils.typeElementToString(visageTypes, (TypeElement) e, isDeprecated, d.isInherited);
         } else if (e instanceof ExecutableElement) {
             if (!spaceMagic && name.contains("$") && !name.contains("init")) { // NOI18N
                 return null;
             }
-            d.htmlHeader = FXSourceUtils.executableElementToString(javafxTypes, (ExecutableElement) e, isDeprecated, d.isInherited);
+            d.htmlHeader = FXSourceUtils.executableElementToString(visageTypes, (ExecutableElement) e, isDeprecated, d.isInherited);
         } else if (e instanceof VariableElement) {
             if (!spaceMagic && kind != ElementKind.FIELD && kind != ElementKind.ENUM_CONSTANT) {
                 return null;
             }
-            d.htmlHeader = FXSourceUtils.variableElementToString(javafxTypes, (VariableElement) e, isDeprecated, d.isInherited);
+            d.htmlHeader = FXSourceUtils.variableElementToString(visageTypes, (VariableElement) e, isDeprecated, d.isInherited);
         }
 
         d.modifiers = FXSourceUtils.getModifiers(e);

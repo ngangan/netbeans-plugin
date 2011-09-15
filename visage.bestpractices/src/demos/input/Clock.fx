@@ -34,18 +34,18 @@
 
 package input;
 
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.scene.Group;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Translate;
-import javafx.scene.transform.Rotate;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.Node;
+import visage.scene.CustomNode;
+import visage.scene.Group;
+import visage.scene.shape.Circle;
+import visage.scene.shape.Line;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.paint.Color;
+import visage.scene.transform.Translate;
+import visage.scene.transform.Rotate;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 import java.util.Calendar;
 import java.lang.System;

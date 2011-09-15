@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.awt.Component;
 import java.awt.Dialog;
@@ -76,8 +76,8 @@ import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
-import org.netbeans.modules.javafx.project.ui.FoldersListSettings;
+import org.netbeans.modules.visage.project.classpath.ClassPathSupport;
+import org.netbeans.modules.visage.project.ui.FoldersListSettings;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -88,13 +88,13 @@ import org.openide.loaders.DataFolder;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
-/** Classes containing code speciic for handling UI of JavaFX project classpath 
+/** Classes containing code speciic for handling UI of Visage project classpath 
  *
  * @author Petr Hrebejk
  */
-public class JavaFXClassPathUi {
+public class VisageClassPathUi {
     
-    private JavaFXClassPathUi() {}
+    private VisageClassPathUi() {}
            
     // Innerclasses ------------------------------------------------------------
             
@@ -105,11 +105,11 @@ public class JavaFXClassPathUi {
         private static final Pattern FOREIGN_PLAIN_FILE_REFERENCE = Pattern.compile("\\$\\{file\\.reference\\.([^${}]+)\\}"); // NOI18N
         private static final Pattern UNKNOWN_FILE_REFERENCE = Pattern.compile("\\$\\{([^${}]+)\\}"); // NOI18N
         
-        private static String RESOURCE_ICON_JAR = "org/netbeans/modules/javafx/project/ui/resources/jar.gif"; //NOI18N
-        private static String RESOURCE_ICON_LIBRARY = "org/netbeans/modules/javafx/project/ui/resources/libraries.gif"; //NOI18N
-        private static String RESOURCE_ICON_ARTIFACT = "org/netbeans/modules/javafx/project/ui/resources/projectDependencies.gif"; //NOI18N
-        private static String RESOURCE_ICON_CLASSPATH = "org/netbeans/modules/javafx/project/ui/resources/referencedClasspath.gif"; //NOI18N
-        private static String RESOURCE_ICON_BROKEN_BADGE = "org/netbeans/modules/javafx/project/ui/resources/brokenProjectBadge.gif"; //NOI18N
+        private static String RESOURCE_ICON_JAR = "org/netbeans/modules/visage/project/ui/resources/jar.gif"; //NOI18N
+        private static String RESOURCE_ICON_LIBRARY = "org/netbeans/modules/visage/project/ui/resources/libraries.gif"; //NOI18N
+        private static String RESOURCE_ICON_ARTIFACT = "org/netbeans/modules/visage/project/ui/resources/projectDependencies.gif"; //NOI18N
+        private static String RESOURCE_ICON_CLASSPATH = "org/netbeans/modules/visage/project/ui/resources/referencedClasspath.gif"; //NOI18N
+        private static String RESOURCE_ICON_BROKEN_BADGE = "org/netbeans/modules/visage/project/ui/resources/brokenProjectBadge.gif"; //NOI18N
         
         
         private static ImageIcon ICON_JAR = new ImageIcon( Utilities.loadImage( RESOURCE_ICON_JAR ) );
@@ -125,12 +125,12 @@ public class JavaFXClassPathUi {
                 
         private PropertyEvaluator evaluator;
         
-        // Contains well known paths in the JavaFXProject
+        // Contains well known paths in the VisageProject
         private static final Map WELL_KNOWN_PATHS_NAMES = new HashMap();
         static {
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.JAVAC_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_JavacClasspath_DisplayName" ) ); // NOI18N
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.RUN_CLASSPATH, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_RunClasspath_DisplayName" ) ); // NOI18N
-            WELL_KNOWN_PATHS_NAMES.put( JavaFXProjectProperties.BUILD_CLASSES_DIR, NbBundle.getMessage( JavaFXProjectProperties.class, "LBL_BuildClassesDir_DisplayName" ) ); // NOI18N
+            WELL_KNOWN_PATHS_NAMES.put( VisageProjectProperties.JAVAC_CLASSPATH, NbBundle.getMessage( VisageProjectProperties.class, "LBL_JavacClasspath_DisplayName" ) ); // NOI18N
+            WELL_KNOWN_PATHS_NAMES.put( VisageProjectProperties.RUN_CLASSPATH, NbBundle.getMessage( VisageProjectProperties.class, "LBL_RunClasspath_DisplayName" ) ); // NOI18N
+            WELL_KNOWN_PATHS_NAMES.put( VisageProjectProperties.BUILD_CLASSES_DIR, NbBundle.getMessage( VisageProjectProperties.class, "LBL_BuildClassesDir_DisplayName" ) ); // NOI18N
         };
                 
         public ClassPathListCellRenderer( PropertyEvaluator evaluator ) {
@@ -156,7 +156,7 @@ public class JavaFXClassPathUi {
                 
                 case ClassPathSupport.Item.TYPE_LIBRARY:
                     if ( item.isBroken() ) {
-                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_LIBRARY", getLibraryName( item ) ); // NOI18N
+                        return NbBundle.getMessage( VisageClassPathUi.class, "LBL_MISSING_LIBRARY", getLibraryName( item ) ); // NOI18N
                     }
                     else { 
                         return item.getLibrary().getDisplayName();
@@ -166,20 +166,20 @@ public class JavaFXClassPathUi {
                     return name == null ? item.getReference() : name;
                 case ClassPathSupport.Item.TYPE_ARTIFACT:
                     if ( item.isBroken() ) {
-                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_PROJECT", getProjectName( item ) ); // NOI18N
+                        return NbBundle.getMessage( VisageClassPathUi.class, "LBL_MISSING_PROJECT", getProjectName( item ) ); // NOI18N
                     }
                     else {
                         Project p = item.getArtifact().getProject();
                         ProjectInformation pi = ProjectUtils.getInformation(p);
                         String projectName = pi.getDisplayName();
-                        return MessageFormat.format (NbBundle.getMessage(JavaFXClassPathUi.class,"MSG_ProjectArtifactFormat"), new Object[] { // NOI18N
+                        return MessageFormat.format (NbBundle.getMessage(VisageClassPathUi.class,"MSG_ProjectArtifactFormat"), new Object[] { // NOI18N
                             projectName,
                             item.getArtifactURI().toString()
                         });
                     }
                 case ClassPathSupport.Item.TYPE_JAR:
                     if ( item.isBroken() ) {
-                        return NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_MISSING_FILE", getFileRefName( item ) ); // NOI18N
+                        return NbBundle.getMessage( VisageClassPathUi.class, "LBL_MISSING_FILE", getFileRefName( item ) ); // NOI18N
                     }
                     else {
                         return item.getFile().getPath();
@@ -380,11 +380,11 @@ public class JavaFXClassPathUi {
                 FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
                 chooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
                 chooser.setMultiSelectionEnabled( true );
-                chooser.setDialogTitle( NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_AddJar_DialogTitle" ) ); // NOI18N
+                chooser.setDialogTitle( NbBundle.getMessage( VisageClassPathUi.class, "LBL_AddJar_DialogTitle" ) ); // NOI18N
                 //#61789 on old macosx (jdk 1.4.1) these two method need to be called in this order.
                 chooser.setAcceptAllFileFilterUsed( false );
                 chooser.setFileFilter( new SimpleFileFilter( 
-                    NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_ZipJarFolderFilter" ),                  // NOI18N
+                    NbBundle.getMessage( VisageClassPathUi.class, "LBL_ZipJarFolderFilter" ),                  // NOI18N
                     new String[] {"ZIP","JAR"} ) );                                                                 // NOI18N 
                 File curDir = FoldersListSettings.getDefault().getLastUsedClassPathFolder(); 
                 chooser.setCurrentDirectory (curDir);
@@ -408,13 +408,13 @@ public class JavaFXClassPathUi {
                     }
                 }
                 Object[] options = new Object[] {
-                    new JButton (NbBundle.getMessage (JavaFXClassPathUi.class,"LBL_AddLibrary")), // NOI18N
+                    new JButton (NbBundle.getMessage (VisageClassPathUi.class,"LBL_AddLibrary")), // NOI18N
                     DialogDescriptor.CANCEL_OPTION
                 };
                 ((JButton)options[0]).setEnabled(false);
-                ((JButton)options[0]).getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (JavaFXClassPathUi.class,"AD_AddLibrary")); // NOI18N
+                ((JButton)options[0]).getAccessibleContext().setAccessibleDescription (NbBundle.getMessage (VisageClassPathUi.class,"AD_AddLibrary")); // NOI18N
                 LibrariesChooser panel = new LibrariesChooser ((JButton)options[0], includedLibraries);
-                DialogDescriptor desc = new DialogDescriptor(panel,NbBundle.getMessage( JavaFXClassPathUi.class, "LBL_CustomizeCompile_Classpath_AddLibrary" ), // NOI18N
+                DialogDescriptor desc = new DialogDescriptor(panel,NbBundle.getMessage( VisageClassPathUi.class, "LBL_CustomizeCompile_Classpath_AddLibrary" ), // NOI18N
                     true, options, options[0], DialogDescriptor.DEFAULT_ALIGN,null,null);
                 Dialog dlg = DialogDisplayer.getDefault().createDialog(desc);
                 dlg.setVisible(true);

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.source.ui;
+package org.netbeans.modules.visage.source.ui;
 
 import java.awt.Image;
 import java.util.Collection;
@@ -59,7 +59,7 @@ import org.openide.util.ImageUtilities;
  */
 public final class Icons {
 
-    private static final String ICON_BASE = "org/netbeans/modules/javafx/source/resources/icons/"; // NOI18N
+    private static final String ICON_BASE = "org/netbeans/modules/visage/source/resources/icons/"; // NOI18N
     private static final String GIF_EXTENSION = ".gif"; // NOI18N
     private static final String PNG_EXTENSION = ".png"; // NOI18N
     private static final String WAIT = ICON_BASE + "wait" + PNG_EXTENSION; // NOI18N

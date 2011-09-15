@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.format.ui;
+package org.netbeans.modules.visage.editor.format.ui;
 
 import java.awt.Component;
 import java.awt.event.KeyEvent;

@@ -41,16 +41,16 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
-public class JavaFXCompletionProviderBasicTest extends CompletionTestBase {
+public class VisageCompletionProviderBasicTest extends CompletionTestBase {
 
-    public JavaFXCompletionProviderBasicTest(String testName) {
+    public VisageCompletionProviderBasicTest(String testName) {
         super(testName);
     }
 
     public void testPackages() throws Exception {
-        checkCompletion("Model", "package ^javafxapplication2;", "packages.pass");
+        checkCompletion("Model", "package ^visageapplication2;", "packages.pass");
     }
 
     public void testOnlyPackageFile() throws Exception {

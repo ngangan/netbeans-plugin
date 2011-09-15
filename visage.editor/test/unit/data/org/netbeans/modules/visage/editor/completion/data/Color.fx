@@ -1,5 +1,5 @@
-package javafxtester;
+package visagetester;
 
-import javafx.scene.paint.Color;
+import visage.scene.paint.Color;
 
 var c = Color.rgb(50, 100, 150);

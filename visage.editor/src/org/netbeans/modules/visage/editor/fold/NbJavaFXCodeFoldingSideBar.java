@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.fold;
+package org.netbeans.modules.visage.editor.fold;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,20 +55,20 @@ import org.netbeans.editor.CodeFoldingSideBar;
  *
  *  @author  Martin Roskanin
  */
-public class NbJavaFXCodeFoldingSideBar extends CodeFoldingSideBar{
+public class NbVisageCodeFoldingSideBar extends CodeFoldingSideBar{
 
     private int startPos;
     private int endPos;
     private List elems = new ArrayList();
     
     /** Creates a new instance of NbCodeFoldingSideBar */
-    public NbJavaFXCodeFoldingSideBar(JTextComponent target) {
+    public NbVisageCodeFoldingSideBar(JTextComponent target) {
         super(target);
 
     }
     
     public javax.swing.JComponent createSideBar(javax.swing.text.JTextComponent target) {
-        return new NbJavaFXCodeFoldingSideBar(target);
+        return new NbVisageCodeFoldingSideBar(target);
     }
 
 }

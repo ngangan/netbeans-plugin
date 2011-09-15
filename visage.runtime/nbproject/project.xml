@@ -3,103 +3,103 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.runtime</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.runtime</code-name-base>
             <suite-component/>
             <module-dependencies/>
             <public-packages>
-                <subpackages>com.javafx</subpackages>
+                <subpackages>com.visage</subpackages>
                 <package>com.sun.embeddedswing</package>
-                <subpackages>com.sun.javafx</subpackages>
+                <subpackages>com.sun.visage</subpackages>
                 <subpackages>com.sun.media.jmc</subpackages>
                 <subpackages>com.sun.media.jmcimpl</subpackages>
                 <package>com.sun.medialib.codec.mpad</package>
                 <subpackages>com.sun.scenario</subpackages>
                 <subpackages>com.sun.stylesheet</subpackages>
-                <subpackages>javafx</subpackages>
+                <subpackages>visage</subpackages>
             </public-packages>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/javafxrt.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/javafxrt.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagert.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/visagert.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/fxdtools.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/fxdtools.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/fxjdi.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/shared/fxjdi.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/shared/fxjdi.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/fxjdi.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-io.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-io.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-io.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-io.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/fxdloader.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/fxdloader.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/fxdloader.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/fxdloader.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-common.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-common.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-common.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-swing.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-sg-swing.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-sg-swing.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-sg-swing.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-geom.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-geom.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-geom.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-geom.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-anim.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-anim.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-anim.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-anim.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-sg-common.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-sg-common.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-sg-common.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-swing.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-swing.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-swing.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-swing.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-common.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-common.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-common.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-controls.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-controls.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-controls.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-controls.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-charts.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-charts.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-charts.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-charts.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-desktop.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/javafx-ui-desktop.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-desktop.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-desktop.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/jmc.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/jmc.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/jmc.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/jmc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-runtime.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-runtime.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-j2d.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/decora-j2d.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-j2d.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-j2d-rsl.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-j2d-rsl.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/decora-j2d-rsl.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-j2d-rsl.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/prism/decora-prism.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/prism/decora-prism.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/prism/decora-prism.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/prism/decora-prism.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-jsw.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/javafx/javafx-sdk/lib/desktop/decora-jsw.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/decora-jsw.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-jsw.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

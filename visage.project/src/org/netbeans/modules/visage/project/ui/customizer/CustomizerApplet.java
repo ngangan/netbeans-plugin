@@ -35,7 +35,7 @@
  * Created on June 17, 2008, 7:26 PM
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 /**
  *
@@ -44,7 +44,7 @@ package org.netbeans.modules.javafx.project.ui.customizer;
 public class CustomizerApplet extends javax.swing.JPanel {
 
     /** Creates new form CustomizerApplet */
-    public CustomizerApplet(JavaFXProjectProperties uiProperties) {
+    public CustomizerApplet(VisageProjectProperties uiProperties) {
         initComponents();
         
         widthSpinner.setModel(uiProperties.widthModel);

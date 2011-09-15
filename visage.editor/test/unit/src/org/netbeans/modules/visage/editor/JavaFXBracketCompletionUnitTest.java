@@ -42,20 +42,20 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 
 /**
  * Test java bracket completion.
  *
  * @autor Miloslav Metelka
  */
-public class JavaFXBracketCompletionUnitTest extends JavaFXBaseDocumentUnitTestCase {
+public class VisageBracketCompletionUnitTest extends VisageBaseDocumentUnitTestCase {
 
-    public JavaFXBracketCompletionUnitTest(String testMethodName) {
+    public VisageBracketCompletionUnitTest(String testMethodName) {
         super(testMethodName);
     }
     
@@ -609,9 +609,9 @@ public class JavaFXBracketCompletionUnitTest extends JavaFXBaseDocumentUnitTestC
     }
     
     private boolean isSkipRightBracketOrParen(boolean parenthesis) {
-        JFXTokenId bracketTokenId = parenthesis
-        ? JFXTokenId.RPAREN
-        : JFXTokenId.RBRACKET;
+        VSGTokenId bracketTokenId = parenthesis
+        ? VSGTokenId.RPAREN
+        : VSGTokenId.RBRACKET;
         
         try {
             return BracketCompletion.isSkipClosingBracket(

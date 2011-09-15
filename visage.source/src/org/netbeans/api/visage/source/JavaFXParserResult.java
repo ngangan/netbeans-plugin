@@ -40,22 +40,22 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
-import com.sun.tools.javafx.api.JavafxcTool;
-import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.tools.visage.api.JavafxcTaskImpl;
+import com.sun.tools.visage.api.JavafxcTool;
+import com.sun.tools.visage.api.JavafxcTrees;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
-import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserTask;
+import org.netbeans.modules.visage.source.ApiSourcePackageAccessor;
+import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
+import org.netbeans.modules.visage.source.parsing.VisageParserTask;
 import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
@@ -66,22 +66,22 @@ import org.netbeans.modules.parsing.spi.ParseException;
  *
  * @author Miloslav Metelka
  */
-public final class JavaFXParserResult extends Result {
+public final class VisageParserResult extends Result {
 
     static {
         ApiSourcePackageAccessor.set(new Accessor());
     }
 
     /**
-     * Create result. {@link #toPhase(org.netbeans.api.javafx.source.CompilationPhase)}
+     * Create result. {@link #toPhase(org.netbeans.api.visage.source.CompilationPhase)}
      * may be used to move to a concrete phase.
      *
      * @param snapshot non-null snapshot to be parsed.
      * @param classpathInfo class path info or null to use default class path.
      * @return non-null result
      */
-    public static JavaFXParserResult create(Source source, ClasspathInfo classpathInfo) throws ParseException {
-        JavaFXParserTask task = new JavaFXParserTask(classpathInfo);
+    public static VisageParserResult create(Source source, ClasspathInfo classpathInfo) throws ParseException {
+        VisageParserTask task = new VisageParserTask(classpathInfo);
         ParserManager.parse(Collections.singletonList(source), task);
         return task.result();
     }
@@ -92,9 +92,9 @@ public final class JavaFXParserResult extends Result {
      */
     public static final int ANALYZED_PRIORITY = 2000;
 
-    private JavaFXParserResultImpl impl;
+    private VisageParserResultImpl impl;
 
-    JavaFXParserResult(JavaFXParserResultImpl impl) {
+    VisageParserResult(VisageParserResultImpl impl) {
         super(impl.getSnapshot());
         this.impl = impl;
     }
@@ -156,15 +156,15 @@ public final class JavaFXParserResult extends Result {
         impl.invalidate();
     }
 
-    JavaFXParserResultImpl impl() {
+    VisageParserResultImpl impl() {
         return impl;
     }
 
     private static final class Accessor extends ApiSourcePackageAccessor {
 
         @Override
-        public JavaFXParserResult createResult(JavaFXParserResultImpl impl) {
-            return new JavaFXParserResult(impl);
+        public VisageParserResult createResult(VisageParserResultImpl impl) {
+            return new VisageParserResult(impl);
         }
 
         @Override
@@ -173,18 +173,18 @@ public final class JavaFXParserResult extends Result {
         }
 
         @Override
-        public ElementUtilities createElementUtilities(JavaFXParserResultImpl resultImpl) {
+        public ElementUtilities createElementUtilities(VisageParserResultImpl resultImpl) {
             return new ElementUtilities(resultImpl);
         }
 
         @Override
-        public TreeUtilities createTreeUtilities(JavaFXParserResultImpl resultImpl) {
+        public TreeUtilities createTreeUtilities(VisageParserResultImpl resultImpl) {
             return new TreeUtilities(resultImpl);
         }
 
         @Override
         public void registerSourceTaskFactoryManager() {
-            JavaFXSourceTaskFactoryManager.register();
+            VisageSourceTaskFactoryManager.register();
         }
 
     }

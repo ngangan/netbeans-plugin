@@ -41,26 +41,26 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.preview;
+package org.netbeans.modules.visage.fxd.composer.preview;
 
-import com.sun.javafx.geom.Bounds2D;
+import com.sun.visage.geom.Bounds2D;
 import java.net.URL;
 import org.openide.util.Exceptions;
 
 import org.openide.util.NbBundle;
 
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.composer.model.*;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookup;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookupUtils;
+import org.netbeans.modules.visage.fxd.composer.model.actions.AbstractFXDAction;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.*;
 
-import com.sun.javafx.tools.fxd.PreviewLoader;
-import com.sun.javafx.tools.fxd.PreviewStatistics;
-import com.sun.javafx.tools.fxd.container.ContainerEntry;
-import com.sun.javafx.tools.fxd.container.misc.ProgressHandler;
-import com.sun.javafx.tools.fxd.loader.Profile;
-import com.sun.javafx.tools.fxd.PreviewLoaderUtilities;
+import com.sun.visage.tools.fxd.PreviewLoader;
+import com.sun.visage.tools.fxd.PreviewStatistics;
+import com.sun.visage.tools.fxd.container.ContainerEntry;
+import com.sun.visage.tools.fxd.container.misc.ProgressHandler;
+import com.sun.visage.tools.fxd.loader.Profile;
+import com.sun.visage.tools.fxd.PreviewLoaderUtilities;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -71,9 +71,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import javafx.geometry.Bounds;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+import visage.geometry.Bounds;
+import visage.scene.Node;
+import visage.scene.Scene;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
@@ -81,10 +81,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import org.netbeans.modules.javafx.fxd.composer.misc.FXDComposerUtils;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
+import org.netbeans.modules.visage.fxd.composer.misc.FXDComposerUtils;
+import org.netbeans.modules.visage.fxd.composer.model.actions.ActionController;
+import org.netbeans.modules.visage.fxd.composer.model.actions.HighlightActionFactory;
+import org.netbeans.modules.visage.fxd.composer.model.actions.SelectActionFactory;
 import org.openide.awt.MouseUtils;
 import org.openide.util.actions.Presenter;
 import org.openide.windows.TopComponent;
@@ -145,7 +145,7 @@ final class PreviewImagePanel extends JPanel implements ActionLookup {
     }
     
     protected JLabel createWaitPanel() {
-        URL url = PreviewImagePanel.class.getClassLoader().getResource("org/netbeans/modules/javafx/fxd/composer/resources/clock.gif"); //NOI18N
+        URL url = PreviewImagePanel.class.getClassLoader().getResource("org/netbeans/modules/visage/fxd/composer/resources/clock.gif"); //NOI18N
         ImageIcon icon = new ImageIcon( url);
         JLabel label = new JLabel( icon);
         label.setHorizontalTextPosition(JLabel.CENTER);

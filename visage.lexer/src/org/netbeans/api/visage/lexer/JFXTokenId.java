@@ -42,11 +42,11 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.api.javafx.lexer;
+package org.netbeans.api.visage.lexer;
 
 import org.netbeans.api.java.lexer.JavadocTokenId;
 import org.netbeans.api.lexer.*;
-import org.netbeans.lib.javafx.lexer.JFXLexer;
+import org.netbeans.lib.visage.lexer.VSGLexer;
 import org.netbeans.spi.lexer.*;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ import java.util.logging.Logger;
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  * @todo documentation
  */
-public enum JFXTokenId implements TokenId {
+public enum VSGTokenId implements TokenId {
 
     /* v4Lexer tokens. */
     ABSTRACT("keyword", 4, "abstract"), // NOI18N
@@ -201,20 +201,20 @@ public enum JFXTokenId implements TokenId {
     private final String primaryCategory;
     private final int tokenType;
     private final String fixedText;
-    private static JFXTokenId[] typeToId;
+    private static VSGTokenId[] typeToId;
 
     static {
         try {
-            final JFXTokenId[] tokenIds = JFXTokenId.values();
-            Arrays.sort(tokenIds, new Comparator<JFXTokenId>() {
-                public int compare(JFXTokenId o1, JFXTokenId o2) {
+            final VSGTokenId[] tokenIds = VSGTokenId.values();
+            Arrays.sort(tokenIds, new Comparator<VSGTokenId>() {
+                public int compare(VSGTokenId o1, VSGTokenId o2) {
                     return o1.getTokenType() - o2.getTokenType();
                 }
             });
-            final JFXTokenId tid = tokenIds[tokenIds.length - 1];
+            final VSGTokenId tid = tokenIds[tokenIds.length - 1];
             final int type = tid.getTokenType();
-            typeToId = new JFXTokenId[type + 2];
-            for (JFXTokenId jfxTokenId : tokenIds) {
+            typeToId = new VSGTokenId[type + 2];
+            for (VSGTokenId jfxTokenId : tokenIds) {
                 if (jfxTokenId.getTokenType() > 0) {
                     typeToId[jfxTokenId.getTokenType()] = jfxTokenId;
                 }
@@ -225,7 +225,7 @@ public enum JFXTokenId implements TokenId {
     }
 
 
-    public static JFXTokenId getId(int tokenType) {
+    public static VSGTokenId getId(int tokenType) {
         if (tokenType >= 0 && tokenType < typeToId.length) {
             return typeToId[tokenType];
         } else {
@@ -233,11 +233,11 @@ public enum JFXTokenId implements TokenId {
         }
     }
 
-    JFXTokenId(String primaryCategory, int tokenType) {
+    VSGTokenId(String primaryCategory, int tokenType) {
         this(primaryCategory, tokenType, null);
     }
 
-    JFXTokenId(String primaryCategory, int tokenType, String fixedText) {
+    VSGTokenId(String primaryCategory, int tokenType, String fixedText) {
         this.fixedText = fixedText;
         this.primaryCategory = primaryCategory;
         this.tokenType = tokenType;
@@ -260,17 +260,17 @@ public enum JFXTokenId implements TokenId {
         return fixedText;
     }
 
-    private static final Language<JFXTokenId> language = new LanguageHierarchy<JFXTokenId>() {
-        private Logger log = Logger.getLogger(JFXTokenId.class.getName());
-//        JFXLexer lexer;
+    private static final Language<VSGTokenId> language = new LanguageHierarchy<VSGTokenId>() {
+        private Logger log = Logger.getLogger(VSGTokenId.class.getName());
+//        VSGLexer lexer;
 
-        protected Collection<JFXTokenId> createTokenIds() {
-            return Arrays.asList(JFXTokenId.values());
+        protected Collection<VSGTokenId> createTokenIds() {
+            return Arrays.asList(VSGTokenId.values());
         }
 
-        protected Lexer<JFXTokenId> createLexer(LexerRestartInfo<JFXTokenId> info) {
+        protected Lexer<VSGTokenId> createLexer(LexerRestartInfo<VSGTokenId> info) {
             /*if (lexer == null) {
-                lexer = new JFXLexer();
+                lexer = new VSGLexer();
             }
             try {
                 lexer.restart(info);
@@ -278,7 +278,7 @@ public enum JFXTokenId implements TokenId {
                 e.printStackTrace();
             }*/
             try {
-                return new JFXLexer(info);
+                return new VSGLexer(info);
             } catch (IOException e) {
                 if (log.isLoggable(Level.SEVERE)) log.severe("Cannot create lexer.\n" + e); // NOI18N
                 throw new IllegalStateException(e);
@@ -291,28 +291,28 @@ public enum JFXTokenId implements TokenId {
         }
 
         @Override
-        protected LanguageEmbedding<?> embedding(Token<JFXTokenId> token, LanguagePath languagePath, InputAttributes inputAttributes) {
+        protected LanguageEmbedding<?> embedding(Token<VSGTokenId> token, LanguagePath languagePath, InputAttributes inputAttributes) {
             switch (token.id()) {
                 case DOC_COMMENT:
                     return LanguageEmbedding.create(JavadocTokenId.language(), 3,
                                 (token.partType() == PartType.COMPLETE) ? 2 : 0);
                 case QUOTE_LBRACE_STRING_LITERAL:
-                    return LanguageEmbedding.create(JFXStringTokenId.language(), 1, 0);
+                    return LanguageEmbedding.create(VSGStringTokenId.language(), 1, 0);
                 case RBRACE_QUOTE_STRING_LITERAL:
-                    return LanguageEmbedding.create(JFXStringTokenId.language(), 0, 1);
+                    return LanguageEmbedding.create(VSGStringTokenId.language(), 0, 1);
                 case RBRACE_LBRACE_STRING_LITERAL:
-                    return LanguageEmbedding.create(JFXStringTokenId.language(), 0, 0);
+                    return LanguageEmbedding.create(VSGStringTokenId.language(), 0, 0);
                 case DoubleQuoteBody:
                 case SingleQuoteBody:
                 case STRING_LITERAL:
-                    return LanguageEmbedding.create(JFXStringTokenId.language(true), 1,
+                    return LanguageEmbedding.create(VSGStringTokenId.language(true), 1,
                             (token.partType() == PartType.COMPLETE) ? 1 : 0);
             }
             return null; // No embedding
         }
 
         @Override
-        protected EmbeddingPresence embeddingPresence(JFXTokenId id) {
+        protected EmbeddingPresence embeddingPresence(VSGTokenId id) {
             switch (id) {
                 case COMMENT:
                 case QUOTE_LBRACE_STRING_LITERAL:
@@ -329,7 +329,7 @@ public enum JFXTokenId implements TokenId {
 
     }.language();
 
-    public static Language<JFXTokenId> language() {
+    public static Language<VSGTokenId> language() {
         return language;
     }
 
@@ -338,7 +338,7 @@ public enum JFXTokenId implements TokenId {
      * @param id to check.
      * @return true if <code>id</code> is comment
      */
-    public static boolean isComment(JFXTokenId id) {
+    public static boolean isComment(VSGTokenId id) {
         if (id == null) return false;
         switch (id) {
             case COMMENT:

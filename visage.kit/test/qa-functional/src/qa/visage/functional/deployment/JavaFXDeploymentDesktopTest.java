@@ -39,29 +39,29 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.deployment;
+package qa.visage.functional.deployment;
 
-import qa.javafx.smoke.*;
+import qa.visage.smoke.*;
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.DeploymentType;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.DeploymentType;
+import qa.visage.functional.library.project.VisageProject;
 
 /**
  *
  * @author andromeda
  */
-public class JavaFXDeploymentDesktopTest extends JavaFXDeploymentTestCase {
+public class VisageDeploymentDesktopTest extends VisageDeploymentTestCase {
 
 
 
     static DeploymentType type = DeploymentType.DESKTOP;
 
-    public JavaFXDeploymentDesktopTest(String name) {
+    public VisageDeploymentDesktopTest(String name) {
         super(name);
     }
     static String[] TESTS = {
@@ -69,13 +69,13 @@ public class JavaFXDeploymentDesktopTest extends JavaFXDeploymentTestCase {
     };
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXDeploymentDesktopTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageDeploymentDesktopTest.class, ".*", ".*", TESTS);
 
     }
 
     public void testDeployment() {
         testDeployment(type);
-//        JavaFXProject project = JavaFXProject.createProject(getProjectName(type),type);
+//        VisageProject project = VisageProject.createProject(getProjectName(type),type);
 //
 //        try{
 //            project.deploy();

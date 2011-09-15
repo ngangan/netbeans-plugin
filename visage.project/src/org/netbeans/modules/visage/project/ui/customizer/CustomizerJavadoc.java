@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import javax.swing.JPanel;
 import org.openide.util.HelpCtx;
@@ -53,7 +53,7 @@ import org.openide.util.HelpCtx;
  */
 public class CustomizerJavadoc extends JPanel implements HelpCtx.Provider {
 
-    public CustomizerJavadoc( JavaFXProjectProperties uiProperties ) {
+    public CustomizerJavadoc( VisageProjectProperties uiProperties ) {
 
         initComponents();
 

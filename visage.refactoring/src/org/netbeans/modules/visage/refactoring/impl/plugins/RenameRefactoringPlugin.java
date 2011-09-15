@@ -29,11 +29,11 @@
  * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Scope;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Scope;
+import com.sun.visage.api.tree.Tree;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -47,27 +47,27 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameInCommentsElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
-import org.netbeans.modules.javafx.refactoring.impl.scanners.LocalVarScanner;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.GlobalDef;
-import org.netbeans.modules.javafx.refactoring.repository.Usage;
-import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.RenameInCommentsElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.RenameOccurencesElement;
+import org.netbeans.modules.visage.refactoring.impl.scanners.LocalVarScanner;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.GlobalDef;
+import org.netbeans.modules.visage.refactoring.repository.Usage;
+import org.netbeans.modules.visage.refactoring.transformations.ReplaceTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
 import org.netbeans.modules.refactoring.spi.RefactoringElementsBag;
@@ -82,7 +82,7 @@ import org.openide.util.Utilities;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
+public class RenameRefactoringPlugin extends VisageRefactoringPlugin {
     private RenameRefactoring refactoring;
 
     public RenameRefactoringPlugin(RenameRefactoring refactoring) {
@@ -107,7 +107,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
     public Problem checkParameters() {
         FileObject fo = getRefactoringFO();
-        if (!SourceUtils.isJavaFXFile(fo)) return null;
+        if (!SourceUtils.isVisageFile(fo)) return null;
         
         fireProgressListenerStart(RenameRefactoring.PARAMETERS_CHECK, 4);
         final ElementDef edef = getElementDef();
@@ -178,7 +178,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
     public Problem fastCheckParameters() {
         FileObject fo = getRefactoringFO();
-        if (!SourceUtils.isJavaFXFile(fo)) return null;
+        if (!SourceUtils.isVisageFile(fo)) return null;
         
         ClassModel cm = getClassModel();
 
@@ -209,7 +209,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
 
     public Problem preCheck() {
         FileObject fo = getRefactoringFO();
-        if (!SourceUtils.isJavaFXFile(fo)) return null;
+        if (!SourceUtils.isVisageFile(fo)) return null;
         
         final ElementDef edef = getElementDef();
         if (edef == null) return null;
@@ -223,7 +223,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         fireProgressListenerStart(RenameRefactoring.PRE_CHECK, 4);
 
         final Element el = edef.getElement();
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        VisageSource jfxs = VisageSource.forFileObject(fo);
         try {
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
@@ -298,7 +298,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         fireProgressListenerStep();
 
         final Set<FileObject> files = new HashSet<FileObject>();
-        if (SourceUtils.isJavaFXFile(fo)) {
+        if (SourceUtils.isVisageFile(fo)) {
             files.add(fo);
         }
 
@@ -330,7 +330,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         for(FileObject file : files) {
             if (isCancelled()) return null;
             fireProgressListenerStep();
-            if (!SourceUtils.isJavaFXFile(file)) continue;
+            if (!SourceUtils.isVisageFile(file)) continue;
 
             RenameOccurencesElement updateRefs = new RenameOccurencesElement(edef.getName(), refactoring.getNewName(), file, bag.getSession()) {
 
@@ -382,7 +382,7 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
         final FileObject srcFo = getRefactoringFO();
         if (edef == null) return null;
 
-        JavaFXSource jfxs = JavaFXSource.forFileObject(srcFo);
+        VisageSource jfxs = VisageSource.forFileObject(srcFo);
         final String[] msg = new String[1];
 
         try {
@@ -392,12 +392,12 @@ public class RenameRefactoringPlugin extends JavaFXRefactoringPlugin {
                     if (edef != null) {
                         Element var = cc.getElementUtilities().elementFor(edef.getStartPos());
 
-                        JavaFXTreePath tp = cc.getPath(var);
+                        VisageTreePath tp = cc.getPath(var);
 
                         LocalVarScanner lookup = new LocalVarScanner(cc, refactoring.getNewName());
-                        JavaFXTreePath scopeBlok = tp;
-                        EnumSet set = EnumSet.of(Tree.JavaFXKind.BLOCK_EXPRESSION, Tree.JavaFXKind.FOR_EXPRESSION_FOR, Tree.JavaFXKind.FUNCTION_DEFINITION, Tree.JavaFXKind.CLASS_DECLARATION);
-                        while (scopeBlok != null && scopeBlok.getLeaf() != null && !set.contains(scopeBlok.getLeaf().getJavaFXKind())) {
+                        VisageTreePath scopeBlok = tp;
+                        EnumSet set = EnumSet.of(Tree.VisageKind.BLOCK_EXPRESSION, Tree.VisageKind.FOR_EXPRESSION_FOR, Tree.VisageKind.FUNCTION_DEFINITION, Tree.VisageKind.CLASS_DECLARATION);
+                        while (scopeBlok != null && scopeBlok.getLeaf() != null && !set.contains(scopeBlok.getLeaf().getVisageKind())) {
                             scopeBlok = scopeBlok.getParentPath();
                         }
                         if (scopeBlok != null) {

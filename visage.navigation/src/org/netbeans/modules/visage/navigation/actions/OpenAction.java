@@ -41,16 +41,16 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation.actions;
+package org.netbeans.modules.visage.navigation.actions;
 
 import javax.swing.*;
 import java.awt.Toolkit;
 import java.awt.event.*;
 import javax.lang.model.element.Element;
-import org.netbeans.api.javafx.editor.ElementOpen;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.navigation.SpaceMagicUtils;
+import org.netbeans.api.visage.editor.ElementOpen;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.navigation.SpaceMagicUtils;
 import org.openide.awt.StatusDisplayer;
 import org.openide.filesystems.FileObject;
 import org.openide.util.*;
@@ -60,7 +60,7 @@ import org.openide.util.*;
  * Similar to editor's go to declaration action.
  *
  * @author tim, Dafe Simonek
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
 public final class OpenAction extends AbstractAction {
 

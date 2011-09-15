@@ -40,13 +40,13 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
 
-import com.sun.tools.javafx.tree.JFXSequenceIndexed;
+import com.sun.tools.visage.tree.VSGSequenceIndexed;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -58,23 +58,23 @@ import javax.lang.model.type.TypeKind;
  *
  * @author Petr Nejedly
  */
-public class SequenceIndexedEnvironment extends JavaFXCompletionEnvironment<JFXSequenceIndexed> {
+public class SequenceIndexedEnvironment extends VisageCompletionEnvironment<VSGSequenceIndexed> {
 
     private static final Logger logger = Logger.getLogger(SequenceIndexedEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXSequenceIndexed t) throws IOException {
+    protected void inside(VSGSequenceIndexed t) throws IOException {
         if (LOGGABLE) {
-            logger.fine("inside JFXSequenceIndexed " + t + "  offset == " + offset); // NOI18N
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("inside VSGSequenceIndexed " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
         localResult(getSmartType(t));
 //        addValueKeywords();
     }
 
-    private TypeMirror getSmartType(JFXSequenceIndexed t) throws IOException {
+    private TypeMirror getSmartType(VSGSequenceIndexed t) throws IOException {
         // the target type is Number (int) as an sequence index
         TypeMirror type = controller.getTypes().getPrimitiveType(TypeKind.INT);
         return type;

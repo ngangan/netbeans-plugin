@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -55,7 +55,7 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.queries.BinaryForSourceQuery;
 import org.netbeans.api.java.queries.BinaryForSourceQuery.Result;
 import org.netbeans.modules.java.api.common.SourceRoots;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.java.queries.BinaryForSourceQueryImplementation;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
@@ -93,7 +93,7 @@ public class BinaryForSourceQueryImpl implements BinaryForSourceQueryImplementat
         if (result == null) {
             for (URL root : this.src.getRootURLs()) {
                 if (root.equals(sourceRoot)) {
-                    result = new R (JavaFXProjectProperties.BUILD_CLASSES_DIR);
+                    result = new R (VisageProjectProperties.BUILD_CLASSES_DIR);
                     cache.put (sourceRoot,result);
                     break;
                 }

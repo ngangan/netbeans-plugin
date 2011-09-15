@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.project;
+package qa.visage.functional.project;
 
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
@@ -56,29 +56,29 @@ import org.netbeans.junit.NbTestSuite;
  */
 
 
-public class JavaFXProjectTest extends JavaFXTestCase {
+public class VisageProjectTest extends VisageTestCase {
 
     static final String[] TESTS = {
         "testCreateEmptyProject",
     };
 
 
-    public JavaFXProjectTest(String name) {
+    public VisageProjectTest(String name) {
         super(name);
     }
 
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXProjectTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageProjectTest.class, ".*", ".*", TESTS);
     }
 
      public static void main(String[] args) {
-        TestRunner.run(new NbTestSuite(JavaFXProjectTest.class));
+        TestRunner.run(new NbTestSuite(VisageProjectTest.class));
     }
 
     
     public void testCreateEmptyProject(){
-        JavaFXProject project = JavaFXProject.createProject("Test");
+        VisageProject project = VisageProject.createProject("Test");
     }
     
 }

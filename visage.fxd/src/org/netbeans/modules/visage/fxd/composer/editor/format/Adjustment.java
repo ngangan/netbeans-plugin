@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor.format;
+package org.netbeans.modules.visage.fxd.composer.editor.format;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 

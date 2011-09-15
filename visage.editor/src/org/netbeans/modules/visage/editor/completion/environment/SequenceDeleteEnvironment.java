@@ -40,13 +40,13 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
 
-import com.sun.tools.javafx.tree.JFXSequenceDelete;
+import com.sun.tools.visage.tree.VSGSequenceDelete;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -58,22 +58,22 @@ import javax.lang.model.type.TypeKind;
  *
  * @author Petr Nejedly
  */
-public class SequenceDeleteEnvironment extends JavaFXCompletionEnvironment<JFXSequenceDelete> {
+public class SequenceDeleteEnvironment extends VisageCompletionEnvironment<VSGSequenceDelete> {
 
     private static final Logger logger = Logger.getLogger(SequenceDeleteEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXSequenceDelete t) throws IOException {
+    protected void inside(VSGSequenceDelete t) throws IOException {
         if (LOGGABLE) {
-            logger.fine("inside JFXSequenceDelete " + t + "  offset == " + offset); // NOI18N
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("inside VSGSequenceDelete " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
         localResult(getSmartType(t));
     }
 
-    private TypeMirror getSmartType(JFXSequenceDelete t) throws IOException {
+    private TypeMirror getSmartType(VSGSequenceDelete t) throws IOException {
         TypeMirror type = null;
         return type;
     }

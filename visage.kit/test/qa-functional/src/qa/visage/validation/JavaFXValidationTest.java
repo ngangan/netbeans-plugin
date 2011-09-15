@@ -29,9 +29,9 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package qa.javafx.validation;
+package qa.visage.validation;
 
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Util;
 import org.netbeans.jellytools.Bundle;
 import org.netbeans.jellytools.MainWindowOperator;
 //import org.netbeans.jellytools.ProjectsTabOperator;
@@ -40,8 +40,8 @@ import org.netbeans.jellytools.nodes.Node;
 
 import org.netbeans.jemmy.operators.*;
 
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
@@ -55,67 +55,67 @@ import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.swing.tree.TreePath;
-import qa.javafx.functional.library.project.OperationSystem;
+import qa.visage.functional.library.project.OperationSystem;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
 
-public class JavaFXValidationTest extends JavaFXTestCase {
+public class VisageValidationTest extends VisageTestCase {
 
 
     final static String DIALOG_MANAGER_TITLE = "Java Platform Manager";
     final static String DIALOG_PLATFORMS_TITLE = "Add Java Platform";
 
 
-    final static String JAVAFX_SDK_LABEL = "Test JavaFX SDK";
+    final static String JAVAFX_SDK_LABEL = "Test Visage SDK";
 
-    final static String JAVAFX_SDK_VER = "javafx-sdk1.2";
-    final static String JAVAFX_SDK_URL = "http://jre.sfbay.sun.com/java/re/javafx/1.2.1/promoted/fcs/b06/bundles";
+    final static String JAVAFX_SDK_VER = "visage-sdk1.2";
+    final static String JAVAFX_SDK_URL = "http://jre.sfbay.sun.com/java/re/visage/1.2.1/promoted/fcs/b06/bundles";
 
     String JAVAFX_SDK_DIR;
 
 
 
     static String[] TESTS = {
-        "testJavaFXPlatform",
-        "testJavaFXProject",
+        "testVisagePlatform",
+        "testVisageProject",
     };
 
 
 
-    public JavaFXValidationTest(String name) {
+    public VisageValidationTest(String name) {
         super(name);
     }
 
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXValidationTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageValidationTest.class, ".*", ".*", TESTS);
 
     }
 
     public static void main(String[] args) {
-        TestRunner.run(new NbTestSuite(JavaFXValidationTest.class));
+        TestRunner.run(new NbTestSuite(VisageValidationTest.class));
     }
 
 
 
     
-    public void testJavaFXPlatform() {
+    public void testVisagePlatform() {
         //System.setOut(getLog());
 
         System.out.println("[validation] setup");
         JAVAFX_SDK_DIR= getDataDir().getAbsolutePath() + File.separator;
         System.out.println("XTEST_WORK_DIR = " + JAVAFX_SDK_DIR);
 
-        System.out.println("  Test JavaFX Plaform  ");
+        System.out.println("  Test Visage Plaform  ");
 
         String dst = Util.WORK_DIR;
 
         System.out.println("Destination dir: \"" + JAVAFX_SDK_DIR + "\"");
         
-        saveJavaFXSDK();
+        saveVisageSDK();
         
 
         new JMenuBarOperator(MainWindowOperator.getDefault()).pushMenuNoBlock("Tools|Java Platforms");
@@ -126,7 +126,7 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
         
         JDialogOperator platformsDialog = new JDialogOperator(DIALOG_PLATFORMS_TITLE);
-        JRadioButtonOperator platformRadioButton = new JRadioButtonOperator(platformsDialog, "JavaFX Platform");
+        JRadioButtonOperator platformRadioButton = new JRadioButtonOperator(platformsDialog, "Visage Platform");
         platformRadioButton.push();
 
         JButtonOperator nextButton = new JButtonOperator(platformsDialog, "Next >");
@@ -154,12 +154,12 @@ public class JavaFXValidationTest extends JavaFXTestCase {
 
     }
 
-    public void testJavaFXProject() {
+    public void testVisageProject() {
 
-        // Create a JavaFX Project
+        // Create a Visage Project
 
 
-         JavaFXProject project = JavaFXProject.createProject("TestJavaFXProject");
+         VisageProject project = VisageProject.createProject("TestVisageProject");
 
          project.getProjectNode().performPopupActionNoBlock("Properties");
 
@@ -201,7 +201,7 @@ public class JavaFXValidationTest extends JavaFXTestCase {
         new JButtonOperator(propertiesDialog, "OK").push();
         
         if(!checkSDK){
-            fail("Custom JavaFX SDK is not found in the project properties");
+            fail("Custom Visage SDK is not found in the project properties");
         }
 
         Util.waitScanFinished();
@@ -226,14 +226,14 @@ public class JavaFXValidationTest extends JavaFXTestCase {
     }
 
 
-    public void saveJavaFXSDK(){
+    public void saveVisageSDK(){
 
-        //windows-i586/javafx_sdk-1_2_1-windows-i586.zip
+        //windows-i586/visage_sdk-1_2_1-windows-i586.zip
 
         OperationSystem os = OperationSystem.getOS();
         String label = os.getLabel();
 
-        String url = JAVAFX_SDK_URL + "/" + label + "/javafx_sdk-1_2_1-" + label + ".zip";
+        String url = JAVAFX_SDK_URL + "/" + label + "/visage_sdk-1_2_1-" + label + ".zip";
         
         new File(JAVAFX_SDK_DIR).mkdirs();
         unzipFile(url, JAVAFX_SDK_DIR);

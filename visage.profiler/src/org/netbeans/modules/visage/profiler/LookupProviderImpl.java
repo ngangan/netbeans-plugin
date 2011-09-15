@@ -40,7 +40,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.profiler;
+package org.netbeans.modules.visage.profiler;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.spi.project.DataFilesProviderImplementation;

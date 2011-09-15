@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.breakpoints;
+package org.netbeans.modules.visage.debugger.breakpoints;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -51,13 +51,13 @@ import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.DebuggerManager;
 import org.netbeans.api.debugger.jpda.JPDABreakpoint;
 import org.netbeans.api.debugger.jpda.LineBreakpoint;
-import org.netbeans.modules.javafx.debugger.utils.Utils;
+import org.netbeans.modules.visage.debugger.utils.Utils;
 
 /**
  *
  * @author Michal Skvor
  */
-public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeListener {
+public class VisageLineBreakpoint extends Breakpoint implements PropertyChangeListener {
     private LineBreakpoint javalb;
 
     private boolean enabled = true;
@@ -80,9 +80,9 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
     public static final String PROP_CONDITION = LineBreakpoint.PROP_CONDITION;
     public static final String PROP_PRINT_TEXT = JPDABreakpoint.PROP_PRINT_TEXT;
 
-    public JavaFXLineBreakpoint() {}
+    public VisageLineBreakpoint() {}
 
-    public JavaFXLineBreakpoint( String url, int lineNumber ) {
+    public VisageLineBreakpoint( String url, int lineNumber ) {
         super();
 
         this.url = url;
@@ -124,8 +124,8 @@ public class JavaFXLineBreakpoint extends Breakpoint implements PropertyChangeLi
      * @param lineNumber a line number
      * @return a new breakpoint for given parameters
      */
-    public static JavaFXLineBreakpoint create( String url, int lineNumber ) {
-        return new JavaFXLineBreakpoint( url, lineNumber );
+    public static VisageLineBreakpoint create( String url, int lineNumber ) {
+        return new VisageLineBreakpoint( url, lineNumber );
     }
 
     @Override

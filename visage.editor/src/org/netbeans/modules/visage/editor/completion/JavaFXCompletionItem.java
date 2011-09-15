@@ -42,16 +42,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.tools.javafx.api.JavafxcScope;
-import com.sun.tools.javafx.api.JavafxcTrees;
+import com.sun.visage.api.tree.*;
+import com.sun.tools.visage.api.JavafxcScope;
+import com.sun.tools.visage.api.JavafxcTrees;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.completion.Completion;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.*;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.*;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
@@ -82,15 +82,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.FXSourceUtils;
 
 /**
  *
  * @author Dusan Balek
  */
-public abstract class JavaFXCompletionItem implements CompletionItem {
+public abstract class VisageCompletionItem implements CompletionItem {
     
-    private static final Logger logger = Logger.getLogger(JavaFXCompletionItem.class.getName());
+    private static final Logger logger = Logger.getLogger(VisageCompletionItem.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     public static final String COLOR_END = "</font>"; //NOI18N
@@ -98,37 +98,37 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
     public static final String STRIKE_END = "</s>"; //NOI18N
     public static final String BOLD = "<b>"; //NOI18N
     public static final String BOLD_END = "</b>"; //NOI18N
-    public static final String SEQUENCE_PREFIX = "com.sun.javafx.runtime.sequence.Sequence<? extends "; // NOI18N
+    public static final String SEQUENCE_PREFIX = "com.sun.visage.runtime.sequence.Sequence<? extends "; // NOI18N
 
     public int substitutionOffset;
     public String textToAdd;
     
     protected static int SMART_TYPE = 1000;
-    private static final String GENERATE_TEXT = NbBundle.getMessage(JavaFXCompletionItem.class, "generate_Lbl"); // NOI18N
+    private static final String GENERATE_TEXT = NbBundle.getMessage(VisageCompletionItem.class, "generate_Lbl"); // NOI18N
 
-    public static final JavaFXCompletionItem createKeywordItem(String kwd, String postfix, int substitutionOffset, boolean smartType) {
+    public static final VisageCompletionItem createKeywordItem(String kwd, String postfix, int substitutionOffset, boolean smartType) {
         return new KeywordItem(kwd, 0, postfix, substitutionOffset, smartType);
     }
     
-    public static final JavaFXCompletionItem createPackageItem(String pkgFQN, int substitutionOffset, boolean isDeprecated) {
+    public static final VisageCompletionItem createPackageItem(String pkgFQN, int substitutionOffset, boolean isDeprecated) {
         return new PackageItem(pkgFQN, substitutionOffset, isDeprecated);
     }
 
-    public static final JavaFXCompletionItem createPseudoVariable(
+    public static final VisageCompletionItem createPseudoVariable(
             String varName, int substitutionOffset) {
         return new PseudoVariableItem(varName, substitutionOffset);
     }
 
-    public static final JavaFXCompletionItem createVariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
+    public static final VisageCompletionItem createVariableItem(ElementHandle element, TypeMirror type, String varName, int substitutionOffset, String textToAdd, boolean smartType) {
         return new VariableItem(element, type, varName, substitutionOffset, textToAdd, smartType);
     }
 
-    public static final JavaFXCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
-        // TODO extract element from David's treeJavaFXCompletionEnvironment
+    public static final VisageCompletionItem createVariableItem(TypeMirror type, String varName, int substitutionOffset, boolean smartType) {
+        // TODO extract element from David's treeVisageCompletionEnvironment
         return new VariableItem(null, type, varName, substitutionOffset, smartType);
     }
 
-    public static final JavaFXCompletionItem createExecutableItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {
+    public static final VisageCompletionItem createExecutableItem(ExecutableElement elem, ExecutableType type, int substitutionOffset, boolean isInherited, boolean isDeprecated, boolean inImport, boolean smartType) {
         switch (elem.getKind()) {
             case METHOD:
                 return new MethodItem(elem, type, substitutionOffset, isInherited, isDeprecated, inImport, smartType);
@@ -137,27 +137,27 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
     }
     
-    public static final JavaFXCompletionItem createTypeItem(TypeElement elem, DeclaredType type, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType, boolean insertImport) {
+    public static final VisageCompletionItem createTypeItem(TypeElement elem, DeclaredType type, int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType, boolean insertImport) {
         return new ClassItem(elem, type, 0, substitutionOffset, isDeprecated, insideNew, smartType, insertImport);
     }
 
-    public static final JavaFXCompletionItem createTypeItem(String name,  int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
+    public static final VisageCompletionItem createTypeItem(String name,  int substitutionOffset, boolean isDeprecated, boolean insideNew, boolean smartType) {
         return new ClassItem(name, 0, substitutionOffset, isDeprecated, insideNew, smartType);
     }
 
-    public static JavaFXCompletionItem createParametersItem(ExecutableElement a, ExecutableType b, int anchorOffset, boolean deprecated, int length, String name) {
+    public static VisageCompletionItem createParametersItem(ExecutableElement a, ExecutableType b, int anchorOffset, boolean deprecated, int length, String name) {
         return new ParametersItem(a, b, anchorOffset, deprecated, length, name);
     }
 
-    public static final JavaFXCompletionItem createConstantItem(int substitutionOffset, String constant, int caretBackShift) {
+    public static final VisageCompletionItem createConstantItem(int substitutionOffset, String constant, int caretBackShift) {
         return new ConstantItem(substitutionOffset, constant, caretBackShift);
     }
 
-    protected JavaFXCompletionItem(int substitutionOffset) {
+    protected VisageCompletionItem(int substitutionOffset) {
         this.substitutionOffset = substitutionOffset;
     }
     
-    protected JavaFXCompletionItem(int substitutionOffset, String textToAdd) {
+    protected VisageCompletionItem(int substitutionOffset, String textToAdd) {
         this.substitutionOffset = substitutionOffset;
         this.textToAdd = textToAdd;
     }
@@ -267,7 +267,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             }
             if (i > 0)
                 toAdd = toAdd.substring(i);
-            TokenSequence<JFXTokenId> sequence = FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+            TokenSequence<VSGTokenId> sequence = FXSourceUtils.getVisageTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
             if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                 text.append(toAdd);
                 toAdd = null;
@@ -285,7 +285,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     text.append(toAdd.substring(0, tokenText.length()));
                     toAdd = toAdd.substring(tokenText.length());
                     added = true;
-                } else if (sequence.token().id() == JFXTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
+                } else if (sequence.token().id() == VSGTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
                     if (!sequence.moveNext()) {
                         text.append(toAdd);
                         toAdd = null;
@@ -333,12 +333,12 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                "java.lang.Double".equals(toImport) || // NOI18N
                "java.lang.Character".equals(toImport) || // NOI18N
                "java.lang.String".equals(toImport) || // NOI18N
-               (    toImport.startsWith("javafx.lang.") && // NOI18N
-                    !"javafx.lang.Builtins".equals(toImport) // NOI18N
+               (    toImport.startsWith("visage.lang.") && // NOI18N
+                    !"visage.lang.Builtins".equals(toImport) // NOI18N
                );
     }
             
-    static class KeywordItem extends JavaFXCompletionItem {
+    static class KeywordItem extends VisageCompletionItem {
         
         private static final String JAVA_KEYWORD = "org/netbeans/modules/java/editor/resources/javakw_16.png"; //NOI18N
         private static final String KEYWORD_COLOR = "<font color=#000099>"; //NOI18N
@@ -430,7 +430,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             if (semiPos > -2)
                 toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
             if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
-                TokenSequence<JFXTokenId> sequence = FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+                TokenSequence<VSGTokenId> sequence = FXSourceUtils.getVisageTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text.append(toAdd);
                     toAdd = null;
@@ -448,7 +448,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         text.append(toAdd.substring(0, tokenText.length()));
                         toAdd = toAdd.substring(tokenText.length());
                         added = true;
-                    } else if (sequence.token().id() == JFXTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
+                    } else if (sequence.token().id() == VSGTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
                         if (!sequence.moveNext()) {
                             text.append(toAdd);
                             toAdd = null;
@@ -495,7 +495,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }        
     }
     
-    static class PackageItem extends JavaFXCompletionItem {
+    static class PackageItem extends VisageCompletionItem {
         
         private static final String PACKAGE = "org/netbeans/modules/java/editor/resources/package.gif"; // NOI18N
         private static final String PACKAGE_COLOR = "<font color=#005600>"; //NOI18N
@@ -587,7 +587,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
     }
 
-    static class VariableItem extends JavaFXCompletionItem {
+    static class VariableItem extends VisageCompletionItem {
         
         private static final String LOCAL_VARIABLE = "org/netbeans/modules/editor/resources/completion/localVariable.gif"; //NOI18N
         private static final String PARAMETER_COLOR = "<font color=#00007c>"; //NOI18N
@@ -625,7 +625,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             if (element == null) {
                 return null;
             }
-            return JavaFXCompletionProvider.createDocTask(element);
+            return VisageCompletionProvider.createDocTask(element);
         }
         
         @Override
@@ -691,7 +691,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return (typeName != null ? typeName + " " : "") + varName; //NOI18N
         }
    }
-        static class MethodItem extends JavaFXCompletionItem {
+        static class MethodItem extends VisageCompletionItem {
         
         private static final String METHOD_PUBLIC = "org/netbeans/modules/editor/resources/completion/method_16.png"; //NOI18N
         private static final String METHOD_PROTECTED = "org/netbeans/modules/editor/resources/completion/method_protected_16.png"; //NOI18N
@@ -834,7 +834,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         
         @Override
         public CompletionTask createDocumentationTask() {
-            return JavaFXCompletionProvider.createDocTask(elementHandle);
+            return VisageCompletionProvider.createDocTask(elementHandle);
         }
 
         @Override
@@ -894,19 +894,19 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 if (isPrimitive) {
                     try {
                         final String[] ret = new String[1];
-                        JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
+                        VisageSource js = VisageSource.forDocument(c.getDocument());
                         js.runUserActionTask(new Task<CompilationController>() {
 
                             public void run(CompilationController controller) throws Exception {
                                 controller.toPhase(Phase.PARSED);
-                                JavaFXTreePath tp = JavaFXCompletionQuery.pathFor(controller, c.getSelectionEnd());
+                                VisageTreePath tp = VisageCompletionQuery.pathFor(controller, c.getSelectionEnd());
                                 Tree tree = tp.getLeaf();
-                                if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER /*|| tree.getJavaFXKind() == Tree.JavaFXKind.PRIMITIVE_TYPE*/)
+                                if (tree.getVisageKind() == Tree.VisageKind.IDENTIFIER /*|| tree.getVisageKind() == Tree.VisageKind.PRIMITIVE_TYPE*/)
                                     tp = tp.getParentPath();
-                                if (tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT ||
-                                    (tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.METHOD_INVOCATION && ((FunctionInvocationTree)tp.getLeaf()).getMethodSelect() == tree))
+                                if (tp.getLeaf().getVisageKind() == Tree.VisageKind.MEMBER_SELECT ||
+                                    (tp.getLeaf().getVisageKind() == Tree.VisageKind.METHOD_INVOCATION && ((FunctionInvocationTree)tp.getLeaf()).getMethodSelect() == tree))
                                     tp = tp.getParentPath();
-                                if (/*tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.EXPRESSION_STATEMENT ||*/ tp.getLeaf().getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION)
+                                if (/*tp.getLeaf().getVisageKind() == Tree.VisageKind.EXPRESSION_STATEMENT ||*/ tp.getLeaf().getVisageKind() == Tree.VisageKind.BLOCK_EXPRESSION)
                                     ret[0] = ";"; //NOI18N
                             }
                         }, true);
@@ -931,8 +931,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 final int semiPos = add.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
                 if (semiPos > -2)
                     add = add.length() > 1 ? add.substring(0, add.length() - 1) : null;
-                JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
-                TokenSequence<JFXTokenId> sequence = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+                VisageSource js = VisageSource.forDocument(c.getDocument());
+                TokenSequence<VSGTokenId> sequence = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
                 sequence = sequence.subSequence(offset + len);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text += add;
@@ -951,7 +951,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         text += add.substring(0, tokenText.length());
                         add = add.substring(tokenText.length());
                         added = true;
-                    } else if (sequence.token().id() == JFXTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
+                    } else if (sequence.token().id() == VSGTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
                         if (!sequence.moveNext()) {
                             text += add;
                             add = null;
@@ -1026,7 +1026,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return sb.toString();
         }   
     }    
-    static class ClassItem extends JavaFXCompletionItem {
+    static class ClassItem extends VisageCompletionItem {
         
         private static final String CLASS = "org/netbeans/modules/editor/resources/completion/class_16.png"; //NOI18N
         private static final String CLASS_COLOR = "<font color=#560000>"; //NOI18N
@@ -1129,7 +1129,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 eh  = ElementHandle.create(type.asElement());
             } catch (Exception ex) {
             }
-            return eh != null ? JavaFXCompletionProvider.createDocTask(eh) : null;
+            return eh != null ? VisageCompletionProvider.createDocTask(eh) : null;
         }
 
         @Override
@@ -1175,8 +1175,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             if (semiPos > -2)
                 toAdd = toAdd.length() > 1 ? toAdd.substring(0, toAdd.length() - 1) : null;
             if (toAdd != null && !toAdd.equals("\n")) {//NOI18N
-                JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
-                TokenSequence<JFXTokenId> sequence = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+                VisageSource js = VisageSource.forDocument(c.getDocument());
+                TokenSequence<VSGTokenId> sequence = ((TokenHierarchy<?>)js.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
                 sequence = sequence.subSequence(offset + len);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text.append(toAdd);
@@ -1195,7 +1195,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         text.append(toAdd.substring(0, tokenText.length()));
                         toAdd = toAdd.substring(tokenText.length());
                         added = true;
-                    } else if (sequence.token().id() == JFXTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
+                    } else if (sequence.token().id() == VSGTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
                         if (!sequence.moveNext()) {
                             text.append(toAdd);
                             toAdd = null;
@@ -1208,13 +1208,13 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 }
             }
             final int finalLen = len;
-            JavaFXSource js = JavaFXSource.forDocument(doc);
+            VisageSource js = VisageSource.forDocument(doc);
             try {
                 js.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController controller) throws IOException {
                         if (controller.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
-                            if (LOGGABLE) log (NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged.")); // NOI18N
+                            if (LOGGABLE) log (NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/Bundle").getString("Cannot_show_code_completion_due_to_compiler_exception_-_should_be_already_logged.")); // NOI18N
                             return;
                         }
                         final TypeElement eleme = (type != null) ? (TypeElement)type.asElement() : elem;
@@ -1264,7 +1264,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                 public void run () {
                                     try {
                                         Position semiPosition = semiPos > -1 && !insideNew ? doc.createPosition(semiPos) : null;
-                                        JavaFXTreePath tp = JavaFXCompletionQuery.pathFor(controller, offset);
+                                        VisageTreePath tp = VisageCompletionQuery.pathFor(controller, offset);
                                         CharSequence cs = simpleName;
                                         if (eleme != null) {
                                             cs = eleme.getSimpleName();
@@ -1318,7 +1318,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                                     }
                                 }
                                 if (val != 1 || ctor != null) {
-                                    final JavaFXCompletionItem item = null;
+                                    final VisageCompletionItem item = null;
                                     try {
                                         final Position offPosition = doc.createPosition(offset);
                                         SwingUtilities.invokeLater(new Runnable() {
@@ -1351,7 +1351,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
             return simpleName;
         }        
     }
-    static class ParametersItem extends JavaFXCompletionItem {
+    static class ParametersItem extends VisageCompletionItem {
 
         private static final String PARAMETERS_COLOR = "<font color=#808080>"; //NOI18N
         private static final String ACTIVE_PARAMETER_COLOR = "<font color=#000000>"; //NOI18N
@@ -1452,7 +1452,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
 
         @Override
         public CompletionTask createDocumentationTask() {
-            return JavaFXCompletionProvider.createDocTask(elementHandle);
+            return VisageCompletionProvider.createDocTask(elementHandle);
         }
 
         @Override
@@ -1473,7 +1473,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                 final int semiPos = add.endsWith(";") ? findPositionForSemicolon(c) : -2; //NOI18N
                 if (semiPos > -2)
                     add = add.length() > 1 ? add.substring(0, add.length() - 1) : null;
-                TokenSequence<JFXTokenId> sequence = FXSourceUtils.getJavaFXTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
+                TokenSequence<VSGTokenId> sequence = FXSourceUtils.getVisageTokenSequence(TokenHierarchy.get(doc), offset + len, doc);
                 if (sequence == null || !sequence.moveNext() && !sequence.movePrevious()) {
                     text += add;
                     add = null;
@@ -1491,7 +1491,7 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                         text += add.substring(0, tokenText.length());
                         add = add.substring(tokenText.length());
                         added = true;
-                    } else if (sequence.token().id() == JFXTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
+                    } else if (sequence.token().id() == VSGTokenId.WS && sequence.token().text().toString().indexOf('\n') < 0) {//NOI18N
                         if (!sequence.moveNext()) {
                             text += add;
                             add = null;
@@ -1561,10 +1561,10 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         }
     }
 
-    static class ConstantItem extends JavaFXCompletionItem {
+    static class ConstantItem extends VisageCompletionItem {
 
         private static final String STRING_LITERAL_COLOR = "<font color=#CE7B00>"; //NOI18N
-        private static String ICON_RESOURCE = "org/netbeans/modules/javafx/editor/resources/keyword-icon.png"; //NOI18N
+        private static String ICON_RESOURCE = "org/netbeans/modules/visage/editor/resources/keyword-icon.png"; //NOI18N
 
         private String leftText;
         private ImageIcon icon;
@@ -1708,15 +1708,15 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         final int[] ret = new int[] {-2};
         final int offset = c.getSelectionEnd();
         try {
-            JavaFXSource js = JavaFXSource.forDocument(c.getDocument());
+            VisageSource js = VisageSource.forDocument(c.getDocument());
             js.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController controller) throws Exception {
-                    controller.toPhase(JavaFXSource.Phase.PARSED);
+                    controller.toPhase(VisageSource.Phase.PARSED);
                     Tree t = null;
-                    JavaFXTreePath tp = JavaFXCompletionQuery.pathFor(controller, offset);
+                    VisageTreePath tp = VisageCompletionQuery.pathFor(controller, offset);
                     while (t == null && tp != null) {
-                        switch(tp.getLeaf().getJavaFXKind()) {
+                        switch(tp.getLeaf().getVisageKind()) {
 /*                            case EXPRESSION_STATEMENT:
                                 ExpressionTree expr = ((ExpressionStatementTree)tp.getLeaf()).getExpression();
                                 if (expr != null && expr.getKind() == Tree.Kind.ERRONEOUS) {
@@ -1738,14 +1738,14 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
                     if (t != null) {
                         SourcePositions sp = controller.getTrees().getSourcePositions();
                         int endPos = (int)sp.getEndPosition(tp.getCompilationUnit(), t);
-                        TokenSequence<JFXTokenId> ts = findLastNonWhitespaceToken(controller, offset, endPos);
+                        TokenSequence<VSGTokenId> ts = findLastNonWhitespaceToken(controller, offset, endPos);
                         if (ts != null) {
-                            ret[0] = ts.token().id() == JFXTokenId.SEMI ? -1 : ts.offset() + ts.token().length();
+                            ret[0] = ts.token().id() == VSGTokenId.SEMI ? -1 : ts.offset() + ts.token().length();
                         }
                     } else {
-                        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+                        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
                         ts.move(offset);
-                        if (ts.moveNext() &&  ts.token().id() == JFXTokenId.SEMI)
+                        if (ts.moveNext() &&  ts.token().id() == VSGTokenId.SEMI)
                             ret[0] = -1;
                     }
                 }
@@ -1755,8 +1755,8 @@ public abstract class JavaFXCompletionItem implements CompletionItem {
         return ret[0];
     }
     
-    private static TokenSequence<JFXTokenId> findLastNonWhitespaceToken(CompilationController controller, int startPos, int endPos) {
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+    private static TokenSequence<VSGTokenId> findLastNonWhitespaceToken(CompilationController controller, int startPos, int endPos) {
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(endPos);
         while(ts.movePrevious()) {
             int offset = ts.offset();

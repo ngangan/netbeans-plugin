@@ -29,12 +29,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
-import org.netbeans.api.javafx.source.*;
+import org.netbeans.api.visage.source.*;
 import org.netbeans.editor.BaseAction;
 import org.netbeans.modules.editor.MainMenuAction;
-import org.netbeans.modules.javafx.editor.JFXImportManager;
+import org.netbeans.modules.visage.editor.VSGImportManager;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
@@ -64,22 +64,22 @@ import org.openide.util.RequestProcessor;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.org">RKo</a>)
  * @author Jaroslav Bachorik
  */
-public final class JavaFXImports extends BaseAction implements JFXImportManager {
+public final class VisageImports extends BaseAction implements VSGImportManager {
 
 
-    private static JavaFXImports instance;
-    public static final Logger logger = Logger.getLogger(JFXImportManager.class.getName());
+    private static VisageImports instance;
+    public static final Logger logger = Logger.getLogger(VSGImportManager.class.getName());
 
-    final private RequestProcessor taskQueue = new RequestProcessor(JavaFXImports.class.getName(), 1);
+    final private RequestProcessor taskQueue = new RequestProcessor(VisageImports.class.getName(), 1);
 
-    public synchronized static JavaFXImports getInstance() {
+    public synchronized static VisageImports getInstance() {
         if (instance == null) {
-            instance = new JavaFXImports();
+            instance = new VisageImports();
         }
         return instance;
     }
 
-    private JavaFXImports() {
+    private VisageImports() {
         super(fixImportsAction);
     }
 
@@ -94,7 +94,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
      */
     @Override
     protected Object getDefaultShortDescription() {
-        return NbBundle.getBundle(JavaFXImports.class).getString(fixImportsAction);
+        return NbBundle.getBundle(VisageImports.class).getString(fixImportsAction);
     }
 
     private static FileObject getFileObject(Document doc) {
@@ -116,10 +116,10 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
 
     private Runnable prepareTask(final Document document, final JTextComponent target) {
         return new Runnable() {
-            private ProgressHandle wHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(JavaFXImports.class, "MSG_Wait")); // NOI18N
+            private ProgressHandle wHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(VisageImports.class, "MSG_Wait")); // NOI18N
             public void run() {
                 wHandle.start();
-                final JavaFXSource s = JavaFXSource.forDocument(document);
+                final VisageSource s = VisageSource.forDocument(document);
                 try {
                     s.runWhenScanFinished(new Task<CompilationController>() {
                         public void run(CompilationController cc) throws Exception {
@@ -141,7 +141,7 @@ public final class JavaFXImports extends BaseAction implements JFXImportManager 
 
                     }, true);
                 } catch (IOException e) {
-                    throw new IllegalArgumentException(NbBundle.getBundle(JavaFXImports.class).getString("FI-cannot-continue"), e); // NOI18N
+                    throw new IllegalArgumentException(NbBundle.getBundle(VisageImports.class).getString("FI-cannot-continue"), e); // NOI18N
                 } finally {
                     if (wHandle != null) {
                         wHandle.finish();

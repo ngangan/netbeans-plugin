@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.variablesfiltering;
+package org.netbeans.modules.visage.debugger.variablesfiltering;
 
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
@@ -64,11 +64,11 @@ import org.openide.util.datatransfer.PasteType;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView", types={ org.netbeans.spi.viewmodel.NodeModelFilter.class } )
-public class JavaFXVariablesNodeModelFilter implements NodeModelFilter {
+public class VisageVariablesNodeModelFilter implements NodeModelFilter {
 
     private final Collection<ModelListener> modelListeners = new HashSet<ModelListener>();
 
-    public JavaFXVariablesNodeModelFilter() {
+    public VisageVariablesNodeModelFilter() {
     }
     
     public String getDisplayName( NodeModel original, Object node ) throws UnknownTypeException {

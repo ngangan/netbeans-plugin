@@ -28,7 +28,7 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.editor;
+package org.netbeans.api.visage.editor;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -51,15 +51,15 @@ import javax.swing.Action;
 import com.sun.javadoc.*;
 import com.sun.javadoc.AnnotationDesc.ElementValuePair;
 import com.sun.tools.mjavac.code.Symbol;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -69,7 +69,7 @@ import org.openide.xml.XMLUtil;
  * Utility class for viewing Javdoc comments as HTML.
  *
  * @author Dusan Balek, Petr Hrebejk
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
 public class ElementJavadoc {
 
@@ -96,7 +96,7 @@ public class ElementJavadoc {
     private Hashtable<String, ElementHandle<? extends Element>> links = new Hashtable<String, ElementHandle<? extends Element>>();
     private int linkCounter = 0;
     private URL docURL = null;
-    private boolean isJavaFXDoc;
+    private boolean isVisageDoc;
     private AbstractAction goToSource = null;
 
     /** Creates an object describing the Javadoc of given element. The object
@@ -134,13 +134,13 @@ public class ElementJavadoc {
         final ElementJavadoc[] ret = new ElementJavadoc[1];
         try {
             final ElementHandle<? extends Element> linkDoc = links.get(link);
-            FileObject fo = linkDoc != null ? JavaFXSourceUtils.getFile(linkDoc, cpInfo) : null;
+            FileObject fo = linkDoc != null ? VisageSourceUtils.getFile(linkDoc, cpInfo) : null;
             if (fo != null && fo.isFolder() && linkDoc.getKind() == ElementKind.PACKAGE) {
                 fo = fo.getFileObject("package-info", "fx"); //NOI18N
             }
             // no file object - no sources (in contrast to java)
-//            JavaFXSource js = fo != null ? JavaFXSource.forFileObject(fo) : JavaFXSource.create(cpInfo);
-            JavaFXSource js = fo != null ? JavaFXSource.forFileObject(fo) : null;
+//            VisageSource js = fo != null ? VisageSource.forFileObject(fo) : VisageSource.create(cpInfo);
+            VisageSource js = fo != null ? VisageSource.forFileObject(fo) : null;
             if (js != null) {
                 js.runUserActionTask(new Task<CompilationController>() {
                     public void run(CompilationController controller) throws IOException {
@@ -215,13 +215,13 @@ public class ElementJavadoc {
         ElementUtilities eu = compilationInfo.getElementUtilities();
         this.cpInfo = compilationInfo.getClasspathInfo();
         Doc doc = eu.javaDocFor(element);
-        boolean isJavaClass = (doc != null) && doc.isClass() && !compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
+        boolean isJavaClass = (doc != null) && doc.isClass() && !compilationInfo.getJavafxTypes().isVSGClass((Symbol) element);
         boolean localized = false;
         if (element != null) {
             FXSourceUtils.URLResult res = FXSourceUtils.getJavadoc(element, compilationInfo);
             if (res != null) {
                 docURL = res.url;
-                isJavaFXDoc = res.isJavaFXDoc;
+                isVisageDoc = res.isVisageDoc;
             }
             localized = isLocalized(docURL, element);
             if (!localized) {
@@ -232,7 +232,7 @@ public class ElementJavadoc {
                     // can't convert to element handler (incomplete element)
                 }
                 if (handle[0] != null) {
-                    final FileObject fo = JavaFXSourceUtils.getFile(handle[0], cpInfo);
+                    final FileObject fo = VisageSourceUtils.getFile(handle[0], cpInfo);
                     if (fo != null) {
                         goToSource = new AbstractAction() {
                             public void actionPerformed(ActionEvent evt) {
@@ -536,7 +536,7 @@ public class ElementJavadoc {
                     }
                 }
             }
-            String jdText = docURL != null ? HTMLJavadocParser.getJavadocText(docURL, isJavaFXDoc) : null;
+            String jdText = docURL != null ? HTMLJavadocParser.getJavadocText(docURL, isVisageDoc) : null;
             if (jdText != null) {
                 sb.append(jdText);
             } else {
@@ -588,7 +588,7 @@ public class ElementJavadoc {
         sb.append("<p><tt>"); //NOI18N
         sb.append(getAnnotations(eu, mdoc.annotations()));
         int len = sb.length();
-        // TODO modifierSpecifier() does not exist for javafx
+        // TODO modifierSpecifier() does not exist for visage
 //        sb.append(Modifier.toString(mdoc.modifierSpecifier() & ~Modifier.NATIVE));
         len = sb.length() - len;
         TypeVariable[] tvars = null;
@@ -679,7 +679,7 @@ public class ElementJavadoc {
         StringBuilder sb = new StringBuilder();
         sb.append("<p><tt>"); //NOI18N
         sb.append(getAnnotations(eu, cdoc.annotations()));
-        // TODO modifierSpecifier() equivalent for javafx?
+        // TODO modifierSpecifier() equivalent for visage?
 //        if (isJavaClass) {
 //            int mods = cdoc.modifierSpecifier() & ~Modifier.INTERFACE;
 //            if (cdoc.isEnum()) {

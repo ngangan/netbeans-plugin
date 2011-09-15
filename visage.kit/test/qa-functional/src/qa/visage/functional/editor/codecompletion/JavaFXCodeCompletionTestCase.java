@@ -39,22 +39,22 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.editor.codecompletion;
+package qa.visage.functional.editor.codecompletion;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Util;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXCodeCompletionTestCase extends JavaFXTestCase {
+public class VisageCodeCompletionTestCase extends VisageTestCase {
 
     public static String PROJECT_NAME = "TestCodeCompletion";
 
@@ -63,7 +63,7 @@ public class JavaFXCodeCompletionTestCase extends JavaFXTestCase {
     public boolean pass = true;
     public String failComponents = "";
 
-    public JavaFXCodeCompletionTestCase(String name) {
+    public VisageCodeCompletionTestCase(String name) {
         super(name);
     }
 
@@ -131,7 +131,7 @@ public class JavaFXCodeCompletionTestCase extends JavaFXTestCase {
 
 
     public void testCodeCompletion(String path, String sample) {
-        JavaFXProject project = JavaFXProject.createProject(getProjectName(path));
+        VisageProject project = VisageProject.createProject(getProjectName(path));
 
        EditorOperator editor = project.getMainEditor();
 
@@ -160,7 +160,7 @@ public class JavaFXCodeCompletionTestCase extends JavaFXTestCase {
 //        project.openOutput();
 //        project.build();
 //
-//        //JavaFXProject project = new JavaFXProject(PROJECT_NAME + "_" + category);
+//        //VisageProject project = new VisageProject(PROJECT_NAME + "_" + category);
 //
 //        EditorOperator editor = project.getMainEditor();
 //

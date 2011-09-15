@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.transformations;
+package org.netbeans.modules.visage.refactoring.transformations;
 
 import java.io.IOException;
 import java.util.ArrayList;

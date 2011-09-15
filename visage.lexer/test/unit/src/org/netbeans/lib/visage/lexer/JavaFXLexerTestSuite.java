@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
@@ -51,23 +51,23 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * The entry point of the JavaFX Lexer test suite.
+ * The entry point of the Visage Lexer test suite.
  * @author Victor G. Vasilyev
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-//	JavaFXLexerTest3.class,
+//	VisageLexerTest3.class,
     DoubleQuoteStringLiteralTest.class,
     NewLineAndBraceAfterComplexStringTest.class,
     StringLiteralModificationTest.class            
 })
-public class JavaFXLexerTestSuite {
+public class VisageLexerTestSuite {
 
-    public JavaFXLexerTestSuite() {
+    public VisageLexerTestSuite() {
     }
 
     public static Test suite() {
-        return new JUnit4TestAdapter(JavaFXLexerTestSuite.class);
+        return new JUnit4TestAdapter(VisageLexerTestSuite.class);
     }
 
 }

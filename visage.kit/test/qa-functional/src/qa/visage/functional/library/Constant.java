@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package qa.javafx.functional.library;
+package qa.visage.functional.library;
 
 /**
  *
@@ -54,7 +54,7 @@ public interface Constant {
     String JAVAFX_SDK_COMPILER = "compiler";
     String JAVAFX_SDK_REPRISE = "reprise";
     
-    String JAVAFX_SDK_VERSION_PROPERTY = "javafx.sdk.version";
+    String JAVAFX_SDK_VERSION_PROPERTY = "visage.sdk.version";
     
     
     // ================   User Data  ========================
@@ -68,11 +68,11 @@ public interface Constant {
     // ================   Project  ========================
     
     String PROJECT_JAVA_APPLICATION = "Java Application";
-    String PROJECT_JAVAFX_APPLICATION = "JavaFX Script Application";
+    String PROJECT_JAVAFX_APPLICATION = "Visage Script Application";
     
     
     String PROJECT_CATEGORY_JAVA = "Java";
-    String PROJECT_CATEGORY_JAVAFX = "JavaFX";
+    String PROJECT_CATEGORY_JAVAFX = "Visage";
     
     // ================   Buttons  ========================
     String BUTTON_OK = "OK";

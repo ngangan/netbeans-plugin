@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package qa.javafx.functional.library.operator;
+package qa.visage.functional.library.operator;
 
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jemmy.operators.AbstractButtonOperator;

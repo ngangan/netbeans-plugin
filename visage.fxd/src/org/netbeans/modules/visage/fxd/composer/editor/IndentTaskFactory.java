@@ -42,16 +42,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor;
+package org.netbeans.modules.visage.fxd.composer.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-import org.netbeans.modules.javafx.fxd.composer.editor.format.FXDIndentTask;
+import org.netbeans.modules.visage.fxd.composer.editor.format.FXDIndentTask;
 
 /**
- * copied from org.netbeans.modules.javafx.editor
+ * copied from org.netbeans.modules.visage.editor
  *
  * @author Rastislav Komara (<a href="mailto:rastislav.komara@sun.com">RKo</a>)
  * @author Andrey Korostelev

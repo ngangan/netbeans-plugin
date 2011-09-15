@@ -47,7 +47,7 @@ made subject to such option by the copyright holder.
 <!DOCTYPE fontscolors PUBLIC "-//NetBeans//DTD Editor Fonts and Colors settings 1.1//EN" "http://www.netbeans.org/dtds/EditorFontsColors-1_1.dtd">
 
 <fontscolors>
-    <!-- JavaFXTokenId categories -->
+    <!-- VisageTokenId categories -->
     <fontcolor name="comment" default="comment"/>
     <fontcolor name="error" default="error"/>    
     <fontcolor name="format" default="string">
@@ -100,7 +100,7 @@ made subject to such option by the copyright holder.
     
 
     
-    <!-- JFXStringTokenId categories -->
+    <!-- VSGStringTokenId categories -->
     <fontcolor name="string-escape" default="string">
         <font style="bold" />
     </fontcolor>

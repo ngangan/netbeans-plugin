@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.event.*;
 import java.awt.*;

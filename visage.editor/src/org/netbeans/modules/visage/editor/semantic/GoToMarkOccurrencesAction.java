@@ -53,7 +53,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
 import java.awt.event.ActionEvent;
 import javax.swing.text.Document;

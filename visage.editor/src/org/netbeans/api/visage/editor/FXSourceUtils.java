@@ -29,7 +29,7 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.editor;
+package org.netbeans.api.visage.editor;
 
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
@@ -37,14 +37,14 @@ import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.code.Type.MethodType;
 import com.sun.tools.mjavac.code.TypeTags;
 import com.sun.tools.mjavac.util.List;
-import com.sun.tools.javafx.code.FunctionType;
-import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.visage.code.FunctionType;
+import com.sun.tools.visage.code.JavafxTypes;
 import javax.swing.text.BadLocationException;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.JavadocForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.modules.javafx.source.classpath.FileObjects;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.modules.visage.source.classpath.FileObjects;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
@@ -66,7 +66,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.mimelookup.MimeLookup;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.InputAttributes;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.LanguagePath;
@@ -468,11 +468,11 @@ public final class FXSourceUtils {
 
     public static class URLResult {
         public URL url;
-        public boolean isJavaFXDoc;
+        public boolean isVisageDoc;
 
-        public URLResult(URL url, boolean isJavaFXDoc) {
+        public URLResult(URL url, boolean isVisageDoc) {
             this.url = url;
-            this.isJavaFXDoc = isJavaFXDoc;
+            this.isVisageDoc = isVisageDoc;
         }
     }
 
@@ -481,7 +481,7 @@ public final class FXSourceUtils {
             throw new IllegalArgumentException("Cannot pass null as an argument of the FXSourceUtils.getJavadoc");  //NOI18N
         }
 
-        boolean isJavaFXClass = isJavaFXClass(element, compilationInfo);
+        boolean isVisageClass = isVisageClass(element, compilationInfo);
         ClassSymbol clsSym = null;
         String pkgName;
         String pkgNameDots = null;
@@ -493,7 +493,7 @@ public final class FXSourceUtils {
             for (Element e : els) {
                 if (e.getKind().isClass() || e.getKind().isInterface()) {
                     clsSym = (ClassSymbol) e;
-                    isJavaFXClass = isJavaFXClass(e, compilationInfo); // package
+                    isVisageClass = isVisageClass(e, compilationInfo); // package
                     break;
                 }
             }
@@ -514,12 +514,12 @@ public final class FXSourceUtils {
                 return null;
             }
             clsSym = (ClassSymbol) prev;
-            isJavaFXClass = isJavaFXClass(prev, compilationInfo); // members
+            isVisageClass = isVisageClass(prev, compilationInfo); // members
 
             pkgNameDots = clsSym.getEnclosingElement().getQualifiedName().toString();
             pkgName = FileObjects.convertPackage2Folder(pkgNameDots);
 
-            if (isJavaFXClass) {
+            if (isVisageClass) {
                 pageName = pkgNameDots + '.' + clsSym.getSimpleName().toString(); // NOI18N
             } else {
                 pageName = clsSym.getSimpleName().toString();
@@ -590,7 +590,7 @@ public final class FXSourceUtils {
             for (URL binary : binaries) {
                 URL[] result = JavadocForBinaryQuery.findJavadoc(binary).getRoots();
                 ClassPath cp = ClassPathSupport.createClassPath(result);
-                FileObject fo = cp.findResource(isJavaFXClass ? pkgNameDots : pkgName);
+                FileObject fo = cp.findResource(isVisageClass ? pkgNameDots : pkgName);
                 if (fo != null) {
                     for (FileObject child : fo.getChildren()) {
                         if (pageName.equals(child.getName()) && FileObjects.HTML.equalsIgnoreCase(child.getExt())) {
@@ -608,7 +608,7 @@ public final class FXSourceUtils {
                                     String encodedfragment = URLEncoder.encode(fragment.toString(), "UTF-8"); // NOI18N
                                     encodedfragment = encodedfragment.replace("+", "%20"); // NOI18N
                                     final URL fragmentUrl = new URI(url.toExternalForm() + '#' + encodedfragment).toURL(); // NOI18N
-                                    return new URLResult(fragmentUrl, isJavaFXClass);
+                                    return new URLResult(fragmentUrl, isVisageClass);
                                 } catch (URISyntaxException ex) {
                                     Exceptions.printStackTrace(ex);
                                 } catch (UnsupportedEncodingException ex) {
@@ -617,7 +617,7 @@ public final class FXSourceUtils {
                                     Exceptions.printStackTrace(ex);
                                 }
                             }
-                            return new URLResult(url, isJavaFXClass);
+                            return new URLResult(url, isVisageClass);
                         }
                     }
                 }
@@ -631,11 +631,11 @@ public final class FXSourceUtils {
         return null;
     }
 
-    public static boolean isJavaFXClass(final Element element, final CompilationInfo compilationInfo) {
+    public static boolean isVisageClass(final Element element, final CompilationInfo compilationInfo) {
         if (element == null || compilationInfo == null) {
-            throw new IllegalArgumentException(NbBundle.getBundle("org/netbeans/api/javafx/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isJavaFXClass")); // NOI18N
+            throw new IllegalArgumentException(NbBundle.getBundle("org/netbeans/api/visage/editor/Bundle").getString("Cannot_pass_null_as_an_argument_of_the_FXSourceUtils.isVisageClass")); // NOI18N
         }
-        return compilationInfo.getJavafxTypes().isJFXClass((Symbol) element);
+        return compilationInfo.getJavafxTypes().isVSGClass((Symbol) element);
     }
 
     public static String getText(final CompilationInfo info) {
@@ -666,7 +666,7 @@ public final class FXSourceUtils {
         return ec != null ? ec.getDocument() : null;
     }
 
-    // JFXC-2154
+    // VSGC-2154
     public static java.util.List<? extends Element> getAllMembers(Elements elements, TypeElement type) {
         java.util.List<? extends Element> allMembers = Collections.<Element>emptyList();
         if (elements == null || type == null) {
@@ -698,12 +698,12 @@ public final class FXSourceUtils {
         return modifiers;
     }
 
-    public static boolean isJavaFXContext(final JTextComponent component, final int offset) {
-        return isJavaFXContext(component.getDocument(), offset);
+    public static boolean isVisageContext(final JTextComponent component, final int offset) {
+        return isVisageContext(component.getDocument(), offset);
     }
 
     @SuppressWarnings("fallthrough")
-    public static boolean isJavaFXContext(final Document doc, final int offset) {
+    public static boolean isVisageContext(final Document doc, final int offset) {
         if (doc instanceof AbstractDocument) {
             ((AbstractDocument) doc).readLock();
         }
@@ -719,7 +719,7 @@ public final class FXSourceUtils {
                 return MIME_TYPE_FX.equals(fo.getMIMEType());
             }
 
-            TokenSequence<JFXTokenId> ts = getJavaFXTokenSequence(TokenHierarchy.get(doc), offset, doc);
+            TokenSequence<VSGTokenId> ts = getVisageTokenSequence(TokenHierarchy.get(doc), offset, doc);
             if (ts == null) {
                 return false;
             }
@@ -749,17 +749,17 @@ public final class FXSourceUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static TokenSequence<JFXTokenId> getJavaFXTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
+    public static TokenSequence<VSGTokenId> getVisageTokenSequence(final TokenHierarchy hierarchy, final int offset, final Document doc) {
         if (hierarchy != null) {
             TokenSequence<?> ts_ = hierarchy.tokenSequence();
             while (ts_ != null && ts_.isValid() && (offset == 0 || ts_.moveNext())) {
                 ts_.move(offset);
-                if (ts_.language() == JFXTokenId.language()) {
-                    return (TokenSequence<JFXTokenId>) ts_;
+                if (ts_.language() == VSGTokenId.language()) {
+                    return (TokenSequence<VSGTokenId>) ts_;
                 }
                 if (!ts_.moveNext() && !ts_.movePrevious()) {
                     if (log.isLoggable(Level.FINE)) {
-                        log.log(Level.FINE, "getJavaFXTokenSequence returning null (1) for offset {0}", offset); // NOI18N
+                        log.log(Level.FINE, "getVisageTokenSequence returning null (1) for offset {0}", offset); // NOI18N
                     }
                     return null;
                 }
@@ -767,7 +767,7 @@ public final class FXSourceUtils {
             }
         }
         if (log.isLoggable(Level.FINE)) {
-            log.log(Level.FINE, "getJavaFXTokenSequence returning null (2) for offset {0}", offset); // NOI18N
+            log.log(Level.FINE, "getVisageTokenSequence returning null (2) for offset {0}", offset); // NOI18N
         }
         return null;
     }

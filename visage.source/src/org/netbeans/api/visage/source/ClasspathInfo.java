@@ -39,9 +39,9 @@
  * 
  * Portions Copyrighted 2008-2009 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import com.sun.tools.javafx.api.JavafxcTool;
+import com.sun.tools.visage.api.JavafxcTool;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
@@ -54,10 +54,10 @@ import javax.tools.JavaFileManager;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.java.queries.SourceForBinaryQuery.Result2;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.netbeans.modules.javafx.source.classpath.CachingFileManager;
-import org.netbeans.modules.javafx.source.classpath.ProxyFileManager;
-import org.netbeans.modules.javafx.source.classpath.SourceFileManager;
+import org.netbeans.api.visage.platform.VisagePlatform;
+import org.netbeans.modules.visage.source.classpath.CachingFileManager;
+import org.netbeans.modules.visage.source.classpath.ProxyFileManager;
+import org.netbeans.modules.visage.source.classpath.SourceFileManager;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
@@ -91,7 +91,7 @@ public class ClasspathInfo {
 
         if (bootPath == null) {
             //javac requires at least java.lang
-            bootPath = JavaFXPlatform.getDefaultFXPlatform().getBootstrapLibraries();
+            bootPath = VisagePlatform.getDefaultFXPlatform().getBootstrapLibraries();
         }
         ClasspathInfo instance = new ClasspathInfo(bootPath, compilePath, srcPath);
         return instance;

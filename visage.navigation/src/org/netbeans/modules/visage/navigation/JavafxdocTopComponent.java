@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.BorderLayout;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.editor.ElementJavadoc;
+import org.netbeans.api.visage.editor.ElementJavadoc;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
@@ -56,7 +56,7 @@ import org.openide.windows.WindowManager;
  * Top component which displays something.
  * 
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
 public class JavafxdocTopComponent extends TopComponent {
 
@@ -64,7 +64,7 @@ public class JavafxdocTopComponent extends TopComponent {
     
     private static JavafxdocTopComponent instance;
     /** path to the icon used by the component and its open action */
-    public static final String ICON_PATH = "org/netbeans/modules/javafx/navigation/resources/javadoc_action.png"; // NOI18N
+    public static final String ICON_PATH = "org/netbeans/modules/visage/navigation/resources/javadoc_action.png"; // NOI18N
     
     private static final String PREFERRED_ID = "JavafxdocTopComponent"; // NOI18N
     

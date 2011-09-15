@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.layouts;
+package org.netbeans.modules.visage.palette.items.layouts;
 
 /**
  *
@@ -51,7 +51,7 @@ public final class HBox extends AbstractLayout {
 
     public HBox() {
         templateName = "TEMPLATE_HBox"; // NOI18N
-        importString = "javafx.scene.layout.HBox"; //NOI18N
+        importString = "visage.scene.layout.HBox"; //NOI18N
     }
 }
 

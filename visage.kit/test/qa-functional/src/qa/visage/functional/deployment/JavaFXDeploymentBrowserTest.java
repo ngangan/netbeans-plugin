@@ -39,27 +39,27 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.deployment;
+package qa.visage.functional.deployment;
 
-import qa.javafx.smoke.*;
+import qa.visage.smoke.*;
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.DeploymentType;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.DeploymentType;
+import qa.visage.functional.library.project.VisageProject;
 
 /**
  *
  * @author andromeda
  */
-public class JavaFXDeploymentBrowserTest extends JavaFXDeploymentTestCase {
+public class VisageDeploymentBrowserTest extends VisageDeploymentTestCase {
 
     static DeploymentType type = DeploymentType.BROWSER;
 
-    public JavaFXDeploymentBrowserTest(String name) {
+    public VisageDeploymentBrowserTest(String name) {
         super(name);
     }
     static String[] TESTS = {
@@ -67,7 +67,7 @@ public class JavaFXDeploymentBrowserTest extends JavaFXDeploymentTestCase {
     };
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXDeploymentBrowserTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageDeploymentBrowserTest.class, ".*", ".*", TESTS);
 
     }
 

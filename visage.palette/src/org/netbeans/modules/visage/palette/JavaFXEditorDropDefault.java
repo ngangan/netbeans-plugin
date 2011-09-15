@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette;
+package org.netbeans.modules.visage.palette;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -50,11 +50,11 @@ import org.openide.text.ActiveEditorDrop;
  *
  * @author Michal Skvor
  */
-public class JavaFXEditorDropDefault implements ActiveEditorDrop {
+public class VisageEditorDropDefault implements ActiveEditorDrop {
 
     private String body;
     
-    public JavaFXEditorDropDefault( String body ) {
+    public VisageEditorDropDefault( String body ) {
         this.body = body;
     }
     
@@ -63,7 +63,7 @@ public class JavaFXEditorDropDefault implements ActiveEditorDrop {
             return false;
 
         try {
-            JavaFXPaletteUtilities.insert( body, (JTextComponent)targetComponent );
+            VisagePaletteUtilities.insert( body, (JTextComponent)targetComponent );
         } catch( BadLocationException ble ) {
             return false;
         }

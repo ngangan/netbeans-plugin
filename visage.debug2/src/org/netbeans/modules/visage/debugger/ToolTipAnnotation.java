@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.debugger;
+package org.netbeans.modules.visage.debugger;
 
 import java.io.IOException;
 
@@ -97,7 +97,7 @@ public class ToolTipAnnotation extends Annotation implements Runnable {
     private static RequestProcessor RP;
 
     private static synchronized RequestProcessor getRP() {
-        if (RP == null) RP = new RequestProcessor("JavaFX tooltip evaluator");
+        if (RP == null) RP = new RequestProcessor("Visage tooltip evaluator");
         return RP;
     }
 

@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model.actions;
+package org.netbeans.modules.visage.fxd.composer.model.actions;
 
 import java.awt.AWTEvent;
 import java.awt.Graphics;
@@ -50,10 +50,10 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElementOutline;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.FXDElement;
+import org.netbeans.modules.visage.fxd.composer.model.FXDElementOutline;
+import org.netbeans.modules.visage.fxd.composer.source.SourceTopComponent;
 
 /**
  *

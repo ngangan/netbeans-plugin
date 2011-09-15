@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -254,7 +254,7 @@ public class LibrariesChooser extends javax.swing.JPanel implements HelpCtx.Prov
 
     private final class LibraryRenderer extends DefaultListCellRenderer {
         
-        private static final String LIBRARY_ICON = "org/netbeans/modules/javafx/project/ui/resources/libraries.gif";  //NOI18N               
+        private static final String LIBRARY_ICON = "org/netbeans/modules/visage/project/ui/resources/libraries.gif";  //NOI18N               
         private Icon cachedIcon;
         
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

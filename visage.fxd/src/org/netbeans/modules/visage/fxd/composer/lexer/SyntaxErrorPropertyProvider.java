@@ -41,9 +41,9 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.lexer;
+package org.netbeans.modules.visage.fxd.composer.lexer;
 
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.spi.lexer.TokenPropertyProvider;
 

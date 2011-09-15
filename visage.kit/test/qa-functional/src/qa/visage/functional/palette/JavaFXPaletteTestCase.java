@@ -39,24 +39,24 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.palette;
+package qa.visage.functional.palette;
 
 import javax.swing.ListModel;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import org.netbeans.jemmy.operators.JListOperator;
 import org.netbeans.junit.NbModuleSuite;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.operator.FXPaletteOperator;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.operator.FXPaletteOperator;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXPaletteTestCase extends JavaFXTestCase {
+public class VisagePaletteTestCase extends VisageTestCase {
 
     public static String PROJECT_NAME = "TestPalette";
 
@@ -66,7 +66,7 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
     public boolean pass = true;
     public String failComponents = "";
 
-    public JavaFXPaletteTestCase(String name) {
+    public VisagePaletteTestCase(String name) {
         super(name);
     }
 
@@ -90,11 +90,11 @@ public class JavaFXPaletteTestCase extends JavaFXTestCase {
 
     public void testItems(String category, String begin, String end) {
     //public void testItems(String category, String template, int deltaX, int deltaY) {
-        JavaFXProject project = JavaFXProject.createProject(getProjectName(category));
+        VisageProject project = VisageProject.createProject(getProjectName(category));
         project.openOutput();
         project.build();
 
-        //JavaFXProject project = new JavaFXProject(PROJECT_NAME + "_" + category);
+        //VisageProject project = new VisageProject(PROJECT_NAME + "_" + category);
         
         EditorOperator editor = project.getMainEditor();
 

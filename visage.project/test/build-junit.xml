@@ -1,4 +1,4 @@
-<project name="javafx/test-junit" basedir="." default="all">
+<project name="visage/test-junit" basedir="." default="all">
     <!-- Imports default qa-functional-compiler and runidetest executor.
         jemmy and jellytools jars are on classpath for both. -->
     <import file="../../../nbbuild/templates/xtest-qa-functional.xml"/>

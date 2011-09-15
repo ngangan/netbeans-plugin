@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.io.File;
 import java.net.URI;

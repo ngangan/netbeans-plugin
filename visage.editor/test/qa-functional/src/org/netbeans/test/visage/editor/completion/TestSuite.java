@@ -40,18 +40,18 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.test.javafx.editor.completion;
+package org.netbeans.test.visage.editor.completion;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbModuleSuite.Configuration;
-//import org.netbeans.test.javafx.editor.completion.AllCCTests;
-//import org.netbeans.test.javafx.editor.completion.ApplicationCCTests;
-//import org.netbeans.test.javafx.editor.completion.ClassCCTests;
-//import org.netbeans.test.javafx.editor.completion.DeclarationCCTests;
-//import org.netbeans.test.javafx.editor.completion.FrameCCTests;
-//import org.netbeans.test.javafx.editor.completion.ImportCCTests;
-//import org.netbeans.test.javafx.editor.completion.PackageCCTests;
+//import org.netbeans.test.visage.editor.completion.AllCCTests;
+//import org.netbeans.test.visage.editor.completion.ApplicationCCTests;
+//import org.netbeans.test.visage.editor.completion.ClassCCTests;
+//import org.netbeans.test.visage.editor.completion.DeclarationCCTests;
+//import org.netbeans.test.visage.editor.completion.FrameCCTests;
+//import org.netbeans.test.visage.editor.completion.ImportCCTests;
+//import org.netbeans.test.visage.editor.completion.PackageCCTests;
 
 /**
  *

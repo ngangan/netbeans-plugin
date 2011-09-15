@@ -28,33 +28,33 @@
  *
  * Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
-public class MarkUnusedImportsTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class MarkUnusedImportsTaskFactory extends EditorAwareVisageSourceTaskFactory {
 
     public MarkUnusedImportsTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     /**
      * <p>
-     * Create task for a given file. This task will be registered into the {@link org.netbeans.api.javafx.source.JavaFXSource}
+     * Create task for a given file. This task will be registered into the {@link org.netbeans.api.visage.source.VisageSource}
      * parsing harness.
      * </p><p>
      * Please note that this method should run as quickly as possible.
      * </p>
      * @param file for which file the task should be created.
-     * @return created {@link org.netbeans.api.javafx.source.CancellableTask}  for a given file.
+     * @return created {@link org.netbeans.api.visage.source.CancellableTask}  for a given file.
      */
     protected CancellableTask<CompilationInfo> createTask(FileObject file) {
         return new MarkUnusedImportsTask(file);

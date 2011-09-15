@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.api;
+package org.netbeans.modules.visage.project.api;
 
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 
@@ -53,7 +53,7 @@ import org.netbeans.spi.project.support.ant.PropertyEvaluator;
  * @author Milan Kubec
  * @since 1.10
  */
-public interface JavaFXPropertyEvaluator {
+public interface VisagePropertyEvaluator {
     /**
      * Gives PropertyEvaluator for resolving project properties
      *

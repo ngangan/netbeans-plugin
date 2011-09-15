@@ -40,12 +40,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.ParenthesizedTree;
-import com.sun.javafx.api.tree.Tree;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.ParenthesizedTree;
+import com.sun.visage.api.tree.Tree;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class ParenthesizedTreeEnvironment extends JavaFXCompletionEnvironment<ParenthesizedTree> {
+public class ParenthesizedTreeEnvironment extends VisageCompletionEnvironment<ParenthesizedTree> {
     
     private static final Logger logger = Logger.getLogger(ParenthesizedTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -68,7 +68,7 @@ public class ParenthesizedTreeEnvironment extends JavaFXCompletionEnvironment<Pa
             addLocalMembersAndVars(null);
             addValueKeywords();
         } else {
-            insideExpression(new JavaFXTreePath(path, exp));
+            insideExpression(new VisageTreePath(path, exp));
         }
     }
 

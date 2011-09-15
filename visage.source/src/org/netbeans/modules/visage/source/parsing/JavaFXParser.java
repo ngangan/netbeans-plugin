@@ -40,16 +40,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.parser.DocCommentScanner;
 import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
-import com.sun.tools.javafx.api.JavafxcTool;
-import com.sun.tools.javafxdoc.JavafxdocEnter;
-import com.sun.tools.javafxdoc.JavafxdocMemberEnter;
-import com.sun.tools.javafxdoc.Messager;
+import com.sun.tools.visage.api.JavafxcTaskImpl;
+import com.sun.tools.visage.api.JavafxcTool;
+import com.sun.tools.visagedoc.JavafxdocEnter;
+import com.sun.tools.visagedoc.JavafxdocMemberEnter;
+import com.sun.tools.visagedoc.Messager;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -68,11 +68,11 @@ import javax.tools.DiagnosticListener;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationPhase;
-import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
-import org.netbeans.modules.javafx.source.JavadocEnv;
-import org.netbeans.modules.javafx.source.classpath.SourceFileObject;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationPhase;
+import org.netbeans.modules.visage.source.ApiSourcePackageAccessor;
+import org.netbeans.modules.visage.source.JavadocEnv;
+import org.netbeans.modules.visage.source.classpath.SourceFileObject;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.api.Task;
@@ -87,10 +87,10 @@ import org.openide.util.ChangeSupport;
  *
  * @author Miloslav Metelka
  */
-public final class JavaFXParser extends Parser {
+public final class VisageParser extends Parser {
 
-    // -J-Dorg.netbeans.modules.javafx.source.parsing.JavaFXParser.level=FINEST
-    private static final Logger LOG = Logger.getLogger(JavaFXParser.class.getName());
+    // -J-Dorg.netbeans.modules.visage.source.parsing.VisageParser.level=FINEST
+    private static final Logger LOG = Logger.getLogger(VisageParser.class.getName());
 
     private static final PrintWriter DEV_NULL = new PrintWriter(new DevNullWriter(), false);
 
@@ -108,7 +108,7 @@ public final class JavaFXParser extends Parser {
 
     Iterable <? extends JavaFileObject> classBytes;
 
-    JavafxcTaskImpl javafxcTaskImpl;
+    JavafxcTaskImpl visagecTaskImpl;
 
     private DiagnosticListener<JavaFileObject> diagnosticListener;
 
@@ -116,7 +116,7 @@ public final class JavaFXParser extends Parser {
 
     private Boolean errorsPresentCached;
 
-    public JavaFXParser() {
+    public VisageParser() {
     }
 
     @Override
@@ -137,7 +137,7 @@ public final class JavaFXParser extends Parser {
     @Override
     public Result getResult(Task task) throws ParseException {
         assert (task != null);
-        JavaFXParserResultImpl impl = new JavaFXParserResultImpl(this);
+        VisageParserResultImpl impl = new VisageParserResultImpl(this);
         if (snapshot != null) {
             ClasspathInfo taskClasspathInfo = getTaskClasspathInfo(task);
             if (taskClasspathInfo != null && !taskClasspathInfo.equals(classpathInfo)) {
@@ -145,8 +145,8 @@ public final class JavaFXParser extends Parser {
                 parse(snapshot, task, null);
             }
             CompilationPhase requestedPhase = CompilationPhase.ANALYZED;
-            if (task instanceof JavaFXSourceCancelableTask) {
-                JavaFXSourceCancelableTask cTask = (JavaFXSourceCancelableTask) task;
+            if (task instanceof VisageSourceCancelableTask) {
+                VisageSourceCancelableTask cTask = (VisageSourceCancelableTask) task;
                 requestedPhase = cTask.getPhase();
             }
             if (currentPhase.lessThan(requestedPhase)) {
@@ -169,14 +169,14 @@ public final class JavaFXParser extends Parser {
 
     private ClasspathInfo getTaskClasspathInfo(Task task) {
         ClasspathInfo taskClasspathInfo;
-        if (task instanceof JavaFXParserTask) {
-            JavaFXParserTask parserTask = (JavaFXParserTask) task;
+        if (task instanceof VisageParserTask) {
+            VisageParserTask parserTask = (VisageParserTask) task;
             taskClasspathInfo = parserTask.classpathInfo();
         } else if (task instanceof LegacyUserTask) {
             LegacyUserTask legacyTask = (LegacyUserTask) task;
             taskClasspathInfo = legacyTask.classpathInfo();
-        } else if (task instanceof JavaFXSourceCancelableTask) {
-            JavaFXSourceCancelableTask sourceTask = (JavaFXSourceCancelableTask) task;
+        } else if (task instanceof VisageSourceCancelableTask) {
+            VisageSourceCancelableTask sourceTask = (VisageSourceCancelableTask) task;
             taskClasspathInfo = sourceTask.classpathInfo();
         } else {
             taskClasspathInfo = null;
@@ -210,12 +210,12 @@ public final class JavaFXParser extends Parser {
     }
 
     public Context context() {
-        return javafxcTaskImpl.getContext();
+        return visagecTaskImpl.getContext();
     }
 
     public List<Diagnostic> getDiagnostics() {
         if (diagnosticsCached == null) {
-            final JavaFXParser.DiagnosticListenerImpl dli = (JavaFXParser.DiagnosticListenerImpl)
+            final VisageParser.DiagnosticListenerImpl dli = (VisageParser.DiagnosticListenerImpl)
                     context().get(DiagnosticListener.class);
             final TreeMap<Integer, Diagnostic> errorsMap = dli.errors;
             Collection<Diagnostic> errors = errorsMap.values();
@@ -252,9 +252,9 @@ public final class JavaFXParser extends Parser {
             Iterable<? extends UnitTree> trees = null;
             diagnosticsCached = null;
             errorsPresentCached = null;
-            javafxcTaskImpl = createJavafxcTaskImpl();
+            visagecTaskImpl = createJavafxcTaskImpl();
             try {
-                trees = javafxcTaskImpl.parse();
+                trees = visagecTaskImpl.parse();
             } catch (RuntimeException parserError) {
                 LOG.log(Level.FINE, "Error in parser", parserError); // NOI18N
                 return currentPhase;
@@ -284,7 +284,7 @@ public final class JavaFXParser extends Parser {
             diagnosticsCached = null;
             errorsPresentCached = null;
             try {
-                javafxcTaskImpl.analyze();
+                visagecTaskImpl.analyze();
             } catch (RuntimeException analyzerError) {
                 LOG.log(Level.FINE, "Error in analyzer", analyzerError); // NOI18N
                 return currentPhase;
@@ -310,7 +310,7 @@ public final class JavaFXParser extends Parser {
                 long start = System.currentTimeMillis();
                 Iterable <? extends JavaFileObject> bytes = null;
                 try {
-                    bytes = javafxcTaskImpl.generate();
+                    bytes = visagecTaskImpl.generate();
                 } catch (RuntimeException generateError) {
                     LOG.log(Level.FINE, "Error in generate", generateError); // NOI18N
                     return currentPhase;
@@ -360,7 +360,7 @@ public final class JavaFXParser extends Parser {
         //options.add("-Xjcov"); //NOI18N, Make the compiler store end positions
         options.add("-XDdisableStringFolding"); //NOI18N
 
-        // required for code formatting (and completion I believe), see JFXC-3528
+        // required for code formatting (and completion I believe), see VSGC-3528
         options.add("-XDpreserveTrees"); //NOI18N
 
         diagnosticListener = new DiagnosticListenerImpl();

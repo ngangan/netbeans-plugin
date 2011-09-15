@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.debugger;
+package org.netbeans.modules.visage.debugger;
 
 import org.netbeans.api.debugger.Breakpoint;
 import org.netbeans.api.debugger.jpda.JPDABreakpoint;

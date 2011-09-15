@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.layouts;
+package org.netbeans.modules.visage.palette.items.layouts;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -55,6 +55,6 @@ abstract class AbstractLayout implements ActiveEditorDrop {
     protected String importString;
 
     public final boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(AbstractLayout.class, templateName, targetComponent, importString);
+        return VisagePaletteUtilities.insertSnippet(AbstractLayout.class, templateName, targetComponent, importString);
     }
 }

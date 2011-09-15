@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.fxd</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.fxd</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -88,7 +88,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -96,7 +96,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.runtime</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.runtime</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -241,37 +241,37 @@
             <public-packages/>
             <!--
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/javafxrt.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagert.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-common.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-common.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-swing.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-sg-swing.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-geom.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-geom.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-anim.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-anim.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-sg-common.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-sg-common.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-swing.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-swing.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-common.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-common.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/javafx-ui-desktop.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-desktop.jar</runtime-relative-path>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../javafx-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
+                <runtime-relative-path>../visage-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
             </class-path-extension>
             -->
         </data>

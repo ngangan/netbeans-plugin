@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette;
+package org.netbeans.modules.visage.palette;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -60,9 +60,9 @@ import org.netbeans.spi.palette.PaletteController;
  *
  * @author Michal Skvor
  */
-public class JavaFXPaletteActions extends PaletteActions {
+public class VisagePaletteActions extends PaletteActions {
 
-    public JavaFXPaletteActions() {
+    public VisagePaletteActions() {
     }
 
     @Override
@@ -87,14 +87,14 @@ public class JavaFXPaletteActions extends PaletteActions {
 
     @Override
     public Action getPreferredAction(Lookup item) {
-        return new JavaFXPaletteItemInsertAction( item );
+        return new VisagePaletteItemInsertAction( item );
     }
 
-    private static class JavaFXPaletteItemInsertAction extends AbstractAction {
+    private static class VisagePaletteItemInsertAction extends AbstractAction {
 
         private Lookup item;
         
-        public JavaFXPaletteItemInsertAction( Lookup item ) {
+        public VisagePaletteItemInsertAction( Lookup item ) {
             this.item = item;
         }
         
@@ -102,11 +102,11 @@ public class JavaFXPaletteActions extends PaletteActions {
             ActiveEditorDrop drop = item.lookup( ActiveEditorDrop.class );
             if( drop == null ) {
                 String body = item.lookup( String.class );
-                drop = new JavaFXEditorDropDefault(body);
+                drop = new VisageEditorDropDefault(body);
             }
             JTextComponent target = Utilities.getFocusedComponent();
             if( target == null ) {
-                String msg = NbBundle.getMessage( JavaFXPaletteActions.class, "MSG_ErrorNoFocusedDocument" ); // NOI18N
+                String msg = NbBundle.getMessage( VisagePaletteActions.class, "MSG_ErrorNoFocusedDocument" ); // NOI18N
                 DialogDisplayer.getDefault().notify( new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE));
                 return;
             }
@@ -118,7 +118,7 @@ public class JavaFXPaletteActions extends PaletteActions {
             }
             
             try {
-                PaletteController pc = JavaFXPaletteFactory.getPalette();
+                PaletteController pc = VisagePaletteFactory.getPalette();
                 pc.clearSelection();
             } catch( IOException ioe ) {} //should not occur
             

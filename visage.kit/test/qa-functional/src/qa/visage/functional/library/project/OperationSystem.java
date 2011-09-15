@@ -39,7 +39,7 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library.project;
+package qa.visage.functional.library.project;
 
 /**
  *

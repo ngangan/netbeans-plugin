@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.navigation.base;
+package org.netbeans.modules.visage.navigation.base;
 
 import javax.swing.*;
 import java.awt.*;

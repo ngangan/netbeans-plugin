@@ -39,36 +39,36 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.perfomance;
+package qa.visage.functional.perfomance;
 
 import java.io.File;
 import java.net.URL;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
-import qa.javafx.functional.library.project.JavaFXProject;
-import qa.javafx.functional.library.project.Project;
+import qa.visage.functional.library.project.VisageProject;
+import qa.visage.functional.library.project.Project;
 
 
 /**
  *
  * @author andromeda
  */
-public class JavaFXPerfomanceTest extends JavaFXTestCase {
+public class VisagePerfomanceTest extends VisageTestCase {
 
     static final String[] TESTS = {
         "testBuildBigProject",
     };
 
 
-    public JavaFXPerfomanceTest(String name) {
+    public VisagePerfomanceTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXPerfomanceTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisagePerfomanceTest.class, ".*", ".*", TESTS);
 
     }
 
@@ -79,7 +79,7 @@ public class JavaFXPerfomanceTest extends JavaFXTestCase {
         String root = Util.getXtestDataPath();
 
         System.out.println("src: '" + root  + "'");
-        String src = root + "/projects/bigproject/BigJavaFXProject.zip";
+        String src = root + "/projects/bigproject/BigVisageProject.zip";
         String dst = Util.WORK_DIR;
 
         src = src.replace('\\', '/');
@@ -96,10 +96,10 @@ public class JavaFXPerfomanceTest extends JavaFXTestCase {
         Util.sleep(3000);
         Util.waitScanFinished();
 
-        String projectPath = dst + "/BigJavaFXProject";
+        String projectPath = dst + "/BigVisageProject";
         Project.openProject(projectPath);
 
-        JavaFXProject bigProject  = new JavaFXProject("BigJavaFXProject");
+        VisageProject bigProject  = new VisageProject("BigVisageProject");
         Util.sleep(3000);
         Util.waitScanFinished();
         bigProject.build();
@@ -111,7 +111,7 @@ public class JavaFXPerfomanceTest extends JavaFXTestCase {
         System.out.println(bigProject.getOutput().getText());
         assertTrue("Big project is not compiled", isCompiled);
         
-//        JavaFXProject profilerProject  = JavaFXProject.createProject("SmokeProfiler");
+//        VisageProject profilerProject  = VisageProject.createProject("SmokeProfiler");
 //        EditorOperator main = profilerProject.openMainFile();
 //        String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
 //        main.setText(code);

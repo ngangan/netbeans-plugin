@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.io.File;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
 import org.netbeans.api.project.libraries.Library;
-import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
+import org.netbeans.modules.visage.project.classpath.ClassPathSupport;
 
 /**
  *

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.imports.ui;
+package org.netbeans.modules.visage.editor.imports.ui;
 
 import javax.swing.text.JTextComponent;
 import java.awt.event.KeyEvent;

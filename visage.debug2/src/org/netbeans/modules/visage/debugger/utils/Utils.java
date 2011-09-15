@@ -43,10 +43,10 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.utils;
+package org.netbeans.modules.visage.debugger.utils;
 
-import com.sun.javafx.jdi.FXClassType;
-import com.sun.javafx.jdi.FXObjectReference;
+import com.sun.visage.jdi.FXClassType;
+import com.sun.visage.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.Value;
 import java.net.MalformedURLException;

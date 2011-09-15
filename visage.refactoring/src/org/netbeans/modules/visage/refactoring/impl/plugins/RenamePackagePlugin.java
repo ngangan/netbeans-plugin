@@ -42,10 +42,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
 import java.io.IOException;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,19 +58,19 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.ReindexFileElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameInCommentsElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.RenameOccurencesElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
-import org.netbeans.modules.javafx.refactoring.repository.Usage;
-import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.ReindexFileElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.RenameInCommentsElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.RenameOccurencesElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.PackageDef;
+import org.netbeans.modules.visage.refactoring.repository.Usage;
+import org.netbeans.modules.visage.refactoring.transformations.ReplaceTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.netbeans.modules.refactoring.api.RenameRefactoring;
@@ -83,7 +83,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
+public class RenamePackagePlugin extends VisageRefactoringPlugin {
     private RenameRefactoring refactoring;
 
     public RenamePackagePlugin(RenameRefactoring refactoring) {
@@ -147,7 +147,7 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
             final Collection<ElementDef> edefs = new HashSet<ElementDef>();
             final PackageDef[] pd = new PackageDef[]{PackageDef.DEFAULT};
 
-            if (SourceUtils.isJavaFXFile(file)) {
+            if (SourceUtils.isVisageFile(file)) {
                 ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(file);
                 pd[0] = cm.getPackageDef();
                 UpdatePackageDeclarationElement ref = new UpdatePackageDeclarationElement(pd[0].getName(), targetPkgName, file, reb.getSession()) {
@@ -196,7 +196,7 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
             for(ElementDef cDef : edefs) {
                 for(FileObject referenced : index.getResources(cDef.createHandle(), EnumSet.of(ClassIndex.SearchKind.TYPE_REFERENCES), EnumSet.allOf(ClassIndex.SearchScope.class))) {
                     if (isCancelled()) return null;
-                    if (!SourceUtils.isJavaFXFile(referenced)) continue;
+                    if (!SourceUtils.isVisageFile(referenced)) continue;
                     
                     RenameOccurencesElement bre = new RenameOccurencesElement(sourcePkgName, targetPkgName, referenced, reb.getSession()) {
                         @Override
@@ -218,7 +218,7 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
             if (isCancelled()) return null;
             if (ref.hasChanges()) {
                 reb.add(refactoring, ref);
-            } else if (SourceUtils.isJavaFXFile(ref.getParentFile())) {
+            } else if (SourceUtils.isVisageFile(ref.getParentFile())) {
                 reb.add(refactoring, new ReindexFileElement(ref.getParentFile()));
             }
         }
@@ -230,7 +230,7 @@ public class RenamePackagePlugin extends JavaFXRefactoringPlugin {
     private void collectRelevantFiles(FileObject parent, Set<FileObject> relevantFiles) {
         for(FileObject fo : parent.getChildren()) {
             if (isCancelled()) return;
-            if (fo.isData() && (SourceUtils.isJavaFXFile(fo) || fo.getExt().toLowerCase().equals("java"))) { // NOI18N
+            if (fo.isData() && (SourceUtils.isVisageFile(fo) || fo.getExt().toLowerCase().equals("java"))) { // NOI18N
                 relevantFiles.add(fo);
             } // package renaming works only on one level; it doesn't recurse to subpackages
         }

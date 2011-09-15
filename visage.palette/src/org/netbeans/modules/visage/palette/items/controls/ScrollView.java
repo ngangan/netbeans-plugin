@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.controls;
+package org.netbeans.modules.visage.palette.items.controls;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.api.visage.source.Imports;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplateManager;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 import org.openide.util.NbBundle;
 
@@ -57,6 +57,6 @@ import org.openide.util.NbBundle;
 public class ScrollView implements ActiveEditorDrop {
 
     public boolean handleTransfer( JTextComponent targetComponent ) {
-        return JavaFXPaletteUtilities.insertSnippet(ScrollView.class, "TEMPLATE_ScrollView", targetComponent, "javafx.scene.control.ScrollView" );//NOI18N
+        return VisagePaletteUtilities.insertSnippet(ScrollView.class, "TEMPLATE_ScrollView", targetComponent, "visage.scene.control.ScrollView" );//NOI18N
     }
 }

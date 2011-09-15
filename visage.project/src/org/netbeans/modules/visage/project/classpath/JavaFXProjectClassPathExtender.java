@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.io.IOException;
 import java.net.URI;
@@ -54,13 +54,13 @@ import org.netbeans.api.project.libraries.Library;
 import org.netbeans.api.project.ant.AntArtifact;
 
 @Deprecated
-public class JavaFXProjectClassPathExtender implements ProjectClassPathExtender {
+public class VisageProjectClassPathExtender implements ProjectClassPathExtender {
     
     private static final String CP_CLASS_PATH = "javac.classpath"; //NOI18N
 
-    private final JavaFXProjectClassPathModifier delegate;
+    private final VisageProjectClassPathModifier delegate;
 
-    public JavaFXProjectClassPathExtender (final JavaFXProjectClassPathModifier delegate) {
+    public VisageProjectClassPathExtender (final VisageProjectClassPathModifier delegate) {
         assert delegate != null;
         this.delegate = delegate;
     }
@@ -70,7 +70,7 @@ public class JavaFXProjectClassPathExtender implements ProjectClassPathExtender 
     }
 
     public boolean addLibrary(final String type, final Library library) throws IOException {
-        return this.delegate.handleLibraries (new Library[] {library},type, JavaFXProjectClassPathModifier.ADD);
+        return this.delegate.handleLibraries (new Library[] {library},type, VisageProjectClassPathModifier.ADD);
     }
 
     public boolean addArchiveFile(final FileObject archiveFile) throws IOException {
@@ -81,7 +81,7 @@ public class JavaFXProjectClassPathExtender implements ProjectClassPathExtender 
         if (FileUtil.isArchiveFile(archiveFile)) {
             archiveFile = FileUtil.getArchiveRoot (archiveFile);
         }
-        return this.delegate.handleRoots(new URL[] {archiveFile.getURL()},type,JavaFXProjectClassPathModifier.ADD);
+        return this.delegate.handleRoots(new URL[] {archiveFile.getURL()},type,VisageProjectClassPathModifier.ADD);
     }
 
     public boolean addAntArtifact(final AntArtifact artifact, final URI artifactElement) throws IOException {
@@ -89,7 +89,7 @@ public class JavaFXProjectClassPathExtender implements ProjectClassPathExtender 
     }
 
     public boolean addAntArtifact(final String type, final AntArtifact artifact, final URI artifactElement) throws IOException {
-        return this.delegate.handleAntArtifacts(new AntArtifact[] {artifact}, new URI[] {artifactElement},type,JavaFXProjectClassPathModifier.ADD);
+        return this.delegate.handleAntArtifacts(new AntArtifact[] {artifact}, new URI[] {artifactElement},type,VisageProjectClassPathModifier.ADD);
     }
 
 }

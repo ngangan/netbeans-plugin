@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://www.netbeans.org/ns/project/1">
-    <type>org.netbeans.modules.javafx.project</type>
+    <type>org.netbeans.modules.visage.project</type>
     <configuration>
-        <data xmlns="http://www.netbeans.org/ns/javafx-project/3">
+        <data xmlns="http://www.netbeans.org/ns/visage-project/3">
             <name>fx-prj-2</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <source-roots>

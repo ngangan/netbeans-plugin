@@ -40,16 +40,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXExpression;
-import com.sun.tools.javafx.tree.JFXForExpression;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import com.sun.tools.visage.tree.VSGExpression;
+import com.sun.tools.visage.tree.VSGForExpression;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionItem;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.IN_KEYWORD;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionItem;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.IN_KEYWORD;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -60,27 +60,27 @@ import org.openide.util.NbBundle;
  *
  * @author David Strupl
  */
-public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXForExpression> {
+public class ForExpressionEnvironment extends VisageCompletionEnvironment<VSGForExpression> {
     
     private static final Logger logger = Logger.getLogger(ForExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXForExpression foe) throws IOException {
-        if (LOGGABLE) log("inside JFXForExpression " + foe); // NOI18N
+    protected void inside(VSGForExpression foe) throws IOException {
+        if (LOGGABLE) log("inside VSGForExpression " + foe); // NOI18N
         if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, foe);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
 
-        JFXExpression expr = foe.getBodyExpression();
+        VSGExpression expr = foe.getBodyExpression();
         if (expr != null && sourcePositions.getStartPosition(root, expr) <= offset) {
             // already inside the for() body
             localResult(null);
             return;
         }
 
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterFor = false;
@@ -123,15 +123,15 @@ public class ForExpressionEnvironment extends JavaFXCompletionEnvironment<JFXFor
             localResult(null);
         } else {
             if (afterIdentifier) {
-                addResult(JavaFXCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false)); // NOI18N
+                addResult(VisageCompletionItem.createKeywordItem(IN_KEYWORD, " ", offset, false)); // NOI18N
                 return;
             }
             if (afterLParen) {
                 if (prefix != null && prefix.length() > 0) {
                     // ok the user has already typed something
-                    if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
+                    if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_\"in_\"_after")); // NOI18N
                 } else {
-                    if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
+                    if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_a_variable_name"));
                 }
             }
         }

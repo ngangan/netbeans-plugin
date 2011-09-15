@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.visage.api.tree.VisageTreePath;
 import java.io.IOException;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.spi.editor.errorstripe.UpToDateStatus;
@@ -103,7 +103,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             "compiler.err.report.access" // NOI18N
     ));
 
-    private static final Set<JFXTokenId> WHITESPACE = EnumSet.of(JFXTokenId.COMMENT, JFXTokenId.DOC_COMMENT, JFXTokenId.LINE_COMMENT, JFXTokenId.WS);
+    private static final Set<VSGTokenId> WHITESPACE = EnumSet.of(VSGTokenId.COMMENT, VSGTokenId.DOC_COMMENT, VSGTokenId.LINE_COMMENT, VSGTokenId.WS);
     
     private AtomicBoolean cancel = new AtomicBoolean();
 
@@ -184,7 +184,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                     continue;
                 } catch (BadLocationException ex) {
                     if (LOGGABLE) {
-                        LOGGER.log(Level.INFO, NbBundle.getBundle("org/netbeans/modules/javafx/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex); // NOI18N
+                        LOGGER.log(Level.INFO, NbBundle.getBundle("org/netbeans/modules/visage/editor/semantic/Bundle").getString("Problem_with_error_underlining"), ex); // NOI18N
                     }
                 } catch (IOException e) {
                     throw new IllegalStateException(e);
@@ -246,24 +246,24 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
         if (UNDERLINE_IDENTIFIER.contains(d.getCode())) {
             int offset = (int) getPrefferedPosition(info, d);
-            TokenSequence<JFXTokenId> ts = info.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+            TokenSequence<VSGTokenId> ts = info.getTokenHierarchy().tokenSequence(VSGTokenId.language());
 
             int diff = ts.move(offset);
 
             if (ts.moveNext() && diff >= 0 && diff < ts.token().length()) {
-                Token<JFXTokenId> t = ts.token();
+                Token<VSGTokenId> t = ts.token();
 
-                if (t.id() == JFXTokenId.DOT) {
+                if (t.id() == VSGTokenId.DOT) {
                     while (ts.moveNext() && WHITESPACE.contains(ts.token().id()));
                     t = ts.token();
                 }
 
-                if (t.id() == JFXTokenId.NEW) {
+                if (t.id() == VSGTokenId.NEW) {
                     while (ts.moveNext() && WHITESPACE.contains(ts.token().id()));
                     t = ts.token();
                 }
 
-                if (t.id() == JFXTokenId.IDENTIFIER) {
+                if (t.id() == VSGTokenId.IDENTIFIER) {
                     int[] span = translatePositions(info, new int[] {ts.offset(), ts.offset() + t.length()});
 
                     if (span != null) {
@@ -343,11 +343,11 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private int skipWhiteSpace(CompilationInfo info, int start) {
-        TokenSequence<JFXTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(start);
         boolean nonWSFound = false;
         while (ts.moveNext()) {
-            if (ts.token().id() != JFXTokenId.WS) {
+            if (ts.token().id() != VSGTokenId.WS) {
                 nonWSFound = true;
                 break;
             }
@@ -368,7 +368,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
     public Token findUnresolvedElementToken(CompilationInfo info, int offset) throws IOException {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
 
         if (ts == null) {
             return null;
@@ -378,18 +378,18 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         if (ts.moveNext()) {
             Token t = ts.token();
 
-            if (t.id() == JFXTokenId.DOT) {
+            if (t.id() == VSGTokenId.DOT) {
                 ts.moveNext();
                 t = ts.token();
             } else {
-                if (t.id() == JFXTokenId.LT) {
+                if (t.id() == VSGTokenId.LT) {
                     ts.moveNext();
                     t = ts.token();
                 } else {
-                    if (t.id() == JFXTokenId.NEW || t.id() == JFXTokenId.WS) {
+                    if (t.id() == VSGTokenId.NEW || t.id() == VSGTokenId.WS) {
                         boolean cont = ts.moveNext();
 
-                        while (cont && ts.token().id() == JFXTokenId.WS) {
+                        while (cont && ts.token().id() == VSGTokenId.WS) {
                             cont = ts.moveNext();
                         }
 
@@ -401,7 +401,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                 }
             }
 
-            if (t.id() == JFXTokenId.IDENTIFIER) {
+            if (t.id() == VSGTokenId.IDENTIFIER) {
                 return ts.offsetToken();
             }
         }
@@ -421,7 +421,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         return null;
     }
 
-    public JavaFXTreePath findUnresolvedElement(CompilationInfo info, int offset) throws IOException {
+    public VisageTreePath findUnresolvedElement(CompilationInfo info, int offset) throws IOException {
         int[] span = findUnresolvedElementSpan(info, offset);
 
         if (span != null) {
@@ -459,7 +459,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         }
         if ("compiler.err.not.stmt".equals(d.getCode())) { // NOI18N
             //check for "Collections.":
-            JavaFXTreePath path = findUnresolvedElement(info, (int) d.getStartPosition() - 1);
+            VisageTreePath path = findUnresolvedElement(info, (int) d.getStartPosition() - 1);
             Element el = path != null ? info.getTrees().getElement(path) : null;
 
             if (el == null || el.asType().getKind() == TypeKind.ERROR) {

@@ -1,8 +1,8 @@
 package declarations;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polyline;
-import javafx.scene.shape.Polyline;
+import visage.scene.paint.Color;
+import visage.scene.shape.Polyline;
+import visage.scene.shape.Polyline;
 
 /** completion after last var should not show Polyline items when ; is missing */
 

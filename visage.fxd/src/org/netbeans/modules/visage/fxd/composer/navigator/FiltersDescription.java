@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import java.util.ArrayList;
 import java.util.List;

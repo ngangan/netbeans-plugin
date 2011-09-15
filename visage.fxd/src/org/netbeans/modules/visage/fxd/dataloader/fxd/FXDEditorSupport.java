@@ -42,18 +42,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader.fxd;
+package org.netbeans.modules.visage.fxd.dataloader.fxd;
 
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceEditorWrapper;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceTopComponent;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.navigator.SelectionCookie;
+import org.netbeans.modules.visage.fxd.composer.source.SourceEditorWrapper;
+import org.netbeans.modules.visage.fxd.composer.source.SourceTopComponent;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.cookies.CloseCookie;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;

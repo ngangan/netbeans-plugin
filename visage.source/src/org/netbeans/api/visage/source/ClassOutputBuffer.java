@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -93,7 +93,7 @@ public class ClassOutputBuffer extends SimpleJavaFileObject {
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {
-                return URI.create("mfm:///com/sun/tools/javafx/script/javafx_source"); // NOI18N
+                return URI.create("mfm:///com/sun/tools/visage/script/visage_source"); // NOI18N
             }
         }
     }

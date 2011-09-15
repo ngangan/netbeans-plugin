@@ -40,16 +40,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.InstanceOfTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.InstanceOfTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.*;
 
 import javax.lang.model.type.TypeMirror;
 import java.util.logging.Level;
@@ -59,7 +59,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<InstanceOfTree> {
+public class InstanceOfTreeEnvironment extends VisageCompletionEnvironment<InstanceOfTree> {
     
     private static final Logger logger = Logger.getLogger(InstanceOfTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -72,9 +72,9 @@ public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<Insta
         int typePos = (int)sourcePositions.getStartPosition(root, t.getType()); // NOI18N
         if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos + "  offset == " + offset); // NOI18N
         if (offset >= typePos) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-            if ((last != null) && (last.token().id() == JFXTokenId.INSTANCEOF)){
+            if ((last != null) && (last.token().id() == VSGTokenId.INSTANCEOF)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
             }
             return;
@@ -85,7 +85,7 @@ public class InstanceOfTreeEnvironment extends JavaFXCompletionEnvironment<Insta
     }
 
     private TypeMirror getSmartType(Tree t) {
-        final JavaFXTreePath treePath = new JavaFXTreePath(path, t);
+        final VisageTreePath treePath = new VisageTreePath(path, t);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type == " + type); // NOI18N
         return type;

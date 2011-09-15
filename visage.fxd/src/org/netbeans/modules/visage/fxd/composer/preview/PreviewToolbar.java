@@ -42,24 +42,24 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.preview;
+package org.netbeans.modules.visage.fxd.composer.preview;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
-import org.netbeans.modules.javafx.fxd.composer.misc.FXDToolbar;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.HighlightActionFactory;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import com.sun.javafx.tools.fxd.container.FXDContainer;
-import com.sun.javafx.tools.fxd.loader.Profile;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookup;
+import org.netbeans.modules.visage.fxd.composer.misc.FXDToolbar;
+import org.netbeans.modules.visage.fxd.composer.model.actions.ActionController;
+import org.netbeans.modules.visage.fxd.composer.model.actions.HighlightActionFactory;
+import org.netbeans.modules.visage.fxd.composer.model.actions.SelectActionFactory;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import com.sun.visage.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.loader.Profile;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
-import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
+import org.netbeans.modules.visage.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.visage.fxd.composer.model.FXZArchive;
 /**
  *
  * @author Pavel Benes

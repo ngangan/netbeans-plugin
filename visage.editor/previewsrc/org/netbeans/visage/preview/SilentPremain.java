@@ -30,7 +30,7 @@
  */
 
 
-package org.netbeans.javafx.preview;
+package org.netbeans.visage.preview;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,7 +132,7 @@ public class SilentPremain {
                         }
                     }
                     
-                    byte buff[] = "org/netbeans/javafx/preview/ScreenShot".getBytes("UTF-8");
+                    byte buff[] = "org/netbeans/visage/preview/ScreenShot".getBytes("UTF-8");
                     out.writeByte(CONSTANT_Utf8);
                     out.writeShort(buff.length);
                     out.write(buff);

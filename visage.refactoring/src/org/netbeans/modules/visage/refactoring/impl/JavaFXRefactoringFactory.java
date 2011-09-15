@@ -29,18 +29,18 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl;
+package org.netbeans.modules.visage.refactoring.impl;
 
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.CopyRefactoringPlugin;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.MoveRefactoringPlugin;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.RenamePackagePlugin;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.RenameRefactoringPlugin;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.SafeDeleteRefactoringPlugin;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.WhereUsedQueryPlugin;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.plugins.CopyRefactoringPlugin;
+import org.netbeans.modules.visage.refactoring.impl.plugins.MoveRefactoringPlugin;
+import org.netbeans.modules.visage.refactoring.impl.plugins.RenamePackagePlugin;
+import org.netbeans.modules.visage.refactoring.impl.plugins.RenameRefactoringPlugin;
+import org.netbeans.modules.visage.refactoring.impl.plugins.SafeDeleteRefactoringPlugin;
+import org.netbeans.modules.visage.refactoring.impl.plugins.WhereUsedQueryPlugin;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
@@ -59,11 +59,11 @@ import org.openide.util.lookup.ServiceProvider;
  * @author Jaroslav Bachorik
  */
 @ServiceProvider(service=RefactoringPluginFactory.class)
-public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
+public class VisageRefactoringFactory implements RefactoringPluginFactory {
 
     public RefactoringPlugin createInstance(AbstractRefactoring refactoring) {
-        // disable javafx refactoring for NB6.8 Beta
-//        if (!Boolean.getBoolean("javafx.refactoring")) return null;
+        // disable visage refactoring for NB6.8 Beta
+//        if (!Boolean.getBoolean("visage.refactoring")) return null;
 
         Lookup look = refactoring.getRefactoringSource();
         FileObject file = look.lookup(FileObject.class);
@@ -81,8 +81,8 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
             if (elDef != null) {
                 return new RenameRefactoringPlugin(((RenameRefactoring)refactoring));
             }
-            if ((elDef !=null && elDef.getStartPos() > -1) || (elDef == null && ((file!=null) && SourceUtils.isJavaFXFile(file)))) {
-                //rename javafx file, class, method etc..
+            if ((elDef !=null && elDef.getStartPos() > -1) || (elDef == null && ((file!=null) && SourceUtils.isVisageFile(file)))) {
+                //rename visage file, class, method etc..
                 return new RenameRefactoringPlugin((RenameRefactoring)refactoring);
             } else if (file!=null && SourceUtils.isOnSourceClasspath(file) && file.isFolder()) {
                 //rename folder
@@ -117,7 +117,7 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
 
     private boolean checkMove(Lookup refactoringSource) {
         for (FileObject f:refactoringSource.lookupAll(FileObject.class)) {
-            if (SourceUtils.isJavaFXFile(f) || f.getExt().toLowerCase().equals("java")) { // NOI18N
+            if (SourceUtils.isVisageFile(f) || f.getExt().toLowerCase().equals("java")) { // NOI18N
                 return true;
             }
             if (f.isFolder()) {
@@ -129,7 +129,7 @@ public class JavaFXRefactoringFactory implements RefactoringPluginFactory {
 
     private boolean checkCopy(Lookup object) {
         FileObject f=object.lookup(FileObject.class);
-        if (f!=null && SourceUtils.isJavaFXFile(f))
+        if (f!=null && SourceUtils.isVisageFile(f))
             return true;
         return false;
     }

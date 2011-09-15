@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.test.javafx.bestpractices.samples;
+package org.netbeans.test.visage.bestpractices.samples;
 
 /**
  *
@@ -49,10 +49,10 @@ package org.netbeans.test.javafx.bestpractices.samples;
 import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
-import org.netbeans.test.javafx.bestpractices.lib.Util;
+import org.netbeans.test.visage.bestpractices.lib.VisageTestCase;
+import org.netbeans.test.visage.bestpractices.lib.Util;
 
-public class Easing extends JavaFXTestCase {
+public class Easing extends VisageTestCase {
 
     public String _type = "Input"; //Type of Sample
     public String _project = "Easing";

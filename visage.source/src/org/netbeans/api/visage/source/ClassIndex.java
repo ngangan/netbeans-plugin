@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.io.IOException;
 import java.net.URL;
@@ -64,8 +64,8 @@ import java.util.regex.Pattern;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.modules.javafx.source.indexing.IndexingUtilities;
-import org.netbeans.modules.javafx.source.indexing.JavaFXIndexer;
+import org.netbeans.modules.visage.source.indexing.IndexingUtilities;
+import org.netbeans.modules.visage.source.indexing.VisageIndexer;
 import org.netbeans.modules.parsing.impl.indexing.PathRecognizerRegistry;
 import org.netbeans.modules.parsing.impl.indexing.PathRegistry;
 import org.netbeans.modules.parsing.impl.indexing.friendapi.IndexingController;
@@ -80,8 +80,8 @@ import static org.netbeans.modules.parsing.spi.indexing.support.QuerySupport.Kin
 import org.openide.util.Exceptions;
 
 /**
- * A JavaFX class index that, for given class path, provide searching services
- * over both java and javafx classes.
+ * A Visage class index that, for given class path, provide searching services
+ * over both java and visage classes.
  * @author nenik
  */
 final public class ClassIndex {
@@ -234,8 +234,8 @@ final public class ClassIndex {
 
     /**
      * Returns {@link ElementHandle}s for all declared types in given classpath corresponding to the name.
-     * All the types belonging to the JDK, JavaFX SDK and user classes are
-     * considered, but even java types are returned in the form of JavaFX
+     * All the types belonging to the JDK, Visage SDK and user classes are
+     * considered, but even java types are returned in the form of Visage
      * ElementHandle.
      * 
      * @param name case sensitive prefix, case insensitive prefix, exact simple name,
@@ -264,7 +264,7 @@ final public class ClassIndex {
 
             String searchValue = name;
             QuerySupport.Kind queryKind;
-            JavaFXIndexer.IndexKey indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_SIMPLE;
+            VisageIndexer.IndexKey indexKey = VisageIndexer.IndexKey.CLASS_NAME_SIMPLE;
 
             switch (kind) {
                 case CAMEL_CASE:
@@ -275,7 +275,7 @@ final public class ClassIndex {
                     break;
                 case CASE_INSENSITIVE_PREFIX:
                     searchValue = searchValue.toLowerCase(); // case-insensitive index uses all-lower case
-                    indexKey = JavaFXIndexer.IndexKey.CLASS_NAME_INSENSITIVE;
+                    indexKey = VisageIndexer.IndexKey.CLASS_NAME_INSENSITIVE;
                     queryKind = QuerySupport.Kind.CASE_INSENSITIVE_PREFIX;
                     break;
                 case CASE_INSENSITIVE_REGEXP:
@@ -286,10 +286,10 @@ final public class ClassIndex {
                     break;
                 case REGEXP:
                     queryKind = QuerySupport.Kind.REGEXP;
-                    indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
+                    indexKey = VisageIndexer.IndexKey.CLASS_FQN;
                     break;
                 case EXACT:
-                    indexKey = JavaFXIndexer.IndexKey.CLASS_FQN;
+                    indexKey = VisageIndexer.IndexKey.CLASS_FQN;
                     queryKind = QuerySupport.Kind.EXACT;
                     break;
                 default:
@@ -299,8 +299,8 @@ final public class ClassIndex {
 
             try {
                 QuerySupport query = getQuery(scope);
-                for (IndexResult ir : query.query(indexKey.toString(), searchValue, queryKind, JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
-                    for (String fqn : matches(name, queryKind, false, ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString()))) {
+                for (IndexResult ir : query.query(indexKey.toString(), searchValue, queryKind, VisageIndexer.IndexKey.CLASS_FQN.toString())) {
+                    for (String fqn : matches(name, queryKind, false, ir.getValues(VisageIndexer.IndexKey.CLASS_FQN.toString()))) {
                         ElementHandle<TypeElement> handle = new ElementHandle<TypeElement>(ElementKind.CLASS, new String[]{fqn});
                         result.add(handle);
                     }
@@ -336,8 +336,8 @@ final public class ClassIndex {
 
             try {
                 QuerySupport query = getQuery(scope);
-                for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), prefix, QuerySupport.Kind.PREFIX, JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
-                    String pkgName = ir.getValue(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString()); // only one package name per indexed document
+                for (IndexResult ir : query.query(VisageIndexer.IndexKey.PACKAGE_NAME.toString(), prefix, QuerySupport.Kind.PREFIX, VisageIndexer.IndexKey.PACKAGE_NAME.toString())) {
+                    String pkgName = ir.getValue(VisageIndexer.IndexKey.PACKAGE_NAME.toString()); // only one package name per indexed document
                     if (pkgName.startsWith(prefix)) {
                         if (directOnly) {
                             if (pkgName.indexOf(".", prefix.length()) == -1) {
@@ -392,22 +392,22 @@ final public class ClassIndex {
 
                     switch (sk) {
                         case TYPE_REFERENCES: {
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_DEF.toString()})) {
-                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString())) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FUNCTION_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{VisageIndexer.IndexKey.FUNCTION_DEF.toString()})) {
+                                for (String value : ir.getValues(VisageIndexer.IndexKey.FUNCTION_DEF.toString())) {
                                     if (value.contains(handle.getQualifiedName())) {
                                         result.add(IndexingUtilities.getLocationHandle(value));
                                     }
                                 }
                             }
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
-                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FUNCTION_INV.toString(), typeRegexp, Kind.REGEXP, new String[]{VisageIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                                for (String value : ir.getValues(VisageIndexer.IndexKey.FUNCTION_INV.toString())) {
                                     if (value.contains(handle.getQualifiedName())) {
                                         result.add(IndexingUtilities.getLocationHandle(value));
                                     }
                                 }
                             }
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FIELD_DEF.toString()})) {
-                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FIELD_DEF.toString())) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FIELD_DEF.toString(), typeRegexp, Kind.REGEXP, new String[]{VisageIndexer.IndexKey.FIELD_DEF.toString()})) {
+                                for (String value : ir.getValues(VisageIndexer.IndexKey.FIELD_DEF.toString())) {
                                     if (value.contains(handle.getQualifiedName())) {
                                         result.add(IndexingUtilities.getLocationHandle(value));
                                     }
@@ -416,8 +416,8 @@ final public class ClassIndex {
                             break;
                         }
                         case METHOD_REFERENCES: {
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{JavaFXIndexer.IndexKey.FUNCTION_INV.toString()})) {
-                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.FUNCTION_INV.toString())) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FUNCTION_INV.toString(), invocationRegex, Kind.REGEXP, new String[]{VisageIndexer.IndexKey.FUNCTION_INV.toString()})) {
+                                for (String value : ir.getValues(VisageIndexer.IndexKey.FUNCTION_INV.toString())) {
                                     if (Pattern.matches(invocationRegex, value)) {
                                         result.add(IndexingUtilities.getLocationHandle(value));
                                     }
@@ -426,14 +426,14 @@ final public class ClassIndex {
                         }
                         case IMPLEMENTORS: {
                             String indexingVal = IndexingUtilities.getIndexValue(handle);
-                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
-                                result.addAll(JavaFXSourceUtils.getClasses(ir.getFile(), handle));
+                            for(IndexResult ir : query.query(VisageIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                                result.addAll(VisageSourceUtils.getClasses(ir.getFile(), handle));
                             }
                         }
                         case PACKAGES: {
                             String indexingVal = IndexingUtilities.getIndexValue(handle);
-                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
-                                for (String value : ir.getValues(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString())) {
+                            for(IndexResult ir : query.query(VisageIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
+                                for (String value : ir.getValues(VisageIndexer.IndexKey.PACKAGE_NAME.toString())) {
                                     result.add(IndexingUtilities.getLocationHandle(value));
                                 }
                             }
@@ -481,43 +481,43 @@ final public class ClassIndex {
 
                     switch (sk) {
                         case TYPE_REFERENCES: {
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), typeDef, Kind.EXACT)) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.TYPE_REF.toString(), typeDef, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
                             break;
                         }
                         case IMPLEMENTORS: {
-                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                            for(IndexResult ir : query.query(VisageIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
                             break;
                         }
                         case METHOD_REFERENCES: {
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FUNCTION_DEF.toString(), indexingVal, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FUNCTION_INV.toString(), indexingVal, Kind.EXACT)) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FUNCTION_INV.toString(), indexingVal, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
                             break;
                         }
                         case FIELD_REFERENCES: {
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_DEF.toString(), indexingVal, Kind.EXACT)) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FIELD_DEF.toString(), indexingVal, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
-                            for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.FIELD_REF.toString(), indexingVal, Kind.EXACT)) {
+                            for (IndexResult ir : query.query(VisageIndexer.IndexKey.FIELD_REF.toString(), indexingVal, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
                             break;
                         }
                         case TYPE_DEFS: {
-                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.CLASS_FQN.toString(), typeDef, Kind.EXACT)) {
+                            for(IndexResult ir : query.query(VisageIndexer.IndexKey.CLASS_FQN.toString(), typeDef, Kind.EXACT)) {
                                 result.add(ir.getFile());
                             }
                             break;
                         }
                         case PACKAGES: {
-                            for(IndexResult ir : query.query(JavaFXIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
+                            for(IndexResult ir : query.query(VisageIndexer.IndexKey.PACKAGE_NAME.toString(), indexingVal, Kind.PREFIX)) {
                                 result.add(ir.getFile());
                             }
                         }
@@ -544,11 +544,11 @@ final public class ClassIndex {
                 ElementHandle<? extends Element> processing = toProcess.pop();
                 final String indexingVal = IndexingUtilities.getIndexValue(processing);
                 QuerySupport query = getUsageQuery(EnumSet.allOf(SearchScope.class));
-                for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_REF.toString(), indexingVal, Kind.EXACT)) {
+                for (IndexResult ir : query.query(VisageIndexer.IndexKey.TYPE_REF.toString(), indexingVal, Kind.EXACT)) {
                     if (ir.getFile() == null) continue;
                     if (!closure.contains(ir.getFile())) {
                         closure.add(ir.getFile());
-                        for(String typeName : ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
+                        for(String typeName : ir.getValues(VisageIndexer.IndexKey.CLASS_FQN.toString())) {
                             toProcess.push(IndexingUtilities.getTypeHandle(typeName));
                         }
                     }
@@ -574,10 +574,10 @@ final public class ClassIndex {
                 ElementHandle<? extends Element> processing = toProcess.pop();
                 final String indexingVal = IndexingUtilities.getIndexValue(processing);
                 QuerySupport query = getUsageQuery(EnumSet.allOf(SearchScope.class));
-                for (IndexResult ir : query.query(JavaFXIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
+                for (IndexResult ir : query.query(VisageIndexer.IndexKey.TYPE_IMPL.toString(), indexingVal, Kind.EXACT)) {
                     if (!closure.contains(ir.getFile())) {
                         closure.add(ir.getFile());
-                        for(String typeName : ir.getValues(JavaFXIndexer.IndexKey.CLASS_FQN.toString())) {
+                        for(String typeName : ir.getValues(VisageIndexer.IndexKey.CLASS_FQN.toString())) {
                             toProcess.push(IndexingUtilities.getTypeHandle(typeName));
                         }
                     }
@@ -593,14 +593,14 @@ final public class ClassIndex {
 
     private QuerySupport getQuery(Set<SearchScope> scope) throws IOException {
         Collection<FileObject> roots = getRoots(scope, false);
-        return QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, roots.toArray(new FileObject[roots.size()]));
+        return QuerySupport.forRoots(VisageIndexer.NAME, VisageIndexer.VERSION, roots.toArray(new FileObject[roots.size()]));
     }
 
     private QuerySupport getUsageQuery(Set<SearchScope> scope) throws IOException {
         Collection<FileObject> roots = new ArrayList<FileObject>();
         roots.addAll(getRoots(scope, true));
         roots.addAll(getRoots(scope, false));
-        return QuerySupport.forRoots(JavaFXIndexer.NAME, JavaFXIndexer.VERSION, roots.toArray(new FileObject[roots.size()]));
+        return QuerySupport.forRoots(VisageIndexer.NAME, VisageIndexer.VERSION, roots.toArray(new FileObject[roots.size()]));
     }
 
     private Collection<FileObject> getRoots(Set<SearchScope> scope, boolean reverse) {

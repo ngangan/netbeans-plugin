@@ -3,11 +3,11 @@
  * and open the template in the editor.
  */
 
-package org.netbeans.modules.javafx.debugger.models;
+package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.javafx.jdi.FXClassType;
-import com.sun.javafx.jdi.FXObjectReference;
-import com.sun.javafx.jdi.FXPrimitiveType;
+import com.sun.visage.jdi.FXClassType;
+import com.sun.visage.jdi.FXObjectReference;
+import com.sun.visage.jdi.FXPrimitiveType;
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.Value;
 import java.util.ArrayList;

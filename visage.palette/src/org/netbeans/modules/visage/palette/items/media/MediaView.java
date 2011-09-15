@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.media;
+package org.netbeans.modules.visage.palette.items.media;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class MediaView implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(MediaView.class, "TEMPLATE_MediaView", targetComponent, "javafx.scene.media.Media", "javafx.scene.media.MediaPlayer", "javafx.scene.media.MediaView"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(MediaView.class, "TEMPLATE_MediaView", targetComponent, "visage.scene.media.Media", "visage.scene.media.MediaPlayer", "visage.scene.media.MediaView"); //NOI18N;
     }
 }

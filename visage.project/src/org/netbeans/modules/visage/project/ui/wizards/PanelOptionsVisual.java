@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -67,7 +67,7 @@ public class PanelOptionsVisual extends SettingsPanel implements ActionListener,
     private PanelConfigureProject panel;
     private boolean valid;
     
-    public PanelOptionsVisual(PanelConfigureProject panel, NewJavaFXProjectWizardIterator.WizardType type) {
+    public PanelOptionsVisual(PanelConfigureProject panel, NewVisageProjectWizardIterator.WizardType type) {
         initComponents();
         this.panel = panel;
 
@@ -111,7 +111,7 @@ public class PanelOptionsVisual extends SettingsPanel implements ActionListener,
     
     public void propertyChange (PropertyChangeEvent event) {
         if (PanelProjectLocationVisual.PROP_PROJECT_NAME.equals(event.getPropertyName())) {
-            String newProjectName = NewJavaFXProjectWizardIterator.getPackageName((String) event.getNewValue());
+            String newProjectName = NewVisageProjectWizardIterator.getPackageName((String) event.getNewValue());
             if (!Utilities.isJavaIdentifier(newProjectName)) {
                 newProjectName = NbBundle.getMessage (PanelOptionsVisual.class, "TXT_PackageNameSuffix", newProjectName);  // NOI18N
             }

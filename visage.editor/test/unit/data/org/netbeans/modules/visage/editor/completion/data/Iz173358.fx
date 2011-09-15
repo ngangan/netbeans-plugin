@@ -1,4 +1,4 @@
-import javafx.scene.control.Button;
+import visage.scene.control.Button;
 
 Button {
     text: "Button"

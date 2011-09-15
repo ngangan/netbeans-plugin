@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.charts;
+package org.netbeans.modules.visage.palette.items.charts;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -53,6 +53,6 @@ import org.openide.text.ActiveEditorDrop;
 public class LineChart implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(LineChart.class, "TEMPLATE_LineChart", targetComponent, "javafx.scene.chart.LineChart", "javafx.scene.chart.part.NumberAxis"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(LineChart.class, "TEMPLATE_LineChart", targetComponent, "visage.scene.chart.LineChart", "visage.scene.chart.part.NumberAxis"); //NOI18N;
     }
 }

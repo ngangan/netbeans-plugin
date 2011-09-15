@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
+package org.netbeans.modules.visage.refactoring.impl.plugins.elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,8 +52,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.Position.Bias;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformer;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformer;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.netbeans.modules.refactoring.spi.BackupFacility;
 import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;

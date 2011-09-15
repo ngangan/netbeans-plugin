@@ -286,9 +286,9 @@ public class DebugServiceDriverSE extends NbTestCase {
         }
 
         //String commandline = MessageFormat.format(System.getProperty("processcommandline"), new Object[]{midletClass, Integer.toString(address)});
-//        String javafxhome = "D:/netbeans/javafx/build/netbeans/javafx/javafx-sdk/";
-        String javafxhome = System.getProperty( "javafx.home" );
-        String cmd = javafxhome + "/bin/javafx -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address={1} -cp tests/TestSuite.jar {0}";
+//        String visagehome = "D:/netbeans/visage/build/netbeans/visage/visage-sdk/";
+        String visagehome = System.getProperty( "visage.home" );
+        String cmd = visagehome + "/bin/visage -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address={1} -cp tests/TestSuite.jar {0}";
         String commandline = MessageFormat.format( cmd, new Object[]{ className , Integer.toString( address )});
         return commandline;
     }

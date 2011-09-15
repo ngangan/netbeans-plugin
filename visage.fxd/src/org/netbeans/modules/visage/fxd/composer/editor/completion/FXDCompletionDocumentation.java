@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor.completion;
+package org.netbeans.modules.visage.fxd.composer.editor.completion;
 
 import java.net.URL;
 import javax.swing.Action;

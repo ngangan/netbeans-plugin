@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.wizard;
+package org.netbeans.modules.visage.platform.wizard;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,7 +62,7 @@ import java.util.Properties;
 import java.util.Set;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
-import org.netbeans.modules.javafx.platform.platformdefinition.JavaFXPlatformImpl;
+import org.netbeans.modules.visage.platform.platformdefinition.VisagePlatformImpl;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
 import org.openide.ErrorManager;
 import org.openide.filesystems.FileObject;
@@ -75,7 +75,7 @@ import org.openide.util.Utilities;
  * inside the Wizard.
  * Made public to allow ide/projectimport to reuse it
  */
-public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runnable {
+public final class NewVisagePlatform extends VisagePlatformImpl implements Runnable {
     
     private static Set<String> propertiesToFix = new HashSet<String> ();
     
@@ -90,7 +90,7 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
     
     private boolean valid;
 
-    public static NewJavaFXPlatform create (String name, File installFolder, File fxFolder) throws IOException {
+    public static NewVisagePlatform create (String name, File installFolder, File fxFolder) throws IOException {
         assert installFolder != null;
         assert fxFolder != null;
         
@@ -98,10 +98,10 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
         List<URL> sources = new ArrayList<URL>(), javadoc = new ArrayList<URL>();
         findSourcesAndJavadoc(sources, javadoc, installFolder, fxFolder);
         loadProfileProperties(fxFolder, platformProperties);
-        return new NewJavaFXPlatform (name, createAntName(name), Arrays.asList(new URL[] {installFolder.toURI().toURL(), fxFolder.toURI().toURL()}), fxFolder.toURI().toURL(), platformProperties, Collections.<String,String>emptyMap(), sources, javadoc);
+        return new NewVisagePlatform (name, createAntName(name), Arrays.asList(new URL[] {installFolder.toURI().toURL(), fxFolder.toURI().toURL()}), fxFolder.toURI().toURL(), platformProperties, Collections.<String,String>emptyMap(), sources, javadoc);
     }
 
-    private NewJavaFXPlatform (String name, String antName, List<URL> javaFolders, URL fxFolder, Map<String,String> platformProperties, Map<String,String> systemProperties, List<URL> sources, List<URL> javadoc) {
+    private NewVisagePlatform (String name, String antName, List<URL> javaFolders, URL fxFolder, Map<String,String> platformProperties, Map<String,String> systemProperties, List<URL> sources, List<URL> javadoc) {
         super(name, antName, javaFolders, fxFolder, platformProperties, systemProperties, sources, javadoc);
     }
 
@@ -130,8 +130,8 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
         JavaPlatformManager mgr = JavaPlatformManager.getDefault();
         JavaPlatform[] platforms = mgr.getInstalledPlatforms();
         for (int i=0; i < platforms.length; i++) {
-            if (platforms[i] instanceof JavaFXPlatformImpl) {
-                String val = ((JavaFXPlatformImpl)platforms[i]).getAntName();
+            if (platforms[i] instanceof VisagePlatformImpl) {
+                String val = ((VisagePlatformImpl)platforms[i]).getAntName();
                 if (antName.equals(val)) {
                     return true;
                 }
@@ -163,10 +163,10 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
             for (Enumeration en = p.keys(); en.hasMoreElements(); ) {
                 String k = (String)en.nextElement();
                 String v = p.getProperty(k);                
-                if (JavaFXPlatformImpl.SYSPROP_JAVA_CLASS_PATH.equals(k)) {
+                if (VisagePlatformImpl.SYSPROP_JAVA_CLASS_PATH.equals(k)) {
                     v = filterProbe (v, probePath);
                 }
-                else if (JavaFXPlatformImpl.SYSPROP_USER_DIR.equals(k)) {
+                else if (VisagePlatformImpl.SYSPROP_USER_DIR.equals(k)) {
                     v = ""; //NOI18N
                 }
                 v = fixSymLinks (k,v);
@@ -232,8 +232,8 @@ public final class NewJavaFXPlatform extends JavaFXPlatformImpl implements Runna
             String[] command = new String[5];
             command[0] = javaPath;
             command[1] = "-classpath";    //NOI18N
-            command[2] = InstalledFileLocator.getDefault().locate("modules/ext/org-netbeans-modules-javafx-platform-probe.jar", "org.netbeans.modules.javafx.platform", false).getAbsolutePath(); // NOI18N
-            command[3] = "org.netbeans.modules.javafx.platform.wizard.SDKProbe"; // NOI18N
+            command[2] = InstalledFileLocator.getDefault().locate("modules/ext/org-netbeans-modules-visage-platform-probe.jar", "org.netbeans.modules.visage.platform", false).getAbsolutePath(); // NOI18N
+            command[3] = "org.netbeans.modules.visage.platform.wizard.SDKProbe"; // NOI18N
             command[4] = path;
             final Process process = runtime.exec(command);
             // PENDING -- this may be better done by using ExecEngine, since

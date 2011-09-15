@@ -42,18 +42,18 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 import javax.swing.Action;
 import org.netbeans.spi.project.ui.support.FileSensitiveActions;
 import org.openide.util.NbBundle;
 
 
-public class JavaFXProjectModule {
+public class VisageProjectModule {
 
     public static Action runApplet() {
         return FileSensitiveActions.fileCommandAction( 
-                       JavaFXActionProvider.COMMAND_RUN_APPLET, 
-                       NbBundle.getMessage( JavaFXProjectModule.class, "LBL_RunApplet_Action"  ), // NOI18N
+                       VisageActionProvider.COMMAND_RUN_APPLET, 
+                       NbBundle.getMessage( VisageProjectModule.class, "LBL_RunApplet_Action"  ), // NOI18N
                        null  );
     }
 }

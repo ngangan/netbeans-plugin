@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
@@ -52,17 +52,17 @@ import org.netbeans.modules.editor.indent.spi.ExtraLock;
  *
  * @author Anton Chechel
  */
-public final class JavaFXReformatExtraLock implements ExtraLock {
+public final class VisageReformatExtraLock implements ExtraLock {
 
-    private static final Logger LOGGER = Logger.getLogger(JavaFXReformatExtraLock.class.getName());
-    private static JavaFXReformatExtraLock instance;
+    private static final Logger LOGGER = Logger.getLogger(VisageReformatExtraLock.class.getName());
+    private static VisageReformatExtraLock instance;
 
     private Method aplMethod;
     private Method rplMethod;
 
     // Using reflecion is temporarily solution while waiting friendly module to
     // provide Utilities functionality from Parsing API.
-    private JavaFXReformatExtraLock() {
+    private VisageReformatExtraLock() {
         try {
             final ClassLoader cl = Thread.currentThread().getContextClassLoader();
             final Class<?> clazz = Class.forName("org.netbeans.modules.parsing.impl.Utilities", true, cl); // NOI18N
@@ -75,9 +75,9 @@ public final class JavaFXReformatExtraLock implements ExtraLock {
         }
     }
 
-    public static synchronized JavaFXReformatExtraLock getInstance() {
+    public static synchronized VisageReformatExtraLock getInstance() {
         if (instance == null) {
-            instance = new JavaFXReformatExtraLock();
+            instance = new VisageReformatExtraLock();
         }
         return instance;
     }

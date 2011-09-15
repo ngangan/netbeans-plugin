@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +66,7 @@ import org.netbeans.api.java.classpath.GlobalPathRegistry;
 import org.netbeans.api.java.platform.JavaPlatform;
 import org.netbeans.api.java.platform.JavaPlatformManager;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.openide.ErrorManager;
@@ -78,7 +78,7 @@ import org.openide.filesystems.FileUtil;
  * 
  * @author answer
  */
-public final class JavaFXAntLogger extends AntLogger {
+public final class VisageAntLogger extends AntLogger {
 
     private static final Pattern HYPERLINK = Pattern.compile("\"?(.+?)\"?(?::|, line )(?:(\\d+):(?:(\\d+):(?:(\\d+):(\\d+):)?)?)? +(.+)"); // NOI18N
 
@@ -120,7 +120,7 @@ public final class JavaFXAntLogger extends AntLogger {
     };
     
     /** Default constructor for lookup. */
-    public JavaFXAntLogger() {}
+    public VisageAntLogger() {}
     
     @Override
     public boolean interestedInSession(AntSession session) {
@@ -149,16 +149,16 @@ public final class JavaFXAntLogger extends AntLogger {
             if (parent != null && parent.getName().equals("nbproject")) { // NOI18N
                 File parent2 = parent.getParentFile();
                 if (parent2 != null) {
-                    return isJavaFXProject(parent2);
+                    return isVisageProject(parent2);
                 }
             }
         }
-        // Was not a JavaFXProject's nbproject/build-impl.xml; ignore it.
+        // Was not a VisageProject's nbproject/build-impl.xml; ignore it.
         return false;
     }
        
     public void taskFinished(AntEvent event) {
-        if (event.getSession().getVerbosity() <= AntEvent.LOG_INFO && ("exec".equals(event.getTaskName()) || "java".equals(event.getTaskName()) || "javafx".equals(event.getTaskName()) || "javac".equals(event.getTaskName()) || "javafxc".equals(event.getTaskName()))) { // NOI18N
+        if (event.getSession().getVerbosity() <= AntEvent.LOG_INFO && ("exec".equals(event.getTaskName()) || "java".equals(event.getTaskName()) || "visage".equals(event.getTaskName()) || "javac".equals(event.getTaskName()) || "visagec".equals(event.getTaskName()))) { // NOI18N
             Throwable t = event.getException();
             AntSession session = event.getSession();
             if (t != null && !session.isExceptionConsumed(t)) {
@@ -288,7 +288,7 @@ public final class JavaFXAntLogger extends AntLogger {
                 data.classpathSourceRoots.addAll(Arrays.asList(data.platformSources.getRoots()));
             } else {
                 // no platform found. use default one:
-                JavaPlatform plat = JavaFXPlatform.getDefaultFXPlatform();
+                JavaPlatform plat = VisagePlatform.getDefaultFXPlatform();
                 // in unit tests the default platform may be null:
                 if (plat != null) {
                     data.classpathSourceRoots.addAll(Arrays.asList(plat.getSourceFolders().getRoots()));
@@ -318,13 +318,13 @@ public final class JavaFXAntLogger extends AntLogger {
         }
     }
 
-    private static boolean isJavaFXProject(File dir) {
+    private static boolean isVisageProject(File dir) {
         FileObject projdir = FileUtil.toFileObject(FileUtil.normalizeFile(dir));
         try {
             Project proj = ProjectManager.getDefault().findProject(projdir);
             if (proj != null) {
-                // Check if it is a JavaFXProject.
-                return proj.getLookup().lookup(JavaFXProject.class) != null;
+                // Check if it is a VisageProject.
+                return proj.getLookup().lookup(VisageProject.class) != null;
             }
         } catch (IOException e) {
             ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, e);

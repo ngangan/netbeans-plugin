@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.fold;
+package org.netbeans.modules.visage.editor.fold;
 
 import org.netbeans.editor.CodeFoldingSideBar;
 import org.netbeans.editor.SideBarFactory;
@@ -53,9 +53,9 @@ import org.netbeans.editor.SideBarFactory;
  *
  *  @author  Martin Roskanin
  */
-public class NbJavaFXCodeFoldingSideBarFactory implements SideBarFactory{
+public class NbVisageCodeFoldingSideBarFactory implements SideBarFactory{
 
-    public NbJavaFXCodeFoldingSideBarFactory() {
+    public NbVisageCodeFoldingSideBarFactory() {
     }
 
     public javax.swing.JComponent createSideBar(javax.swing.text.JTextComponent target) {

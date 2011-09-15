@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -50,7 +50,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import org.netbeans.api.queries.FileEncodingQuery;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.queries.FileEncodingQueryImplementation;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.openide.filesystems.FileObject;
@@ -59,14 +59,14 @@ import org.openide.filesystems.FileObject;
  *
  * @author Tomas Zezula
  */
-public class JavaFXProjectEncodingQueryImpl extends FileEncodingQueryImplementation implements PropertyChangeListener {
+public class VisageProjectEncodingQueryImpl extends FileEncodingQueryImplementation implements PropertyChangeListener {
     
     
     private final PropertyEvaluator eval;
     private Charset cache;
     
-    /** Creates a new instance of JavaFXProjectEncodingQueryImpl */
-    public JavaFXProjectEncodingQueryImpl(final PropertyEvaluator eval) {
+    /** Creates a new instance of VisageProjectEncodingQueryImpl */
+    public VisageProjectEncodingQueryImpl(final PropertyEvaluator eval) {
         assert eval != null;
         this.eval = eval;
         this.eval.addPropertyChangeListener(this);
@@ -79,7 +79,7 @@ public class JavaFXProjectEncodingQueryImpl extends FileEncodingQueryImplementat
                 return cache;
             }
         }
-        String enc = eval.getProperty(JavaFXProjectProperties.SOURCE_ENCODING);
+        String enc = eval.getProperty(VisageProjectProperties.SOURCE_ENCODING);
         synchronized (this) {
             if (cache == null) {
                 try {
@@ -96,7 +96,7 @@ public class JavaFXProjectEncodingQueryImpl extends FileEncodingQueryImplementat
    
     public void propertyChange(PropertyChangeEvent event) {        
         String propName = event.getPropertyName();
-        if (propName == null || propName.equals(JavaFXProjectProperties.SOURCE_ENCODING)) {
+        if (propName == null || propName.equals(VisageProjectProperties.SOURCE_ENCODING)) {
             synchronized (this) {
                 cache = null;
             }

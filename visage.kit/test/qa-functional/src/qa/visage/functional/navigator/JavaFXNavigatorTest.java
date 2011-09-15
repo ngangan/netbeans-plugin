@@ -39,14 +39,14 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.navigator;
+package qa.visage.functional.navigator;
 
 import org.netbeans.jellytools.TopComponentOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
@@ -58,7 +58,7 @@ import org.netbeans.junit.NbTestSuite;
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXNavigatorTest extends JavaFXTestCase {
+public class VisageNavigatorTest extends VisageTestCase {
 
     public static String PROJECT_NAME = "TestNavigator";
 
@@ -68,18 +68,18 @@ public class JavaFXNavigatorTest extends JavaFXTestCase {
     };
 
 
-    public JavaFXNavigatorTest(String name) {
+    public VisageNavigatorTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXNavigatorTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageNavigatorTest.class, ".*", ".*", TESTS);
 
     }
 
     
     public void testNavigator(){
-        JavaFXProject project  = JavaFXProject.createProject(PROJECT_NAME);
+        VisageProject project  = VisageProject.createProject(PROJECT_NAME);
         TopComponentOperator navigator = new TopComponentOperator("Navigator");
         
         assertNotNull("Navigator has not been found.", navigator);
@@ -87,7 +87,7 @@ public class JavaFXNavigatorTest extends JavaFXTestCase {
     }
 
     public void testVariable(){
-        JavaFXProject project = new JavaFXProject(PROJECT_NAME);
+        VisageProject project = new VisageProject(PROJECT_NAME);
         EditorOperator editor = project.openMainFile();
         editor.setText("var a = 10;");
         

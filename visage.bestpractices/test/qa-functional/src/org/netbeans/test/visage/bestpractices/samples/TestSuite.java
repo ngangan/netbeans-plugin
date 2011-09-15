@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.test.javafx.bestpractices.samples;
+package org.netbeans.test.visage.bestpractices.samples;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;

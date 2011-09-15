@@ -41,11 +41,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.Tree.VisageKind;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -54,19 +54,19 @@ import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.swing.SwingUtilities;
-import org.netbeans.api.javafx.editor.ElementJavadoc;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.source.JavaFXParserResult;
+import org.netbeans.api.visage.source.VisageParserResult;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.filesystems.FileObject;
@@ -80,7 +80,7 @@ import org.openide.util.Exceptions;
  * and javadoc in the Javadoc window.
  *
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
- * @author Anton Chechel - javafx changes
+ * @author Anton Chechel - visage changes
  */
 public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
@@ -89,10 +89,10 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private boolean canceled;
     private static ElementHandle<Element> lastEh;
     private static ElementHandle<Element> lastEhForNavigator;
-    private static final Set<? extends TokenId> TOKENS_TO_SKIP = EnumSet.of(JFXTokenId.WS,
-            JFXTokenId.COMMENT,
-            JFXTokenId.LINE_COMMENT,
-            JFXTokenId.DOC_COMMENT);
+    private static final Set<? extends TokenId> TOKENS_TO_SKIP = EnumSet.of(VSGTokenId.WS,
+            VSGTokenId.COMMENT,
+            VSGTokenId.LINE_COMMENT,
+            VSGTokenId.DOC_COMMENT);
 
     CaretListeningTask(CaretListeningFactory whichElementJavaSourceTaskFactory, FileObject fileObject) {
         this.caretListeningFactory = whichElementJavaSourceTaskFactory;
@@ -117,14 +117,14 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
         int lastPosition = CaretListeningFactory.getLastPosition(fileObject);
 
-        TokenSequence<JFXTokenId> ts = compilationInfo.getTokenHierarchy().tokenSequence();
+        TokenSequence<VSGTokenId> ts = compilationInfo.getTokenHierarchy().tokenSequence();
         boolean inJavadoc = false;
         int offset = ts.move(lastPosition);
         if (ts.moveNext() && ts.token() != null) {
 
             Token token = ts.token();
             TokenId tid = token.id();
-            if (tid == JFXTokenId.DOC_COMMENT) {
+            if (tid == VSGTokenId.DOC_COMMENT) {
                 inJavadoc = true;
             }
 
@@ -158,7 +158,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 //        }
 
         // Find the TreePath for the caret position
-        JavaFXTreePath tp = compilationInfo.getTreeUtilities().pathFor(lastPosition);
+        VisageTreePath tp = compilationInfo.getTreeUtilities().pathFor(lastPosition);
         // if cancelled, return
         if (isCancelled()) {
             return;
@@ -282,9 +282,9 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private void setJavadoc(final ElementJavadoc javadoc) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JavafxdocTopComponent javafxdocTopComponent = JavafxdocTopComponent.findInstance();
-                if (javafxdocTopComponent != null && javafxdocTopComponent.isOpened()) {
-                    javafxdocTopComponent.setJavadoc(javadoc);
+                JavafxdocTopComponent visagedocTopComponent = JavafxdocTopComponent.findInstance();
+                if (visagedocTopComponent != null && visagedocTopComponent.isOpened()) {
+                    visagedocTopComponent.setJavadoc(javadoc);
                 }
             }
         });
@@ -321,11 +321,11 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
         final boolean hasDeclaredType = asType.getKind() == TypeKind.DECLARED;
         if (hasDeclaredType) {
-            if (compilationInfo.getJavafxTypes().isJFXClass((Symbol) element)) {
-                FileObject fo = JavaFXSourceUtils.getFile(element, compilationInfo.getClasspathInfo());
+            if (compilationInfo.getJavafxTypes().isVSGClass((Symbol) element)) {
+                FileObject fo = VisageSourceUtils.getFile(element, compilationInfo.getClasspathInfo());
                 if (fo != null) {
                     try {
-                        JavaFXParserResult parserResult = JavaFXParserResult.create(Source.create(fo),
+                        VisageParserResult parserResult = VisageParserResult.create(Source.create(fo),
                                 compilationInfo.getClasspathInfo());
                         compilationInfo = CompilationController.create(parserResult);
                     } catch (ParseException e) {
@@ -353,7 +353,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                 }
             } else {
                 // nenik: do nothing, otherwise a bunch of exceptions can happen
-                // manowar: I have uncommened this since I need javadoc for java (not javafx) classes as well
+                // manowar: I have uncommened this since I need javadoc for java (not visage) classes as well
                 // no exceptions happen so far... but it need to be tested
                 setJavadoc(ElementJavadoc.create(compilationInfo, element));
             }
@@ -467,7 +467,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 //        return result;
 //    }
 
-    private void updateNavigatorSelection(CompilationInfo ci, JavaFXTreePath tp) {
+    private void updateNavigatorSelection(CompilationInfo ci, VisageTreePath tp) {
         // Try to find the declaration we are in
         Element e = outerElement(ci, tp);
 
@@ -501,7 +501,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
     }
 
-    private static Element outerElement(CompilationInfo ci, JavaFXTreePath tp) {
+    private static Element outerElement(CompilationInfo ci, VisageTreePath tp) {
         Element e = null;
 
         while (tp != null) {
@@ -509,10 +509,10 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
             if (tree == null) {
                 break;
             }
-            JavaFXKind javaFXKind = null;
-            // JFXC-4282
+            VisageKind javaFXKind = null;
+            // VSGC-4282
             try {
-                javaFXKind  = tree.getJavaFXKind();
+                javaFXKind  = tree.getVisageKind();
             } catch (Exception ex) {
             }
             if (javaFXKind == null) {
@@ -546,7 +546,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         return e;
     }
 
-    private void skipTokens(TokenSequence<JFXTokenId> ts, Set<? extends TokenId> typesToSkip) {
+    private void skipTokens(TokenSequence<VSGTokenId> ts, Set<? extends TokenId> typesToSkip) {
         while (ts.moveNext()) {
             if (!typesToSkip.contains(ts.token().id())) {
                 return;

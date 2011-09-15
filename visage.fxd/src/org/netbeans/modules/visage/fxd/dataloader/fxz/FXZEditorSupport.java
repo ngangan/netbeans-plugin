@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader.fxz;
+package org.netbeans.modules.visage.fxd.dataloader.fxz;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,9 +49,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewFactory;
-import org.netbeans.modules.javafx.fxd.composer.archive.ArchiveViewDescription;
-import org.netbeans.modules.javafx.fxd.composer.preview.PreviewViewDescription;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceViewDescription;
+import org.netbeans.modules.visage.fxd.composer.archive.ArchiveViewDescription;
+import org.netbeans.modules.visage.fxd.composer.preview.PreviewViewDescription;
+import org.netbeans.modules.visage.fxd.composer.source.SourceViewDescription;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;
@@ -60,7 +60,7 @@ import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
-import com.sun.javafx.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
 import java.io.OutputStream;
@@ -70,7 +70,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.EditorKit;
 import org.netbeans.core.spi.multiview.CloseOperationHandler;
 import org.netbeans.core.spi.multiview.CloseOperationState;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.UndoRedo.Manager;

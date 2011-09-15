@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.Color;
 import java.awt.Insets;

@@ -1,10 +1,10 @@
 
 package frame.stage.content;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.text.Text;
-import javafx.scene.text.Font;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.text.Text;
+import visage.scene.text.Font;
 
 Stage {
     title: "MyApplication"

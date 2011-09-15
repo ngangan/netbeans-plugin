@@ -5,13 +5,13 @@
 -->
 <html>
 <head>
-<title>Managing the Classpath of JavaFX Projects</title>
+<title>Managing the Classpath of Visage Projects</title>
 	<link rel="StyleSheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
 </head>
 <body>
-<h2>Managing the Classpath of JavaFX Projects</h2>
+<h2>Managing the Classpath of Visage Projects</h2>
 <p> <small><a href="#seealso">See Also</a>&nbsp; </small> 
-<p>Adding a group of class files to a JavaFX project's classpath tells the IDE which 
+<p>Adding a group of class files to a Visage project's classpath tells the IDE which 
   classes the project should have access to during compilation and execution. 
   The IDE also uses classpath settings to enable code completion, automatic highlighting 
   of compilation errors, and refactoring. 
@@ -22,24 +22,24 @@
 		project within which to store it.
 </ul>
 
-<h3> Classpath and JavaFX Projects</h3>
+<h3> Classpath and Visage Projects</h3>
 <!--todo : add mention of libraries node here & mention contextual menu as primary way to add items to classpath (for more detailed configing, use proj props)-->
 <p>The IDE maintains separate classpaths for compiling and running your 
-JavaFX project. The IDE automatically adds 
+Visage project. The IDE automatically adds 
 everything on your project's compilation classpath to the project's runtime classpath.</p>
 
         <ul class="note">
-        <li>Whenever you build a JavaFX project for which a main class is specified, the IDE automatically copies any JAR 
+        <li>Whenever you build a Visage project for which a main class is specified, the IDE automatically copies any JAR 
         files on the project's classpath to the <tt>dist/lib</tt> folder.
         The IDE also adds each of the JAR files 
         to the Class-Path element in the application JAR's <tt>manifest.mf</tt> 
         file. This simplifies running the application outside the IDE.</li>
         </ul>  
 
-<p><b>To edit a JavaFX project's classpath:</b></p>
+<p><b>To edit a Visage project's classpath:</b></p>
 <ol>
   <li>Expand the project node, right-click the Libraries node, and choose Properties.<br>
-    Alternatively, you can select the project in the Projects window, select File &gt; Project Properties (<i>&lt;JavaFX_project_name&gt;) </i>from the main menu, and select the Libraries category from the Project Properties dialog. </li>
+    Alternatively, you can select the project in the Projects window, select File &gt; Project Properties (<i>&lt;Visage_project_name&gt;) </i>from the main menu, and select the Libraries category from the Project Properties dialog. </li>
     <li>In the Project Properties dialog box, add the necessary elements to the project's compilation classpath by clicking
   	the appropriate Add button. You can add any of the following:
 	  <ul><li><b>Project.</b> The JAR file or
@@ -68,8 +68,8 @@ everything on your project's compilation classpath to the project's runtime clas
         
 <dl>
     <dt><a name="seealso">See also</a></dt>
-	<dd><a href="../project/javafx_proj_sdk.html">Setting the Target JavaFX SDK in a JavaFX Project </a></dd>
-    <dd><a href="../run/javafx_run_args.html">Setting the Main JavaFX Class and Runtime Arguments</a></dd>        
+	<dd><a href="../project/visage_proj_sdk.html">Setting the Target Visage SDK in a Visage Project </a></dd>
+    <dd><a href="../run/visage_run_args.html">Setting the Main Visage Class and Runtime Arguments</a></dd>        
 </dl>
 <hr>
 <small><a href="../credits.html">Legal Notices</a></small> 

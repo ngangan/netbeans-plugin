@@ -1,5 +1,5 @@
 package applications;
 
-import javafx.animation.*;
+import visage.animation.*;
 
 

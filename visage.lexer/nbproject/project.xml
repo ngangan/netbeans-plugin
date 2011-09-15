@@ -47,7 +47,7 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.lexer</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.lexer</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -60,7 +60,7 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -89,7 +89,7 @@ made subject to such option by the copyright holder.
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.lexer</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.lexer</code-name-base>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
@@ -100,7 +100,7 @@ made subject to such option by the copyright holder.
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>org.netbeans.api.javafx.lexer</package>
+                <package>org.netbeans.api.visage.lexer</package>
             </public-packages>
         </data>
     </configuration>

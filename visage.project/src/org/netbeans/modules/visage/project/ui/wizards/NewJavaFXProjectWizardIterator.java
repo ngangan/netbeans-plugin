@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import java.awt.Component;
 import java.io.File;
@@ -57,13 +57,13 @@ import java.util.Set;
 import java.util.TreeMap;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
-import org.netbeans.modules.javafx.project.ui.FoldersListSettings;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
+import org.netbeans.modules.visage.project.ui.FoldersListSettings;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
@@ -76,9 +76,9 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
- * Wizard to create a new JavaFX project.
+ * Wizard to create a new Visage project.
  */
-public class NewJavaFXProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
+public class NewVisageProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
     enum WizardType {APP, EXT}
     
@@ -91,11 +91,11 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
     private WizardType type;
     
     /** Create a new wizard iterator. */
-    public NewJavaFXProjectWizardIterator() {
+    public NewVisageProjectWizardIterator() {
         this(WizardType.APP);
     }
     
-    public NewJavaFXProjectWizardIterator(WizardType type) {
+    public NewVisageProjectWizardIterator(WizardType type) {
         this.type = type;
     }
     
@@ -107,7 +107,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
     
     private String[] createSteps() {
         return new String[] {
-            NbBundle.getMessage(NewJavaFXProjectWizardIterator.class,"LAB_ConfigureProject"), // NOI18N
+            NbBundle.getMessage(NewVisageProjectWizardIterator.class,"LAB_ConfigureProject"), // NOI18N
         };
     }
     
@@ -126,25 +126,25 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
         }
         String name = (String)wiz.getProperty("name");        //NOI18N
         String mainClass = (String)wiz.getProperty("mainClass");        //NOI18N
-        handle.progress (NbBundle.getMessage (NewJavaFXProjectWizardIterator.class, "LBL_NewJavaFXProjectWizardIterator_WizardProgress_CreatingProject"), 1); // NOI18N
+        handle.progress (NbBundle.getMessage (NewVisageProjectWizardIterator.class, "LBL_NewVisageProjectWizardIterator_WizardProgress_CreatingProject"), 1); // NOI18N
         
         type = (WizardType)wiz.getProperty("projectType"); // NOI18N
         
         switch (type) {
         case EXT:
             File[] sourceFolders = (File[])wiz.getProperty("sourceRoot");        //NOI18N
-            AntProjectHelper h = JavaFXProjectGenerator.createProject(dirF, name, sourceFolders, MANIFEST_FILE );
+            AntProjectHelper h = VisageProjectGenerator.createProject(dirF, name, sourceFolders, MANIFEST_FILE );
             EditableProperties ep = h.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-            String includes = (String) wiz.getProperty(JavaFXProjectProperties.INCLUDES);
+            String includes = (String) wiz.getProperty(VisageProjectProperties.INCLUDES);
             if (includes == null) {
                 includes = "**"; // NOI18N
             }
-            ep.setProperty(JavaFXProjectProperties.INCLUDES, includes);
-            String excludes = (String) wiz.getProperty(JavaFXProjectProperties.EXCLUDES);
+            ep.setProperty(VisageProjectProperties.INCLUDES, includes);
+            String excludes = (String) wiz.getProperty(VisageProjectProperties.EXCLUDES);
             if (excludes == null) {
                 excludes = ""; // NOI18N
             }
-            ep.setProperty(JavaFXProjectProperties.EXCLUDES, excludes);
+            ep.setProperty(VisageProjectProperties.EXCLUDES, excludes);
             h.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
             handle.progress (2);
             for (File f : sourceFolders) {
@@ -157,11 +157,11 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
             createRuntimeProfiles( h );        
             break;
         default:
-            h = JavaFXProjectGenerator.createProject(dirF, name, mainClass, type == WizardType.APP ? MANIFEST_FILE : null);
+            h = VisageProjectGenerator.createProject(dirF, name, mainClass, type == WizardType.APP ? MANIFEST_FILE : null);
             handle.progress (2);
             if (mainClass != null && mainClass.length () > 0) {
                 try {
-                    //String sourceRoot = "src"; //(String)javafxProperties.get (JavaFXProjectProperties.SRC_DIR);
+                    //String sourceRoot = "src"; //(String)visageProperties.get (VisageProjectProperties.SRC_DIR);
                     FileObject sourcesRoot = h.getProjectDirectory ().getFileObject ("src");        //NOI18N
                     FileObject mainClassFo = getMainClassFO (sourcesRoot, mainClass);
                     assert mainClassFo != null : "sourcesRoot: " + sourcesRoot + ", mainClass: " + mainClass;        //NOI18N
@@ -194,7 +194,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                 break;
         }        
         resultSet.add (dir);
-        handle.progress (NbBundle.getMessage (NewJavaFXProjectWizardIterator.class, "LBL_NewJavaFXProjectWizardIterator_WizardProgress_PreparingToOpen"), 4); // NOI18N
+        handle.progress (NbBundle.getMessage (NewVisageProjectWizardIterator.class, "LBL_NewVisageProjectWizardIterator_WizardProgress_PreparingToOpen"), 4); // NOI18N
         dirF = (dirF != null) ? dirF.getParentFile() : null;
         if (dirF != null && dirF.exists()) {
             ProjectChooser.setProjectsFolder (dirF);    
@@ -205,9 +205,9 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
 
     private void createRuntimeProfiles( AntProjectHelper helper ) throws IOException {
         // Create runtime profiles
-        JavaFXProject project = (JavaFXProject)ProjectManager.getDefault().
+        VisageProject project = (VisageProject)ProjectManager.getDefault().
                 findProject( helper.getProjectDirectory());
-        JavaFXProjectProperties projectProperties = new JavaFXProjectProperties(
+        VisageProjectProperties projectProperties = new VisageProjectProperties(
                 project, project.getUpdateHelper(), project.evaluator(), project.getReferenceHelper(), null );
 
         Map<String, Map<String, String>> profiles = projectProperties.readRunConfigs();
@@ -216,23 +216,23 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
 
         // Browser
         profile = new TreeMap<String, String>();
-        profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_Browser" )); //NOI18N
-        profile.put( "javafx.profile", "desktop" ); //NOI18N
+        profile.put( "$label", NbBundle.getMessage(NewVisageProjectWizardIterator.class, "LBL_Profile_Browser" )); //NOI18N
+        profile.put( "visage.profile", "desktop" ); //NOI18N
         profile.put( "execution.target", "applet" ); //NOI18N
         profiles.put( "browser", profile );
         // Web start
         profile = new TreeMap<String, String>();
-        profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_WebStart" )); //NOI18N
-        profile.put( "javafx.profile", "desktop" ); //NOI18N
+        profile.put( "$label", NbBundle.getMessage(NewVisageProjectWizardIterator.class, "LBL_Profile_WebStart" )); //NOI18N
+        profile.put( "visage.profile", "desktop" ); //NOI18N
         profile.put( "execution.target", "jnlp" ); //NOI18N
         profiles.put( "webstart", profile );
 
         // Mobile
         try {
-            if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) { // NOI18N
+            if( new File( new File( VisagePlatform.getDefaultFXPlatform().getVisageFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) { // NOI18N
                 profile = new TreeMap<String, String>();
-                profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_Mobile" )); //NOI18N
-                profile.put( "javafx.profile", "mobile" ); //NOI18N
+                profile.put( "$label", NbBundle.getMessage(NewVisageProjectWizardIterator.class, "LBL_Profile_Mobile" )); //NOI18N
+                profile.put( "visage.profile", "mobile" ); //NOI18N
                 profile.put( "execution.target", "midp" ); //NOI18N
                 profiles.put( "mobile", profile );
             }
@@ -240,10 +240,10 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
 
         // TV
         try {
-            if( new File( new File( JavaFXPlatform.getDefaultFXPlatform().getJavaFXFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) { // NOI18N
+            if( new File( new File( VisagePlatform.getDefaultFXPlatform().getVisageFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) { // NOI18N
                 profile = new TreeMap<String, String>();
-                profile.put( "$label", NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LBL_Profile_TV" )); //NOI18N
-                profile.put( "javafx.profile", "tv" ); //NOI18N
+                profile.put( "$label", NbBundle.getMessage(NewVisageProjectWizardIterator.class, "LBL_Profile_TV" )); //NOI18N
+                profile.put( "visage.profile", "tv" ); //NOI18N
                 profile.put( "execution.target", "cvm" ); //NOI18N
                 profiles.put( "tv", profile );
              }
@@ -303,7 +303,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
     }
     
     public String name() {
-        return NbBundle.getMessage(NewJavaFXProjectWizardIterator.class, "LAB_IteratorName", index + 1, panels.length); // NOI18N
+        return NbBundle.getMessage(NewVisageProjectWizardIterator.class, "LAB_IteratorName", index + 1, panels.length); // NOI18N
     }
     
     public boolean hasNext() {
@@ -348,7 +348,7 @@ public class NewJavaFXProjectWizardIterator implements WizardDescriptor.Progress
                 builder.append(c);
             }            
         }
-        return builder.length() == 0 ? NbBundle.getMessage(NewJavaFXProjectWizardIterator.class,"TXT_DefaultPackageName") : builder.toString(); // NOI18N
+        return builder.length() == 0 ? NbBundle.getMessage(NewVisageProjectWizardIterator.class,"TXT_DefaultPackageName") : builder.toString(); // NOI18N
     }
     
     /**

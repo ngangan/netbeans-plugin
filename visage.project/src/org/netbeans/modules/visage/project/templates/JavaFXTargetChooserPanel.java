@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.templates;
+package org.netbeans.modules.visage.project.templates;
 
 import java.awt.Component;
 import java.io.File;
@@ -70,13 +70,13 @@ import org.openide.util.Utilities;
  *
  * @author answer
  */
-public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, ChangeListener{
+public final class VisageTargetChooserPanel implements WizardDescriptor.Panel, ChangeListener{
 
     private static final String FOLDER_TO_DELETE = "folderToDelete";    //NOI18N
 
     private final SpecificationVersion JDK_14 = new SpecificationVersion ("1.4");   //NOI18N
     private final List<ChangeListener> listeners = new ArrayList<ChangeListener>();
-    private JavaFXTargetChooserPanelGUI gui;
+    private VisageTargetChooserPanelGUI gui;
     private WizardDescriptor.Panel bottomPanel;
     private WizardDescriptor wizard;
 
@@ -85,11 +85,11 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
     private int type;
     private boolean isValidPackageRequired;
     
-    public JavaFXTargetChooserPanel( Project project, SourceGroup folders[], WizardDescriptor.Panel bottomPanel, int type ) {
+    public VisageTargetChooserPanel( Project project, SourceGroup folders[], WizardDescriptor.Panel bottomPanel, int type ) {
         this(project, folders, bottomPanel, type, false);
     }
     
-    public JavaFXTargetChooserPanel( Project project, SourceGroup folders[], WizardDescriptor.Panel bottomPanel, int type, boolean isValidPackageRequired ) {
+    public VisageTargetChooserPanel( Project project, SourceGroup folders[], WizardDescriptor.Panel bottomPanel, int type, boolean isValidPackageRequired ) {
         this.project = project;
         this.folders = folders;
         this.bottomPanel = bottomPanel;
@@ -102,7 +102,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
 
     public Component getComponent() {
         if (gui == null) {
-            gui = new JavaFXTargetChooserPanelGUI( project, folders, bottomPanel == null ? null : bottomPanel.getComponent(), type );
+            gui = new VisageTargetChooserPanelGUI( project, folders, bottomPanel == null ? null : bottomPanel.getComponent(), type );
             gui.addChangeListener(this);
         }
         return gui;
@@ -116,7 +116,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
             }
         }
 
-        return new HelpCtx("javafx_proj_quickref"); // NOI18N
+        return new HelpCtx("visage_proj_quickref"); // NOI18N
     }
 
     public boolean isValid() {              
@@ -124,29 +124,29 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
            setErrorMessage( null );
            return false;
         }        
-        if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE) {
+        if ( type == NewVisageFileWizardIterator.TYPE_PACKAGE) {
             if ( !isValidPackageName( gui.getTargetName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" ); // NOI18N
+                setErrorMessage( "ERR_VisageTargetChooser_InvalidPackage" ); // NOI18N
                 return false;
             }
         }
-        else if (type == NewJavaFXFileWizardIterator.TYPE_PKG_INFO) {
+        else if (type == NewVisageFileWizardIterator.TYPE_PKG_INFO) {
             assert "package-info".equals( gui.getTargetName() );        //NOI18N
             if ( !isValidPackageName( gui.getPackageName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" ); // NOI18N
+                setErrorMessage( "ERR_VisageTargetChooser_InvalidPackage" ); // NOI18N
                 return false;
             }
         }
         else {
             if (!isValidFileName(gui.getTargetName())) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidFilename" ); // NOI18N
+                setErrorMessage( "ERR_VisageTargetChooser_InvalidFilename" ); // NOI18N
                 return false;
             } else if ( !isValidTypeIdentifier( gui.getTargetName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidClass" ); // NOI18N
+                setErrorMessage( "ERR_VisageTargetChooser_InvalidClass" ); // NOI18N
                 return false;
             }
             else if ( !isValidPackageName( gui.getPackageName() ) ) {
-                setErrorMessage( "ERR_JavaFXTargetChooser_InvalidPackage" ); // NOI18N
+                setErrorMessage( "ERR_VisageTargetChooser_InvalidPackage" ); // NOI18N
                 return false;
             }            
         }
@@ -157,7 +157,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
         boolean returnValue=true;
         FileObject rootFolder = gui.getRootFolder();
         SpecificationVersion specVersion = null;
-        if (type != NewJavaFXFileWizardIterator.TYPE_PACKAGE) {
+        if (type != NewVisageFileWizardIterator.TYPE_PACKAGE) {
             String sl = SourceLevelQuery.getSourceLevel(rootFolder);
             specVersion = sl != null? new SpecificationVersion(sl): null;
         }
@@ -167,18 +167,18 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
         }
         if (errorMessage!=null) returnValue=false;                
         
-        if (type != NewJavaFXFileWizardIterator.TYPE_PACKAGE && returnValue && gui.getPackageName().length() == 0 && specVersion != null && JDK_14.compareTo(specVersion)<=0) { 
+        if (type != NewVisageFileWizardIterator.TYPE_PACKAGE && returnValue && gui.getPackageName().length() == 0 && specVersion != null && JDK_14.compareTo(specVersion)<=0) { 
             if(isValidPackageRequired){
-                setErrorMessage( "ERR_JavaFXTargetChooser_CantUseDefaultPackage" ); // NOI18N
+                setErrorMessage( "ERR_VisageTargetChooser_CantUseDefaultPackage" ); // NOI18N
                 return false;
             }
             //Only warning, display it only if everything else is OK.
-            setErrorMessage( "ERR_JavaFXTargetChooser_DefaultPackage" ); // NOI18N
+            setErrorMessage( "ERR_VisageTargetChooser_DefaultPackage" ); // NOI18N
         }
         String templateSrcLev = (String) template.getAttribute("javac.source"); // NOI18N
         //Only warning, display it only if everything else id OK.
         if (specVersion != null && templateSrcLev != null && specVersion.compareTo(new SpecificationVersion(templateSrcLev)) < 0) {
-            setErrorMessage("ERR_JavaFXTargetChooser_WrongPlatform"); // NOI18N
+            setErrorMessage("ERR_VisageTargetChooser_WrongPlatform"); // NOI18N
         }
         
         // this enables to display error messages from the bottom panel
@@ -263,7 +263,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
             setLocalizedErrorMessage ( "" ); // NOI18N
         }
         else {
-            setLocalizedErrorMessage ( NbBundle.getMessage( JavaFXTargetChooserPanelGUI.class, key) ); // NOI18N
+            setLocalizedErrorMessage ( NbBundle.getMessage( VisageTargetChooserPanelGUI.class, key) ); // NOI18N
         }
     }
     
@@ -275,7 +275,7 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
         assert gui != null;
         FileObject rootFolder = gui.getRootFolder();
         FileObject folder = null;
-        if ( type != NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+        if ( type != NewVisageFileWizardIterator.TYPE_PACKAGE ) {
             String packageFileName = gui.getPackageFileName();
             folder = rootFolder.getFileObject( packageFileName );
             if ( folder == null ) {
@@ -384,17 +384,17 @@ public final class JavaFXTargetChooserPanel implements WizardDescriptor.Panel, C
 
         // test whether the selected folder on selected filesystem already exists
         if (targetFolder == null) {
-            return NbBundle.getMessage (JavaFXTargetChooserPanel.class, "MSG_fs_or_folder_does_not_exist"); // NOI18N
+            return NbBundle.getMessage (VisageTargetChooserPanel.class, "MSG_fs_or_folder_does_not_exist"); // NOI18N
         }
         
         // target filesystem should be writable
         if (!targetFolder.canWrite ()) {
-            return NbBundle.getMessage (JavaFXTargetChooserPanel.class, "MSG_fs_is_readonly"); // NOI18N
+            return NbBundle.getMessage (VisageTargetChooserPanel.class, "MSG_fs_is_readonly"); // NOI18N
         }
         
         
         if (existFileName(targetFolder, relFileName)) {
-            return NbBundle.getMessage (JavaFXTargetChooserPanel.class, "MSG_file_already_exist", newObjectNameToDisplay); // NOI18N
+            return NbBundle.getMessage (VisageTargetChooserPanel.class, "MSG_file_already_exist", newObjectNameToDisplay); // NOI18N
         }
         
         // all ok

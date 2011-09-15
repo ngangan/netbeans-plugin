@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import java.awt.Component;
 import java.io.File;
@@ -61,7 +61,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXSourceRootsUi;
+import org.netbeans.modules.visage.project.ui.customizer.VisageSourceRootsUi;
 
 /**
  * List of source/test roots
@@ -186,7 +186,7 @@ public final class FolderList extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 12);
         add(jScrollPane1, gridBagConstraints);
 
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/wizards/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/wizards/Bundle"); // NOI18N
         addButton.setText(bundle.getString("CTL_AddFolder")); // NOI18N
         addButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -266,7 +266,7 @@ public final class FolderList extends javax.swing.JPanel {
                 this.setLastUsedDir(FileUtil.normalizeFile(cd));
             }
             if (invalidRoots.size()>0) {
-                JavaFXSourceRootsUi.showIllegalRootsDialog(invalidRoots);
+                VisageSourceRootsUi.showIllegalRootsDialog(invalidRoots);
             }
         }
     }//GEN-LAST:event_addButtonActionPerformed

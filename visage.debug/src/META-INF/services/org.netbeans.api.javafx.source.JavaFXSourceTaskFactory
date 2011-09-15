@@ -1,2 +1,2 @@
-org.netbeans.modules.javafx.debug.ElementNavigatorJavaFXSourceFactory
-org.netbeans.modules.javafx.debug.TreeNavigatorJavaFXSourceFactory
+org.netbeans.modules.visage.debug.ElementNavigatorVisageSourceFactory
+org.netbeans.modules.visage.debug.TreeNavigatorVisageSourceFactory

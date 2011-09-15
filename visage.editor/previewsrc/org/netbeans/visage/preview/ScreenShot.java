@@ -29,7 +29,7 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package org.netbeans.javafx.preview;
+package org.netbeans.visage.preview;
 
 import java.awt.Component;
 import java.awt.Dimension;

@@ -1,10 +1,10 @@
 
 package frame.stage.content;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.shape.Circle;
-import javafx.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.shape.Circle;
+import visage.scene.paint.Color;
 
 Stage {
     title: "MyApplication"

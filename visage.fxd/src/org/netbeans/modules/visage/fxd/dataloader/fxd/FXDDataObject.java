@@ -41,12 +41,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader.fxd;
+package org.netbeans.modules.visage.fxd.dataloader.fxd;
 
-import com.sun.javafx.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.io.IOException;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.nodes.CookieSet;

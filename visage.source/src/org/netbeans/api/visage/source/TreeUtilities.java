@@ -41,30 +41,30 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.SyntheticTree.SynthType;
+import com.sun.visage.api.tree.*;
+import com.sun.visage.api.tree.SyntheticTree.SynthType;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.tree.JCTree;
-import com.sun.tools.javafx.api.JavafxcScope;
-import com.sun.tools.javafx.code.JavafxFlags;
-import com.sun.tools.javafx.comp.JavafxAttrContext;
-import com.sun.tools.javafx.comp.JavafxEnv;
-import com.sun.tools.javafx.comp.JavafxResolve;
-import com.sun.tools.javafx.tree.JFXBreak;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXContinue;
-import com.sun.tools.javafx.tree.JFXExpression;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXLiteral;
-import com.sun.tools.javafx.tree.JFXModifiers;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxPretty;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import com.sun.tools.visage.api.JavafxcScope;
+import com.sun.tools.visage.code.JavafxFlags;
+import com.sun.tools.visage.comp.JavafxAttrContext;
+import com.sun.tools.visage.comp.JavafxEnv;
+import com.sun.tools.visage.comp.JavafxResolve;
+import com.sun.tools.visage.tree.VSGBreak;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGContinue;
+import com.sun.tools.visage.tree.VSGExpression;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGLiteral;
+import com.sun.tools.visage.tree.VSGModifiers;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.JavafxPretty;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
@@ -91,7 +91,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.SourceVersion;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserResultImpl;
+import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 import org.netbeans.modules.parsing.api.Source;
 
 /**
@@ -206,14 +206,14 @@ public final class TreeUtilities {
     private static final Logger logger = Logger.getLogger(TreeUtilities.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
     
-    private JavaFXParserResultImpl parserResultImpl;
+    private VisageParserResultImpl parserResultImpl;
     
     /** Creates a new instance of CommentUtilities */
     TreeUtilities(final CompilationInfo info) {
         this(info.impl().parserResultImpl());
     }
 
-    TreeUtilities(JavaFXParserResultImpl parserResultImpl) {
+    TreeUtilities(VisageParserResultImpl parserResultImpl) {
         assert parserResultImpl != null;
         this.parserResultImpl = parserResultImpl;
 //        this.handler = CommentHandlerService.instance(info.impl.getJavacTask().getContext());
@@ -225,18 +225,18 @@ public final class TreeUtilities {
      * may be considered non-syntetic.
      * @return true if the given tree is synthetic, false otherwise
      */
-    public boolean isSynthetic(JavaFXTreePath path) {
+    public boolean isSynthetic(VisageTreePath path) {
         if (path == null) {
             if (LOGGABLE) log("isSynthetic invoked with null argument"); // NOI18N
             return false;
         }
         final Tree leaf = path.getLeaf();
-        if (leaf instanceof JFXTree) {
-            JFXTree fxLeaf = (JFXTree)leaf;
+        if (leaf instanceof VSGTree) {
+            VSGTree fxLeaf = (VSGTree)leaf;
             SynthType type = fxLeaf.getGenType();
             return SynthType.SYNTHETIC.equals(type);
         }
-        if (LOGGABLE) log("isSynthetic returning false because the leaf is not JFXTree."); // NOI18N
+        if (LOGGABLE) log("isSynthetic returning false because the leaf is not VSGTree."); // NOI18N
         return false;
     }
 
@@ -246,19 +246,19 @@ public final class TreeUtilities {
         if (tree.pos == (-1))
             return true;
 
-        if (leaf.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
+        if (leaf.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION) {
             //check for synthetic constructor:
-            return (((JFXFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
+            return (((VSGFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
         }
-        if (leaf.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-            return (((JFXClassDeclaration)leaf).mods.flags & Flags.SYNTHETIC) != 0L; // anonymous inner classes in SOMA
+        if (leaf.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
+            return (((VSGClassDeclaration)leaf).mods.flags & Flags.SYNTHETIC) != 0L; // anonymous inner classes in SOMA
         }
 
         SourcePositions sp = parserResultImpl.getTrees().getSourcePositions();
         return sp.getStartPosition(cut, leaf) == sp.getEndPosition(cut, leaf);
 
 //        //check for synthetic superconstructor call:
-//        if (leaf.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
+//        if (leaf.getVisageKind() == Tree.VisageKind.BLOCK_EXPRESSION) {
 //            ExpressionStatementTree est = (ExpressionStatementTree) leaf;
 //
 //            if (est.getExpression().getKind() == Kind.METHOD_INVOCATION) {
@@ -307,7 +307,7 @@ public final class TreeUtilities {
 //            
 //            if (automap) {
 //                try {
-//                    TokenSequence<JFXTokenId> seq = ((SourceFileObject) info.getCompilationUnit().getSourceFile()).getTokenHierarchy().tokenSequence(JFXTokenId.language());
+//                    TokenSequence<VSGTokenId> seq = ((SourceFileObject) info.getCompilationUnit().getSourceFile()).getTokenHierarchy().tokenSequence(VSGTokenId.language());
 //                    new TranslateIdentifier(info, true, false, seq).translate(tree);
 //                } catch (IOException ex) {
 //                    Exceptions.printStackTrace(ex);
@@ -320,36 +320,36 @@ public final class TreeUtilities {
 //        return Collections.unmodifiableList(comments);
 //    }
 
-    final private PositionCache<JavaFXTreePath> pathCache = new PositionCache();
-    final private PositionCache<TokenSequence<JFXTokenId>> tokenCache = new PositionCache();
+    final private PositionCache<VisageTreePath> pathCache = new PositionCache();
+    final private PositionCache<TokenSequence<VSGTokenId>> tokenCache = new PositionCache();
 
-    public JavaFXTreePath pathFor(long pos) {
-        return pathFor(new JavaFXTreePath(parserResultImpl.getCompilationUnit()), pos);
+    public VisageTreePath pathFor(long pos) {
+        return pathFor(new VisageTreePath(parserResultImpl.getCompilationUnit()), pos);
     }
 
     /*XXX: dbalek
      */
-    public JavaFXTreePath pathFor(JavaFXTreePath path, long pos) {
+    public VisageTreePath pathFor(VisageTreePath path, long pos) {
         return pathFor(path, pos, parserResultImpl.getTrees().getSourcePositions());
     }
 
     /*XXX: dbalek
      */
-    public JavaFXTreePath pathFor(JavaFXTreePath path, long pos, SourcePositions sourcePositions) {
+    public VisageTreePath pathFor(VisageTreePath path, long pos, SourcePositions sourcePositions) {
         if (parserResultImpl == null || path == null || sourcePositions == null)
             throw new IllegalArgumentException();
 
-        JavaFXTreePath foundPath = pathCache.getValue(pos);
+        VisageTreePath foundPath = pathCache.getValue(pos);
         if (foundPath != null) return foundPath;
 
         class Result extends Error {
-            JavaFXTreePath path;
-            Result(JavaFXTreePath path) {
+            VisageTreePath path;
+            Result(VisageTreePath path) {
                 this.path = path;
             }
         }
         
-        class PathFinder extends JavaFXTreePathScanner<Void,Void> {
+        class PathFinder extends VisageTreePathScanner<Void,Void> {
             private long pos;
             private SourcePositions sourcePositions;
             
@@ -394,52 +394,52 @@ public final class TreeUtilities {
             @Override
             public Void scan(Tree tree, Void p) {
                 if (tree != null && 
-                    !isEmptyStringLiteral(tree)) {  // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
+                    !isEmptyStringLiteral(tree)) {  // workaround for http://visage-jira.kenai.com/browse/VSGC-3494
                     long start = sourcePositions.getStartPosition(getCurrentPath().getCompilationUnit(), tree);
                     long end = sourcePositions.getEndPosition(getCurrentPath().getCompilationUnit(), tree);
 
                     if (start == end &&
-                        tree.getJavaFXKind() != Tree.JavaFXKind.PARENTHESIZED && // this is a workaround for javafxc bug setting PARENTHESIZED positions such as start == end
-                        (!(tree.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION && (((JFXClassDeclaration)tree).mods.flags & Flags.SYNTHETIC) != 0L))) // anonymous inner class is synthetic, start==end but we must follow it anyway
+                        tree.getVisageKind() != Tree.VisageKind.PARENTHESIZED && // this is a workaround for visagec bug setting PARENTHESIZED positions such as start == end
+                        (!(tree.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION && (((VSGClassDeclaration)tree).mods.flags & Flags.SYNTHETIC) != 0L))) // anonymous inner class is synthetic, start==end but we must follow it anyway
                         return null; // don't go this way; all subtrees are synthetic although they might not be flagged so
 
                     super.scan(tree, p);
-                    if (start != -1 && start <= pos && end >= pos && tree.getJavaFXKind() != Tree.JavaFXKind.MODIFIERS) {
-                        JavaFXTreePath tp = new JavaFXTreePath(getCurrentPath(), tree);
+                    if (start != -1 && start <= pos && end >= pos && tree.getVisageKind() != Tree.VisageKind.MODIFIERS) {
+                        VisageTreePath tp = new VisageTreePath(getCurrentPath(), tree);
                         boolean isSynteticMainBlock = isSynthetic(tp.getCompilationUnit(), tp.getLeaf());
                         // we don't want to return the syntetic main block as the result
-                        if (tree.getJavaFXKind() == Tree.JavaFXKind.BLOCK_EXPRESSION) {
-                            JavaFXTreePath parentPath = tp.getParentPath();
+                        if (tree.getVisageKind() == Tree.VisageKind.BLOCK_EXPRESSION) {
+                            VisageTreePath parentPath = tp.getParentPath();
                             if (parentPath != null) {
-                                JavaFXTreePath grandParentPath = parentPath.getParentPath();
+                                VisageTreePath grandParentPath = parentPath.getParentPath();
                                 if (grandParentPath != null) {
                                     Tree grandParent = grandParentPath.getLeaf();
-                                    if (grandParent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(grandParentPath)) {
+                                    if (grandParent.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION && isSynthetic(grandParentPath)) {
                                         isSynteticMainBlock = true;
                                     }
                                 }
                             }
                         }
-                        if (tree.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_VALUE) {
-                            JavaFXTreePath parentPath = tp.getParentPath();
+                        if (tree.getVisageKind() == Tree.VisageKind.FUNCTION_VALUE) {
+                            VisageTreePath parentPath = tp.getParentPath();
                             if (parentPath != null) {
                                 Tree parent = parentPath.getLeaf();
-                                if (parent.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION && isSynthetic(parentPath)) {
+                                if (parent.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION && isSynthetic(parentPath)) {
                                     isSynteticMainBlock = true;
                                 }
                             }
                         }
-                        if (tree.getJavaFXKind() == Tree.JavaFXKind.IDENTIFIER) { // The name of a synthetic anonymous inner class; must never be used for resolving path from position!!!
-                            JavaFXTreePath parentPath = tp.getParentPath();
+                        if (tree.getVisageKind() == Tree.VisageKind.IDENTIFIER) { // The name of a synthetic anonymous inner class; must never be used for resolving path from position!!!
+                            VisageTreePath parentPath = tp.getParentPath();
                             if (parentPath != null) {
                                 Tree parent = parentPath.getLeaf();
-                                if (parent.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION && isSynthetic(tp.getCompilationUnit(), parent)) {
+                                if (parent.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION && isSynthetic(tp.getCompilationUnit(), parent)) {
                                     isSynteticMainBlock = true;
                                 }
                             }
                         }
                         if (!isSynteticMainBlock) {
-                            throw new Result(new JavaFXTreePath(getCurrentPath(), tree));
+                            throw new Result(new VisageTreePath(getCurrentPath(), tree));
                         }
                     } else {
                         if ((start == -1) || (end == -1)) {
@@ -455,12 +455,12 @@ public final class TreeUtilities {
                 return null;
             }
 
-            // workaround for http://javafx-jira.kenai.com/browse/JFXC-3494
+            // workaround for http://visage-jira.kenai.com/browse/VSGC-3494
             private boolean isEmptyStringLiteral(Tree tree) {
                 if (tree != null) {
-//                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals("\"\""));
+//                    return (tree instanceof VSGLiteral && ((VSGLiteral)tree).value != null && ((VSGLiteral)tree).value.equals("\"\""));
                     // see #177301 - it seems that soma compiler now uses an empty string as an empty string literal value rather than ""
-                    return (tree instanceof JFXLiteral && ((JFXLiteral)tree).value != null && ((JFXLiteral)tree).value.equals(""));
+                    return (tree instanceof VSGLiteral && ((VSGLiteral)tree).value != null && ((VSGLiteral)tree).value.equals(""));
                 }
                 return false;
             }
@@ -505,12 +505,12 @@ public final class TreeUtilities {
     /**Computes {@link Scope} for the given position.
      */
     public JavafxcScope scopeFor(int pos) {
-        JavaFXTreePath path = pathFor(pos);
+        VisageTreePath path = pathFor(pos);
         JavafxcScope scope = getScope(path);
         return scope;
     }
 
-    public JavafxcScope getScope(JavaFXTreePath p) {
+    public JavafxcScope getScope(VisageTreePath p) {
         JavafxcScope scope = null;
         while ((p != null) && (scope == null)) {
             try {
@@ -538,7 +538,7 @@ public final class TreeUtilities {
      */
     public long[] findNameSpan(VariableTree var) {
         if (var == null || var.getName() == null) return null;
-        return findNameSpan(var.getName().toString(), var, JFXTokenId.VAR, JFXTokenId.DEF, JFXTokenId.PUBLIC_INIT, JFXTokenId.PUBLIC_READ);
+        return findNameSpan(var.getName().toString(), var, VSGTokenId.VAR, VSGTokenId.DEF, VSGTokenId.PUBLIC_INIT, VSGTokenId.PUBLIC_READ);
     }
 
     /**Find span of the {@link MethodTree#getName()} identifier in the source.
@@ -554,9 +554,9 @@ public final class TreeUtilities {
         if (method == null || isSynthetic(parserResultImpl.getCompilationUnit(), method)) {
             return null;
         }
-        JFXFunctionDefinition jcm = (JFXFunctionDefinition) method;
+        VSGFunctionDefinition jcm = (VSGFunctionDefinition) method;
         String name = jcm.name.toString();
-        return findNameSpan(name, method, JFXTokenId.ABSTRACT, JFXTokenId.BOUND, JFXTokenId.OVERRIDE, JFXTokenId.FUNCTION);
+        return findNameSpan(name, method, VSGTokenId.ABSTRACT, VSGTokenId.BOUND, VSGTokenId.OVERRIDE, VSGTokenId.FUNCTION);
     }
 
     public long[] findNameSpan(ClassDeclarationTree clazz) {
@@ -564,7 +564,7 @@ public final class TreeUtilities {
 
         String name = clazz.getSimpleName().toString();
 
-        return findNameSpan(name, clazz, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
+        return findNameSpan(name, clazz, VSGTokenId.ABSTRACT, VSGTokenId.CLASS, VSGTokenId.MIXIN);
     }
 
     public long[] findNameSpan(TypeClassTree type) {
@@ -572,28 +572,28 @@ public final class TreeUtilities {
 
         String name = type.toString();
 
-        return findNameSpan(name, type, JFXTokenId.ABSTRACT, JFXTokenId.CLASS, JFXTokenId.MIXIN);
+        return findNameSpan(name, type, VSGTokenId.ABSTRACT, VSGTokenId.CLASS, VSGTokenId.MIXIN);
     }
 
     /**Returns tokens for a given tree.
      */
-    public TokenSequence<JFXTokenId> tokensFor(Tree tree) {
+    public TokenSequence<VSGTokenId> tokensFor(Tree tree) {
         return tokensFor(tree, parserResultImpl.getTrees().getSourcePositions());
     }
     
     /**Returns tokens for a given tree. Uses specified {@link SourcePositions}.
      */
-    public TokenSequence<JFXTokenId> tokensFor(Tree tree, SourcePositions sourcePositions) {
+    public TokenSequence<VSGTokenId> tokensFor(Tree tree, SourcePositions sourcePositions) {
         int start = (int)sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), tree);
         int end   = (int)sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), tree);
         if ((start == -1) || (end == -1)) {
             throw new RuntimeException("RE Cannot determine start and end for: " + treeToString(parserResultImpl, tree)); // NOI18N
         }
 
-        TokenSequence<JFXTokenId> t = tokenCache.getValue(start);
+        TokenSequence<VSGTokenId> t = tokenCache.getValue(start);
 
         if (t == null) {
-            t = ((TokenHierarchy<?>)parserResultImpl.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+            t = ((TokenHierarchy<?>)parserResultImpl.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
             tokenCache.addValue(t, start, end);
         }
         if (t == null) {
@@ -602,15 +602,15 @@ public final class TreeUtilities {
         return t.subSequence(start, end);
     }
     
-    private static String treeToString(JavaFXParserResultImpl parserResultImpl, Tree t) {
-        Tree.JavaFXKind k = null;
+    private static String treeToString(VisageParserResultImpl parserResultImpl, Tree t) {
+        Tree.VisageKind k = null;
         StringWriter s = new StringWriter();
         try {
-            new JavafxPretty(s, false).printExpr((JFXTree)t);
+            new JavafxPretty(s, false).printExpr((VSGTree)t);
         } catch (Exception e) {
-            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e); // NOI18N
+            if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getVisageKind(), e); // NOI18N
         }
-        k = t.getJavaFXKind();
+        k = t.getVisageKind();
         String res = k.toString();
         SourcePositions pos = parserResultImpl.getTrees().getSourcePositions();
         res = res + '[' + pos.getStartPosition(parserResultImpl.getCompilationUnit(), t) + ',' +  // NOI18N
@@ -618,27 +618,27 @@ public final class TreeUtilities {
         return res;
     }
 
-    public ExpressionTree getBreakContinueTarget(JavaFXTreePath breakOrContinue) throws IllegalArgumentException {
+    public ExpressionTree getBreakContinueTarget(VisageTreePath breakOrContinue) throws IllegalArgumentException {
         if (parserResultImpl.getPhase().lessThan(CompilationPhase.ANALYZED))
             throw new IllegalArgumentException("Not in correct Phase. Required: Phase.RESOLVED, got: Phase." + parserResultImpl.getPhase().toString()); // NOI18N
         
         Tree leaf = breakOrContinue.getLeaf();
         
-        switch (leaf.getJavaFXKind()) {
+        switch (leaf.getVisageKind()) {
             case BREAK:
-                return (ExpressionTree) ((JFXBreak) leaf).target;
+                return (ExpressionTree) ((VSGBreak) leaf).target;
             case CONTINUE:
-                ExpressionTree target = (ExpressionTree) ((JFXContinue) leaf).target;
+                ExpressionTree target = (ExpressionTree) ((VSGContinue) leaf).target;
                 
                 if (target == null)
                     return null;
                 
                 // always true with current grammar
-                //if (((JFXContinue) leaf).label == null)
+                //if (((VSGContinue) leaf).label == null)
                     return target;
                 
             default:
-                throw new IllegalArgumentException("Unsupported kind: " + leaf.getJavaFXKind()); // NOI18N
+                throw new IllegalArgumentException("Unsupported kind: " + leaf.getVisageKind()); // NOI18N
         }
     }
 
@@ -668,10 +668,10 @@ public final class TreeUtilities {
             if (LOGGABLE) log("  source written to " + fo); // NOI18N
             ClasspathInfo cp = ClasspathInfo.create(source.getFileObject());
             Source exprSource = Source.create(fo);
-            JavaFXParserResult result = JavaFXParserResult.create(exprSource, cp);
-            if (LOGGABLE) log("  JavaFXParserResult obtained " + result); // NOI18N
+            VisageParserResult result = VisageParserResult.create(exprSource, cp);
+            if (LOGGABLE) log("  VisageParserResult obtained " + result); // NOI18N
             result.toPhase(CompilationPhase.ANALYZED);
-            JavaFXTreePath p = result.getTreeUtilities().pathFor(pos+2);
+            VisageTreePath p = result.getTreeUtilities().pathFor(pos+2);
             if (p == null) {
                 if (LOGGABLE) log("  path for returned null"); // NOI18N
                 return null;
@@ -688,7 +688,7 @@ public final class TreeUtilities {
                 return null;
             }
             // the second while loop will try to find as big expression as possible
-            JavaFXTreePath pp = p.getParentPath();
+            VisageTreePath pp = p.getParentPath();
             if (LOGGABLE && pp != null) {
                 log(pp.getLeaf().getClass().getName() + "   pp = " + pp.getLeaf()); // NOI18N
                 log("   start == " + sp.getStartPosition(result.getCompilationUnit(),pp.getLeaf())); // NOI18N
@@ -787,13 +787,13 @@ public final class TreeUtilities {
         @SuppressWarnings("unchecked")
         JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
 
-        // #182138: Prevent NPE inside javafxc
+        // #182138: Prevent NPE inside visagec
         if (fxEnv.outer == null) return true;
 
         return JavafxResolve.isStatic(fxEnv);
     }
 
-    private long[] findNameSpan(String name, Tree t, JFXTokenId... allowedTokens) {
+    private long[] findNameSpan(String name, Tree t, VSGTokenId... allowedTokens) {
         if (!SourceVersion.isIdentifier(name)) {
             //names like "<error>", etc.
             return null;
@@ -805,17 +805,17 @@ public final class TreeUtilities {
         if (pos < 0)
             return null;
 
-        Set<JFXTokenId> allowedTokensSet = EnumSet.of(
-                JFXTokenId.WS,
-                JFXTokenId.PRIVATE,
-                JFXTokenId.PROTECTED,
-                JFXTokenId.PACKAGE,
-                JFXTokenId.PUBLIC,
-                JFXTokenId.STATIC);
+        Set<VSGTokenId> allowedTokensSet = EnumSet.of(
+                VSGTokenId.WS,
+                VSGTokenId.PRIVATE,
+                VSGTokenId.PROTECTED,
+                VSGTokenId.PACKAGE,
+                VSGTokenId.PUBLIC,
+                VSGTokenId.STATIC);
 
         allowedTokensSet.addAll(Arrays.asList(allowedTokens));
 
-        TokenSequence<JFXTokenId> tokenSequence = parserResultImpl.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> tokenSequence = parserResultImpl.getTokenHierarchy().tokenSequence(VSGTokenId.language());
 
         tokenSequence.move(pos);
 
@@ -824,7 +824,7 @@ public final class TreeUtilities {
         while ((wasNext = tokenSequence.moveNext()) && allowedTokensSet.contains(tokenSequence.token().id()));
 
         if (wasNext) {
-            if (tokenSequence.token().id() == JFXTokenId.IDENTIFIER &&
+            if (tokenSequence.token().id() == VSGTokenId.IDENTIFIER &&
                 name.contentEquals(tokenSequence.token().text())) {
                 return new long[] {
                     tokenSequence.offset(),

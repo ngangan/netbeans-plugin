@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.code.JavafxTypes;
+import com.sun.tools.visage.api.JavafxcTaskImpl;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.code.JavafxTypes;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -55,32 +55,32 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationPhase;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.TreeUtilities;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationPhase;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.api.lexer.TokenHierarchy;
-import org.netbeans.modules.javafx.source.ApiSourcePackageAccessor;
+import org.netbeans.modules.visage.source.ApiSourcePackageAccessor;
 import org.netbeans.modules.parsing.api.Snapshot;
 
 /**
  *
  * @author Miloslav Metelka
  */
-public class JavaFXParserResultImpl {
+public class VisageParserResultImpl {
 
-    // -J-Dorg.netbeans.api.javafx.source.parsing.JavaFXParserResult.level=FINEST
-    private static final Logger LOG = Logger.getLogger(JavaFXParserResultImpl.class.getName());
+    // -J-Dorg.netbeans.api.visage.source.parsing.VisageParserResult.level=FINEST
+    private static final Logger LOG = Logger.getLogger(VisageParserResultImpl.class.getName());
 
     private final AtomicBoolean invalid = new AtomicBoolean();
 
-    private final JavaFXParser parser;
+    private final VisageParser parser;
 
     private ElementUtilities elementUtilities;
 
     private TreeUtilities treeUtilities;
 
-    JavaFXParserResultImpl(JavaFXParser parser) {
+    VisageParserResultImpl(VisageParser parser) {
         this.parser = parser;
     }
 
@@ -122,12 +122,12 @@ public class JavaFXParserResultImpl {
     }
 
     public Context getContext() {
-        return parser.javafxcTaskImpl.getContext();
+        return parser.visagecTaskImpl.getContext();
     }
 
     public UnitTree getCompilationUnit() {
         if (parser.currentPhase.lessThan(CompilationPhase.PARSED))
-            throw new IllegalStateException("Cannot call getCompilationInfo() if current phase < JavaFXSource.Phase.PARSED. You must call toPhase(Phase.PARSED) first.");//NOI18N
+            throw new IllegalStateException("Cannot call getCompilationInfo() if current phase < VisageSource.Phase.PARSED. You must call toPhase(Phase.PARSED) first.");//NOI18N
         return parser.compilationUnit;
     }
 
@@ -144,7 +144,7 @@ public class JavaFXParserResultImpl {
     }
 
     public JavafxcTaskImpl getJavafxcTaskImpl() {
-        return parser.javafxcTaskImpl;
+        return parser.visagecTaskImpl;
     }
 
     public Types getTypes() {

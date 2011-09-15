@@ -29,7 +29,7 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.modules.refactoring.api.Problem;
@@ -40,7 +40,7 @@ import org.netbeans.modules.refactoring.spi.RefactoringPlugin;
  *
  * @author Jaroslav Bachorik
  */
-abstract public class JavaFXRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
+abstract public class VisageRefactoringPlugin extends ProgressProviderAdapter implements RefactoringPlugin {
     final private AtomicBoolean cancelled = new AtomicBoolean(false);
 
     final public void cancelRequest() {

@@ -40,15 +40,15 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.Tree;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import static org.junit.Assert.*;
@@ -84,7 +84,7 @@ public class ElementUtilitiesTest extends SourceTestBase {
         
         System.out.println("pathFor(pos)");
         FileObject fo = FileUtil.toFileObject(getDataDir());
-        fo = fo.getFileObject("org/netbeans/api/javafx/source/TreeUtilitiesTest.fx");
+        fo = fo.getFileObject("org/netbeans/api/visage/source/TreeUtilitiesTest.fx");
         testInsideSourceTask(fo,
           new Task<CompilationController>() {
             public void run(CompilationController controller) throws Exception {

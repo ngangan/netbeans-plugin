@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library.project;
+package qa.visage.functional.library.project;
 
 import javax.swing.JDialog;
 import org.netbeans.jellytools.MainWindowOperator;
@@ -58,8 +58,8 @@ import org.netbeans.jemmy.operators.JDialogOperator;
 import org.netbeans.jemmy.operators.JMenuBarOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 //import org.netbeans.junit.ide.ProjectSupport;
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Constant;
+import qa.visage.functional.library.Util;
 
 /**
  *

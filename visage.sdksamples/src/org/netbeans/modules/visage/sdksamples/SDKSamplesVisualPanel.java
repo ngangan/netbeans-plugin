@@ -46,7 +46,7 @@
  * Created on Oct 15, 2008, 11:34:28 AM
  */
 
-package org.netbeans.modules.javafx.sdksamples;
+package org.netbeans.modules.visage.sdksamples;
 
 import java.io.File;
 import javax.swing.JFileChooser;

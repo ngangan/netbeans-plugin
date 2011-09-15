@@ -41,10 +41,10 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 import java.awt.BorderLayout;
@@ -55,8 +55,8 @@ import javax.swing.ActionMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.ListSelectionModel;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
@@ -81,7 +81,7 @@ public class ElementNavigatorProviderImpl implements NavigatorPanel {
         manager.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (ExplorerManager.PROP_SELECTED_NODES.equals(evt.getPropertyName())) {
-                    TreeNavigatorProviderImpl.setHighlights(ElementNavigatorJavaFXSourceFactory.getInstance().getFile(), manager);
+                    TreeNavigatorProviderImpl.setHighlights(ElementNavigatorVisageSourceFactory.getInstance().getFile(), manager);
                 }
             }
         });
@@ -124,11 +124,11 @@ public class ElementNavigatorProviderImpl implements NavigatorPanel {
     }
 
     public void panelActivated(Lookup context) {
-        ElementNavigatorJavaFXSourceFactory.getInstance().setLookup(context, new TaskImpl());
+        ElementNavigatorVisageSourceFactory.getInstance().setLookup(context, new TaskImpl());
     }
 
     public void panelDeactivated() {
-        ElementNavigatorJavaFXSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
+        ElementNavigatorVisageSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
     }
     
     private final class TaskImpl implements CancellableTask<CompilationInfo> {
@@ -144,12 +144,12 @@ public class ElementNavigatorProviderImpl implements NavigatorPanel {
         }
         
     }
-    // javafxc doesn't provide an element for compilation unit,
+    // visagec doesn't provide an element for compilation unit,
     // but always generate the module class, present or not. This would
     // be the only element under the compilation unit element, so why not find
     // it and use it instead
     private static Element getRootElement(final CompilationInfo info) {
-        return new JavaFXTreePathScanner<Element,Void>() {
+        return new VisageTreePathScanner<Element,Void>() {
             public @Override Element visitClassDeclaration(ClassDeclarationTree arg0, Void arg1) {
                 return info.getTrees().getElement(getCurrentPath());
             }

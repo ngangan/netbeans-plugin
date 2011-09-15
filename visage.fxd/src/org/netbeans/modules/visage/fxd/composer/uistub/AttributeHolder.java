@@ -41,10 +41,10 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.uistub;
+package org.netbeans.modules.visage.fxd.composer.uistub;
 
-import com.sun.javafx.tools.fxd.container.generator.IndentedWriter;
-import com.sun.javafx.tools.fxd.container.generator.PackagerUtils;
+import com.sun.visage.tools.fxd.container.generator.IndentedWriter;
+import com.sun.visage.tools.fxd.container.generator.PackagerUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;

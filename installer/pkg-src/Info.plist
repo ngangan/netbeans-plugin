@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
         <key>CFBundleIdentifier</key>
-            <string>netbeans.ide.javafx</string>	
+            <string>netbeans.ide.visage</string>	
 	<key>IFPkgFlagAllowBackRev</key>
             <false/>
 	<key>IFPkgFlagAuthorizationAction</key>

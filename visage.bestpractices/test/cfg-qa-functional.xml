@@ -51,12 +51,12 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, color, all, stable" name="Color">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/ColorWheel.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/ColorWheel.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/LinearGradient.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/LinearGradient.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -64,12 +64,12 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, forms, all, stable" name="Forms">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/PointsAndLines.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/PointsAndLines.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/ShapePrimitives.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/ShapePrimitives.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -77,7 +77,7 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, games, all, stable" name="Games">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Bounce.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Bounce.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -85,17 +85,17 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, image, all, stable" name="Image">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/BackgroundImage.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/BackgroundImage.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Displaying.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Displaying.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Transparency.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Transparency.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -103,42 +103,42 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, input, all, stable" name="Input">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Clock.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Clock.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Constrain.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Constrain.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Easing.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Easing.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Milliseconds.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Milliseconds.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Mouse1D.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Mouse1D.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Mouse2D.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Mouse2D.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/MousePress.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/MousePress.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/StoringInput.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/StoringInput.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -146,27 +146,27 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, math, all, stable" name="Math">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Arctangent.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Arctangent.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Distance1D.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Distance1D.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Distance2D.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Distance2D.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Sine.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Sine.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/SineWave.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/SineWave.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -174,12 +174,12 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, motion, all, stable" name="Motion">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/BouncyBubbles.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/BouncyBubbles.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Linear.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Linear.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -187,17 +187,17 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, simulation, all, stable" name="Simulation">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Flocks.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Flocks.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/SimpleParticleSystem.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/SimpleParticleSystem.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/SmokeParticleSystem.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/SmokeParticleSystem.class"/>
             </patternset>
         </testset>
     </testbag>
@@ -205,17 +205,17 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, transform, all, stable" name="Transform">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Rotate.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Rotate.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Scale.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Scale.class"/>
             </patternset>
         </testset>
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/bestpractices/samples/Translate.class"/>
+                <include name="org/netbeans/test/visage/bestpractices/samples/Translate.class"/>
             </patternset>
         </testset>
     </testbag>

@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 
 import java.awt.*;
@@ -68,26 +68,26 @@ import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 
 
 
-public class JavaFXPlatformCustomizer extends JTabbedPane {
+public class VisagePlatformCustomizer extends JTabbedPane {
 
     private static final int CLASSPATH = 0;
     private static final int SOURCES = 1;
     private static final int JAVADOC = 2;
 
-    private JavaFXPlatformImpl platform;    
+    private VisagePlatformImpl platform;    
 
-    public JavaFXPlatformCustomizer (JavaFXPlatformImpl platform) {
+    public VisagePlatformCustomizer (VisagePlatformImpl platform) {
         this.platform = platform;
         this.initComponents ();
     }
 
 
     private void initComponents () {
-        this.getAccessibleContext().setAccessibleName (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"AN_JavaFXPlatformCustomizer")); // NOI18N
-        this.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"AD_JavaFXPlatformCustomizer")); // NOI18N
-        this.addTab(NbBundle.getMessage(JavaFXPlatformCustomizer.class,"TXT_Classes"), createPathTab(CLASSPATH)); // NOI18N
-        this.addTab(NbBundle.getMessage(JavaFXPlatformCustomizer.class,"TXT_Sources"), createPathTab(SOURCES)); // NOI18N
-        this.addTab(NbBundle.getMessage(JavaFXPlatformCustomizer.class,"TXT_Javadoc"), createPathTab(JAVADOC)); // NOI18N
+        this.getAccessibleContext().setAccessibleName (NbBundle.getMessage(VisagePlatformCustomizer.class,"AN_VisagePlatformCustomizer")); // NOI18N
+        this.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(VisagePlatformCustomizer.class,"AD_VisagePlatformCustomizer")); // NOI18N
+        this.addTab(NbBundle.getMessage(VisagePlatformCustomizer.class,"TXT_Classes"), createPathTab(CLASSPATH)); // NOI18N
+        this.addTab(NbBundle.getMessage(VisagePlatformCustomizer.class,"TXT_Sources"), createPathTab(SOURCES)); // NOI18N
+        this.addTab(NbBundle.getMessage(VisagePlatformCustomizer.class,"TXT_Javadoc"), createPathTab(JAVADOC)); // NOI18N
     }
 
 
@@ -107,12 +107,12 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
         private int type;
         private File currentDir;
 
-        public PathView (JavaFXPlatformImpl platform, int type) {
+        public PathView (VisagePlatformImpl platform, int type) {
             this.type = type;
             this.initComponents (platform);
         }
 
-        private void initComponents (JavaFXPlatformImpl platform) {
+        private void initComponents (VisagePlatformImpl platform) {
             this.setLayout(new GridBagLayout());
             JLabel label = new JLabel ();
             String key = null;
@@ -138,8 +138,8 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                     assert false : "Illegal type of panel";     //NOI18N
                     return;
             }
-            label.setText (NbBundle.getMessage(JavaFXPlatformCustomizer.class,key));
-            label.setDisplayedMnemonic(NbBundle.getMessage(JavaFXPlatformCustomizer.class,mneKey).charAt(0));
+            label.setText (NbBundle.getMessage(VisagePlatformCustomizer.class,key));
+            label.setDisplayedMnemonic(NbBundle.getMessage(VisagePlatformCustomizer.class,mneKey).charAt(0));
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = GridBagConstraints.RELATIVE;
             c.gridy = GridBagConstraints.RELATIVE;
@@ -151,7 +151,7 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
             this.add (label);
             this.resources = new JList(new PathModel(platform,type));
             label.setLabelFor (this.resources);
-            this.resources.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(JavaFXPlatformCustomizer.class,ad));
+            this.resources.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(VisagePlatformCustomizer.class,ad));
             this.resources.addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     selectionChanged ();
@@ -174,14 +174,14 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                 String text;
                 char mne;
                 if (type == SOURCES) {
-                    text = NbBundle.getMessage(JavaFXPlatformCustomizer.class, "CTL_Add"); // NOI18N
-                    mne = NbBundle.getMessage(JavaFXPlatformCustomizer.class, "MNE_Add").charAt(0); // NOI18N
-                    ad = NbBundle.getMessage(JavaFXPlatformCustomizer.class, "AD_Add"); // NOI18N
+                    text = NbBundle.getMessage(VisagePlatformCustomizer.class, "CTL_Add"); // NOI18N
+                    mne = NbBundle.getMessage(VisagePlatformCustomizer.class, "MNE_Add").charAt(0); // NOI18N
+                    ad = NbBundle.getMessage(VisagePlatformCustomizer.class, "AD_Add"); // NOI18N
                 }
                 else {
-                    text = NbBundle.getMessage(JavaFXPlatformCustomizer.class, "CTL_AddZip"); // NOI18N
-                    mne = NbBundle.getMessage(JavaFXPlatformCustomizer.class, "MNE_AddZip").charAt(0); // NOI18N
-                    ad = NbBundle.getMessage(JavaFXPlatformCustomizer.class, "AD_AddZip"); // NOI18N
+                    text = NbBundle.getMessage(VisagePlatformCustomizer.class, "CTL_AddZip"); // NOI18N
+                    mne = NbBundle.getMessage(VisagePlatformCustomizer.class, "MNE_AddZip").charAt(0); // NOI18N
+                    ad = NbBundle.getMessage(VisagePlatformCustomizer.class, "AD_AddZip"); // NOI18N
                 }
                 this.addButton.setText(text);
                 this.addButton.setMnemonic(mne);
@@ -201,8 +201,8 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                 ((GridBagLayout)this.getLayout()).setConstraints(addButton,c);
                 this.add (addButton);
 //                if (this.type == JAVADOC) {
-//                    addURLButton  = new JButton (NbBundle.getMessage(JavaFXPlatformCustomizer.class, "CTL_AddURL"));
-//                    addURLButton.setMnemonic(NbBundle.getMessage(JavaFXPlatformCustomizer.class, "MNE_AddURL").charAt(0));
+//                    addURLButton  = new JButton (NbBundle.getMessage(VisagePlatformCustomizer.class, "CTL_AddURL"));
+//                    addURLButton.setMnemonic(NbBundle.getMessage(VisagePlatformCustomizer.class, "MNE_AddURL").charAt(0));
 //                    addURLButton.addActionListener(new ActionListener () {
 //                        public void actionPerformed(ActionEvent e) {
 //                            addURLElement ();
@@ -218,9 +218,9 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
 //                    ((GridBagLayout)this.getLayout()).setConstraints(addURLButton,c);
 //                    this.add (addURLButton);
 //                }
-                removeButton = new JButton (NbBundle.getMessage(JavaFXPlatformCustomizer.class, "CTL_Remove")); // NOI18N
-                removeButton.setMnemonic(NbBundle.getMessage(JavaFXPlatformCustomizer.class, "MNE_Remove").charAt(0)); // NOI18N
-                removeButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"AD_Remove")); // NOI18N
+                removeButton = new JButton (NbBundle.getMessage(VisagePlatformCustomizer.class, "CTL_Remove")); // NOI18N
+                removeButton.setMnemonic(NbBundle.getMessage(VisagePlatformCustomizer.class, "MNE_Remove").charAt(0)); // NOI18N
+                removeButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(VisagePlatformCustomizer.class,"AD_Remove")); // NOI18N
                 removeButton.addActionListener( new ActionListener () {
                     public void actionPerformed(ActionEvent e) {
                         removePathElement ();
@@ -236,9 +236,9 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                 c.insets = new Insets (12,6,0,6);
                 ((GridBagLayout)this.getLayout()).setConstraints(removeButton,c);
                 this.add (removeButton);
-                moveUpButton = new JButton (NbBundle.getMessage(JavaFXPlatformCustomizer.class, "CTL_Up")); // NOI18N
-                moveUpButton.setMnemonic(NbBundle.getMessage(JavaFXPlatformCustomizer.class, "MNE_Up").charAt(0)); // NOI18N
-                moveUpButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"AD_Up")); // NOI18N
+                moveUpButton = new JButton (NbBundle.getMessage(VisagePlatformCustomizer.class, "CTL_Up")); // NOI18N
+                moveUpButton.setMnemonic(NbBundle.getMessage(VisagePlatformCustomizer.class, "MNE_Up").charAt(0)); // NOI18N
+                moveUpButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(VisagePlatformCustomizer.class,"AD_Up")); // NOI18N
                 moveUpButton.addActionListener( new ActionListener () {
                     public void actionPerformed(ActionEvent e) {
                         moveUpPathElement ();
@@ -254,9 +254,9 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                 c.insets = new Insets (12,6,0,6);
                 ((GridBagLayout)this.getLayout()).setConstraints(moveUpButton,c);
                 this.add (moveUpButton);
-                moveDownButton = new JButton (NbBundle.getMessage(JavaFXPlatformCustomizer.class, "CTL_Down")); // NOI18N
-                moveDownButton.setMnemonic (NbBundle.getMessage(JavaFXPlatformCustomizer.class, "MNE_Down").charAt(0)); // NOI18N
-                moveDownButton.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(JavaFXPlatformCustomizer.class,"AD_Down")); // NOI18N
+                moveDownButton = new JButton (NbBundle.getMessage(VisagePlatformCustomizer.class, "CTL_Down")); // NOI18N
+                moveDownButton.setMnemonic (NbBundle.getMessage(VisagePlatformCustomizer.class, "MNE_Down").charAt(0)); // NOI18N
+                moveDownButton.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(VisagePlatformCustomizer.class,"AD_Down")); // NOI18N
                 moveDownButton.addActionListener( new ActionListener () {
                     public void actionPerformed(ActionEvent e) {
                         moveDownPathElement ();
@@ -283,7 +283,7 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
 //            c.gridx = c.gridy = GridBagConstraints.RELATIVE;
 //            c.insets = new Insets (12,12,12,6);
 //            c.anchor = GridBagConstraints.NORTHWEST;
-//            JLabel label = new JLabel (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"CTL_AddJavadocURLMessage"));
+//            JLabel label = new JLabel (NbBundle.getMessage(VisagePlatformCustomizer.class,"CTL_AddJavadocURLMessage"));
 //            label.setDisplayedMnemonic ('U');
 //            lm.setConstraints(label,c);
 //            p.add (label);
@@ -295,20 +295,20 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
 //            c.anchor = GridBagConstraints.NORTHWEST;
 //            JTextField text = new JTextField ();
 //            text.setColumns(30);
-//            text.setText (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"TXT_DefaultProtocol"));
+//            text.setText (NbBundle.getMessage(VisagePlatformCustomizer.class,"TXT_DefaultProtocol"));
 //            text.selectAll();
 //            label.setLabelFor(text);
 //            lm.setConstraints(text,c);
 //            p.add (text);            
 //            JButton[] options = new JButton[] {
-//                new JButton (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"CTL_AddJavadocURLTitle")),
-//                new JButton (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"CTL_Cancel"))
+//                new JButton (NbBundle.getMessage(VisagePlatformCustomizer.class,"CTL_AddJavadocURLTitle")),
+//                new JButton (NbBundle.getMessage(VisagePlatformCustomizer.class,"CTL_Cancel"))
 //            };
-//            options[0].setMnemonic(NbBundle.getMessage(JavaFXPlatformCustomizer.class,"MNE_Add").charAt(0));
-//            options[1].setMnemonic(NbBundle.getMessage(JavaFXPlatformCustomizer.class,"MNE_Cancel").charAt(0));
+//            options[0].setMnemonic(NbBundle.getMessage(VisagePlatformCustomizer.class,"MNE_Add").charAt(0));
+//            options[1].setMnemonic(NbBundle.getMessage(VisagePlatformCustomizer.class,"MNE_Cancel").charAt(0));
 //            DialogDescriptor input = new DialogDescriptor (
 //                p,
-//                NbBundle.getMessage(JavaFXPlatformCustomizer.class,"CTL_AddJavadocURLTitle"),
+//                NbBundle.getMessage(VisagePlatformCustomizer.class,"CTL_AddJavadocURLTitle"),
 //                true, options, options[0], DialogDescriptor.DEFAULT_ALIGN, null, null);            
 //            if (DialogDisplayer.getDefault().notify(input) == options[0]) {
 //                try {
@@ -318,7 +318,7 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
 //                    this.resources.setSelectedIndex (this.resources.getModel().getSize()-1);
 //                } catch (MalformedURLException mue) {
 //                    DialogDescriptor.Message message = new DialogDescriptor.Message (
-//                        NbBundle.getMessage(JavaFXPlatformCustomizer.class,"CTL_InvalidURLFormat"),
+//                        NbBundle.getMessage(VisagePlatformCustomizer.class,"CTL_InvalidURLFormat"),
 //                        DialogDescriptor.ERROR_MESSAGE);
 //                    DialogDisplayer.getDefault().notify(message);
 //                }
@@ -334,16 +334,16 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
             String approveButtonName = null;
             String approveButtonNameMne = null;
             if (this.type == SOURCES) {
-                title = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"TXT_OpenSources"); // NOI18N
-                message = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"TXT_Sources"); // NOI18N
-                approveButtonName = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"TXT_OpenSources"); // NOI18N
-                approveButtonNameMne = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"MNE_OpenSources"); // NOI18N
+                title = NbBundle.getMessage (VisagePlatformCustomizer.class,"TXT_OpenSources"); // NOI18N
+                message = NbBundle.getMessage (VisagePlatformCustomizer.class,"TXT_Sources"); // NOI18N
+                approveButtonName = NbBundle.getMessage (VisagePlatformCustomizer.class,"TXT_OpenSources"); // NOI18N
+                approveButtonNameMne = NbBundle.getMessage (VisagePlatformCustomizer.class,"MNE_OpenSources"); // NOI18N
             }
             else if (this.type == JAVADOC) {
-                title = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"TXT_OpenJavadoc"); // NOI18N
-                message = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"TXT_Javadoc"); // NOI18N
-                approveButtonName = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"TXT_OpenJavadoc"); // NOI18N
-                approveButtonNameMne = NbBundle.getMessage (JavaFXPlatformCustomizer.class,"MNE_OpenJavadoc"); // NOI18N
+                title = NbBundle.getMessage (VisagePlatformCustomizer.class,"TXT_OpenJavadoc"); // NOI18N
+                message = NbBundle.getMessage (VisagePlatformCustomizer.class,"TXT_Javadoc"); // NOI18N
+                approveButtonName = NbBundle.getMessage (VisagePlatformCustomizer.class,"TXT_OpenJavadoc"); // NOI18N
+                approveButtonNameMne = NbBundle.getMessage (VisagePlatformCustomizer.class,"MNE_OpenJavadoc"); // NOI18N
             }
             chooser.setDialogTitle(title);
             chooser.setApproveButtonText(approveButtonName);
@@ -374,7 +374,7 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
                     addingFailed|=!model.addPath (f);
                 }
                 if (addingFailed) {
-                    new NotifyDescriptor.Message (NbBundle.getMessage(JavaFXPlatformCustomizer.class,"TXT_CanNotAddResolve"), // NOI18N
+                    new NotifyDescriptor.Message (NbBundle.getMessage(VisagePlatformCustomizer.class,"TXT_CanNotAddResolve"), // NOI18N
                             NotifyDescriptor.ERROR_MESSAGE);
                 }
                 int lastIndex = this.resources.getModel().getSize()-1;
@@ -445,11 +445,11 @@ public class JavaFXPlatformCustomizer extends JTabbedPane {
 
     private static class PathModel extends AbstractListModel/*<String>*/ {
 
-        private JavaFXPlatformImpl platform;
+        private VisagePlatformImpl platform;
         private int type;
         private java.util.List<URL> data;
 
-        public PathModel (JavaFXPlatformImpl platform, int type) {
+        public PathModel (VisagePlatformImpl platform, int type) {
             this.platform = platform;
             this.type = type;
         }

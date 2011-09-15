@@ -34,16 +34,16 @@
 
 package input;
 
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Circle;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.input.MouseEvent;
+import visage.scene.Node;
+import visage.scene.CustomNode;
+import visage.scene.shape.Rectangle;
+import visage.scene.shape.Circle;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 import java.lang.Math;
 

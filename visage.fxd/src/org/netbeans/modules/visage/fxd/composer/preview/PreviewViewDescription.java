@@ -42,15 +42,15 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.preview;
+package org.netbeans.modules.visage.fxd.composer.preview;
 
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.io.Serializable;
 import org.netbeans.core.spi.multiview.MultiViewDescription;
 import org.netbeans.core.spi.multiview.MultiViewElement;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataNode;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataNode;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;

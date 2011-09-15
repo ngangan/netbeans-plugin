@@ -41,15 +41,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.navigation.actions;
+package org.netbeans.modules.visage.navigation.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import org.netbeans.modules.javafx.navigation.base.FiltersDescription;
-import org.netbeans.modules.javafx.navigation.base.FiltersManager;
+import org.netbeans.modules.visage.navigation.base.FiltersDescription;
+import org.netbeans.modules.visage.navigation.base.FiltersManager;
 import org.openide.util.NbBundle;
 import org.openide.util.actions.Presenter;
 

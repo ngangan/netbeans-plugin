@@ -40,12 +40,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXType;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGType;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -56,17 +56,17 @@ import org.netbeans.api.lexer.TokenUtilities;
  *
  * @author David Strupl
  */
-public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<JFXFunctionDefinition> {
+public class FunctionDefinitionEnvironment extends VisageCompletionEnvironment<VSGFunctionDefinition> {
     
     private static final Logger logger = Logger.getLogger(FunctionDefinitionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXFunctionDefinition t) throws IOException {
-        if (LOGGABLE) log("inside JFXFunctionDefinition " + t); // NOI18N
-        JFXFunctionDefinition def = t;
+    protected void inside(VSGFunctionDefinition t) throws IOException {
+        if (LOGGABLE) log("inside VSGFunctionDefinition " + t); // NOI18N
+        VSGFunctionDefinition def = t;
         int startPos = (int) sourcePositions.getStartPosition(root, def);
-        JFXType retType = def.getJFXReturnType();
+        VSGType retType = def.getVSGReturnType();
         if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
         CharSequence headerText = controller.getText().subSequence(startPos, offset > startPos ? offset : startPos);
         if (LOGGABLE) log("  headerText(1) == " + headerText); // NOI18N
@@ -77,7 +77,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             if (parEnd > parStart) {
                 headerText = TokenUtilities.trim(headerText.subSequence(parEnd + 1, headerText.length()));
             } else {
-//                for (JFXVar param : def.getParams()) {
+//                for (VSGVar param : def.getParams()) {
 //                    int parPos = (int) sourcePositions.getEndPosition(root, param);
 //                    if (parPos == Diagnostic.NOPOS || offset <= parPos) {
 //                        break;
@@ -94,7 +94,7 @@ public class FunctionDefinitionEnvironment extends JavaFXCompletionEnvironment<J
             }
         } else if (retType != null && TokenUtilities.trim(headerText).length() == 0) {
             if (LOGGABLE) log("  insideExpression for retType:"); // NOI18N
-            insideExpression(new JavaFXTreePath(path, retType));
+            insideExpression(new VisageTreePath(path, retType));
             return;
         }
         int bodyPos = (int) sourcePositions.getStartPosition(root, def.getBodyExpression());

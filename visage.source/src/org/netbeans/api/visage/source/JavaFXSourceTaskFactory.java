@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,50 +52,50 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.modules.javafx.source.parsing.JavaFXTaskProcessor;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.modules.visage.source.parsing.VisageTaskProcessor;
 import org.openide.filesystems.FileObject;
 import org.openide.ErrorManager;
 import org.openide.util.RequestProcessor;
 
 /**
- * A factory for tasks that will be run in the {@link JavaFXSource} Java parsing harness.
+ * A factory for tasks that will be run in the {@link VisageSource} Java parsing harness.
  *
  * Please note that there is usually no need to implement this class directly,
- * as there are support classes for common {@link JavaFXSourceTaskFactory} implementations.
+ * as there are support classes for common {@link VisageSourceTaskFactory} implementations.
  *
  * This factory should be registered in the global lookup by listing its fully qualified
- * name in file <code>META-INF/services/org.netbeans.api.java.source.JavaFXSourceTaskFactory</code>.
+ * name in file <code>META-INF/services/org.netbeans.api.java.source.VisageSourceTaskFactory</code>.
  * 
- * @see EditorAwareJavaFXSourceTaskFactory
- * @see CaretAwareJavaFXSourceTaskFactory
- * @see LookupBasedJavaFXSourceTaskFactory
+ * @see EditorAwareVisageSourceTaskFactory
+ * @see CaretAwareVisageSourceTaskFactory
+ * @see LookupBasedVisageSourceTaskFactory
  *
  * @author Jan Lahoda
  */
-public abstract class JavaFXSourceTaskFactory {
+public abstract class VisageSourceTaskFactory {
 
-    private static final Logger LOG = Logger.getLogger(JavaFXSourceTaskFactory.class.getName());
+    private static final Logger LOG = Logger.getLogger(VisageSourceTaskFactory.class.getName());
             static final String BEFORE_ADDING_REMOVING_TASKS = "beforeAddingRemovingTasks"; //NOI18N
             static final String FILEOBJECTS_COMPUTATION = "fileObjectsComputation"; //NOI18N
             
     private final Phase phase;
     private final Priority priority;
 
-    /**Construct the JavaFXSourceTaskFactory with given {@link Phase} and {@link Priority}.
+    /**Construct the VisageSourceTaskFactory with given {@link Phase} and {@link Priority}.
      *
      * @param phase phase to use for tasks created by {@link #createTask}
      * @param priority priority to use for tasks created by {@link #createTask}
      */
-    protected JavaFXSourceTaskFactory(Phase phase, Priority priority) {
+    protected VisageSourceTaskFactory(Phase phase, Priority priority) {
         this.phase = phase;
         this.priority = priority;
         this.file2Task = new HashMap<FileObject, CancellableTask<CompilationInfo>>();
-        this.file2JS = new HashMap<FileObject, JavaFXSource>();
+        this.file2JS = new HashMap<FileObject, VisageSource>();
     }
 
-    /**Create task for a given file. This task will be registered into the {@link JavaFXSource}
+    /**Create task for a given file. This task will be registered into the {@link VisageSource}
      * parsing harness with a given {@link #getPriority priority} and {@link #getPhase phase}.
      *
      * Please note that this method should run as quickly as possible.
@@ -106,7 +106,7 @@ public abstract class JavaFXSourceTaskFactory {
     protected abstract CancellableTask<CompilationInfo> createTask(FileObject file);
 
     /**Specifies on which files should be registered tasks created by this factory.
-     * On {@link JavaFXSource}'s corresponding to {@link FileObject}s returned from
+     * On {@link VisageSource}'s corresponding to {@link FileObject}s returned from
      * this method will be registered tasks created by the {@link #createTask} method
      * of this factory.
      *
@@ -117,8 +117,8 @@ public abstract class JavaFXSourceTaskFactory {
      * registered.
      * @see #createTask
      * @see #addChangeListener
-     * @see EditorAwareJavaFXSourceTaskFactory
-     * @see CaretAwareJavaFXSourceTaskFactory
+     * @see EditorAwareVisageSourceTaskFactory
+     * @see CaretAwareVisageSourceTaskFactory
      */
     protected abstract Collection<FileObject> getFileObjects();
 
@@ -146,8 +146,8 @@ public abstract class JavaFXSourceTaskFactory {
     static boolean SYNCHRONOUS_EVENTS = false;
 
     private void stateChangedImpl(List<FileObject> currentFiles) {
-        Map<JavaFXSource, CancellableTask<CompilationInfo>> toRemove = new HashMap<JavaFXSource, CancellableTask<CompilationInfo>>();
-        Map<JavaFXSource, CancellableTask<CompilationInfo>> toAdd = new HashMap<JavaFXSource, CancellableTask<CompilationInfo>>();
+        Map<VisageSource, CancellableTask<CompilationInfo>> toRemove = new HashMap<VisageSource, CancellableTask<CompilationInfo>>();
+        Map<VisageSource, CancellableTask<CompilationInfo>> toAdd = new HashMap<VisageSource, CancellableTask<CompilationInfo>>();
         
         synchronized (this) {
             List<FileObject> addedFiles = new ArrayList<FileObject>(currentFiles);
@@ -158,7 +158,7 @@ public abstract class JavaFXSourceTaskFactory {
             
             //remove old tasks:
             for (FileObject r : removedFiles) {
-                JavaFXSource source = file2JS.remove(r);
+                VisageSource source = file2JS.remove(r);
                 
                 if (source == null) {
                     //TODO: log
@@ -175,7 +175,7 @@ public abstract class JavaFXSourceTaskFactory {
                 if (!a.isValid()) {
                     continue;
                 }
-                JavaFXSource js = JavaFXSource.forFileObject(a);
+                VisageSource js = VisageSource.forFileObject(a);
                 
                 if (js != null) {
                     CancellableTask<CompilationInfo> task = createTask(a);
@@ -190,15 +190,15 @@ public abstract class JavaFXSourceTaskFactory {
         
         LOG.log(Level.FINEST, BEFORE_ADDING_REMOVING_TASKS);
         
-        for (Entry<JavaFXSource, CancellableTask<CompilationInfo>> e : toRemove.entrySet()) {
-            JavaFXTaskProcessor.removePhaseCompletionTask(e.getKey(), e.getValue());
+        for (Entry<VisageSource, CancellableTask<CompilationInfo>> e : toRemove.entrySet()) {
+            VisageTaskProcessor.removePhaseCompletionTask(e.getKey(), e.getValue());
         }
 
-        for (Entry<JavaFXSource, CancellableTask<CompilationInfo>> e : toAdd.entrySet()) {
+        for (Entry<VisageSource, CancellableTask<CompilationInfo>> e : toAdd.entrySet()) {
             try {
-                JavaFXTaskProcessor.addPhaseCompletionTask(e.getKey(), e.getValue(), phase, priority);
+                VisageTaskProcessor.addPhaseCompletionTask(e.getKey(), e.getValue(), phase, priority);
 //            } catch (FileObjects.InvalidFileException ie) {
-//                LOG.info("JavaFXSource.addPhaseCompletionTask called on deleted file");       //NOI18N
+//                LOG.info("VisageSource.addPhaseCompletionTask called on deleted file");       //NOI18N
             } catch (IOException ex) {
                 ErrorManager.getDefault().notify(ex);
             }
@@ -211,10 +211,10 @@ public abstract class JavaFXSourceTaskFactory {
      * @param file task created by this factory for this file is re-run.
      */
     protected final synchronized void reschedule(FileObject file) throws IllegalArgumentException {
-        JavaFXSource source = file2JS.get(file);
+        VisageSource source = file2JS.get(file);
 
         if (source == null) {
-//            throw new IllegalArgumentException("No JavaFXSource for given file.");
+//            throw new IllegalArgumentException("No VisageSource for given file.");
             return ;
 }
         
@@ -225,12 +225,12 @@ public abstract class JavaFXSourceTaskFactory {
             return ;
         }
 
-        JavaFXTaskProcessor.rescheduleTask(source, task);
+        VisageTaskProcessor.rescheduleTask(source, task);
     }
 
     private final Map<FileObject, CancellableTask<CompilationInfo>> file2Task;
-    private final Map<FileObject, JavaFXSource> file2JS;
+    private final Map<FileObject, VisageSource> file2JS;
 
-    private static RequestProcessor WORKER = new RequestProcessor("JavaFXSourceTaskFactory", 1); // NOI18N
+    private static RequestProcessor WORKER = new RequestProcessor("VisageSourceTaskFactory", 1); // NOI18N
     
 }

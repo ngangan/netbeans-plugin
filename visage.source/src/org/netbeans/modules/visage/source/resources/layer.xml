@@ -48,20 +48,20 @@ made subject to such option by the copyright holder.
     <folder name="Editors">
         <folder name="text">
             <folder name="x-fx">
-                <file name="JavaFXParserFactory.instance">
-                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory"/>
+                <file name="VisageParserFactory.instance">
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.visage.source.parsing.VisageParserFactory"/>
                 </file>
-                <file name="JavaFXIndexer.instance">
-                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.source.indexing.JavaFXIndexer$Factory"/>
+                <file name="VisageIndexer.instance">
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.visage.source.indexing.VisageIndexer$Factory"/>
                 </file>
             </folder>
         </folder>
     </folder>
     <folder name="TaskList">
         <folder name="Scanners">
-            <file name="JavaFXTaskListProvider.instance">
+            <file name="VisageTaskListProvider.instance">
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.tasklist.PushTaskScanner"/>
-                <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.source.tasklist.JavaFXErrorTaskListProvider.create"/>
+                <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.source.tasklist.VisageErrorTaskListProvider.create"/>
             </file>
         </folder>
     </folder>

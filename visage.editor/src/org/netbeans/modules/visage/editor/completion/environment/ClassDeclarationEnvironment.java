@@ -40,40 +40,40 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
 
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 import static javax.lang.model.element.ElementKind.*;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.EXTENDS_KEYWORD;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.EXTENDS_KEYWORD;
 
 
 /**
  *
  * @author David Strupl
  */
-public class ClassDeclarationEnvironment extends JavaFXCompletionEnvironment<JFXClassDeclaration> {
+public class ClassDeclarationEnvironment extends VisageCompletionEnvironment<VSGClassDeclaration> {
     
     private static final Logger logger = Logger.getLogger(ClassDeclarationEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXClassDeclaration cldecl) throws IOException {
-        if (LOGGABLE) log("inside JFXClassDeclaration " + cldecl); // NOI18N
+    protected void inside(VSGClassDeclaration cldecl) throws IOException {
+        if (LOGGABLE) log("inside VSGClassDeclaration " + cldecl); // NOI18N
         if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, cldecl);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(start);
         boolean afterLBrace = false;
         boolean afterExtends = false;

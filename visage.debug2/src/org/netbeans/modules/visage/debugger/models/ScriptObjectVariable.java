@@ -3,10 +3,10 @@
  * and open the template in the editor.
  */
 
-package org.netbeans.modules.javafx.debugger.models;
+package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.javafx.jdi.FXClassType;
-import com.sun.javafx.jdi.FXObjectReference;
+import com.sun.visage.jdi.FXClassType;
+import com.sun.visage.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
@@ -26,7 +26,7 @@ import org.netbeans.modules.debugger.jpda.jdi.TypeComponentWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
-import org.netbeans.modules.javafx.debugger.utils.Utils;
+import org.netbeans.modules.visage.debugger.utils.Utils;
 
 /**
  *

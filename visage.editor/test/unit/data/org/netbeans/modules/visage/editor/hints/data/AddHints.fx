@@ -1,4 +1,4 @@
-package javafxapplication22;
+package visageapplication22;
 
 CustomNode{
     override protected function create () : Node {

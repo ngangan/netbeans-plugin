@@ -51,7 +51,7 @@ made subject to such option by the copyright holder.
     <testbag testattribs="samples, weather, all, stable" name="Weather">
         <testset dir="qa-functional/src">
             <patternset>
-                <include name="org/netbeans/test/javafx/weather2/sample/Weather.class"/>
+                <include name="org/netbeans/test/visage/weather2/sample/Weather.class"/>
             </patternset>
         </testset>
     </testbag>

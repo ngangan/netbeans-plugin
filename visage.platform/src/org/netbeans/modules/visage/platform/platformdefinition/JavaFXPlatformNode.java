@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.text.MessageFormat;
 import org.openide.nodes.AbstractNode;
@@ -50,16 +50,16 @@ import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
-class JavaFXPlatformNode extends AbstractNode {
+class VisagePlatformNode extends AbstractNode {
 
-    private JavaFXPlatformImpl platform;
+    private VisagePlatformImpl platform;
     private String toolTip;
     private boolean broken;
 
-    public JavaFXPlatformNode (JavaFXPlatformImpl platform, DataObject definition) {
+    public VisagePlatformNode (VisagePlatformImpl platform, DataObject definition) {
         super (Children.LEAF, Lookups.fixed(new Object[] {platform, definition}));
         this.platform = platform;
-        super.setIconBaseWithExtension("org/netbeans/modules/javafx/platform/resources/platform.gif"); // NOI18N
+        super.setIconBaseWithExtension("org/netbeans/modules/visage/platform/resources/platform.gif"); // NOI18N
     }
 
     public String getDisplayName () {
@@ -90,7 +90,7 @@ class JavaFXPlatformNode extends AbstractNode {
     public synchronized String getShortDescription() {
         if (this.toolTip == null) {
             this.toolTip = MessageFormat.format (
-            NbBundle.getMessage(JavaFXPlatformNode.class,"TXT_JavaFXPlatformToolTip"), // NOI18N
+            NbBundle.getMessage(VisagePlatformNode.class,"TXT_VisagePlatformToolTip"), // NOI18N
             new Object[] {
                 this.platform.getSpecification().getVersion()
             });
@@ -107,7 +107,7 @@ class JavaFXPlatformNode extends AbstractNode {
             return new BrokenPlatformCustomizer (this.platform);
         }
         else {
-            return new JavaFXPlatformCustomizer (this.platform);
+            return new VisagePlatformCustomizer (this.platform);
         }
     }
 

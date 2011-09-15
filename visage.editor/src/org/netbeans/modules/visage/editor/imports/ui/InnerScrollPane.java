@@ -29,7 +29,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.imports.ui;
+package org.netbeans.modules.visage.editor.imports.ui;
 
 import org.netbeans.editor.BaseKit;
 import org.netbeans.editor.ext.ExtKit;

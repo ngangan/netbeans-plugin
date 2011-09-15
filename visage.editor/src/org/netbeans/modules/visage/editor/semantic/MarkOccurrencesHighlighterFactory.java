@@ -41,20 +41,20 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.CaretAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.support.CaretAwareVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author Jan Lahoda
  */
-public class MarkOccurrencesHighlighterFactory extends CaretAwareJavaFXSourceTaskFactory {
+public class MarkOccurrencesHighlighterFactory extends CaretAwareVisageSourceTaskFactory {
 
     public MarkOccurrencesHighlighterFactory() {
         super(Phase.ANALYZED, Priority.LOW, "*"); // NOI18N

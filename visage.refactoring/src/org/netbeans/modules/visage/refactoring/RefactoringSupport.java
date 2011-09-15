@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring;
+package org.netbeans.modules.visage.refactoring;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -55,12 +55,12 @@ import org.netbeans.api.java.source.CompilationInfo;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModelFactory;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.GlobalDef;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.modules.visage.refactoring.repository.ClassModelFactory;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.GlobalDef;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.openide.filesystems.FileObject;
 

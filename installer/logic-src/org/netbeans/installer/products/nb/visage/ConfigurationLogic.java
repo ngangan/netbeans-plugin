@@ -37,7 +37,7 @@
  * copyright holder.
  */
 
-package org.netbeans.installer.products.nb.javafx;
+package org.netbeans.installer.products.nb.visage;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,11 +57,11 @@ public class ConfigurationLogic extends NbClusterConfigurationLogic {
     /////////////////////////////////////////////////////////////////////////////////
     // Constants
     private static final String JAVAFX_CLUSTER = 
-            "{javafx-cluster}"; // NOI18N
+            "{visage-cluster}"; // NOI18N
     private static final String ID = 
             "FX"; // NOI18N
     private static final String EULA_ACCEPTED_MARKER =
-            ".javafx_eula_accepted";
+            ".visage_eula_accepted";
     /////////////////////////////////////////////////////////////////////////////////
     // Instance
     public ConfigurationLogic() throws InitializationException {

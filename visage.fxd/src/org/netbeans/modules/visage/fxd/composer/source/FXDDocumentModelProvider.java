@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.source;
+package org.netbeans.modules.visage.fxd.composer.source;
        
-import com.sun.javafx.tools.fxd.FXDReference;
-import com.sun.javafx.tools.fxd.container.scene.fxd.ContentHandler;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDParser;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
+import com.sun.visage.tools.fxd.FXDReference;
+import com.sun.visage.tools.fxd.container.scene.fxd.ContentHandler;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDException;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDParser;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,14 +70,14 @@ import org.netbeans.modules.editor.structure.api.DocumentModel.DocumentModelTran
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.spi.DocumentModelProvider;
 
-import org.netbeans.modules.javafx.fxd.composer.misc.CharSeqReader;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.composer.misc.CharSeqReader;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.netbeans.modules.javafx.fxd.composer.editor.SyntaxErrorsHighlightingTask;
+import org.netbeans.modules.visage.fxd.composer.editor.SyntaxErrorsHighlightingTask;
 
 /**
  *

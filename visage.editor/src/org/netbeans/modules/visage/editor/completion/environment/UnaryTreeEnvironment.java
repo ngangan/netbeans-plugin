@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.UnaryTree;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.visage.api.tree.UnaryTree;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class UnaryTreeEnvironment extends JavaFXCompletionEnvironment<UnaryTree> {
+public class UnaryTreeEnvironment extends VisageCompletionEnvironment<UnaryTree> {
     
     private static final Logger logger = Logger.getLogger(UnaryTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);

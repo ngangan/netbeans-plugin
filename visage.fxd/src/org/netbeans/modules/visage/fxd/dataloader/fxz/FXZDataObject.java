@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader.fxz;
+package org.netbeans.modules.visage.fxd.dataloader.fxz;
 
-import com.sun.javafx.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -61,11 +61,11 @@ import org.netbeans.core.api.multiview.MultiViewHandler;
 import org.netbeans.core.api.multiview.MultiViewPerspective;
 import org.netbeans.core.api.multiview.MultiViews;
 import org.netbeans.core.spi.multiview.MultiViewElementCallback;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerController;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDComposerModel;
-import org.netbeans.modules.javafx.fxd.composer.navigator.FXDNavigatorContent;
-import org.netbeans.modules.javafx.fxd.composer.preview.PreviewTopComponent;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.FXDComposerController;
+import org.netbeans.modules.visage.fxd.composer.model.FXDComposerModel;
+import org.netbeans.modules.visage.fxd.composer.navigator.FXDNavigatorContent;
+import org.netbeans.modules.visage.fxd.composer.preview.PreviewTopComponent;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.cookies.EditCookie;

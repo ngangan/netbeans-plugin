@@ -42,16 +42,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins.elements;
+package org.netbeans.modules.visage.refactoring.impl.plugins.elements;
 
 import java.util.Set;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.ImportEntry;
-import org.netbeans.modules.javafx.refactoring.repository.ImportSet;
-import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.ImportEntry;
+import org.netbeans.modules.visage.refactoring.repository.ImportSet;
+import org.netbeans.modules.visage.refactoring.transformations.InsertTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.RemoveTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.RefactoringSession;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;

@@ -47,13 +47,13 @@ made subject to such option by the copyright holder.
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:p="http://www.netbeans.org/ns/project/1"
                 xmlns:xalan="http://xml.apache.org/xslt"
-                xmlns:javafxproject1="http://www.netbeans.org/ns/javafx-project/1"
-                xmlns:javafxproject2="http://www.netbeans.org/ns/javafx-project/2"
-                xmlns:javafxproject3="http://www.netbeans.org/ns/javafx-project/3"
+                xmlns:visageproject1="http://www.netbeans.org/ns/visage-project/1"
+                xmlns:visageproject2="http://www.netbeans.org/ns/visage-project/2"
+                xmlns:visageproject3="http://www.netbeans.org/ns/visage-project/3"
                 xmlns:projdeps="http://www.netbeans.org/ns/ant-project-references/1"
                 xmlns:projdeps2="http://www.netbeans.org/ns/ant-project-references/2"
                 exclude-result-prefixes="xalan p projdeps projdeps2">
-<xsl:comment> XXX should use namespaces for NB in-VM tasks from ant/browsetask and debuggerjavafx/ant (Ant 1.6.1 and higher only)</xsl:comment>
+<xsl:comment> XXX should use namespaces for NB in-VM tasks from ant/browsetask and debuggervisage/ant (Ant 1.6.1 and higher only)</xsl:comment>
     <xsl:output method="xml" indent="yes" encoding="UTF-8" xalan:indent-amount="4" cdata-section-elements="script"/>
     <xsl:template match="/">
         
@@ -78,7 +78,7 @@ is divided into following sections:
 
         ]]></xsl:comment>
         
-        <xsl:variable name="name" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:name"/>
+        <xsl:variable name="name" select="/p:project/p:configuration/visageproject3:data/visageproject3:name"/>
     <!-- Synch with build-impl.xsl: -->
         <xsl:variable name="codename" select="translate($name, ' ', '_')"/>
         <project name="{$codename}-impl">
@@ -100,7 +100,7 @@ is divided into following sections:
         <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
         </target>
         <target depends="-pre-init" name="-init-private">
-            <macrodef name="property" uri="http://www.netbeans.org/ns/javafx-project/1">
+            <macrodef name="property" uri="http://www.netbeans.org/ns/visage-project/1">
                 <attribute name="name"/>
                 <attribute name="value"/>
                 <sequential>
@@ -119,8 +119,8 @@ is divided into following sections:
             <property file="nbproject/project.properties"/>
         </target>
         <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
-            <javafxproject1:property name="platform.fxhome" value="platforms.${{platform.active}}.fxhome"/>
-            <javafxproject1:property name="platform.javadoc.tmp" value="platforms.${{platform.active}}.javadoc"/>
+            <visageproject1:property name="platform.fxhome" value="platforms.${{platform.active}}.fxhome"/>
+            <visageproject1:property name="platform.javadoc.tmp" value="platforms.${{platform.active}}.javadoc"/>
             <condition property="platform.javadoc" value="${{platform.home}}/bin/javadoc">
                 <equals arg1="${{platform.javadoc.tmp}}" arg2="$${{platforms.${{platform.active}}.javadoc}}"/>
             </condition>
@@ -173,22 +173,22 @@ is divided into following sections:
             <condition property="java.home.key" value="JAVA_HOME" else="NOTHING_IMPORTANT">
                 <isset property="java.home.value"/>
             </condition>
-            <property name="javafx.profile" value="desktop"/>
+            <property name="visage.profile" value="desktop"/>
             <condition property="midp.execution.trigger">
-                <equals arg1="${{javafx.profile}}" arg2="mobile"/>
+                <equals arg1="${{visage.profile}}" arg2="mobile"/>
             </condition>
             <condition property="tv.execution.trigger">
-                <equals arg1="${{javafx.profile}}" arg2="tv"/>
+                <equals arg1="${{visage.profile}}" arg2="tv"/>
             </condition>
             <condition property="jnlp.execution.trigger">
                 <and>
-                    <equals arg1="${{javafx.profile}}" arg2="desktop"/>
+                    <equals arg1="${{visage.profile}}" arg2="desktop"/>
                     <equals arg1="${{execution.target}}" arg2="jnlp"/>
                 </and>    
             </condition>
             <condition property="applet.execution.trigger">
                 <and>
-                    <equals arg1="${{javafx.profile}}" arg2="desktop"/>
+                    <equals arg1="${{visage.profile}}" arg2="desktop"/>
                     <equals arg1="${{execution.target}}" arg2="applet"/>
                     <isset property="netbeans.home"/>
                 </and>    
@@ -239,12 +239,12 @@ is divided into following sections:
         <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
         </target>
         <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-            <exec executable="${{platform.fxhome}}/bin/javafxpackager${{binary.extension}}" failonerror="true" logerror="true">
+            <exec executable="${{platform.fxhome}}/bin/visagepackager${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="-src"/>
                 <arg>
                     <xsl:attribute name="value">
                         <xsl:call-template name="createPath">
-                            <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                            <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
                         </xsl:call-template>
                     </xsl:attribute>
                 </arg>
@@ -266,7 +266,7 @@ is divided into following sections:
                 <arg value="-encoding"/>
                 <arg value="${{source.encoding}}"/>
                 <arg value="-p"/>
-                <arg value="${{javafx.profile}}"/>
+                <arg value="${{visage.profile}}"/>
                 <arg value="${{verbose.arg}}"/>
                 <arg value="${{draggable.arg}}"/>
                 <arg value="${{pack200.arg}}"/>
@@ -297,7 +297,7 @@ is divided into following sections:
     </xsl:comment>
         <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
             <property name="application.args" value=""/>
-            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true">
+            <java fork="true" jvm="${{platform.fxhome}}/bin/visage${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true">
                 <arg line="${{application.args}}"/>
             </java>
         </target>
@@ -317,7 +317,7 @@ is divided into following sections:
         <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true" logerror="true">
+            <exec executable="${{platform.fxhome}}/bin/visage${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="-profile"/>
                 <arg value="tv"/>
                 <arg value="-classpath"/>
@@ -349,7 +349,7 @@ is divided into following sections:
                     =================
     </xsl:comment>
         <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger">
-            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" connector="com.sun.javafx.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
+            <nbjpdastart addressproperty="visage.address" name="${{application.title}}" connector="com.sun.visage.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
@@ -357,7 +357,7 @@ is divided into following sections:
                     <path>
                       <xsl:attribute name="path">
                           <xsl:call-template name="createPath">
-                              <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                              <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
                           </xsl:call-template>
                       </xsl:attribute>
                     </path>
@@ -365,7 +365,7 @@ is divided into following sections:
             </nbjpdastart>
         </target>
         <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger-stepinto">
-            <nbjpdastart addressproperty="javafx.address" name="${{application.title}}" stopclassname="${{main.class}}" connector="com.sun.javafx.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
+            <nbjpdastart addressproperty="visage.address" name="${{application.title}}" stopclassname="${{main.class}}" connector="com.sun.visage.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
                 <classpath>
                     <path path="${{javac.classpath}}"/>
                 </classpath>
@@ -373,7 +373,7 @@ is divided into following sections:
                     <path>
                       <xsl:attribute name="path">
                           <xsl:call-template name="createPath">
-                              <xsl:with-param name="roots" select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots"/>
+                              <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
                           </xsl:call-template>
                       </xsl:attribute>
                     </path>
@@ -382,8 +382,8 @@ is divided into following sections:
         </target>
         <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
             <property name="application.args" value=""/>
-            <java fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}">
-                <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}}"/>
+            <java fork="true" jvm="${{platform.fxhome}}/bin/visage${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}">
+                <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{visage.address}}"/>
                 <jvmarg line="${{run.jvmargs}}"/>
                 <syspropertyset>
                     <propertyref prefix="run-sys-prop."/>
@@ -402,7 +402,7 @@ is divided into following sections:
                 importClass(java.net.Socket);
                 socket = new Socket();
                 socket.bind(null);
-                project.setNewProperty("javafx.address", socket.getLocalPort());
+                project.setNewProperty("visage.address", socket.getLocalPort());
                 socket.close();
             ]]></script>
             <parallel failonany="true">
@@ -410,11 +410,11 @@ is divided into following sections:
                     <arg value="${{run.jvmargs}}"/>
                     <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
                     <arg value="-Xdebug"/>
-                    <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=y,suspend=y"/>
+                    <arg value="-Xrunjdwp:transport=dt_socket,address=${{visage.address}},server=y,suspend=y"/>
                 </exec>
                 <sequential>
                     <sleep seconds="6"/>
-                    <nbjpdaconnect address="${{javafx.address}}" name="${{application.title}}" transport="dt_socket">
+                    <nbjpdaconnect address="${{visage.address}}" name="${{application.title}}" transport="dt_socket">
                         <classpath>
                             <path path="${{javac.classpath}}"/>
                         </classpath>
@@ -428,9 +428,9 @@ is divided into following sections:
         <target name="-debug-tv-debuggee" if="tv.execution.trigger">
             <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
             <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/bin/javafx${{binary.extension}}" failonerror="true" logerror="true">
+            <exec executable="${{platform.fxhome}}/bin/visage${{binary.extension}}" failonerror="true" logerror="true">
                 <arg value="-Xdebug"/>
-                <arg value="-Xrunjdwp:transport=dt_socket,address=${{javafx.address}},server=n"/>
+                <arg value="-Xrunjdwp:transport=dt_socket,address=${{visage.address}},server=n"/>
                 <arg value="-profile"/>
                 <arg value="tv"/>
                 <arg value="-classpath"/>
@@ -444,7 +444,7 @@ is divided into following sections:
                 <os family="mac"/>
             </condition>
             <exec executable="${{javaws.home}}/bin/javaws" failonerror="true" logerror="true">
-                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{javafx.address}} ${{run.jvmargs}}"/>
+                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{visage.address}} ${{run.jvmargs}}"/>
                 <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
             </exec>
         </target>
@@ -457,8 +457,8 @@ is divided into following sections:
     </xsl:comment>
         <target depends="jar" name="-javadoc-build">
             <mkdir dir="${{dist.javadoc.dir}}"/>
-            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}:${{build.dir}}/compiled" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/javafxdoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true"  encoding="${{source.encoding}}">
-                <xsl:for-each select="/p:project/p:configuration/javafxproject3:data/javafxproject3:source-roots/javafxproject3:root">
+            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}:${{build.dir}}/compiled" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/visagedoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true"  encoding="${{source.encoding}}">
+                <xsl:for-each select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots/visageproject3:root">
                     <fileset includes="**/*.fx">
                         <xsl:attribute name="dir">
                           <xsl:text>${</xsl:text>
@@ -564,7 +564,7 @@ is divided into following sections:
 
     <xsl:template name="createPath">
         <xsl:param name="roots"/>
-        <xsl:for-each select="$roots/javafxproject3:root">
+        <xsl:for-each select="$roots/visageproject3:root">
             <xsl:if test="position() != 1">
                 <xsl:text>;</xsl:text>
             </xsl:if>

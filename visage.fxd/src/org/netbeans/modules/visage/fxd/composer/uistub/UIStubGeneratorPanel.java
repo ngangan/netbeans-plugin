@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.uistub;
+package org.netbeans.modules.visage.fxd.composer.uistub;
 
-import com.sun.javafx.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.awt.Color;
 import java.io.File;
 import java.util.HashMap;

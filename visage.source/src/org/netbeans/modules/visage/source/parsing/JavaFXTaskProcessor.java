@@ -40,38 +40,38 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.impl.Utilities;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 
-public final class JavaFXTaskProcessor {
+public final class VisageTaskProcessor {
 
     private static Map<CancellableTask<CompilationInfo>,ParserResultTask<?>> tasks =
             new HashMap<CancellableTask<CompilationInfo>,ParserResultTask<?>>();
 
-    public static void addPhaseCompletionTask(JavaFXSource javaFXSource, CancellableTask<CompilationInfo> task,
-            JavaFXSource.Phase phase, JavaFXSource.Priority priority) throws IOException
+    public static void addPhaseCompletionTask(VisageSource javaFXSource, CancellableTask<CompilationInfo> task,
+            VisageSource.Phase phase, VisageSource.Priority priority) throws IOException
     {
         final Collection<Source> sources = javaFXSource.sources();
         assert sources.size() == 1;
         int pp = translatePriority(priority);
         assert !tasks.keySet().contains(task);
-        final ParserResultTask<?> cTask = new JavaFXSourceCancelableTask(javaFXSource, task, phase.toCompilationPhase(), pp);
+        final ParserResultTask<?> cTask = new VisageSourceCancelableTask(javaFXSource, task, phase.toCompilationPhase(), pp);
         tasks.put(task, cTask);
         Utilities.addParserResultTask(cTask, sources.iterator().next());
 
     }
 
-    public static void removePhaseCompletionTask(JavaFXSource javaFXSource, CancellableTask<CompilationInfo> task) {
+    public static void removePhaseCompletionTask(VisageSource javaFXSource, CancellableTask<CompilationInfo> task) {
         final Collection<Source> sources = javaFXSource.sources();
         assert sources.size() == 1;
         final ParserResultTask<?> cTask = tasks.remove(task);
@@ -79,7 +79,7 @@ public final class JavaFXTaskProcessor {
         Utilities.removeParserResultTask(cTask, sources.iterator().next());
     }
 
-    public static void rescheduleTask (JavaFXSource javaFXSource, CancellableTask<CompilationInfo> task) {
+    public static void rescheduleTask (VisageSource javaFXSource, CancellableTask<CompilationInfo> task) {
         final Collection<Source> sources = javaFXSource.sources();
         assert sources.size() == 1;
         final ParserResultTask<?> cTask = tasks.get(task);
@@ -87,13 +87,13 @@ public final class JavaFXTaskProcessor {
             Utilities.rescheduleTask(cTask, sources.iterator().next());
     }
 
-    private static int translatePriority (JavaFXSource.Priority priority) {
+    private static int translatePriority (VisageSource.Priority priority) {
         assert priority != null;
         int tmp;
-        if (priority == JavaFXSource.Priority.MAX) {
+        if (priority == VisageSource.Priority.MAX) {
             tmp = 0;
         }
-        else if (priority == JavaFXSource.Priority.MIN) {
+        else if (priority == VisageSource.Priority.MIN) {
             tmp = Integer.MAX_VALUE;
         }
         else {

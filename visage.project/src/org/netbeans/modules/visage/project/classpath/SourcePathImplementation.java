@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.beans.PropertyChangeEvent;
 import java.io.File;
@@ -57,7 +57,7 @@ import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.spi.java.classpath.ClassPathImplementation;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.java.classpath.FilteringPathResourceImplementation;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.PathMatcher;
@@ -117,8 +117,8 @@ final class SourcePathImplementation implements ClassPathImplementation, Propert
                         public boolean includes(URL root, String resource) {
                             if (matcher == null) {
                                 matcher = new PathMatcher(
-                                        evaluator.getProperty(JavaFXProjectProperties.INCLUDES),
-                                        evaluator.getProperty(JavaFXProjectProperties.EXCLUDES),
+                                        evaluator.getProperty(VisageProjectProperties.INCLUDES),
+                                        evaluator.getProperty(VisageProjectProperties.EXCLUDES),
                                         new File(URI.create(root.toExternalForm())));
                             }
                             return matcher.matches(resource, true);
@@ -134,7 +134,7 @@ final class SourcePathImplementation implements ClassPathImplementation, Propert
                         }
                         public void propertyChange(PropertyChangeEvent ev) {
                             String prop = ev.getPropertyName();
-                            if (prop == null || prop.equals(JavaFXProjectProperties.INCLUDES) || prop.equals(JavaFXProjectProperties.EXCLUDES)) {
+                            if (prop == null || prop.equals(VisageProjectProperties.INCLUDES) || prop.equals(VisageProjectProperties.EXCLUDES)) {
                                 matcher = null;
                                 PropertyChangeEvent ev2 = new PropertyChangeEvent(this, FilteringPathResourceImplementation.PROP_INCLUDES, null, null);
                                 ev2.setPropagationId(ev);

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.queries;
+package org.netbeans.modules.visage.project.queries;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,10 +53,10 @@ import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
-import org.netbeans.modules.javafx.project.JavaFXProjectType;
-import org.netbeans.modules.javafx.project.MockLookup;
-import org.netbeans.modules.javafx.project.TestUtil;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
+import org.netbeans.modules.visage.project.VisageProjectType;
+import org.netbeans.modules.visage.project.MockLookup;
+import org.netbeans.modules.visage.project.TestUtil;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.openide.filesystems.FileObject;
@@ -92,7 +92,7 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
         super.setUp();
         clearWorkDir();
         TestUtil.setLookup(new Object[] {
-            new org.netbeans.modules.javafx.project.JavaFXProjectType(),
+            new org.netbeans.modules.visage.project.VisageProjectType(),
             new org.netbeans.modules.java.project.ProjectSourceForBinaryQuery(),
             new org.netbeans.modules.projectapi.SimpleFileOwnerQueryImplementation(),
         });
@@ -113,9 +113,9 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
         scratchF.mkdir();
         scratch = FileUtil.toFileObject(scratchF);
         projdir = scratch.createFolder("proj");
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null);
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);   //NOI18N
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        helper = null; // FIXME (not compilable): VisageProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null);
+        VisageProjectGenerator.setDefaultSourceLevel(null);   //NOI18N
         pm = ProjectManager.getDefault();
         pp = pm.findProject(projdir);
         sources = projdir.getFileObject("src");
@@ -187,11 +187,11 @@ public class CompiledSourceForBinaryQueryTest extends NbTestCase {
     private static FileObject addSourceRoot (AntProjectHelper helper, FileObject projdir,
                                             String propName, String folderName) throws Exception {
         Element data = helper.getPrimaryConfigurationData(true);
-        NodeList nl = data.getElementsByTagNameNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");
+        NodeList nl = data.getElementsByTagNameNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");
         assert nl.getLength() == 1;
         Element roots = (Element) nl.item(0);
         Document doc = roots.getOwnerDocument();
-        Element root = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");
+        Element root = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");
         root.setAttribute("id", propName);
         roots.appendChild (root);
         helper.putPrimaryConfigurationData (data,true);

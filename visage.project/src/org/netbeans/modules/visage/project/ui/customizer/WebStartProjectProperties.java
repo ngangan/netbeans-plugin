@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,8 +57,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.api.JavaFXProjectConfigurations;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.api.VisageProjectConfigurations;
 import org.netbeans.spi.project.ProjectConfiguration;
 import org.netbeans.spi.project.ProjectConfigurationProvider;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -99,7 +99,7 @@ public class WebStartProjectProperties {
     public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value"; // NOI18N
     private StoreGroup jnlpPropGroup = new StoreGroup();
     private PropertyEvaluator evaluator;
-    private JavaFXProject javafxProject;
+    private VisageProject visageProject;
     // Models
     ButtonModel allowOfflineModel;
     ButtonModel signedModel;
@@ -112,17 +112,17 @@ public class WebStartProjectProperties {
     Document codebaseURLDocument;
 
     /** Creates a new instance of JWSProjectProperties */
-    public WebStartProjectProperties(JavaFXProject project, PropertyEvaluator evaluator) {
-        javafxProject = project;
+    public WebStartProjectProperties(VisageProject project, PropertyEvaluator evaluator) {
+        visageProject = project;
         this.evaluator = evaluator;
         /*
-        javafxProject = context.lookup(org.netbeans.api.project.Project.class);
-        if (javafxProject != null) {
-        javafxPropEval = javafxProject.getLookup().lookup(org.netbeans.modules.javafx.project.api.JavaFXPropertyEvaluator.class);
+        visageProject = context.lookup(org.netbeans.api.project.Project.class);
+        if (visageProject != null) {
+        visagePropEval = visageProject.getLookup().lookup(org.netbeans.modules.visage.project.api.VisagePropertyEvaluator.class);
         } else {
         // XXX
         }
-        evaluator = javafxPropEval.evaluator();
+        evaluator = visagePropEval.evaluator();
          */
         allowOfflineModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_OFFLINE);
         signedModel = jnlpPropGroup.createToggleButtonModel(evaluator, JNLP_SIGNED);
@@ -166,7 +166,7 @@ public class WebStartProjectProperties {
     public void store() throws IOException {
 
         final EditableProperties ep = new EditableProperties(true);
-        final FileObject projPropsFO = javafxProject.getProjectDirectory().getFileObject("nbproject/project.properties"); // NOI18N
+        final FileObject projPropsFO = visageProject.getProjectDirectory().getFileObject("nbproject/project.properties"); // NOI18N
 
         try {
             final InputStream is = projPropsFO.getInputStream();
@@ -241,7 +241,7 @@ public class WebStartProjectProperties {
     }
 
     public String getProjectDistDir() {
-        File distDir = new File(FileUtil.toFile(javafxProject.getProjectDirectory()), evaluator.getProperty("dist.dir")); // NOI18N
+        File distDir = new File(FileUtil.toFile(visageProject.getProjectDirectory()), evaluator.getProperty("dist.dir")); // NOI18N
         return distDir.toURI().toString();
     }
 
@@ -254,12 +254,12 @@ public class WebStartProjectProperties {
 //        if (enabled) {
 //            // XXX logging
 //            // test if the file already exists, if so do not z tigenerate, just set as active
-//            JavaFXProjectConfigurations.createConfigurationFiles(javafxProject, "JWS_generated", prepareSharedProps(), null); // NOI18N
-//            setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
-////            copyTemplate(javafxProject);
-////            modifyBuildXml(javafxProject);
+//            VisageProjectConfigurations.createConfigurationFiles(visageProject, "JWS_generated", prepareSharedProps(), null); // NOI18N
+//            setActiveConfig(configProvider, NbBundle.getBundle(VisageCompositePanelProvider.class).getString("LBL_Category_WebStart"));
+////            copyTemplate(visageProject);
+////            modifyBuildXml(visageProject);
 //        } else {
-//            setActiveConfig(configProvider, NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_Default"));
+//            setActiveConfig(configProvider, NbBundle.getBundle(VisageCompositePanelProvider.class).getString("LBL_Category_Default"));
 //        }
 //        CustomizerWebStart.runComponent.setCheckboxEnabled(true);
 //        CustomizerWebStart.runComponent.setHintVisible(true);
@@ -289,7 +289,7 @@ public class WebStartProjectProperties {
 //        FileObject jnlpBuildFile = projDir.getFileObject("nbproject/jnlp-impl.xml"); // NOI18N
 //        if (jnlpBuildFile == null) {
 //            FileSystem sfs = Repository.getDefault().getDefaultFileSystem();
-//            FileObject templateFO = sfs.findResource("Templates/Project/JavaFX/jnlp-impl.xml"); // NOI18N
+//            FileObject templateFO = sfs.findResource("Templates/Project/Visage/jnlp-impl.xml"); // NOI18N
 //            if (templateFO != null) {
 //                FileUtil.copyFile(templateFO, projDir.getFileObject("nbproject"), "jnlp-impl"); // NOI18N
 //            }
@@ -317,7 +317,7 @@ public class WebStartProjectProperties {
 //            }
 //            ProjectManager.getDefault().saveProject(proj);
 //        } else {
-//            Logger.getLogger(JavaFXCompositePanelProvider.class.getName()).log(Level.INFO, "Trying to include JWS build snippet in project type that doesn't support AntBuildExtender API contract."); // NOI18N
+//            Logger.getLogger(VisageCompositePanelProvider.class.getName()).log(Level.INFO, "Trying to include JWS build snippet in project type that doesn't support AntBuildExtender API contract."); // NOI18N
 //        }
 //
 //        //TODO this piece shall not proceed when the upgrade to j2se-project/4 was cancelled.
@@ -390,7 +390,7 @@ public class WebStartProjectProperties {
 
 //    private Properties prepareSharedProps() {
 //        Properties props = new Properties();
-//        props.setProperty("$label", NbBundle.getBundle(JavaFXCompositePanelProvider.class).getString("LBL_Category_WebStart"));
+//        props.setProperty("$label", NbBundle.getBundle(VisageCompositePanelProvider.class).getString("LBL_Category_WebStart"));
 //        if (CustomizerWebStart.runComponent.isRunCheckBoxSelected()) {
 //            props.setProperty("$target.run", "jws-run"); // NOI18N
 //            props.setProperty("$target.debug", "jws-debug"); // NOI18N

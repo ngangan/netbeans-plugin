@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,7 +62,7 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ant.AntArtifact;
 import org.netbeans.junit.MockServices;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.ant.AntArtifactProvider;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -111,9 +111,9 @@ public final class BuildImplTest extends NbTestCase {
         if (subFolder != null) {
             proj = new File(getWorkDir(), subFolder);
         }
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        AntProjectHelper aph = JavaFXProjectGenerator.createProject(proj, subFolder != null ? subFolder + getName() : getName(), (String)null, (String)null);
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        AntProjectHelper aph = VisageProjectGenerator.createProject(proj, subFolder != null ? subFolder + getName() : getName(), (String)null, (String)null);
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         FileObject root = aph.getProjectDirectory();
         for (int i=0; i<numberOfSourceFiles; i++) {
             generateJava(root, "src/pkg/Source" + i + ".java", false);
@@ -290,8 +290,8 @@ public final class BuildImplTest extends NbTestCase {
 //    public void testIncludesExcludes() throws Exception {
 //        AntProjectHelper aph = setupProject(12, true);
 //        EditableProperties ep = aph.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-//        ep.setProperty(JavaFXProjectProperties.INCLUDES, "**/*1*");
-//        ep.setProperty(JavaFXProjectProperties.EXCLUDES, "**/*0*");
+//        ep.setProperty(VisageProjectProperties.INCLUDES, "**/*1*");
+//        ep.setProperty(VisageProjectProperties.EXCLUDES, "**/*0*");
 //        aph.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
 //        ProjectManager.getDefault().saveAllProjects();
 //        FileObject dir = aph.getProjectDirectory();
@@ -556,7 +556,7 @@ public final class BuildImplTest extends NbTestCase {
         AntProjectHelper aph2 = setupProject("p2", 1, false);
         Project proj1 = ProjectManager.getDefault().findProject(aph1.getProjectDirectory());
         Project proj2 = ProjectManager.getDefault().findProject(aph2.getProjectDirectory());
-        ReferenceHelper refHelper = ((JavaFXProject)proj1).getReferenceHelper();
+        ReferenceHelper refHelper = ((VisageProject)proj1).getReferenceHelper();
         AntArtifactProvider aap = proj2.getLookup().lookup(AntArtifactProvider.class);
         AntArtifact[] aa = aap.getBuildArtifacts();
         assertTrue("Project should have an artifact", aa.length > 0);

@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.sdksamples;
+package org.netbeans.modules.visage.sdksamples;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.StandardLocation;
-import org.netbeans.modules.javafx.sdksamples.api.JavaFXSamples;
+import org.netbeans.modules.visage.sdksamples.api.VisageSamples;
 import org.openide.filesystems.annotations.LayerBuilder;
 import org.openide.filesystems.annotations.LayerGeneratingProcessor;
 import org.openide.filesystems.annotations.LayerGenerationException;
@@ -65,7 +65,7 @@ import org.openide.util.lookup.ServiceProvider;
  * folders and generates layer file containing all the samples found.
  */
 @ServiceProvider(service=Processor.class)
-@SupportedAnnotationTypes("org.netbeans.modules.javafx.sdksamples.api.JavaFXSamples")
+@SupportedAnnotationTypes("org.netbeans.modules.visage.sdksamples.api.VisageSamples")
 @SupportedSourceVersion(SourceVersion.RELEASE_5)
 public class SDKSamplesProcessor extends LayerGeneratingProcessor {
 
@@ -73,10 +73,10 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
     protected boolean handleProcess(Set<? extends TypeElement> set, RoundEnvironment re) throws LayerGenerationException {
         if (re.processingOver()) return false;
 
-        for (Element e : re.getElementsAnnotatedWith(JavaFXSamples.class)) {
-            JavaFXSamples samples = e.getAnnotation(JavaFXSamples.class);
+        for (Element e : re.getElementsAnnotatedWith(VisageSamples.class)) {
+            VisageSamples samples = e.getAnnotation(VisageSamples.class);
 
-            LayerBuilder.File wizzard = layer(e).folder("Templates/Project/Samples/JavaFX");
+            LayerBuilder.File wizzard = layer(e).folder("Templates/Project/Samples/Visage");
             File sdkRoot = null;
 
             URI uri = null;
@@ -115,15 +115,15 @@ public class SDKSamplesProcessor extends LayerGeneratingProcessor {
 
                 if( descriptionFile.canRead()) {
                     LayerBuilder.File desc = layer(e).file("SDKSamples/" + sampleName + "/description.html"); // NOI18N
-                    desc.url("nbinst://javafx/javafx-sdk/samples/" + sampleName + "/comment.html");
+                    desc.url("nbinst://visage/visage-sdk/samples/" + sampleName + "/comment.html");
                     desc.write();
                 }
 
-                LayerBuilder.File l = layer(e).file("Templates/Project/Samples/JavaFX/" + spaceName(sampleName));
-                l.url("nbinst://javafx/javafx-sdk/samples/" + sampleName + "/" + zip.getName());
-                l.urlvalue("SystemFileSystem.icon", "nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"); // NOI18N
-                l.stringvalue("SystemFileSystem.localizingBundle", "org.netbeans.modules.javafx.sdksamples.Bundle"); // NOI18N
-                l.methodvalue("instantiatingIterator", "org.netbeans.modules.javafx.sdksamples.SDKSamplesWizardIterator", "createIterator"); // NOI18N
+                LayerBuilder.File l = layer(e).file("Templates/Project/Samples/Visage/" + spaceName(sampleName));
+                l.url("nbinst://visage/visage-sdk/samples/" + sampleName + "/" + zip.getName());
+                l.urlvalue("SystemFileSystem.icon", "nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"); // NOI18N
+                l.stringvalue("SystemFileSystem.localizingBundle", "org.netbeans.modules.visage.sdksamples.Bundle"); // NOI18N
+                l.methodvalue("instantiatingIterator", "org.netbeans.modules.visage.sdksamples.SDKSamplesWizardIterator", "createIterator"); // NOI18N
 //                if (descriptionFile.isFile()) {
 //                    l.urlvalue("instantiatingWizardURL", "nbresloc:/SDKSamples/" + sampleName + "/description.html"); // NOI18N
 //                }

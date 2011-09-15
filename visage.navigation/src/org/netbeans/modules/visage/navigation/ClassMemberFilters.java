@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 
 import java.util.ArrayList;
@@ -54,10 +54,10 @@ import javax.lang.model.element.Modifier;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JToggleButton;
-import org.netbeans.modules.javafx.navigation.ElementNode.Description;
-import org.netbeans.modules.javafx.navigation.actions.SortActionSupport;
-import org.netbeans.modules.javafx.navigation.base.FiltersDescription;
-import org.netbeans.modules.javafx.navigation.base.FiltersManager;
+import org.netbeans.modules.visage.navigation.ElementNode.Description;
+import org.netbeans.modules.visage.navigation.actions.SortActionSupport;
+import org.netbeans.modules.visage.navigation.base.FiltersDescription;
+import org.netbeans.modules.visage.navigation.base.FiltersManager;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
@@ -160,25 +160,25 @@ public final class ClassMemberFilters {
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowInherited"), //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowInheritedTip"), //NOI18N
                 false,
-                new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideInherited.png")), //NOI18N
+                new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/filterHideInherited.png")), //NOI18N
                 null);
         desc.addFilter(SHOW_FIELDS,
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowFields"), //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowFieldsTip"), //NOI18N
                 true,
-                new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideFields.gif")), //NOI18N
+                new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/filterHideFields.gif")), //NOI18N
                 null);
         desc.addFilter(SHOW_STATIC,
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowStatic"), //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowStaticTip"), //NOI18N
                 true,
-                new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideStatic.png")), //NOI18N
+                new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/filterHideStatic.png")), //NOI18N
                 null);
         desc.addFilter(SHOW_NON_PUBLIC,
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowNonPublic"), //NOI18N
                 NbBundle.getMessage(ClassMemberFilters.class, "LBL_ShowNonPublicTip"), //NOI18N
                 true,
-                new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/navigation/resources/filterHideNonPublic.png")), //NOI18N
+                new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/navigation/resources/filterHideNonPublic.png")), //NOI18N
                 null);
 
         return FiltersDescription.createManager(desc);

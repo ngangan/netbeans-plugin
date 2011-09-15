@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.source;
+package org.netbeans.modules.visage.fxd.composer.source;
 
 import javax.swing.Box;
 import javax.swing.JComboBox;
@@ -52,12 +52,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.misc.FXDToolbar;
-import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
-import org.netbeans.modules.javafx.fxd.composer.preview.PreviewToolbar;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.visage.fxd.composer.misc.FXDToolbar;
+import org.netbeans.modules.visage.fxd.composer.navigator.SelectionCookie;
+import org.netbeans.modules.visage.fxd.composer.preview.PreviewToolbar;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZEditorSupport;
 import org.openide.cookies.EditCookie;
 import org.openide.cookies.EditorCookie;
 import org.openide.cookies.OpenCookie;

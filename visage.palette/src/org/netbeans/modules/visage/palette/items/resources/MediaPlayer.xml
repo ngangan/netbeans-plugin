@@ -46,11 +46,11 @@ made subject to such option by the copyright holder.
 <!DOCTYPE editor_palette_item PUBLIC "-//NetBeans//Editor Palette Item 1.0//EN" "http://www.netbeans.org/dtds/editor-palette-item-1_0.dtd">
 
 <editor_palette_item version="1.0">
-    <class name="org.netbeans.modules.javafx.palette.items.media.MediaPlayer" />
+    <class name="org.netbeans.modules.visage.palette.items.media.MediaPlayer" />
 
-    <icon16 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/media_player_16.png" />
-    <icon32 urlvalue="org/netbeans/modules/javafx/palette/items/resources/icons/media_player_32.png" />
-    <description localizing-bundle="org.netbeans.modules.javafx.palette.items.resources.Bundle"
-               display-name-key="NAME_javafx-MediaPlayer"
-               tooltip-key="HINT_javafx-MediaPlayer" />
+    <icon16 urlvalue="org/netbeans/modules/visage/palette/items/resources/icons/media_player_16.png" />
+    <icon32 urlvalue="org/netbeans/modules/visage/palette/items/resources/icons/media_player_32.png" />
+    <description localizing-bundle="org.netbeans.modules.visage.palette.items.resources.Bundle"
+               display-name-key="NAME_visage-MediaPlayer"
+               tooltip-key="HINT_visage-MediaPlayer" />
 </editor_palette_item>

@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -61,18 +61,18 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.tree.TreePath;
-import org.netbeans.api.javafx.editor.ElementJavadoc;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.navigation.ElementNode.Description;
-import org.netbeans.modules.javafx.navigation.actions.FilterSubmenuAction;
-import org.netbeans.modules.javafx.navigation.actions.SortActionSupport.SortByNameAction;
-import org.netbeans.modules.javafx.navigation.actions.SortActionSupport.SortBySourceAction;
-import org.netbeans.modules.javafx.navigation.base.FiltersManager;
-import org.netbeans.modules.javafx.navigation.base.TapPanel;
+import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
+import org.netbeans.modules.visage.navigation.ElementNode.Description;
+import org.netbeans.modules.visage.navigation.actions.FilterSubmenuAction;
+import org.netbeans.modules.visage.navigation.actions.SortActionSupport.SortByNameAction;
+import org.netbeans.modules.visage.navigation.actions.SortActionSupport.SortBySourceAction;
+import org.netbeans.modules.visage.navigation.base.FiltersManager;
+import org.netbeans.modules.visage.navigation.base.TapPanel;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.view.BeanTreeView;
 import org.openide.explorer.view.Visualizer;
@@ -276,7 +276,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
 
         ElementHandle<? extends Element> eh = node.getDescritption().elementHandle;
 
-        final JavaFXSource js = JavaFXSource.forFileObject(root.getDescritption().fileObject);
+        final VisageSource js = VisageSource.forFileObject(root.getDescritption().fileObject);
         if (js == null) {
             return null;
         }
@@ -303,7 +303,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         }
 
         public void run(CompilationController cc) throws Exception {
-            cc.toPhase(JavaFXSource.Phase.UP_TO_DATE);
+            cc.toPhase(VisageSource.Phase.UP_TO_DATE);
 
             Element e = null;
             try {

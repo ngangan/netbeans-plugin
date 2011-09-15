@@ -1,6 +1,6 @@
-package javafxapplication6;
+package visageapplication6;
 
-import javafx.animation.Timeline;
+import visage.animation.Timeline;
 
 // place your code here
 var timeline = Timeline{}

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.test.javafx.editor.completion;
+package org.netbeans.test.visage.editor.completion;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;

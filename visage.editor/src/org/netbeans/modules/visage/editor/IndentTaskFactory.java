@@ -28,11 +28,11 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
-import org.netbeans.modules.javafx.editor.format.CompilerIndependentJFXIndentTask;
+import org.netbeans.modules.visage.editor.format.CompilerIndependentVSGIndentTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -53,6 +53,6 @@ public class IndentTaskFactory implements IndentTask.Factory {
         if (log.isLoggable(Level.FINE)) {
             log.fine("Creating indentation factory"); // NOI18N
         }
-        return new CompilerIndependentJFXIndentTask(context);
+        return new CompilerIndependentVSGIndentTask(context);
     }
 }

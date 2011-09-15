@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.wizard;
+package org.netbeans.modules.visage.platform.wizard;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -68,7 +68,7 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.Utilities;
 
 /**
- * This Panel launches autoconfiguration during the New JavaFX Platform sequence.
+ * This Panel launches autoconfiguration during the New Visage Platform sequence.
  * The UI views properties of the platform, reacts to the end of detection by
  * updating itself. It triggers the detection task when the button is pressed.
  * The inner class WizardPanel acts as a controller, reacts to the UI completness
@@ -79,8 +79,8 @@ import org.openide.util.Utilities;
  */
 public class DetectPanel extends javax.swing.JPanel {
 
-    private static final Icon BADGE = new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/platform/resources/platformBadge.gif")); // NOI18N
-    private static final Icon EMPTY = new ImageIcon(Utilities.loadImage("org/netbeans/modules/javafx/platform/resources/empty.gif")); // NOI18N
+    private static final Icon BADGE = new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/platform/resources/platformBadge.gif")); // NOI18N
+    private static final Icon EMPTY = new ImageIcon(Utilities.loadImage("org/netbeans/modules/visage/platform/resources/empty.gif")); // NOI18N
 
     private final ChangeSupport cs = new ChangeSupport(this);
 
@@ -212,7 +212,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                     // L&F (e.g. GTK) did not specify any icon.
                     original = EMPTY;
                 }
-                if ((new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) && new File(f, "lib/shared/javafxc.jar").isFile() && new File(f, "lib/shared/javafxrt.jar").isFile()) { // NOI18N
+                if ((new File(f, "bin/visagepackager.exe").isFile() || new File(f, "bin/visagepackager").isFile()) && new File(f, "lib/shared/visagec.jar").isFile() && new File(f, "lib/shared/visagert.jar").isFile()) { // NOI18N
                     if ( original.equals( lastOriginal ) ) {
                         return lastMerged;
                     }
@@ -270,12 +270,12 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
      */
     static class WizardPanel implements WizardDescriptor.Panel<WizardDescriptor>,ChangeListener {
         private DetectPanel         component;
-        private final JavaFXWizardIterator  iterator;
+        private final VisageWizardIterator  iterator;
         private final ChangeSupport cs = new ChangeSupport(this);
         private boolean             valid;
         private WizardDescriptor    wiz;
 
-        WizardPanel(JavaFXWizardIterator iterator) {            
+        WizardPanel(VisageWizardIterator iterator) {            
 	    this.iterator = iterator;
         }
 
@@ -311,9 +311,9 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             int i = 1;
             while (!checkName(name = NbBundle.getMessage(DetectPanel.class, "TXT_DefaultPlaformName", String.valueOf(i)))) i++; // NOI18N
             component.jdkName.setText(name);
-            File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
-            if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
-                fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
+            File fxPath = InstalledFileLocator.getDefault().locate("visage-sdk/lib/shared/visagec.jar", "org.netbeans.modules.visage", false); // NOI18N
+            if (fxPath == null) //try to find runtime in the root visage folder as for public compiler
+                fxPath = InstalledFileLocator.getDefault().locate("lib/shared/visagec.jar", "org.netbeans.modules.visage", false); // NOI18N
             if (fxPath != null && fxPath.isFile()) component.fxFolder.setText(fxPath.getParentFile().getParentFile().getParent());
             File f = component.getPlatformFolder();
             checkValid();
@@ -371,7 +371,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 //                 return;
 //            }
             File f = component.getFxFolder();
-            if (!(new File(f, "bin/javafxpackager.exe").isFile() || new File(f, "bin/javafxpackager").isFile()) || !new File(f, "lib/shared/javafxc.jar").isFile() || !new File(f, "lib/shared/javafxrt.jar").isFile()) { // NOI18N
+            if (!(new File(f, "bin/visagepackager.exe").isFile() || new File(f, "bin/visagepackager").isFile()) || !new File(f, "lib/shared/visagec.jar").isFile() || !new File(f, "lib/shared/visagert.jar").isFile()) { // NOI18N
                 setErrorMessage("ERROR_WrongFxLocation"); //NOI18N
                  return;
             }
@@ -387,7 +387,7 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             } catch (IOException e) {
                 //ignore
             }
-            if (!pv.startsWith("javafx-1.3")) this.wiz.putProperty("WizardPanel_errorMessage", NbBundle.getMessage(DetectPanel.class, "WARNING_WrongVersion", pv));    //NOI18N
+            if (!pv.startsWith("visage-1.3")) this.wiz.putProperty("WizardPanel_errorMessage", NbBundle.getMessage(DetectPanel.class, "WARNING_WrongVersion", pv));    //NOI18N
             setValid(true);            
         }
     }    

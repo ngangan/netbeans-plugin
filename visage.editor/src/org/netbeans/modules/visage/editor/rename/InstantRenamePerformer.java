@@ -41,10 +41,10 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.rename;
+package org.netbeans.modules.visage.editor.rename;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree.VisageKind;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -80,10 +80,10 @@ import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.editor.settings.EditorStyleConstants;
 import org.netbeans.api.editor.settings.FontColorSettings;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSourceUtils;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
@@ -92,9 +92,9 @@ import org.netbeans.editor.GuardedDocument;
 import org.netbeans.editor.MarkBlock;
 import org.netbeans.editor.Utilities;
 import org.netbeans.lib.editor.util.swing.MutablePositionRegion;
-import org.netbeans.modules.javafx.editor.JavaFXEditorKit.JavaFXDeleteCharAction;
-import org.netbeans.modules.javafx.editor.RunOffAWT;
-import org.netbeans.modules.javafx.editor.semantic.FindLocalUsagesQuery;
+import org.netbeans.modules.visage.editor.VisageEditorKit.VisageDeleteCharAction;
+import org.netbeans.modules.visage.editor.RunOffAWT;
+import org.netbeans.modules.visage.editor.semantic.FindLocalUsagesQuery;
 import org.netbeans.modules.refactoring.api.ui.RefactoringActionsFactory;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.cookies.EditorCookie;
@@ -189,7 +189,7 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
             }
             
             DataObject od = (DataObject) target.getDocument().getProperty(Document.StreamDescriptionProperty);
-            JavaFXSource js = od != null ? JavaFXSource.forFileObject(od.getPrimaryFile()) : null;
+            VisageSource js = od != null ? VisageSource.forFileObject(od.getPrimaryFile()) : null;
 
             if (js == null) {
                 Utilities.setStatusBoldText(target, NbBundle.getMessage(InstantRenamePerformer.class, "WARN_CannotPerformHere"));
@@ -207,7 +207,7 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
                         return null;
                     }
                 }
-            }, NbBundle.getMessage(InstantRenamePerformer.class, "in-place-refactoring"), js, JavaFXSource.Phase.ANALYZED); // NOI18N
+            }, NbBundle.getMessage(InstantRenamePerformer.class, "in-place-refactoring"), js, VisageSource.Phase.ANALYZED); // NOI18N
             
             if (wasResolved[0]) {
                 if (changePoints != null) {
@@ -248,15 +248,15 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
         
         doc.render(new Runnable() {
             public void run() {
-                TokenSequence<JFXTokenId> ts = JavaFXSourceUtils.getJavaTokenSequence(info.getTokenHierarchy(), caret);
+                TokenSequence<VSGTokenId> ts = VisageSourceUtils.getJavaTokenSequence(info.getTokenHierarchy(), caret);
                 
                 ts.move(caret);
                 
                 if (ts.moveNext() && ts.token()!=null) {
-                    if (ts.token().id() == JFXTokenId.IDENTIFIER) {
+                    if (ts.token().id() == VSGTokenId.IDENTIFIER) {
                         adjustedCaret[0] = ts.offset() + ts.token().length() / 2 + 1;
-                    } else if (ts.token().id() == JFXTokenId.COMMENT) {
-                        TokenSequence<JFXTokenId> jdts = ts.embedded(JFXTokenId.language());
+                    } else if (ts.token().id() == VSGTokenId.COMMENT) {
+                        TokenSequence<VSGTokenId> jdts = ts.embedded(VSGTokenId.language());
 //                        if (jdts != null && JavadocImports.isInsideReference(jdts, caret)) {
 //                            jdts.move(caret);
 //                            if (jdts.moveNext() && jdts.token().id() == JavadocTokenId.IDENT) {
@@ -275,14 +275,14 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
             }
         });
         
-        JavaFXTreePath path = insideJavadoc[0]? null: info.getTreeUtilities().pathFor(adjustedCaret[0]);
+        VisageTreePath path = insideJavadoc[0]? null: info.getTreeUtilities().pathFor(adjustedCaret[0]);
         
         //correction for int something[]:
         if (path != null && path.getParentPath() != null) {
-            JavaFXKind leafKind = path.getLeaf().getJavaFXKind();
-            JavaFXKind parentKind = path.getParentPath().getLeaf().getJavaFXKind();
+            VisageKind leafKind = path.getLeaf().getVisageKind();
+            VisageKind parentKind = path.getParentPath().getLeaf().getVisageKind();
             
-            if (leafKind == JavaFXKind.TYPE_ARRAY && parentKind == JavaFXKind.VARIABLE) {
+            if (leafKind == VisageKind.TYPE_ARRAY && parentKind == VisageKind.VARIABLE) {
                 long typeEnd = info.getTrees().getSourcePositions().getEndPosition(info.getCompilationUnit(), path.getLeaf());
                 long variableEnd = info.getTrees().getSourcePositions().getEndPosition(info.getCompilationUnit(), path.getLeaf());
                 
@@ -306,7 +306,7 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
 //        final Token name = insideJavadoc[0]
 //                ? JavadocImports.findNameTokenOfReferencedElement(info, adjustedCaret[0])
 //                : org.netbeans.modules.java.editor.semantic.Utilities.getToken(info, doc, path);
-        final Token name = org.netbeans.modules.javafx.editor.semantic.Utilities.getToken(info, doc, path);
+        final Token name = org.netbeans.modules.visage.editor.semantic.Utilities.getToken(info, doc, path);
         
         if (name == null)
             return null;
@@ -331,10 +331,10 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
             if (el.getKind().isClass()) {
                 //rename also the constructors:
                 for (ExecutableElement c : ElementFilter.constructorsIn(el.getEnclosedElements())) {
-                    JavaFXTreePath t = info.getTrees().getPath(c);
+                    VisageTreePath t = info.getTrees().getPath(c);
                     
                     if (t != null) {
-                        Token token = org.netbeans.modules.javafx.editor.semantic.Utilities.getToken(info, doc, t);
+                        Token token = org.netbeans.modules.visage.editor.semantic.Utilities.getToken(info, doc, t);
                         
                         if (token != null) {
                             points.add(token);
@@ -365,7 +365,7 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
     }
 
     private static boolean allowInstantRename(Element e) {
-        if (org.netbeans.modules.javafx.editor.semantic.Utilities.isPrivateElement(e)) {
+        if (org.netbeans.modules.visage.editor.semantic.Utilities.isPrivateElement(e)) {
             return true;
         }
         
@@ -509,7 +509,7 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
                     LOG.fine("region.getFirstRegionEndOffset()=" + region.getFirstRegionEndOffset());
                     LOG.fine("span= " + span);
                 }
-                JavaFXDeleteCharAction jdca = (JavaFXDeleteCharAction) target.getClientProperty(JavaFXDeleteCharAction.class);
+                VisageDeleteCharAction jdca = (VisageDeleteCharAction) target.getClientProperty(VisageDeleteCharAction.class);
                 
                 if (jdca != null && !jdca.getNextChar()) {
                     undo();

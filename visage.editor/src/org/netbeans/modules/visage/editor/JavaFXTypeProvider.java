@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -52,18 +52,18 @@ import java.util.logging.Logger;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.javafx.editor.ElementOpen;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.visage.editor.ElementOpen;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSourceUtils;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.ui.OpenProjects;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.spi.jumpto.type.SearchType;
 import org.netbeans.spi.jumpto.type.TypeDescriptor;
 import org.netbeans.spi.jumpto.type.TypeProvider;
@@ -75,18 +75,18 @@ import org.openide.filesystems.FileObject;
  *
  * @author nenik
  */
-public class JavaFXTypeProvider implements TypeProvider {
-    private static final Logger LOGGER = Logger.getLogger(JavaFXTypeProvider.class.getName());
+public class VisageTypeProvider implements TypeProvider {
+    private static final Logger LOGGER = Logger.getLogger(VisageTypeProvider.class.getName());
     private static final ClassPath EMPTY_CLASSPATH = org.netbeans.spi.java.classpath.support.ClassPathSupport.createClassPath( new FileObject[0] );
     private Set<CacheItem> cache;
     private volatile boolean isCanceled = false;
 
     public String name() {
-        return "javafx"; // system name: NOI18N
+        return "visage"; // system name: NOI18N
     }
 
     public String getDisplayName() {
-        return "JavaFX Types"; // XXX internationalization
+        return "Visage Types"; // XXX internationalization
     }
 
     public void cancel() {
@@ -136,8 +136,8 @@ public class JavaFXTypeProvider implements TypeProvider {
             Set<CacheItem> sources = new HashSet<CacheItem>();
             Set<FileObject> roots = new HashSet<FileObject>();
             for (Project project : projs) {
-                if (! (project instanceof JavaFXProject)) continue;
-                JavaFXProject jfxp = (JavaFXProject)project;
+                if (! (project instanceof VisageProject)) continue;
+                VisageProject jfxp = (VisageProject)project;
                 ClassPath pcp = jfxp.getClassPathProvider().getProjectSourcesClassPath(ClassPath.SOURCE);
 
                 for (FileObject root : pcp.getRoots()) {
@@ -155,7 +155,7 @@ public class JavaFXTypeProvider implements TypeProvider {
             cache = sources;
         }
 
-        ArrayList<JavaFXTypeDescription> types = new ArrayList<JavaFXTypeDescription>();
+        ArrayList<VisageTypeDescription> types = new ArrayList<VisageTypeDescription>();
         
         res.setMessage(null); // no startup scanning yet.
 
@@ -179,7 +179,7 @@ public class JavaFXTypeProvider implements TypeProvider {
                         textForQuery, nameKind, EnumSet.of(ci.isBinary ? ClassIndex.SearchScope.DEPENDENCIES : ClassIndex.SearchScope.SOURCE)
                     );
             for (ElementHandle<TypeElement> name : names) {
-                JavaFXTypeDescription td = new JavaFXTypeDescription(ci, name);
+                VisageTypeDescription td = new VisageTypeDescription(ci, name);
                 types.add(td);
                 if (isCanceled) {
                     return;
@@ -192,7 +192,7 @@ public class JavaFXTypeProvider implements TypeProvider {
         res.addResult(types);
     }
     
-    class JavaFXTypeDescription extends TypeDescriptor {
+    class VisageTypeDescription extends TypeDescriptor {
         private Icon icon;
 
         private final CacheItem cacheItem;
@@ -202,7 +202,7 @@ public class JavaFXTypeProvider implements TypeProvider {
         private String outerName;
         private String packageName;
 
-        public JavaFXTypeDescription(CacheItem cacheItem, final ElementHandle<TypeElement> handle ) {
+        public VisageTypeDescription(CacheItem cacheItem, final ElementHandle<TypeElement> handle ) {
             this.cacheItem = cacheItem;
             this.handle = handle; 
             init();
@@ -291,7 +291,7 @@ public class JavaFXTypeProvider implements TypeProvider {
         @Override
         public void open() {
             ClasspathInfo ci = ClasspathInfo.create(cacheItem.getRoot());
-            FileObject file = JavaFXSourceUtils.getFile(handle, ci);
+            FileObject file = VisageSourceUtils.getFile(handle, ci);
             try {
                 ElementOpen.open(file, handle);
             } catch (Exception exception) {

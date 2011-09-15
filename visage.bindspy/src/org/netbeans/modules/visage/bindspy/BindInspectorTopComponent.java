@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.bindspy;
+package org.netbeans.modules.visage.bindspy;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -62,15 +62,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.text.StyledDocument;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.visual.graph.layout.GridGraphLayout;
-import org.netbeans.modules.javafx.bindspy.BindsModel.BindConnection;
-import org.netbeans.modules.javafx.bindspy.BindsModel.BindVariable;
+import org.netbeans.modules.visage.bindspy.BindsModel.BindConnection;
+import org.netbeans.modules.visage.bindspy.BindsModel.BindVariable;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
@@ -89,7 +89,7 @@ public class BindInspectorTopComponent extends TopComponent implements PropertyC
 
     private static BindInspectorTopComponent instance;
     private static final String PREFERRED_ID = "BindInspectorTopComponent"; //NOI18N
-    private static final Logger log = Logger.getLogger( "org.netbeans.javafx.bindspy" ); //NOI18N
+    private static final Logger log = Logger.getLogger( "org.netbeans.visage.bindspy" ); //NOI18N
 
     private DataObject oldDataObject;
     private Process process;
@@ -110,7 +110,7 @@ public class BindInspectorTopComponent extends TopComponent implements PropertyC
         toolBar.setLayout( new BoxLayout( toolBar, BoxLayout.X_AXIS ));
 
         JButton buttonZoomIn = new JButton( new ImageIcon(
-                ImageUtilities.loadImage( "org/netbeans/modules/javafx/bindspy/resources/zoom_in.png" )));
+                ImageUtilities.loadImage( "org/netbeans/modules/visage/bindspy/resources/zoom_in.png" )));
         buttonZoomIn.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if( bindGraphScene != null ) {
@@ -123,7 +123,7 @@ public class BindInspectorTopComponent extends TopComponent implements PropertyC
         toolBar.add( buttonZoomIn );
 
         JButton buttonZoomOut = new JButton( new ImageIcon(
-                ImageUtilities.loadImage( "org/netbeans/modules/javafx/bindspy/resources/zoom_out.png" )));
+                ImageUtilities.loadImage( "org/netbeans/modules/visage/bindspy/resources/zoom_out.png" )));
         buttonZoomOut.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if( bindGraphScene != null ) {
@@ -176,7 +176,7 @@ public class BindInspectorTopComponent extends TopComponent implements PropertyC
                             return;
                         }
 //                        wHandle.start();
-                        final JavaFXSource s = JavaFXSource.forDocument( ec.getDocument());
+                        final VisageSource s = VisageSource.forDocument( ec.getDocument());
                         try {
                             s.runWhenScanFinished( new Task<CompilationController>() {
                                 public void run( CompilationController cc ) throws Exception {
@@ -257,7 +257,7 @@ public class BindInspectorTopComponent extends TopComponent implements PropertyC
 //    }
 
     /**
-     * Obtain the JavaFXPreviewTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the VisagePreviewTopComponent instance. Never call {@link #getDefault} directly!
      */
     public static synchronized BindInspectorTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );

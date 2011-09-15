@@ -41,28 +41,28 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector;
+package org.netbeans.modules.visage.profiler.selector;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.selector.spi.SelectionTreeBuilder;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import java.util.ArrayList;
 import java.util.List;
-import org.netbeans.modules.javafx.profiler.selector.node.ProjectNode;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.profiler.selector.node.ProjectNode;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
 
 /**
  *
  * @author cms
  */
-@ProjectServiceProvider(projectType="org-netbeans-modules-javafx-project", service=SelectionTreeBuilder.class)
-public class JavaFXSelectionTreeBuilderImpl extends SelectionTreeBuilder {
-    final private JavaFXProject project;
+@ProjectServiceProvider(projectType="org-netbeans-modules-visage-project", service=SelectionTreeBuilder.class)
+public class VisageSelectionTreeBuilderImpl extends SelectionTreeBuilder {
+    final private VisageProject project;
 
-    public JavaFXSelectionTreeBuilderImpl(Project project) {
-        super(new Type("fx-desktop", "JavaFX Desktop"), true);
-        this.project = (JavaFXProject)project;
+    public VisageSelectionTreeBuilderImpl(Project project) {
+        super(new Type("fx-desktop", "Visage Desktop"), true);
+        this.project = (VisageProject)project;
     }
 
     @Override

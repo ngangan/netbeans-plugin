@@ -136,7 +136,7 @@ function checkChoiceUpgradeAction() {
         <line choice="netbeans">
             <line choice="baseide"></line>
             <line choice="javase"></line>
-            <line choice="javafx"></line>
+            <line choice="visage"></line>
         </line>
     </choices-outline>
    
@@ -147,12 +147,12 @@ function checkChoiceUpgradeAction() {
     <choice id="javase" title="javase-title" description="javase-description" start_selected="true" start_enabled="true" start_visible="true" selected="choices.javase.selected &amp;&amp; choices.baseide.selected" enabled="choices.baseide.selected">
         <pkg-ref id="ident.pkg.javase"></pkg-ref>
     </choice>
-    <choice id="javafx" title="javafx-title" description="javafx-description" start_selected="true" start_enabled="true" start_visible="true" selected="choices.javafx.selected &amp;&amp; choices.javase.selected" enabled="choices.javase.selected">
-        <pkg-ref id="ident.pkg.javafx"></pkg-ref>
+    <choice id="visage" title="visage-title" description="visage-description" start_selected="true" start_enabled="true" start_visible="true" selected="choices.visage.selected &amp;&amp; choices.javase.selected" enabled="choices.javase.selected">
+        <pkg-ref id="ident.pkg.visage"></pkg-ref>
     </choice>
     
     <pkg-ref id="ident.pkg.baseide" version="0.0.0.0.1" installKBytes="77796	" auth="Root" onConclusion="None">file:./Contents/Packages/baseide.pkg</pkg-ref>
     <pkg-ref id="ident.pkg.javase" version="0.0.0.0.1" installKBytes="68468	" auth="Root" onConclusion="None">file:./Contents/Packages/javase.pkg</pkg-ref>
-    <pkg-ref id="ident.pkg.javafx" version="0.0.0.0.1" installKBytes="61792	" auth="Root" onConclusion="None">file:./Contents/Packages/javafx.pkg</pkg-ref>
+    <pkg-ref id="ident.pkg.visage" version="0.0.0.0.1" installKBytes="61792	" auth="Root" onConclusion="None">file:./Contents/Packages/visage.pkg</pkg-ref>
  
 </installer-gui-script>

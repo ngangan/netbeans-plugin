@@ -34,12 +34,12 @@
 
 package weatherfx;
 
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.transform.Transform;
+import visage.scene.Group;
+import visage.scene.Scene;
+import visage.scene.paint.Color;
+import visage.scene.transform.Transform;
 
-import javafx.stage.Stage;
+import visage.stage.Stage;
 
 import java.lang.*;
 import weatherfx.service.YahooWeatherService;

@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXVar;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGVar;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -56,15 +56,15 @@ import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
-import static org.netbeans.modules.javafx.editor.completion.JavaFXCompletionQuery.*;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.*;
 
 /**
  *
  * @author David Strupl
  */
-public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<UnitTree> {
+public class CompilationUnitEnvironment extends VisageCompletionEnvironment<UnitTree> {
     
     private static final Logger logger = Logger.getLogger(CompilationUnitEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -84,8 +84,8 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
         if (offset <= sourcePositions.getStartPosition(root, pkg)) {
             addPackages(getPrefix());
         } else {
-            TokenSequence<JFXTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
-            if (first != null && first.token().id() == JFXTokenId.SEMI) {
+            TokenSequence<VSGTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
+            if (first != null && first.token().id() == VSGTokenId.SEMI) {
                 addKeywordsForCU(ut);
                 if (!hasPublicDecls) {
                     addKeywordsForStatement();
@@ -103,18 +103,18 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
     private boolean hasPublicDeclarations(UnitTree ut) {
         if (LOGGABLE) log("hasPublicDeclarations"); // NOI18N
         for (Tree tr : ut.getTypeDecls()) {
-            if (tr.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-                JFXClassDeclaration cl = (JFXClassDeclaration)tr;
+            if (tr.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
+                VSGClassDeclaration cl = (VSGClassDeclaration)tr;
                 if (LOGGABLE) log("   cl " + cl); // NOI18N
-                JavaFXTreePath tp = JavaFXTreePath.getPath(root, cl);
+                VisageTreePath tp = VisageTreePath.getPath(root, cl);
                 if (controller.getTreeUtilities().isSynthetic(tp)) {
                     if (LOGGABLE) log("       isSynthetic "); // NOI18N
                     for (Tree t : cl.getClassMembers()) {
                         if (LOGGABLE) log("   t == " + t); // NOI18N
-                        if (t instanceof JFXFunctionDefinition) {
-                            JFXFunctionDefinition fd = (JFXFunctionDefinition)t;
+                        if (t instanceof VSGFunctionDefinition) {
+                            VSGFunctionDefinition fd = (VSGFunctionDefinition)t;
                             if (LOGGABLE) log("   fd == " + fd); // NOI18N
-                            JavaFXTreePath fp = JavaFXTreePath.getPath(root, fd);
+                            VisageTreePath fp = VisageTreePath.getPath(root, fd);
                             if (controller.getTreeUtilities().isSynthetic(fp)) {
                                 if (LOGGABLE) log("  ignoring " + fd + " because it is syntetic"); // NOI18N
                                 continue;
@@ -124,16 +124,16 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
                                 return true;
                             }
                         }
-                        if (t instanceof JFXVar) {
-                            JFXVar v = (JFXVar)t;
+                        if (t instanceof VSGVar) {
+                            VSGVar v = (VSGVar)t;
                             if (LOGGABLE) log("   v == " + v); // NOI18N
                             if (v.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
                                 if (LOGGABLE) log("   returning true because of " + v); // NOI18N
                                 return true;
                             }
                         }
-                        if (t instanceof JFXClassDeclaration) {
-                            JFXClassDeclaration inner = (JFXClassDeclaration)t;
+                        if (t instanceof VSGClassDeclaration) {
+                            VSGClassDeclaration inner = (VSGClassDeclaration)t;
                             if (LOGGABLE) log("   inner == " + inner); // NOI18N
                             if (inner.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
                                 if (LOGGABLE) log("   returning true because of " + inner); // NOI18N
@@ -165,7 +165,7 @@ public class CompilationUnitEnvironment extends JavaFXCompletionEnvironment<Unit
         addKeyword(IMPORT_KEYWORD, SPACE, false);
         boolean beforeAnyClass = true;
         for (Tree t : root.getTypeDecls()) {
-            if (t.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
+            if (t.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
                 int pos = (int) sourcePositions.getEndPosition(root, t);
                 if (pos != Diagnostic.NOPOS && offset >= pos) {
                     beforeAnyClass = false;

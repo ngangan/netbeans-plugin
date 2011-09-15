@@ -41,12 +41,12 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.tools.javafx.tree.JFXErroneous;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxPretty;
+import com.sun.visage.api.tree.*;
+import com.sun.tools.visage.tree.VSGErroneous;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.JavafxPretty;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,7 +55,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeMirror;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
@@ -66,27 +66,27 @@ import org.openide.util.NbBundle;
  */
 public class TreeNode extends AbstractNode implements OffsetProvider {
 
-    private final JavaFXTreePath tree;
+    private final VisageTreePath tree;
     private final CompilationInfo info;
     private final boolean synthetic;
     private final boolean errorneous;
     private final boolean dummyPos;
 
-    public static Node getTree(CompilationInfo info, JavaFXTreePath tree) {
+    public static Node getTree(CompilationInfo info, VisageTreePath tree) {
         List<Node> result = new ArrayList<Node>();
         new FindChildrenTreeVisitor(info).scan(tree, result);
         return result.get(0);
     }
 
-    private static String treeToString(CompilationInfo info, JavaFXTreePath tree) {
+    private static String treeToString(CompilationInfo info, VisageTreePath tree) {
         Tree t = tree.getLeaf();
         StringWriter s = new StringWriter();
         try {
-            new JavafxPretty(s, false).printExpr((JFXTree)t);
+            new JavafxPretty(s, false).printExpr((VSGTree)t);
         } catch (Exception e) {
-            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Unable to pretty print " + t.getJavaFXKind(), e); // NOI18N
+            Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Unable to pretty print " + t.getVisageKind(), e); // NOI18N
         }
-        String res = t.getJavaFXKind().toString();
+        String res = t.getVisageKind().toString();
 
         SourcePositions pos = info.getTrees().getSourcePositions();
         res = res + '[' + pos.getStartPosition(tree.getCompilationUnit(), t) + ',' +  // NOI18N
@@ -94,12 +94,12 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         return res;
     }
 
-    public TreeNode(CompilationInfo info, JavaFXTreePath tree, List<Node> nodes) {
+    public TreeNode(CompilationInfo info, VisageTreePath tree, List<Node> nodes) {
         super(nodes.isEmpty() ? Children.LEAF: new NodeChilren(nodes));
         this.tree = tree;
         this.info = info;
         this.synthetic = info.getTreeUtilities().isSynthetic(tree);
-        this.errorneous = tree.getLeaf().getJavaFXKind() == Tree.JavaFXKind.ERRONEOUS;
+        this.errorneous = tree.getLeaf().getVisageKind() == Tree.VisageKind.ERRONEOUS;
 
         Tree t = tree.getLeaf();
         SourcePositions pos = info.getTrees().getSourcePositions();
@@ -167,7 +167,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
 
     }
 
-    private static class FindChildrenTreeVisitor extends JavaFXTreePathScanner<Void, List<Node>> {
+    private static class FindChildrenTreeVisitor extends VisageTreePathScanner<Void, List<Node>> {
 
         private CompilationInfo info;
 
@@ -620,7 +620,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
 
             addCorrespondingType(below);
             addCorrespondingComments(below);
-            scan(((JFXErroneous)tree).errs, below);
+            scan(((VSGErroneous)tree).errs, below);
 
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;
@@ -855,7 +855,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         }
 
         private void addCorrespondingElement(List<Node> below) {
-            JavaFXTreePath tp = getCurrentPath();
+            VisageTreePath tp = getCurrentPath();
             try {
                 Element el = info.getTrees().getElement(tp);
 

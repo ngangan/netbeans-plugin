@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor.format;
+package org.netbeans.modules.visage.fxd.composer.editor.format;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -51,9 +51,9 @@ import org.netbeans.api.lexer.TokenUtilities;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
-import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
+import org.netbeans.modules.visage.fxd.composer.editor.BracketCompletion;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.lexer.TokenUtils;
 
 /**
  *

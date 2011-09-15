@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -63,8 +63,8 @@ import junit.framework.Assert;
 
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.lib.lexer.test.TestLanguageProvider;
@@ -72,7 +72,7 @@ import org.netbeans.modules.java.source.TreeLoader;
 import org.netbeans.modules.java.source.usages.BinaryAnalyser;
 import org.netbeans.modules.java.source.usages.ClassIndexImpl;
 import org.netbeans.modules.java.source.usages.ClassIndexManager;
-import org.netbeans.modules.javafx.source.parsing.JavaFXParserFactory;
+import org.netbeans.modules.visage.source.parsing.VisageParserFactory;
 import org.netbeans.spi.editor.mimelookup.MimeDataProvider;
 import org.netbeans.spi.java.classpath.ClassPathProvider;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
@@ -139,7 +139,7 @@ public class SourceTestBase extends NbTestCase {
 
         XMLFileSystem system = new XMLFileSystem();
         system.setXmlUrls(new URL[] {
-            SourceTestBase.class.getResource("/org/netbeans/api/javafx/source/resources/layer.xml"),
+            SourceTestBase.class.getResource("/org/netbeans/api/visage/source/resources/layer.xml"),
         });
         Repository repository = new Repository(new MultiFileSystem(
                 new FileSystem[] {FileUtil.createMemoryFileSystem(), system}));
@@ -162,21 +162,21 @@ public class SourceTestBase extends NbTestCase {
                 return null;
             }
         };
-/*        SharedClassObject loader = JavaFXDataLoader.findObject(JavaFXDataLoader.class, true);
+/*        SharedClassObject loader = VisageDataLoader.findObject(VisageDataLoader.class, true);
 */
         MimeDataProvider mdp = new MimeDataProvider() {
             public Lookup getLookup(MimePath mimePath) {
-                return Lookups.fixed(/*new JavaFXEditorKit(),*/ new JavaFXParserFactory());
+                return Lookups.fixed(/*new VisageEditorKit(),*/ new VisageParserFactory());
             }
         };
         Lkp.initLookups(new Object[] {repository, /*loader, */ cpp, mdp});
-        TestLanguageProvider.register(JFXTokenId.language());
+        TestLanguageProvider.register(VSGTokenId.language());
 
 /*        File cacheFolder = new File(getWorkDir(), "var/cache/index");
         cacheFolder.mkdirs();
         IndexUtil.setCacheFolder(cacheFolder);
  */
-//        JEditorPane.registerEditorKitForContentType("text/x-java", "org.netbeans.modules.javafx.editor.JavaFXEditorKit");
+//        JEditorPane.registerEditorKitForContentType("text/x-java", "org.netbeans.modules.visage.editor.VisageEditorKit");
         final ClassPath sourcePath = ClassPathSupport.createClassPath(new FileObject[] {FileUtil.toFileObject(getDataDir())});
         final ClassIndexManager mgr  = ClassIndexManager.getDefault();
         for (ClassPath.Entry entry : sourcePath.entries()) {
@@ -184,7 +184,7 @@ public class SourceTestBase extends NbTestCase {
         }
         final ClasspathInfo cpInfo = ClasspathInfo.create(getBootClassPath(), ClassPathSupport.createClassPath(new URL[0]), sourcePath);
         assertNotNull(cpInfo);
-        final JavaFXSource js = JavaFXSource.create(cpInfo, Collections.<FileObject>emptyList());
+        final VisageSource js = VisageSource.create(cpInfo, Collections.<FileObject>emptyList());
         assertNotNull(js);
         js.runUserActionTask(new Task<CompilationController>() {
             public void run(CompilationController parameter) throws Exception {
@@ -213,7 +213,7 @@ public class SourceTestBase extends NbTestCase {
         final ClasspathInfo cpInfo = ClasspathInfo.create(getBootClassPath(),
                 ClassPathSupport.createClassPath(new URL[0]), getBootClassPath());
         assertNotNull(cpInfo);
-        final JavaFXSource js = JavaFXSource.create(cpInfo, Collections.<FileObject>emptyList());
+        final VisageSource js = VisageSource.create(cpInfo, Collections.<FileObject>emptyList());
         assertNotNull(js);
         for (ClassPath.Entry entry : getBootClassPath().entries()) {
             final URL url = entry.getURL();
@@ -245,7 +245,7 @@ public class SourceTestBase extends NbTestCase {
         if (this.bootPath == null) {
             this.bootPath = ClassPathSupport.createProxyClassPath(
                     createClassPath(System.getProperty("sun.boot.class.path")),
-                    JavaFXPlatform.getDefault().getBootstrapLibraries());
+                    VisagePlatform.getDefault().getBootstrapLibraries());
         }
         return this.bootPath;
     }
@@ -297,11 +297,11 @@ public class SourceTestBase extends NbTestCase {
     }
 
     public static void testInsideSourceTask(FileObject fo, final Task<CompilationController> task) throws Exception {
-        JavaFXSource src = JavaFXSource.forFileObject(fo);
+        VisageSource src = VisageSource.forFileObject(fo);
         DataObject dobj = DataObject.find(fo);
         EditorCookie ec = dobj.getCookie(EditorCookie.class);
         Document doc = ec.openDocument();
-        doc.putProperty(Language.class, JFXTokenId.language());
+        doc.putProperty(Language.class, VSGTokenId.language());
 
         final Exception[] exc = new Exception[1];
         src.runUserActionTask(new CancellableTask<CompilationController>() {

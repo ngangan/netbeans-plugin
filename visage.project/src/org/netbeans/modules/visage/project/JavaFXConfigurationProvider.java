@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -62,8 +62,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.modules.javafx.project.ui.customizer.CustomizerProviderImpl;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXCompositePanelProvider;
+import org.netbeans.modules.visage.project.ui.customizer.CustomizerProviderImpl;
+import org.netbeans.modules.visage.project.ui.customizer.VisageCompositePanelProvider;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.ProjectConfiguration;
 import org.netbeans.spi.project.ProjectConfigurationProvider;
@@ -78,12 +78,12 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 
 /**
- * Manages configurations for a JavaFX project.
+ * Manages configurations for a Visage project.
  * @author ads
  */
-final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<JavaFXConfigurationProvider.Config> {
+final class VisageConfigurationProvider implements ProjectConfigurationProvider<VisageConfigurationProvider.Config> {
 
-    private static final Logger LOGGER = Logger.getLogger(JavaFXConfigurationProvider.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VisageConfigurationProvider.class.getName());
 
     /**
      * Ant property name for active config.
@@ -112,14 +112,14 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
             return (o instanceof Config) && Utilities.compareObjects(name, ((Config) o).name);
         }
         public String toString() {
-            return "JavaFXConfigurationProvider.Config[" + name + "," + displayName + "]"; // NOI18N
+            return "VisageConfigurationProvider.Config[" + name + "," + displayName + "]"; // NOI18N
         }
     }
 
     private static final Config DEFAULT = new Config(null,
-            NbBundle.getMessage(JavaFXConfigurationProvider.class, "JavaFXConfigurationProvider.default.label")); // NOI18N
+            NbBundle.getMessage(VisageConfigurationProvider.class, "VisageConfigurationProvider.default.label")); // NOI18N
 
-    private final JavaFXProject p;
+    private final VisageProject p;
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final FileChangeListener fcl = new FileChangeAdapter() {
         public void fileFolderCreated(FileEvent fe) {
@@ -159,7 +159,7 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
     private Map<String,Config> configs;
     private FileObject nbp;
     
-    public JavaFXConfigurationProvider(JavaFXProject p) {
+    public VisageConfigurationProvider(VisageProject p) {
         this.p = p;
         fclWeak = FileUtil.weakFileChangeListener(fcl, null);
         nbp = p.getProjectDirectory().getFileObject("nbproject"); // NOI18N
@@ -267,7 +267,7 @@ final class JavaFXConfigurationProvider implements ProjectConfigurationProvider<
     }
 
     public void customize() {
-        p.getLookup().lookup(CustomizerProviderImpl.class).showCustomizer(JavaFXCompositePanelProvider.RUN);
+        p.getLookup().lookup(CustomizerProviderImpl.class).showCustomizer(VisageCompositePanelProvider.RUN);
     }
 
     public boolean configurationsAffectAction(String command) {

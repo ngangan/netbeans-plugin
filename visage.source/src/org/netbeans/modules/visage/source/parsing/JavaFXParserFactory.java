@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.source.parsing;
+package org.netbeans.modules.visage.source.parsing;
 
 import java.util.Collection;
 import java.util.logging.Level;
@@ -57,16 +57,16 @@ import org.openide.util.Lookup;
  *
  * @author Miloslav Metelka
  */
-public final class JavaFXParserFactory extends ParserFactory {
+public final class VisageParserFactory extends ParserFactory {
 
     /** Mime-type of FX sources. */
     public static final String MIME_TYPE = "text/x-fx";
 
     /** used by tests to ensure that all instances of parser were GCed */
-    private static final Logger TIMER = Logger.getLogger("TIMER.JavaFXParser");
+    private static final Logger TIMER = Logger.getLogger("TIMER.VisageParser");
 
     @Override
-    public JavaFXParser createParser(final Collection<Snapshot> snapshots) {
+    public VisageParser createParser(final Collection<Snapshot> snapshots) {
         assert snapshots != null;
         if (snapshots.size() == 1) {
             final FileObject fo = snapshots.iterator().next().getSource().getFileObject();
@@ -81,18 +81,18 @@ public final class JavaFXParserFactory extends ParserFactory {
                 }
             } catch (FileStateInvalidException fsie) {}
         }
-        JavaFXParser parser = new JavaFXParser();
+        VisageParser parser = new VisageParser();
         if (TIMER.isLoggable(Level.FINE)) {
-            LogRecord rec = new LogRecord(Level.FINE, "JavaFXParser");
+            LogRecord rec = new LogRecord(Level.FINE, "VisageParser");
             rec.setParameters(new Object[] { parser });
             TIMER.log(rec);
         }
         return parser;
     }
 
-    public static JavaFXParserFactory getDefault () {
+    public static VisageParserFactory getDefault () {
         final Lookup lookup = MimeLookup.getLookup (MIME_TYPE);
-        return lookup.lookup (JavaFXParserFactory.class);
+        return lookup.lookup (VisageParserFactory.class);
     }
 
 }

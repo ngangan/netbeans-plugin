@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,28 +54,28 @@ import org.openide.util.RequestProcessor;
  *
  * @author Jan Lahoda
  */
-final class JavaFXSourceTaskFactoryManager {
+final class VisageSourceTaskFactoryManager {
 
-    // -J-Dorg.netbeans.api.javafx.source.JavaFXSourceTaskFactoryManager.level=FINEST
-    private static final Logger LOG = Logger.getLogger(JavaFXSourceTaskFactoryManager.class.getName());
+    // -J-Dorg.netbeans.api.visage.source.VisageSourceTaskFactoryManager.level=FINEST
+    private static final Logger LOG = Logger.getLogger(VisageSourceTaskFactoryManager.class.getName());
     
-    private static JavaFXSourceTaskFactoryManager INSTANCE;
+    private static VisageSourceTaskFactoryManager INSTANCE;
     
     public static synchronized void register() {
-        INSTANCE = new JavaFXSourceTaskFactoryManager();
+        INSTANCE = new VisageSourceTaskFactoryManager();
     }
     
-    private Lookup.Result<JavaFXSourceTaskFactory> factories;
+    private Lookup.Result<VisageSourceTaskFactory> factories;
     
     /** Creates a new instance of JavaSourceTaskFactoryManager */
-    private JavaFXSourceTaskFactoryManager() {
-        final RequestProcessor.Task updateTask = new RequestProcessor("JavaFXSourceTaskFactoryManager Worker", 1).create(new Runnable() { // NOI18N
+    private VisageSourceTaskFactoryManager() {
+        final RequestProcessor.Task updateTask = new RequestProcessor("VisageSourceTaskFactoryManager Worker", 1).create(new Runnable() { // NOI18N
             public void run() {
                 update();
             }
         });
         
-        factories = Lookup.getDefault().lookupResult(JavaFXSourceTaskFactory.class);
+        factories = Lookup.getDefault().lookupResult(VisageSourceTaskFactory.class);
         factories.addLookupListener(new LookupListener() {
             public void resultChanged(LookupEvent ev) {
                 updateTask.schedule(0);
@@ -89,7 +89,7 @@ final class JavaFXSourceTaskFactoryManager {
     }
     
     private void update() {
-        for (JavaFXSourceTaskFactory f : factories.allInstances()) {
+        for (VisageSourceTaskFactory f : factories.allInstances()) {
             f.fileObjectsChanged();
         }
     }

@@ -39,22 +39,22 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.editor;
+package qa.visage.functional.editor;
 
 import java.util.StringTokenizer;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Util;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaCodeFormatingTest extends JavaFXTestCase {
+public class JavaCodeFormatingTest extends VisageTestCase {
 
     public static String PROJECT_NAME = "CFTests";
     final static String ccPath = "editor/codeformating";
@@ -172,7 +172,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
     public void testCreateProject() {
         System.out.println("============  Test Code Formating  =======");
-        JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
+        VisageProject project = VisageProject.createProject(PROJECT_NAME);
 
 //        for(String template: TEMPLATES){
 //            testCodeFormating(template);
@@ -187,7 +187,7 @@ public class JavaCodeFormatingTest extends JavaFXTestCase {
 
 
     public void testCodeFormating(String testName) {
-        JavaFXProject project = new JavaFXProject(PROJECT_NAME);
+        VisageProject project = new VisageProject(PROJECT_NAME);
         
         EditorOperator editor = project.getMainEditor();
 

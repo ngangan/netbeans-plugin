@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.actions;
+package org.netbeans.modules.visage.palette.items.actions;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class KeyTyped implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(KeyTyped.class, "TEMPLATE_KeyTyped", targetComponent, "javafx.scene.input.KeyEvent"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(KeyTyped.class, "TEMPLATE_KeyTyped", targetComponent, "visage.scene.input.KeyEvent"); //NOI18N;
     }
 }

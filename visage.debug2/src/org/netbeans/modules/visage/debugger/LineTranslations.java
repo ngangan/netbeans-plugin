@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.debugger;
+package org.netbeans.modules.visage.debugger;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -60,7 +60,7 @@ import javax.swing.event.ChangeListener;
 
 import org.netbeans.api.debugger.jpda.LineBreakpoint;
 
-import org.netbeans.modules.javafx.debugger.breakpoints.JavaFXLineBreakpoint;
+import org.netbeans.modules.visage.debugger.breakpoints.VisageLineBreakpoint;
 import org.openide.cookies.LineCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.URLMapper;
@@ -80,7 +80,7 @@ class LineTranslations {
 
     private ChangeListener          changedFilesListener;
     private Map<Object, Registry>   timeStampToRegistry = new WeakHashMap<Object, Registry>();
-    private Map<JavaFXLineBreakpoint, BreakpointLineUpdater> lineUpdaters = new HashMap<JavaFXLineBreakpoint, BreakpointLineUpdater>();
+    private Map<VisageLineBreakpoint, BreakpointLineUpdater> lineUpdaters = new HashMap<VisageLineBreakpoint, BreakpointLineUpdater>();
     private Map<Object, Map<LineBreakpoint, Integer>> originalBreakpointLines = new WeakHashMap<Object, Map<LineBreakpoint, Integer>>();
     private Map<Object, PropertyChangeListener> breakpointListeners = new WeakHashMap<Object, PropertyChangeListener>();
     
@@ -284,7 +284,7 @@ class LineTranslations {
         return null;
     }
     
-    void registerForLineUpdates( JavaFXLineBreakpoint lb ) {
+    void registerForLineUpdates( VisageLineBreakpoint lb ) {
         //translatedBreakpoints.add(lb);
         DataObject dobj = getDataObject(lb.getURL());
         if (dobj != null) {
@@ -300,7 +300,7 @@ class LineTranslations {
         }
     }
 
-    void unregisterFromLineUpdates( JavaFXLineBreakpoint lb ) {
+    void unregisterFromLineUpdates( VisageLineBreakpoint lb ) {
         //translatedBreakpoints.remove(lb);
         BreakpointLineUpdater blu;
         synchronized (this) {
@@ -375,12 +375,12 @@ class LineTranslations {
     
     private class BreakpointLineUpdater implements PropertyChangeListener {
         
-        private final JavaFXLineBreakpoint lb;
+        private final VisageLineBreakpoint lb;
         private DataObject dataObject;
         private Line line;
         private boolean updatingLine = false;
         
-        public BreakpointLineUpdater( JavaFXLineBreakpoint lb, DataObject dataObject ) {
+        public BreakpointLineUpdater( VisageLineBreakpoint lb, DataObject dataObject ) {
             this.lb = lb;
             this.dataObject = dataObject;
         }

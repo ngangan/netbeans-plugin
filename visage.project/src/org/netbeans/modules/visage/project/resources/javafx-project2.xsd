@@ -43,9 +43,9 @@ However, if you add GPL Version 2 code and therefore, elected the GPL
 Version 2 license, then the option applies only if the new code is
 made subject to such option by the copyright holder.
 -->
-<xsd:schema xmlns="http://www.netbeans.org/ns/javafx-project/2"
+<xsd:schema xmlns="http://www.netbeans.org/ns/visage-project/2"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" 
-	targetNamespace="http://www.netbeans.org/ns/javafx-project/2">
+	targetNamespace="http://www.netbeans.org/ns/visage-project/2">
     <xsd:element name="data">
         <xsd:complexType>
             <xsd:sequence>

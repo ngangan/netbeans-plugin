@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.applications;
+package org.netbeans.modules.visage.palette.items.applications;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class CustomNode implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(CustomNode.class, "TEMPLATE_CustomNode", targetComponent, "javafx.scene.CustomNode", "javafx.scene.Group", "javafx.scene.Node"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(CustomNode.class, "TEMPLATE_CustomNode", targetComponent, "visage.scene.CustomNode", "visage.scene.Group", "visage.scene.Node"); //NOI18N;
     }
 }

@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -157,7 +157,7 @@ public class Imports {
         // Get package import name
         final String pkgImport = im.substring( 0, im.lastIndexOf( '.' )) + ".*";
         try {
-            JavaFXSource js = JavaFXSource.forDocument( targetComponent.getDocument());
+            VisageSource js = VisageSource.forDocument( targetComponent.getDocument());
             js.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController controller) throws Exception {

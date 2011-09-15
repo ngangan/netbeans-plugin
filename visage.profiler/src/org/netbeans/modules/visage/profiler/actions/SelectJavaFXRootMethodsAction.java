@@ -39,11 +39,11 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.profiler.actions;
+package org.netbeans.modules.visage.profiler.actions;
 
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.EditorRegistry;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 import org.netbeans.modules.profiler.actions.BaseSelectRootMethodsAction;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.openide.filesystems.FileObject;
@@ -52,7 +52,7 @@ import org.openide.filesystems.FileObject;
  * Action enabled on Java sources allowing to select root method(s) for Profiling of Part of Application.
  * @author Jaroslav Bachorik <jaroslav.bachorik@sun.com>
  */
-final public class SelectJavaFXRootMethodsAction extends BaseSelectRootMethodsAction {
+final public class SelectVisageRootMethodsAction extends BaseSelectRootMethodsAction {
 
     @Override
     protected String getFileClassName(FileObject file) {
@@ -68,7 +68,7 @@ final public class SelectJavaFXRootMethodsAction extends BaseSelectRootMethodsAc
         }
 
         // Try to get class at cursor or type of field at cursor
-        JavaFXProjectUtilities.ResolvedClass resolvedClass = JavaFXProjectUtilities.resolveClassAtPosition(file,
+        VisageProjectUtilities.ResolvedClass resolvedClass = VisageProjectUtilities.resolveClassAtPosition(file,
                 currentOffsetInEditor, true);
 
         if ((resolvedClass != null) && (resolvedClass.getJClass() != null)) {

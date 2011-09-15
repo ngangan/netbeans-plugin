@@ -35,9 +35,9 @@
  
 package weatherfx;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.animation.*;
+import visage.scene.image.Image;
+import visage.scene.image.ImageView;
+import visage.animation.*;
 import java.lang.*;
 
 /**

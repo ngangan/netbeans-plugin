@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.fxd;
+package qa.visage.functional.fxd;
 
 import javax.swing.tree.TreePath;
 import junit.framework.Test;
@@ -47,17 +47,17 @@ import org.netbeans.jellytools.NewFileWizardOperator;
 import org.netbeans.jellytools.modules.web.NavigatorOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 import org.netbeans.junit.NbModuleSuite;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.VisageProject;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jemmy.operators.JTreeOperator;
-import qa.javafx.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.EditorOperator;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
+public class VisageFxdFileTestCase extends VisageFxdTestCase {
 
 
     static final String PROJECT_NAME = "FXDProject";
@@ -65,12 +65,12 @@ public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
 
 
 
-    public JavaFXFxdFileTestCase(String name) {
+    public VisageFxdFileTestCase(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXFxdFileTestCase.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageFxdFileTestCase.class, ".*", ".*", TESTS);
 
     }
     static final String[] TESTS = {
@@ -85,12 +85,12 @@ public class JavaFXFxdFileTestCase extends JavaFXFxdTestCase {
         String pack = PROJECT_NAME.toLowerCase();
         
         System.out.println("*** FXD Test File");
-        JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME);
+        VisageProject project = VisageProject.createProject(PROJECT_NAME);
         project.popup(pack, "New|Other...");
 
 
         NewFileWizardOperator wizard = new NewFileWizardOperator();
-        wizard.selectCategory("JavaFX");
+        wizard.selectCategory("Visage");
         wizard.selectFileType("Empty FXD File");
         wizard.btNext().push();
         new JTextFieldOperator(wizard).setText(FILE_NAME);

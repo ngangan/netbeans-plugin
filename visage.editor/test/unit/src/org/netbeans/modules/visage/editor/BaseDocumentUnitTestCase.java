@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;

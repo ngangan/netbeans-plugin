@@ -34,12 +34,12 @@
 
 package shapes;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Circle;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
+import visage.scene.paint.Color;
+import visage.scene.shape.Polygon;
+import visage.scene.shape.Rectangle;
+import visage.scene.shape.Circle;
+import visage.stage.Stage;
+import visage.scene.Scene;
 
 /**
  * @author Michal Skvor

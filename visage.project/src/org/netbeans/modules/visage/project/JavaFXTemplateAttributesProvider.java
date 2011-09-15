@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.util.Collections;
 import java.util.Map;
@@ -64,7 +64,7 @@ import org.openide.loaders.DataObject;
  *
  * @author Jan Pokorsky
  */
-public final class JavaFXTemplateAttributesProvider implements CreateFromTemplateAttributesProvider {
+public final class VisageTemplateAttributesProvider implements CreateFromTemplateAttributesProvider {
     
     public Map<String,? extends Object> attributesFor(DataObject template, DataFolder target, String name) {
         FileObject templateFO = template.getPrimaryFile();
@@ -75,7 +75,7 @@ public final class JavaFXTemplateAttributesProvider implements CreateFromTemplat
         FileObject targetFO = target.getPrimaryFile();
         ClassPath cp = ClassPath.getClassPath(targetFO, ClassPath.SOURCE);
         if (cp == null) {
-            Logger.getLogger(JavaFXTemplateAttributesProvider.class.getName()).warning("No classpath was found for folder: " + target.getPrimaryFile()); // NOI18N
+            Logger.getLogger(VisageTemplateAttributesProvider.class.getName()).warning("No classpath was found for folder: " + target.getPrimaryFile()); // NOI18N
             return Collections.emptyMap();
         }
         return Collections.<String, Object>singletonMap("package", cp.getResourceName(targetFO, '.', false)); // NOI18N

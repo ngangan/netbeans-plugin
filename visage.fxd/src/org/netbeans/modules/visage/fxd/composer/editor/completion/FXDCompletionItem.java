@@ -41,15 +41,15 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor.completion;
+package org.netbeans.modules.visage.fxd.composer.editor.completion;
 
-import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
-import com.sun.javafx.tools.fxd.schema.model.Element;
-import com.sun.javafx.tools.fxd.schema.model.Enumeration;
-import com.sun.javafx.tools.fxd.schema.model.Function;
-import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
-import com.sun.javafx.tools.fxd.schema.model.Property;
-import com.sun.javafx.tools.fxd.schema.model.Value;
+import com.sun.visage.tools.fxd.schema.model.AbstractSchemaElement;
+import com.sun.visage.tools.fxd.schema.model.Element;
+import com.sun.visage.tools.fxd.schema.model.Enumeration;
+import com.sun.visage.tools.fxd.schema.model.Function;
+import com.sun.visage.tools.fxd.schema.model.PrimitiveType;
+import com.sun.visage.tools.fxd.schema.model.Property;
+import com.sun.visage.tools.fxd.schema.model.Value;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;

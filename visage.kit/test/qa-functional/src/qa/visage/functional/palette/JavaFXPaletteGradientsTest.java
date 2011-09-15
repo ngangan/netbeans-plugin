@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.palette;
+package qa.visage.functional.palette;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
@@ -48,18 +48,18 @@ import org.netbeans.junit.NbModuleSuite;
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXPaletteGradientsTest extends JavaFXPaletteTestCase {
+public class VisagePaletteGradientsTest extends VisagePaletteTestCase {
 
 
     static final String CATEGORY = "Gradients";
 
 
-    public JavaFXPaletteGradientsTest(String name) {
+    public VisagePaletteGradientsTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXPaletteGradientsTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisagePaletteGradientsTest.class, ".*", ".*", TESTS);
 
     }
 

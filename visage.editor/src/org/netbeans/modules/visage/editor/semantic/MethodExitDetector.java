@@ -41,11 +41,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.*;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
+import com.sun.visage.api.tree.*;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
 
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -83,7 +83,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
             //"return" exit point only if not searching for exceptions:
             doExitPoints = excs == null;
             
-            Boolean wasReturn = scan(JavaFXTreePath.getPath(cu, methoddecl), null);
+            Boolean wasReturn = scan(VisageTreePath.getPath(cu, methoddecl), null);
             
             if (isCanceled())
                 return null;
@@ -106,7 +106,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
                     if (isCanceled())
                         return null;
                     
-                    TypeMirror m = info.getTrees().getTypeMirror(JavaFXTreePath.getPath(cu, t));
+                    TypeMirror m = info.getTrees().getTypeMirror(VisageTreePath.getPath(cu, t));
                     
                     if (m != null) {
                         exceptions.add(m);
@@ -267,7 +267,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     
     @Override
     public Boolean visitCatch(CatchTree tree, Stack<Tree> d) {
-        TypeMirror type1 = info.getTrees().getTypeMirror(new JavaFXTreePath(new JavaFXTreePath(getCurrentPath(), tree.getParameter()), tree.getParameter().getType()));
+        TypeMirror type1 = info.getTrees().getTypeMirror(new VisageTreePath(new VisageTreePath(getCurrentPath(), tree.getParameter()), tree.getParameter().getType()));
         Types t = info.getTypes();
         
         if (type1 != null) {
@@ -294,7 +294,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     
     @Override
     public Boolean visitMethodInvocation(FunctionInvocationTree tree, Stack<Tree> d) {
-        Element el = info.getTrees().getElement(new JavaFXTreePath(getCurrentPath(), tree.getMethodSelect()));
+        Element el = info.getTrees().getElement(new VisageTreePath(getCurrentPath(), tree.getMethodSelect()));
         
         if (el == null) {
             System.err.println("Warning: decl == null"); // NOI18N
@@ -313,7 +313,7 @@ public class MethodExitDetector extends CancellableTreePathScanner<Boolean, Stac
     
     @Override
     public Boolean visitThrow(ThrowTree tree, Stack<Tree> d) {
-        addToExceptionsMap(info.getTrees().getTypeMirror(new JavaFXTreePath(getCurrentPath(), tree.getExpression())), tree);
+        addToExceptionsMap(info.getTrees().getTypeMirror(new VisageTreePath(getCurrentPath(), tree.getExpression())), tree);
         
         super.visitThrow(tree, d);
         

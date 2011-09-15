@@ -39,15 +39,15 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.tree.JavafxTreeInfo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,7 +72,7 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
@@ -82,19 +82,19 @@ import org.openide.util.Exceptions;
  *
  * @author answer
  */
-public class JavaFXSourceUtils {
-    final private static Logger LOG = Logger.getLogger(JavaFXSourceUtils.class.getName());
+public class VisageSourceUtils {
+    final private static Logger LOG = Logger.getLogger(VisageSourceUtils.class.getName());
     final private static boolean DEBUG = LOG.isLoggable(Level.FINEST);
 
     public static final String JAVAFX_MIME_TYPE = "text/x-fx"; // NOI18N
     
-    public static TokenSequence<JFXTokenId> getJavaTokenSequence(final TokenHierarchy hierarchy, final int offset) {
+    public static TokenSequence<VSGTokenId> getJavaTokenSequence(final TokenHierarchy hierarchy, final int offset) {
         if (hierarchy != null) {
             TokenSequence<?> ts = hierarchy.tokenSequence();
             while(ts != null && (offset == 0 || ts.moveNext())) {
                 ts.move(offset);
-                if (ts.language() == JFXTokenId.language())
-                    return (TokenSequence<JFXTokenId>)ts;
+                if (ts.language() == VSGTokenId.language())
+                    return (TokenSequence<VSGTokenId>)ts;
                 if (!ts.moveNext() && !ts.movePrevious())
                     return null;
                 ts = ts.embedded();
@@ -103,12 +103,12 @@ public class JavaFXSourceUtils {
         return null;
     }
 
-    public static boolean isJavaFXApplet(final FileObject file) {
+    public static boolean isVisageApplet(final FileObject file) {
         if (file == null) {
             return false;
         }
 
-        JavaFXSource js = JavaFXSource.forFileObject(file);
+        VisageSource js = VisageSource.forFileObject(file);
         if (js == null) {
             return false;
         }
@@ -117,19 +117,19 @@ public class JavaFXSourceUtils {
             js.runUserActionTask(new CancellableTask<CompilationController>() {
 
                 public void run(CompilationController control) throws Exception {
-                    if (!control.toPhase(JavaFXSource.Phase.ANALYZED).lessThan(JavaFXSource.Phase.ANALYZED)) {
+                    if (!control.toPhase(VisageSource.Phase.ANALYZED).lessThan(VisageSource.Phase.ANALYZED)) {
 
                         Elements elements = control.getElements();
                         JavafxcTrees trees = control.getTrees();
                         Types types = control.getTypes();
-                        TypeElement fxapplet = elements.getTypeElement("javafx.ui.Applet");     //NOI18N
+                        TypeElement fxapplet = elements.getTypeElement("visage.ui.Applet");     //NOI18N
                         TypeElement applet = elements.getTypeElement("java.applet.Applet");     //NOI18N
                         TypeElement japplet = elements.getTypeElement("javax.swing.JApplet");   //NOI18N
                         UnitTree cu = control.getCompilationUnit();
                         List<? extends Tree> topLevels = cu.getTypeDecls();
                         for (Tree topLevel : topLevels) {
-                            if (topLevel.getJavaFXKind() == Tree.JavaFXKind.CLASS_DECLARATION) {
-                                TypeElement type = (TypeElement) trees.getElement(JavaFXTreePath.getPath(cu, topLevel));
+                            if (topLevel.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
+                                TypeElement type = (TypeElement) trees.getElement(VisageTreePath.getPath(cu, topLevel));
                                 if (type != null) {
                                     Set<Modifier> modifiers = type.getModifiers();
                                     if (modifiers.contains(Modifier.PUBLIC) &&
@@ -154,25 +154,25 @@ public class JavaFXSourceUtils {
     }
 
     /**
-     * Checks whether the JavaFX platform used for a project
+     * Checks whether the Visage platform used for a project
      * containing the given file is valid - ie. all essential jars existing etc.
      * @param f The file object which containing project to check for platform validity
-     * @return Returns true if the containing project is using a valid and usable JavaFX SDK platform
+     * @return Returns true if the containing project is using a valid and usable Visage SDK platform
      */
     public static boolean isPlatformOk(FileObject f) {
-        if (!isJavaFXFile(f) && !f.isFolder()) return false; // a valid javafx file or a package folder
+        if (!isVisageFile(f) && !f.isFolder()) return false; // a valid visage file or a package folder
 
         ClasspathInfo cpi = ClasspathInfo.create(f);
         ClassPath cp = cpi.getClassPath(ClasspathInfo.PathKind.BOOT);
         for(ClassPath.Entry e : cp.entries()) {
-            if (e.getURL().toString().endsWith("javafxrt.jar!/")) { // NOI18N
+            if (e.getURL().toString().endsWith("visagert.jar!/")) { // NOI18N
                 return  e.isValid();
             }
         }
         return false;
     }
 
-    public static boolean isJavaFXFile(FileObject f) {
+    public static boolean isVisageFile(FileObject f) {
         return JAVAFX_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
     }
 
@@ -267,7 +267,7 @@ public class JavaFXSourceUtils {
     
     public static FileObject getFile(final ElementHandle<? extends Element> handle, final ClasspathInfo cpInfo) {
         if (handle == null || cpInfo == null) {
-            throw new IllegalArgumentException("Cannot pass null as an argument of the JavaFXSourceUtils.getFile");  //NOI18N
+            throw new IllegalArgumentException("Cannot pass null as an argument of the VisageSourceUtils.getFile");  //NOI18N
         }
 
         try {
@@ -308,14 +308,14 @@ public class JavaFXSourceUtils {
     }
 
     public static Collection<ElementHandle<TypeElement>> getMainClasses(FileObject fo) {
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        VisageSource jfxs = VisageSource.forFileObject(fo);
         final Collection<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
         if (jfxs != null) {
             try {
                 jfxs.runUserActionTask(new Task<CompilationController>() {
 
                     public void run(final CompilationController cc) throws Exception {
-                        new JavaFXTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
+                        new VisageTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
 
                             @Override
                             public Void visitClassDeclaration(ClassDeclarationTree node, Collection<ElementHandle<TypeElement>> p) {
@@ -340,7 +340,7 @@ public class JavaFXSourceUtils {
     }
 
     public static Collection<ElementHandle<TypeElement>> getClasses(FileObject fo, final ElementHandle<TypeElement> superTypeHandle) {
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        VisageSource jfxs = VisageSource.forFileObject(fo);
         final Collection<ElementHandle<TypeElement>> result = new HashSet<ElementHandle<TypeElement>>();
         if (jfxs != null) {
             try {
@@ -348,7 +348,7 @@ public class JavaFXSourceUtils {
 
                     public void run(final CompilationController cc) throws Exception {
                         final String superTypeQN = superTypeHandle != null ? superTypeHandle.getQualifiedName() : null;
-                        new JavaFXTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
+                        new VisageTreePathScanner<Void, Collection<ElementHandle<TypeElement>>>() {
 
                             @Override
                             public Void visitClassDeclaration(ClassDeclarationTree node, Collection<ElementHandle<TypeElement>> p) {

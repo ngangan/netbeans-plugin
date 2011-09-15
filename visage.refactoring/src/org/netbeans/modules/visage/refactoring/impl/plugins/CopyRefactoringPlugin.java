@@ -29,14 +29,14 @@
  * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.plugins;
+package org.netbeans.modules.visage.refactoring.impl.plugins;
 
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.tools.javafx.code.JavafxFlags;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.MemberSelectTree;
+import com.sun.tools.visage.code.JavafxFlags;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.File;
 import java.io.IOException;
@@ -50,22 +50,22 @@ import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.FixImportsElement;
-import org.netbeans.modules.javafx.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.ImportEntry;
-import org.netbeans.modules.javafx.refactoring.repository.ImportSet;
-import org.netbeans.modules.javafx.refactoring.transformations.InsertTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.RemoveTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.ReplaceTextTransformation;
-import org.netbeans.modules.javafx.refactoring.transformations.Transformation;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.FixImportsElement;
+import org.netbeans.modules.visage.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.ImportEntry;
+import org.netbeans.modules.visage.refactoring.repository.ImportSet;
+import org.netbeans.modules.visage.refactoring.transformations.InsertTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.RemoveTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.ReplaceTextTransformation;
+import org.netbeans.modules.visage.refactoring.transformations.Transformation;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MultipleCopyRefactoring;
 import org.netbeans.modules.refactoring.api.Problem;
@@ -87,7 +87,7 @@ import org.openide.util.NbBundle;
  *
  * @author Jaroslav Bachorik <yardus@netbeans.org>
  */
-public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
+public class CopyRefactoringPlugin extends VisageRefactoringPlugin {
     private AbstractRefactoring refactoring;
 
     public CopyRefactoringPlugin(AbstractRefactoring refactoring) {
@@ -133,7 +133,7 @@ public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
 
         for(FileObject fobj : affectedFiles) {
             if (isCancelled()) return null;
-            if (!SourceUtils.isJavaFXFile(fobj)) continue;
+            if (!SourceUtils.isVisageFile(fobj)) continue;
             final ClassModel cm = RefactoringSupport.classModelFactory(refactoring).classModelFor(fobj);
             // Refactoring API doesn't handle copy of multiple files
             if (refactoring instanceof MultipleCopyRefactoring) {
@@ -263,18 +263,18 @@ public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
         // can't use MoveProblemCollector as the preconditions are a bit different :(
         final Problem[] problem = new Problem[]{p};
 
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fobj);
+        VisageSource jfxs = VisageSource.forFileObject(fobj);
         try {
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(final CompilationController cc) throws Exception {
-                    JavaFXTreePathScanner<Void, Void> scanner = new JavaFXTreePathScanner<Void, Void>() {
+                    VisageTreePathScanner<Void, Void> scanner = new VisageTreePathScanner<Void, Void>() {
                         private String clzName = ""; // NOI18N
                         @Override
                         public Void visitIdentifier(IdentifierTree node, Void p) {
                             Element e = cc.getTrees().getElement(getCurrentPath());
                             if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
-                                TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
+                                TypeElement topClass = VisageSourceUtils.getOutermostEnclosingTypeElement(e);
                                 String message = ""; // NOI18N
                                 if (e.getKind().isInterface() || e.getKind().isClass()) {
                                     message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()}); // NOI18N
@@ -290,7 +290,7 @@ public class CopyRefactoringPlugin extends JavaFXRefactoringPlugin {
                         public Void visitMemberSelect(MemberSelectTree node, Void p) {
                             Element e = cc.getTrees().getElement(getCurrentPath());
                             if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
-                                TypeElement topClass = JavaFXSourceUtils.getOutermostEnclosingTypeElement(e);
+                                TypeElement topClass = VisageSourceUtils.getOutermostEnclosingTypeElement(e);
                                 String message = ""; // NOI18N
                                 if (e.getKind().isInterface() || e.getKind().isClass()) {
                                     message = NbBundle.getMessage(CopyRefactoringPlugin.class, "ERR_AccessesPackagePrivateClass2", new Object[]{clzName, e.getSimpleName().toString()}); // NOI18n

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 import java.io.IOException;
 import java.net.URL;
@@ -71,7 +71,7 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
-import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
+import org.netbeans.modules.visage.project.classpath.ClassPathSupport;
 
 /**
  * This class decorates package nodes and file nodes under the Libraries Nodes.

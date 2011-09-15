@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.layouts;
+package org.netbeans.modules.visage.palette.items.layouts;
 
 /**
  *
@@ -50,7 +50,7 @@ public final class Flow extends AbstractLayout{
 
     public Flow() {
         templateName = "TEMPLATE_Flow"; // NOI18N
-        importString = "javafx.scene.layout.Flow"; //NOI18N
+        importString = "visage.scene.layout.Flow"; //NOI18N
     }
 
 }

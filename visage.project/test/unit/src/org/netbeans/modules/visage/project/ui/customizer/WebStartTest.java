@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
-import org.netbeans.modules.javafx.project.*;
+import org.netbeans.modules.visage.project.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -95,12 +95,12 @@ public class WebStartTest extends NbTestCase {
         String name = "WebStartFXProject";
         String mainClass = name.toLowerCase() + ".Main";
         //System.out.println("WorkDir = " + getWorkDir());
-        AntProjectHelper aph = JavaFXProjectGenerator.createProject(new File(getWorkDir(), name), name, mainClass, "manifest.mf");
+        AntProjectHelper aph = VisageProjectGenerator.createProject(new File(getWorkDir(), name), name, mainClass, "manifest.mf");
         assertNotNull(aph);
         //String projectDirectory = aph.getProjectDirectory().getName();
         //System.out.println("ProjectDirectory = " + aph.getProjectDirectory().getName());
 
-        JavaFXProject prj = (JavaFXProject) ProjectManager.getDefault().findProject(aph.getProjectDirectory());
+        VisageProject prj = (VisageProject) ProjectManager.getDefault().findProject(aph.getProjectDirectory());
         assertNotNull(prj);
         //System.out.println("prj = "+ prj.getProjectDirectory().getNameExt());
         //System.out.println("Path = "+ prj.getProjectDirectory().getFileObject("nbproject/project.properties").getPath());

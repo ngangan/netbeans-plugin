@@ -28,11 +28,11 @@
  *
  * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.editor.mimelookup.MimePath;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
@@ -53,12 +53,12 @@ import org.netbeans.modules.editor.indent.api.Indent;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
-public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
+public class VisageInsertBreakAction extends BaseKit.InsertBreakAction {
 
     static final long serialVersionUID = -1506173310438326380L;
 
     private boolean isJavadocTouched = false;
-    private static Logger log = Logger.getLogger(JavaFXInsertBreakAction.class.getName());
+    private static Logger log = Logger.getLogger(VisageInsertBreakAction.class.getName());
 
     @Override
     public void actionPerformed(ActionEvent evt, JTextComponent target) {
@@ -108,9 +108,9 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
     }
 
     private static boolean posWithinString(BaseDocument doc, int dotOffset) {
-        TokenSequence<JFXTokenId> ts = BracketCompletion.getTokenSequence(doc, dotOffset);
+        TokenSequence<VSGTokenId> ts = BracketCompletion.getTokenSequence(doc, dotOffset);
         // Check that the ENTER right at begining of string-literal is not treated like "within" the string
-        return (ts.moveNext() && ts.token().id() == JFXTokenId.STRING_LITERAL && ts.offset() != dotOffset);
+        return (ts.moveNext() && ts.token().id() == VSGTokenId.STRING_LITERAL && ts.offset() != dotOffset);
     }
 
     private StringBuilder createAdditiveString(BaseDocument doc, int baseIndent, String closingString) {
@@ -136,7 +136,7 @@ public class JavaFXInsertBreakAction extends BaseKit.InsertBreakAction {
             TokenHierarchy<BaseDocument> tokens = TokenHierarchy.get(doc);
             TokenSequence<?> ts = tokens.tokenSequence();
             ts.move(dotPosition);
-            if (!((ts.moveNext() || ts.movePrevious()) && ts.token().id() == JFXTokenId.DOC_COMMENT)) {
+            if (!((ts.moveNext() || ts.movePrevious()) && ts.token().id() == VSGTokenId.DOC_COMMENT)) {
                 return null;
             }
 

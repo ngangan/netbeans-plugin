@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader.fxz;
+package org.netbeans.modules.visage.fxd.dataloader.fxz;
 
 import java.io.IOException;
 import org.openide.filesystems.FileObject;
@@ -62,7 +62,7 @@ public final class FXZDataLoader extends UniFileLoader {
     private static final long serialVersionUID = 2L;
     
     public FXZDataLoader() {
-        super("org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject"); //NOI18N
+        super("org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject"); //NOI18N
     }
     
     @Override

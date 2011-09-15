@@ -41,9 +41,9 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.visage.api.tree.VisageTreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
@@ -59,8 +59,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import javax.swing.text.StyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.openide.cookies.EditorCookie;
@@ -94,7 +94,7 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
         manager.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (ExplorerManager.PROP_SELECTED_NODES.equals(evt.getPropertyName())) {
-                    setHighlights(TreeNavigatorJavaFXSourceFactory.getInstance().getFile(), manager);
+                    setHighlights(TreeNavigatorVisageSourceFactory.getInstance().getFile(), manager);
                 }
                 if (ExplorerManager.PROP_ROOT_CONTEXT.equals(evt.getPropertyName())) {
                     taskQueue.post(new Runnable() {
@@ -150,11 +150,11 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
     }
 
     public void panelActivated(Lookup context) {
-        TreeNavigatorJavaFXSourceFactory.getInstance().setLookup(context, new TaskImpl());
+        TreeNavigatorVisageSourceFactory.getInstance().setLookup(context, new TaskImpl());
     }
 
     public void panelDeactivated() {
-        TreeNavigatorJavaFXSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
+        TreeNavigatorVisageSourceFactory.getInstance().setLookup(Lookup.EMPTY, null);
     }
 
     static OffsetsBag getBag(Document doc) {
@@ -218,7 +218,7 @@ public class TreeNavigatorProviderImpl implements NavigatorPanel {
         }
 
         public void run(CompilationInfo info) {
-            manager.setRootContext(TreeNode.getTree(info, new JavaFXTreePath(info.getCompilationUnit())));
+            manager.setRootContext(TreeNode.getTree(info, new VisageTreePath(info.getCompilationUnit())));
         }
         
     }

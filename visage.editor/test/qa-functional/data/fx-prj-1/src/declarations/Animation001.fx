@@ -1,6 +1,6 @@
 package auto1;
 
-import javafx.animation.*;
+import visage.animation.*;
 
 var rotation = 0;
 var anim = Timeline {

@@ -1,8 +1,8 @@
-package org.netbeans.modules.javafx.debugger.models;
+package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.javafx.jdi.FXPrimitiveValue;
-import com.sun.javafx.jdi.FXSequenceReference;
-import com.sun.javafx.jdi.FXValue;
+import com.sun.visage.jdi.FXPrimitiveValue;
+import com.sun.visage.jdi.FXSequenceReference;
+import com.sun.visage.jdi.FXValue;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;

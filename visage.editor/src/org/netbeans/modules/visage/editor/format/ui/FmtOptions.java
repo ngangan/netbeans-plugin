@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.format.ui;
+package org.netbeans.modules.visage.editor.format.ui;
 
 import java.awt.Component;
 import java.awt.Container;
@@ -56,10 +56,10 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.editor.settings.SimpleValueNames;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.modules.javafx.editor.format.CodeStyle;
-import org.netbeans.modules.javafx.editor.format.JFXReformatTask;
-import static org.netbeans.modules.javafx.editor.format.CodeStyle.*;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.modules.visage.editor.format.CodeStyle;
+import org.netbeans.modules.visage.editor.format.VSGReformatTask;
+import static org.netbeans.modules.visage.editor.format.CodeStyle.*;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
 import org.netbeans.modules.options.editor.spi.PreviewProvider;
 
@@ -418,7 +418,7 @@ public class FmtOptions {
       
     public static class CategorySupport implements ActionListener, DocumentListener, PreviewProvider, PreferencesCustomizer {
 
-        public static final String OPTION_ID = "org.netbeans.modules.javafx.editor.format.ui.FormatingOptions.ID";
+        public static final String OPTION_ID = "org.netbeans.modules.visage.editor.format.ui.FormatingOptions.ID";
                 
         private static final int LOAD = 0;
         private static final int STORE = 1;
@@ -554,7 +554,7 @@ public class FmtOptions {
             if (!fail) {
                 CodeStyle codeStyle = codeStyleProducer.create(previewPrefs);
                 jep.setIgnoreRepaint(true);
-                jep.setText(JFXReformatTask.reformat(previewText, codeStyle));
+                jep.setText(VSGReformatTask.reformat(previewText, codeStyle));
                 jep.setIgnoreRepaint(false);
                 jep.scrollRectToVisible(new Rectangle(0, 0, 10, 10));
                 jep.repaint(100);

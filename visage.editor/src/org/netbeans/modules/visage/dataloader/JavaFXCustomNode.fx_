@@ -7,9 +7,9 @@
 package ${package};
 </#if>
 
-import javafx.scene.CustomNode;
-import javafx.scene.Group;
-import javafx.scene.Node;
+import visage.scene.CustomNode;
+import visage.scene.Group;
+import visage.scene.Node;
 
 /**
  * @author ${user}

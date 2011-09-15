@@ -40,14 +40,14 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXForExpression;
+import com.sun.tools.visage.tree.VSGForExpression;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -58,19 +58,19 @@ import org.openide.util.NbBundle;
  * seq[x | condition]
  * @author David Strupl
  */
-public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironment<JFXForExpression> {
+public class ForExpressionPredicateEnvironment extends VisageCompletionEnvironment<VSGForExpression> {
     
     private static final Logger logger = Logger.getLogger(ForExpressionPredicateEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXForExpression foe) throws IOException {
+    protected void inside(VSGForExpression foe) throws IOException {
         if (LOGGABLE) log("inside ForExpressionPredicateEnvironment " + foe); // NOI18N
         if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, foe);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<JFXTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterPipe = false;
@@ -111,12 +111,12 @@ public class ForExpressionPredicateEnvironment extends JavaFXCompletionEnvironme
         }
         if (LOGGABLE) log("  afterPipe: " + afterPipe); // NOI18N
         if (afterPipe) {
-            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_")); // NOI18N
+            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_boolean_condition_")); // NOI18N
             return;
         }
         if (LOGGABLE) log("  afterIdentifier: " + afterIdentifier); // NOI18N
         if (afterIdentifier) {
-            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/javafx/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after")); // NOI18N
+            if (LOGGABLE) log(NbBundle.getBundle("org/netbeans/modules/visage/editor/completion/environment/Bundle").getString("__NOT_IMPLEMENTED:_suggest_ending_the_variable_name_and_|_after")); // NOI18N
             return;
         } 
     }

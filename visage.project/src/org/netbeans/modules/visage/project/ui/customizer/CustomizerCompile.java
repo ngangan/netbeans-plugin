@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.util.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ import org.openide.util.HelpCtx;
 public class CustomizerCompile extends JPanel implements HelpCtx.Provider {
 
         
-    public CustomizerCompile( JavaFXProjectProperties uiProperties ) {
+    public CustomizerCompile( VisageProjectProperties uiProperties ) {
         initComponents();
                 
         uiProperties.JAVAC_DEPRECATION_MODEL.setMnemonic( jCheckBoxDeprecation.getMnemonic() );

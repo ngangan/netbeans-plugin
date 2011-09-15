@@ -46,11 +46,11 @@ made subject to such option by the copyright holder.
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.sdk.mac</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.sdk.mac</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.sdksamples</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.sdksamples</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

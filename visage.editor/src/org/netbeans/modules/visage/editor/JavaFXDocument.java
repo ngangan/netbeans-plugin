@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -56,15 +56,15 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.editor.NbEditorDocument;
 import org.netbeans.modules.editor.NbEditorUtilities;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
@@ -76,7 +76,7 @@ import org.openide.util.NbBundle;
  *
  * @author answer
  */
-public class JavaFXDocument extends NbEditorDocument {
+public class VisageDocument extends NbEditorDocument {
     
     private JEditorPane pane = null;
     private Component editor = null;
@@ -85,7 +85,7 @@ public class JavaFXDocument extends NbEditorDocument {
     private Point previewLocation = new Point(0, 0);
     private Dimension previewSize = new Dimension(200, 200);
     
-    public JavaFXDocument(String mimeType)  {
+    public VisageDocument(String mimeType)  {
         super(mimeType);
     }
     
@@ -169,11 +169,11 @@ public class JavaFXDocument extends NbEditorDocument {
     public void enableExecution(boolean enabled) {
         if (enabled) {
             Project project = getProject(this);
-            org.netbeans.spi.project.support.ant.PropertyEvaluator evaluator =((JavaFXProject)project).evaluator();
-            Object profile = evaluator.getProperty("javafx.profile");                                                   //NOI18N
+            org.netbeans.spi.project.support.ant.PropertyEvaluator evaluator =((VisageProject)project).evaluator();
+            Object profile = evaluator.getProperty("visage.profile");                                                   //NOI18N
             if (profile != null)
                 if (profile.toString().contentEquals("mobile")) {                                                       //NOI18N
-                    String message = NbBundle.getMessage(JavaFXDocument.class, "PREVIEW_DISABLED_BY_PROFILE");          //NOI18N
+                    String message = NbBundle.getMessage(VisageDocument.class, "PREVIEW_DISABLED_BY_PROFILE");          //NOI18N
                     NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.INFORMATION_MESSAGE);  
                     DialogDisplayer.getDefault().notify(d);
                     return;
@@ -211,7 +211,7 @@ public class JavaFXDocument extends NbEditorDocument {
 //
             } else {
                 executionEnabled = true;
-                final JavaFXSource js = JavaFXSource.forDocument(this);
+                final VisageSource js = VisageSource.forDocument(this);
                 try {
                     js.runUserActionTask(new Task<CompilationController>() {
                         public void run(CompilationController controller) throws Exception {

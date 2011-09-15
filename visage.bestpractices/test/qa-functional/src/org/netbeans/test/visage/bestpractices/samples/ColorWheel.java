@@ -39,15 +39,15 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.test.javafx.bestpractices.samples;
+package org.netbeans.test.visage.bestpractices.samples;
 
 import junit.framework.Test;
 import org.netbeans.jellytools.OutputOperator;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.test.javafx.bestpractices.lib.JavaFXTestCase;
-import org.netbeans.test.javafx.bestpractices.lib.Util;
+import org.netbeans.test.visage.bestpractices.lib.VisageTestCase;
+import org.netbeans.test.visage.bestpractices.lib.Util;
 
-public class ColorWheel extends JavaFXTestCase {
+public class ColorWheel extends VisageTestCase {
 
     public String _type = "Color";
     public String _project = "Color Wheel";

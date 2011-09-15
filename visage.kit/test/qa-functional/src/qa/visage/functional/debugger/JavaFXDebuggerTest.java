@@ -39,14 +39,14 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.debugger;
+package qa.visage.functional.debugger;
 
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.Util;
-import qa.javafx.functional.library.project.DebuggerOperator;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.Constant;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.Util;
+import qa.visage.functional.library.project.DebuggerOperator;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
 
 import junit.framework.Test;
@@ -60,24 +60,24 @@ import org.netbeans.junit.NbTestSuite;
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
 
-public class JavaFXDebuggerTest extends JavaFXTestCase {
+public class VisageDebuggerTest extends VisageTestCase {
 
     static final String[] TESTS = {
         "testDebugger",
     };
 
 
-    public JavaFXDebuggerTest(String name) {
+    public VisageDebuggerTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXDebuggerTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageDebuggerTest.class, ".*", ".*", TESTS);
 
     }
 
      public static void main(String[] args) {
-        TestRunner.run(new NbTestSuite(JavaFXDebuggerTest.class));
+        TestRunner.run(new NbTestSuite(VisageDebuggerTest.class));
     }
 
 
@@ -86,7 +86,7 @@ public class JavaFXDebuggerTest extends JavaFXTestCase {
         //System.out.println("Debugger Test!");
         System.out.println("XTEST_DATA_PATH = " + Util.XTEST_DATA_PATH);
         
-        JavaFXProject project  = JavaFXProject.createProject("SmokeDebugger");
+        VisageProject project  = VisageProject.createProject("SmokeDebugger");
         
         EditorOperator editor = project.openMainFile();
         String code = Util.getSampleText(Constant.SMOKE_DEBUGGER_FILE_PATH);

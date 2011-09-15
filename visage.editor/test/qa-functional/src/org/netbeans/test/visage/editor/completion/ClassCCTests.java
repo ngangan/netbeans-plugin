@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.test.javafx.editor.completion;
+package org.netbeans.test.visage.editor.completion;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
@@ -200,7 +200,7 @@ public class ClassCCTests extends CompletionTestPerformer {
     public void testFXClass006() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter,
-                "class testit extends javafx.", // what should be typed in the editor
+                "class testit extends visage.", // what should be typed in the editor
                 false,
                 getDataDir(),
                 "fx-prj-1",

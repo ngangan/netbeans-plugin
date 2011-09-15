@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -56,7 +56,7 @@ import java.util.Map;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.spi.project.support.ant.GeneratedFilesHelper;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.ReferenceHelper;
@@ -67,7 +67,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.lookup.Lookups;
 
 
-/** Customization of JavaFX project
+/** Customization of Visage project
  *
  * @author Petr Hrebejk
  */
@@ -90,7 +90,7 @@ public class CustomizerProviderImpl implements CustomizerProvider {
     private static final String COMMAND_OK = "OK";          // NOI18N
     private static final String COMMAND_CANCEL = "CANCEL";  // NOI18N
 
-    public static final String CUSTOMIZER_FOLDER_PATH = "Projects/org-netbeans-modules-javafx-project/Customizer"; // NOI18N
+    public static final String CUSTOMIZER_FOLDER_PATH = "Projects/org-netbeans-modules-visage-project/Customizer"; // NOI18N
     
     private static Map /*<Project,Dialog>*/project2Dialog = new HashMap(); 
     
@@ -122,8 +122,8 @@ public class CustomizerProviderImpl implements CustomizerProvider {
             return;
         }
         else {
-            JavaFXProjectProperties uiProperties = new JavaFXProjectProperties( 
-                    (JavaFXProject)project, updateHelper, evaluator, refHelper ,
+            VisageProjectProperties uiProperties = new VisageProjectProperties( 
+                    (VisageProject)project, updateHelper, evaluator, refHelper ,
                     genFileHelper);
             Lookup context = Lookups.fixed(new Object[] {
                 project,
@@ -147,9 +147,9 @@ public class CustomizerProviderImpl implements CustomizerProvider {
     private class OptionListener extends WindowAdapter implements ActionListener {
     
         private Project project;
-        private JavaFXProjectProperties uiProperties;
+        private VisageProjectProperties uiProperties;
         
-        OptionListener( Project project, JavaFXProjectProperties uiProperties ) {
+        OptionListener( Project project, VisageProjectProperties uiProperties ) {
             this.project = project;
             this.uiProperties = uiProperties;            
         }

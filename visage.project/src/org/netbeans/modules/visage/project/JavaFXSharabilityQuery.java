@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.File;
 import java.beans.PropertyChangeEvent;
@@ -53,12 +53,12 @@ import org.netbeans.api.project.ProjectManager;
 import org.netbeans.spi.queries.SharabilityQueryImplementation;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 
 /**
- * SharabilityQueryImplementation for javafxproject with multiple sources
+ * SharabilityQueryImplementation for visageproject with multiple sources
  */
-public class JavaFXSharabilityQuery implements SharabilityQueryImplementation, PropertyChangeListener {
+public class VisageSharabilityQuery implements SharabilityQueryImplementation, PropertyChangeListener {
 
     private final AntProjectHelper helper;
     private final PropertyEvaluator evaluator;
@@ -67,13 +67,13 @@ public class JavaFXSharabilityQuery implements SharabilityQueryImplementation, P
     private SharabilityQueryImplementation delegate;
 
     /**
-     * Creates new JavaFXSharabilityQuery
+     * Creates new VisageSharabilityQuery
      * @param helper AntProjectHelper
      * @param evaluator PropertyEvaluator
      * @param srcRoots sources
      * @param testRoots tests
      */
-    JavaFXSharabilityQuery (AntProjectHelper helper, PropertyEvaluator evaluator, SourceRoots srcRoots, SourceRoots testRoots) {
+    VisageSharabilityQuery (AntProjectHelper helper, PropertyEvaluator evaluator, SourceRoots srcRoots, SourceRoots testRoots) {
         this.helper = helper;
         this.evaluator = evaluator;
         this.srcRoots = srcRoots;
@@ -93,7 +93,7 @@ public class JavaFXSharabilityQuery implements SharabilityQueryImplementation, P
     public int getSharability(final File file) {
         return ProjectManager.mutex().readAccess(new Mutex.Action<Integer>() {
             public Integer run() {
-                synchronized (JavaFXSharabilityQuery.this) {
+                synchronized (VisageSharabilityQuery.this) {
                     if (delegate == null) {
                         delegate = createDelegate ();
                     }
@@ -123,8 +123,8 @@ public class JavaFXSharabilityQuery implements SharabilityQueryImplementation, P
         }
         return helper.createSharabilityQuery(this.evaluator, props,
             new String[] {
-                "${" + JavaFXProjectProperties.DIST_DIR + "}", // NOI18N
-                "${" + JavaFXProjectProperties.BUILD_DIR + "}", // NOI18N
+                "${" + VisageProjectProperties.DIST_DIR + "}", // NOI18N
+                "${" + VisageProjectProperties.BUILD_DIR + "}", // NOI18N
             });
     }
 

@@ -29,7 +29,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.lexer;
+package org.netbeans.api.visage.lexer;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -39,7 +39,7 @@ import org.netbeans.api.lexer.TokenId;
 import org.netbeans.spi.lexer.LanguageHierarchy;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerRestartInfo;
-import org.netbeans.lib.javafx.lexer.JFXStringLexer;
+import org.netbeans.lib.visage.lexer.VSGStringLexer;
 
 /**
  * Token ids for java string language
@@ -49,7 +49,7 @@ import org.netbeans.lib.javafx.lexer.JFXStringLexer;
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.org">RKo</a>)
  * @version 1.00
  */
-public enum JFXStringTokenId implements TokenId {
+public enum VSGStringTokenId implements TokenId {
 
     TEXT("string"), //NOI18N
     BACKSPACE("string-escape"), //NOI18N
@@ -72,11 +72,11 @@ public enum JFXStringTokenId implements TokenId {
 
     private final String primaryCategory;
 
-    JFXStringTokenId() {
+    VSGStringTokenId() {
         this(null);
     }
 
-    JFXStringTokenId(String primaryCategory) {
+    VSGStringTokenId(String primaryCategory) {
         this.primaryCategory = primaryCategory;
     }
 
@@ -84,18 +84,18 @@ public enum JFXStringTokenId implements TokenId {
         return primaryCategory;
     }
 
-    private static final Language<JFXStringTokenId> language = new MyLanguageHierarchy(false).language();
-    private static final Language<JFXStringTokenId> language_STO = new MyLanguageHierarchy(true).language();
+    private static final Language<VSGStringTokenId> language = new MyLanguageHierarchy(false).language();
+    private static final Language<VSGStringTokenId> language_STO = new MyLanguageHierarchy(true).language();
 
-    public static Language<JFXStringTokenId> language() {
+    public static Language<VSGStringTokenId> language() {
         return language(false);
     }
 
-    public static Language<JFXStringTokenId> language(boolean forceStringOnly) {
+    public static Language<VSGStringTokenId> language(boolean forceStringOnly) {
         return forceStringOnly ? language_STO : language;
     }
 
-    private static class MyLanguageHierarchy extends LanguageHierarchy<JFXStringTokenId> {
+    private static class MyLanguageHierarchy extends LanguageHierarchy<VSGStringTokenId> {
         private final boolean forceStringOnly;
 
         private MyLanguageHierarchy(boolean forceStringOnly) {
@@ -103,18 +103,18 @@ public enum JFXStringTokenId implements TokenId {
         }
 
         @Override
-        protected Collection<JFXStringTokenId> createTokenIds() {
-            return EnumSet.allOf(JFXStringTokenId.class);
+        protected Collection<VSGStringTokenId> createTokenIds() {
+            return EnumSet.allOf(VSGStringTokenId.class);
         }
 
         @Override
-        protected Map<String, Collection<JFXStringTokenId>> createTokenCategories() {
+        protected Map<String, Collection<VSGStringTokenId>> createTokenCategories() {
             return null; // no extra categories
         }
 
         @Override
-        protected Lexer<JFXStringTokenId> createLexer(LexerRestartInfo<JFXStringTokenId> info) {
-            return new JFXStringLexer(info, forceStringOnly);
+        protected Lexer<VSGStringTokenId> createLexer(LexerRestartInfo<VSGStringTokenId> info) {
+            return new VSGStringLexer(info, forceStringOnly);
         }
 
         @Override

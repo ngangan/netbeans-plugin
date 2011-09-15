@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
@@ -64,20 +64,20 @@ import java.util.List;
 /**
  * @author Vita Stejskal
  */
-public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFactory {
+public final class VisageBracesMatcher implements BracesMatcher, BracesMatcherFactory {
     private static final char[] PAIRS = new char[]{'(', ')', // NOI18N
             '[', ']', // NOI18N
             '{', '}', // NOI18N
             '{', '}', // NOI18N
             '{', '}' // NOI18N
     };
-    private static final JFXTokenId[] PAIR_TOKEN_IDS = new JFXTokenId[]{
-            JFXTokenId.LPAREN, JFXTokenId.RPAREN,
-            JFXTokenId.LBRACKET, JFXTokenId.RBRACKET,
-            JFXTokenId.LBRACE, JFXTokenId.RBRACE,
-            JFXTokenId.QUOTE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_QUOTE_STRING_LITERAL,
-            JFXTokenId.QUOTE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL,
-            JFXTokenId.RBRACE_LBRACE_STRING_LITERAL, JFXTokenId.RBRACE_QUOTE_STRING_LITERAL,
+    private static final VSGTokenId[] PAIR_TOKEN_IDS = new VSGTokenId[]{
+            VSGTokenId.LPAREN, VSGTokenId.RPAREN,
+            VSGTokenId.LBRACKET, VSGTokenId.RBRACKET,
+            VSGTokenId.LBRACE, VSGTokenId.RBRACE,
+            VSGTokenId.QUOTE_LBRACE_STRING_LITERAL, VSGTokenId.RBRACE_QUOTE_STRING_LITERAL,
+            VSGTokenId.QUOTE_LBRACE_STRING_LITERAL, VSGTokenId.RBRACE_LBRACE_STRING_LITERAL,
+            VSGTokenId.RBRACE_LBRACE_STRING_LITERAL, VSGTokenId.RBRACE_QUOTE_STRING_LITERAL,
     };
 
 
@@ -88,11 +88,11 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
     private char matchingChar;
     private boolean backward;
 
-    public JavaFXBracesMatcher() {
+    public VisageBracesMatcher() {
         this(null);
     }
 
-    private JavaFXBracesMatcher(MatcherContext context) {
+    private VisageBracesMatcher(MatcherContext context) {
         this.context = context;
     }
 
@@ -122,7 +122,7 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
     public int[] findMatches() throws InterruptedException, BadLocationException {
         TokenHierarchy<Document> th = TokenHierarchy.get(context.getDocument());
         List<TokenSequence<? extends TokenId>> sequences = getEmbeddedTokenSequences(
-                th, originOffset, backward, JFXTokenId.language());
+                th, originOffset, backward, VSGTokenId.language());
 
         if (!sequences.isEmpty()) {
             // Check special tokens
@@ -131,7 +131,7 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
             if (seq.moveNext()) {
                 int offset = -1;
                 final TokenId id = seq.token().id();
-                if (id == JFXTokenId.STRING_LITERAL || isComment((JFXTokenId) id)) {
+                if (id == VSGTokenId.STRING_LITERAL || isComment((VSGTokenId) id)) {
                     offset = BracesMatcherSupport.matchChar(
                             context.getDocument(),
                             backward ? originOffset : originOffset + 1,
@@ -139,9 +139,9 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
                             originChar,
                             matchingChar);
 
-                } else if (id == JFXTokenId.QUOTE_LBRACE_STRING_LITERAL ||
-                        id == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL ||
-                        id == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL) {
+                } else if (id == VSGTokenId.QUOTE_LBRACE_STRING_LITERAL ||
+                        id == VSGTokenId.RBRACE_QUOTE_STRING_LITERAL ||
+                        id == VSGTokenId.RBRACE_LBRACE_STRING_LITERAL) {
                     offset = BracesMatcherSupport.matchChar(
                             context.getDocument(),
                             backward ? originOffset : originOffset + 1,
@@ -166,8 +166,8 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
                 list = th.tokenSequenceList(seq.languagePath(), originOffset + 1, context.getDocument().getLength());
             }
 
-            JFXTokenId originId = getTokenId(originChar);
-            JFXTokenId lookingForId = getTokenId(matchingChar);
+            VSGTokenId originId = getTokenId(originChar);
+            VSGTokenId lookingForId = getTokenId(matchingChar);
             int counter = 0;
 
             for (TokenSequenceIterator tsi = new TokenSequenceIterator(new ArrayList<TokenSequence<? extends TokenId>>(list), backward); tsi.hasMore();) {
@@ -189,15 +189,15 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
     }
 
 
-    private static boolean isComment(JFXTokenId id) {
-        return id == JFXTokenId.COMMENT || id == JFXTokenId.LINE_COMMENT || id == JFXTokenId.DOC_COMMENT;
+    private static boolean isComment(VSGTokenId id) {
+        return id == VSGTokenId.COMMENT || id == VSGTokenId.LINE_COMMENT || id == VSGTokenId.DOC_COMMENT;
     }
 
     // -----------------------------------------------------
     // private implementation
     // -----------------------------------------------------
 
-    private JFXTokenId getTokenId(char ch) {
+    private VSGTokenId getTokenId(char ch) {
         for (int i = 0; i < PAIRS.length; i++) {
             if (PAIRS[i] == ch) {
                 return PAIR_TOKEN_IDS[i];
@@ -206,7 +206,7 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
         return null;
     }
 
-    public static JFXTokenId getOposite(JFXTokenId tokenId, boolean isLeftToken) {
+    public static VSGTokenId getOposite(VSGTokenId tokenId, boolean isLeftToken) {
         for (int i = (isLeftToken ? 0 : 1); i < PAIR_TOKEN_IDS.length; i += 2) {
             if (PAIR_TOKEN_IDS[i] == tokenId) {
                 return PAIR_TOKEN_IDS[(isLeftToken ? i + 1 : i - 1)];
@@ -308,7 +308,7 @@ public final class JavaFXBracesMatcher implements BracesMatcher, BracesMatcherFa
 
     /** */
     public BracesMatcher createMatcher(MatcherContext context) {
-        return new JavaFXBracesMatcher(context);
+        return new VisageBracesMatcher(context);
     }
 
 }

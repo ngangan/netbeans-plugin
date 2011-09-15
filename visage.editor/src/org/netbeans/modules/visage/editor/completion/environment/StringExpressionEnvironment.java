@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXStringExpression;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.tools.visage.tree.VSGStringExpression;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -53,14 +53,14 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class StringExpressionEnvironment extends JavaFXCompletionEnvironment<JFXStringExpression> {
+public class StringExpressionEnvironment extends VisageCompletionEnvironment<VSGStringExpression> {
 
     private static final Logger logger = Logger.getLogger(StringExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXStringExpression bl) throws IOException {
-        if (LOGGABLE) log("inside JFXStringExpression " + bl); // NOI18N
+    protected void inside(VSGStringExpression bl) throws IOException {
+        if (LOGGABLE) log("inside VSGStringExpression " + bl); // NOI18N
         localResult(null);
         addKeywordsForStatement();
     }

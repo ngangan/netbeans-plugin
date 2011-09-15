@@ -43,18 +43,18 @@
  */
 
 
-package org.netbeans.modules.javafx.refactoring.issues;
+package org.netbeans.modules.visage.refactoring.issues;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.text.Document;
-import org.netbeans.modules.javafx.refactoring.SourceTestBase;
+import org.netbeans.modules.visage.refactoring.SourceTestBase;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
-import org.netbeans.modules.javafx.refactoring.transformations.*;
+import org.netbeans.modules.visage.refactoring.transformations.*;
 
 /**
  *
@@ -76,7 +76,7 @@ public class I184290 extends SourceTestBase {
     protected void setUp() throws Exception {
         super.setUp();
         FileObject fo = FileUtil.toFileObject(getDataDir());
-        fo = fo.getFileObject("org/netbeans/modules/javafx/refactoring/GSimpleEdge.fx");
+        fo = fo.getFileObject("org/netbeans/modules/visage/refactoring/GSimpleEdge.fx");
 
         DataObject dobj = DataObject.find(fo);
         EditorCookie ec = dobj.getCookie(EditorCookie.class);

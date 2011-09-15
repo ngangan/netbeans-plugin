@@ -52,10 +52,10 @@ made subject to such option by the copyright holder.
     <property name="jfxc.home" value="E:\\SunWork\\jfxc\\trunk"/>
 
     <property name="antlr.grammarv3" value="v3"/>
-    <property name="jfxc.grammar" value="${jfxc.home}/src/share/classes/com/sun/tools/javafx/antlr/${antlr.grammarv3}.g"/>
+    <property name="jfxc.grammar" value="${jfxc.home}/src/share/classes/com/sun/tools/visage/antlr/${antlr.grammarv3}.g"/>
     <property name="lexer.grammar" value="${basedir}/${antlr.grammarv3}.g"/>
     <property name="antlr.dir" value="${jfxc.home}/tools/antlr-2008-01-14.10"/>
-    <property name="antlr.generated.dir" value="${basedir}/src/org/netbeans/lib/javafx/lexer"/>
+    <property name="antlr.generated.dir" value="${basedir}/src/org/netbeans/lib/visage/lexer"/>
     <property name="local.tmp" value="${basedir}/tmp"/>
 
     <path id="antlr.class.path">
@@ -75,8 +75,8 @@ made subject to such option by the copyright holder.
         <copy file="${lexer.grammar}" todir="${antlr.generated.dir}"/>
         <replace dir="${antlr.generated.dir}">
             <include name="*.g"/>
-            <replacetoken><![CDATA[package com.sun.tools.javafx.antlr;]]></replacetoken>
-            <replacevalue><![CDATA[package org.netbeans.lib.javafx.lexer;]]></replacevalue>
+            <replacetoken><![CDATA[package com.sun.tools.visage.antlr;]]></replacetoken>
+            <replacevalue><![CDATA[package org.netbeans.lib.visage.lexer;]]></replacevalue>
         </replace>
         <antcall target="_generate-parserv3"/>
         <delete>

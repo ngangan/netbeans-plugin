@@ -2,8 +2,8 @@
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="org.netbeans.modules.javafx.sdk.mac" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project org.netbeans.modules.javafx.sdk.mac.</description>
+<project name="org.netbeans.modules.visage.sdk.mac" default="netbeans" basedir=".">
+    <description>Builds, tests, and runs the project org.netbeans.modules.visage.sdk.mac.</description>
     <import file="nbproject/build-impl.xml"/>
 
     <condition property="isMacOSX">
@@ -22,9 +22,9 @@
       <property file="../build-${build.config}.properties"/>
       <mkdir dir="external"/>
       <property name="offline" value="false"/>
-  		<get src="${javafx-sdk.mac.url}" dest="external/javafx_sdk-macosx.zip" usetimestamp="true" verbose="true" ignoreerrors="${offline}"/>
-      <unzip src="external/javafx_sdk-macosx.zip" dest="release/javafx-sdk">
-        <regexpmapper from="^(javafx-sdk[^/]*/)?(.*)$" to="\2"/>
+  		<get src="${visage-sdk.mac.url}" dest="external/visage_sdk-macosx.zip" usetimestamp="true" verbose="true" ignoreerrors="${offline}"/>
+      <unzip src="external/visage_sdk-macosx.zip" dest="release/visage-sdk">
+        <regexpmapper from="^(visage-sdk[^/]*/)?(.*)$" to="\2"/>
       </unzip>
     </target>
 

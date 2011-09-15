@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package qa.javafx.functional.library;
+package qa.visage.functional.library;
 
 import org.netbeans.jemmy.JemmyException;
 

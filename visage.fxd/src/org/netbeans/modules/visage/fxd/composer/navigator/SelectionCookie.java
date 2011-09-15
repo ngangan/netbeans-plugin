@@ -42,10 +42,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
 import org.openide.nodes.Node;
 
 /**

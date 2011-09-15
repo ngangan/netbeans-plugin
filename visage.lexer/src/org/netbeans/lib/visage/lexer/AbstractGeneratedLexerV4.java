@@ -29,7 +29,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
 import com.sun.tools.mjavac.util.Log;
 import org.antlr.runtime.*;
@@ -41,7 +41,7 @@ import java.util.logging.Logger;
 
 /**
  * Lexer base class provide user code for grammar. This code is called from antlr generated lexer. The main
- * purpose is to cover differences between javafxc lexer customizations and this module.
+ * purpose is to cover differences between visagec lexer customizations and this module.
  *
  * @author Rastislav Komara (<a href="mailto:rastislav .komara@sun.com">RKo</a>)
  */

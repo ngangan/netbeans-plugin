@@ -29,7 +29,7 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 /**
  * Constants useful for Java-based projects.
@@ -38,8 +38,8 @@ package org.netbeans.modules.javafx.project;
  * @author Jesse Glick
  * @author Jaroslav Bachorik
  */
-public class JavaFXProjectConstants {
-    private JavaFXProjectConstants() {}
+public class VisageProjectConstants {
+    private VisageProjectConstants() {}
 
     /**
      * Java package root sources type.

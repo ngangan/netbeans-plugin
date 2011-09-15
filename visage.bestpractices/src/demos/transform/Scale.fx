@@ -34,13 +34,13 @@
 
 package transform;
 
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.animation.Interpolator;
+import visage.scene.shape.Rectangle;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
+import visage.animation.Interpolator;
 
 import java.lang.Math;
 
@@ -78,8 +78,8 @@ Stage {
             Rectangle {
                 // Bind size of rectangle to s variable
                 transforms : [
-                    javafx.scene.transform.Translate { x : bind 100 - 40 * s / 2, y : bind 100 - 40 * s / 2 },
-                    javafx.scene.transform.Scale { x : bind s, y : bind s }
+                    visage.scene.transform.Translate { x : bind 100 - 40 * s / 2, y : bind 100 - 40 * s / 2 },
+                    visage.scene.transform.Scale { x : bind s, y : bind s }
                 ]
                 x : 0, y : 0
                 width : 40, height : 40

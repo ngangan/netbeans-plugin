@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.ImportTree;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.visage.api.tree.ImportTree;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +52,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class ImportTreeEnvironment extends JavaFXCompletionEnvironment<ImportTree> {
+public class ImportTreeEnvironment extends VisageCompletionEnvironment<ImportTree> {
     
     private static final Logger logger = Logger.getLogger(ImportTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);

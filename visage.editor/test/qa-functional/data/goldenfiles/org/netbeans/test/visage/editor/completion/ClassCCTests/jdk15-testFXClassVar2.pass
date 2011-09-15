@@ -33,7 +33,7 @@ fxprj1
 imports
 java
 javacard
-javafx
+visage
 javax
 org
 packages

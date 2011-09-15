@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.templates;
+package org.netbeans.modules.visage.project.templates;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -75,12 +75,12 @@ import org.openide.util.RequestProcessor;
  * 
  * @author answer
  */
-public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements ActionListener, DocumentListener {
+public class VisageTargetChooserPanelGUI extends javax.swing.JPanel implements ActionListener, DocumentListener {
   
     private static final String DEFAULT_NEW_PACKAGE_NAME = 
-        NbBundle.getMessage( JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_DefaultNewPackageName"  ); // NOI18N
+        NbBundle.getMessage( VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_DefaultNewPackageName"  ); // NOI18N
     private static final String NEW_CLASS_PREFIX = 
-        NbBundle.getMessage( JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_NewJavaFXClassPrefix"  ); // NOI18N
+        NbBundle.getMessage( VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_NewVisageClassPrefix"  ); // NOI18N
     
     /** preferred dimension of the panel */
     private static final Dimension PREF_DIM = new Dimension(500, 340);
@@ -93,21 +93,21 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
     private boolean ignoreRootCombo;
     
     /** Creates new form SimpleTargetChooserGUI */
-    public JavaFXTargetChooserPanelGUI( Project p, SourceGroup[] groups, Component bottomPanel, int type ) {
+    public VisageTargetChooserPanelGUI( Project p, SourceGroup[] groups, Component bottomPanel, int type ) {
         this.type = type;
         this.project = p;
         this.groups = groups;
         
         initComponents();        
                 
-        if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+        if ( type == NewVisageFileWizardIterator.TYPE_PACKAGE ) {
             packageComboBox.setVisible( false );
             packageLabel.setVisible( false );
-            Mnemonics.setLocalizedText (fileLabel, NbBundle.getMessage (JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_CreatedFolder_Label")); // NOI18N
-            Mnemonics.setLocalizedText (documentNameLabel, NbBundle.getMessage (JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_PackageName_Label")); // NOI18N
+            Mnemonics.setLocalizedText (fileLabel, NbBundle.getMessage (VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_CreatedFolder_Label")); // NOI18N
+            Mnemonics.setLocalizedText (documentNameLabel, NbBundle.getMessage (VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_PackageName_Label")); // NOI18N
             documentNameTextField.getDocument().addDocumentListener( this );
         }
-        else if ( type == NewJavaFXFileWizardIterator.TYPE_PKG_INFO ) {
+        else if ( type == NewVisageFileWizardIterator.TYPE_PKG_INFO ) {
             documentNameTextField.setEditable (false);
         }
         else {
@@ -137,7 +137,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         rootComboBox.addActionListener( this );
         
         setPreferredSize( PREF_DIM );
-        setName( NbBundle.getBundle (JavaFXTargetChooserPanelGUI.class).getString ("LBL_JavaFXTargetChooserPanelGUI_Name")  ); // NOI18N
+        setName( NbBundle.getBundle (VisageTargetChooserPanelGUI.class).getString ("LBL_VisageTargetChooserPanelGUI_Name")  ); // NOI18N
     }
             
     public void addNotify () {
@@ -174,7 +174,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         rootComboBox.setSelectedItem( preselectedGroup );                       
         ignoreRootCombo = false;
         Object preselectedPackage = getPreselectedPackage(preselectedGroup, preselectedFolder, packageComboBox.getModel());
-        if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+        if ( type == NewVisageFileWizardIterator.TYPE_PACKAGE ) {
             String docName = preselectedPackage == null || preselectedPackage.toString().length() == 0 ? 
                 DEFAULT_NEW_PACKAGE_NAME : 
                 preselectedPackage.toString() + "." + DEFAULT_NEW_PACKAGE_NAME; // NOI18N
@@ -192,7 +192,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
             }
             if (template != null) {
             	if ( documentNameTextField.getText().trim().length() == 0 ) { // To preserve the class name on back in the wizard
-                    if (this.type == NewJavaFXFileWizardIterator.TYPE_PKG_INFO) {
+                    if (this.type == NewVisageFileWizardIterator.TYPE_PKG_INFO) {
                         documentNameTextField.setText (template.getName ());
                     }
                     else {
@@ -230,7 +230,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
     
     public String getPackageFileName() {
         
-        if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+        if ( type == NewVisageFileWizardIterator.TYPE_PACKAGE ) {
             return ""; // NOI18N
         }
         
@@ -242,7 +242,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
      * Name of selected package, or "" for default package.
      */
     String getPackageName() {
-        if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+        if ( type == NewVisageFileWizardIterator.TYPE_PACKAGE ) {
             return ""; // NOI18N
         }
         return packageComboBox.getEditor().getItem().toString();
@@ -323,7 +323,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
         documentNameLabel.setLabelFor(documentNameTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(documentNameLabel, org.openide.util.NbBundle.getMessage(JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_ClassName_Label")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(documentNameLabel, org.openide.util.NbBundle.getMessage(VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_ClassName_Label")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanel1.add(documentNameLabel, gridBagConstraints);
@@ -333,7 +333,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
         jPanel1.add(documentNameTextField, gridBagConstraints);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/templates/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/templates/Bundle"); // NOI18N
         documentNameTextField.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_documentNameTextField")); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -344,7 +344,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         jPanel2.add(jPanel1, gridBagConstraints);
 
         jLabel5.setLabelFor(projectTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_jLabel5")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_jLabel5")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
@@ -359,7 +359,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         projectTextField.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_projectTextField")); // NOI18N
 
         jLabel1.setLabelFor(rootComboBox);
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_jLabel1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_jLabel1")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
@@ -373,7 +373,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         rootComboBox.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_rootComboBox")); // NOI18N
 
         packageLabel.setLabelFor(packageComboBox);
-        org.openide.awt.Mnemonics.setLocalizedText(packageLabel, org.openide.util.NbBundle.getMessage(JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_jLabel2")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(packageLabel, org.openide.util.NbBundle.getMessage(VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_jLabel2")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
@@ -389,7 +389,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         packageComboBox.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_packageComboBox")); // NOI18N
 
         fileLabel.setLabelFor(fileTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(fileLabel, org.openide.util.NbBundle.getMessage(JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_CreatedFile_Label")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(fileLabel, org.openide.util.NbBundle.getMessage(VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_CreatedFile_Label")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 12, 0);
@@ -413,7 +413,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         gridBagConstraints.weightx = 1.0;
         add(jPanel2, gridBagConstraints);
 
-        getAccessibleContext().setAccessibleDescription(bundle.getString("AD_JavaFXTargetChooserPanelGUI")); // NOI18N
+        getAccessibleContext().setAccessibleDescription(bundle.getString("AD_VisageTargetChooserPanelGUI")); // NOI18N
     }// </editor-fold>//GEN-END:initComponents
 
     
@@ -439,7 +439,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         
     public void actionPerformed(java.awt.event.ActionEvent e) {
         if ( rootComboBox == e.getSource() ) {            
-//            if ( !ignoreRootCombo && type != NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+//            if ( !ignoreRootCombo && type != NewVisageFileWizardIterator.TYPE_PACKAGE ) {
 //                updatePackages( true );
 //            }
             updateText();
@@ -475,7 +475,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
     
     private static final ComboBoxModel WAIT_MODEL = new DefaultComboBoxModel( 
         new String[] {
-            NbBundle.getMessage( JavaFXTargetChooserPanelGUI.class, "LBL_JavaFXTargetChooserPanelGUI_PackageName_PleaseWait"  ) // NOI18N
+            NbBundle.getMessage( VisageTargetChooserPanelGUI.class, "LBL_VisageTargetChooserPanelGUI_PackageName_PleaseWait"  ) // NOI18N
          // NOI18N
         } 
      
@@ -517,7 +517,7 @@ public class JavaFXTargetChooserPanelGUI extends javax.swing.JPanel implements A
         FileObject rootFolder = g.getRootFolder();
         String packageName = getPackageFileName();
         String documentName = documentNameTextField.getText().trim();
-        if ( type == NewJavaFXFileWizardIterator.TYPE_PACKAGE ) {
+        if ( type == NewVisageFileWizardIterator.TYPE_PACKAGE ) {
             documentName = documentName.replace( '.', '/' ); // NOI18N
         }
         else if ( documentName.length() > 0 ) {

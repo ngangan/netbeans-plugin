@@ -29,16 +29,16 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.javafxc;
+package org.netbeans.modules.visage.refactoring.impl.visagec;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.JavafxTreeInfo;
 import com.sun.tools.mjavac.code.Symbol;
 import java.awt.Color;
 import java.awt.Dialog;
@@ -90,28 +90,28 @@ import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.java.source.ClasspathInfo.PathKind;
 import org.netbeans.api.java.source.JavaSource;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.platform.VisagePlatform;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.ui.OpenProjects;
-import org.netbeans.modules.javafx.project.JavaFXProjectConstants;
-import org.netbeans.api.javafx.source.ClasspathInfoProvider;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.modules.visage.project.VisageProjectConstants;
+import org.netbeans.api.visage.source.ClasspathInfoProvider;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.netbeans.modules.parsing.api.ParserManager;
 import org.netbeans.modules.parsing.api.ResultIterator;
 import org.netbeans.modules.parsing.api.UserTask;
@@ -163,12 +163,12 @@ final public class SourceUtils {
 
     public static String getHtml(String text, int hilite) {
         StringBuffer buf = new StringBuffer();
-        TokenHierarchy tokenH = TokenHierarchy.create(text, JFXTokenId.language());
-        Lookup lookup = MimeLookup.getLookup(MimePath.get(JavaFXSourceUtils.JAVAFX_MIME_TYPE));
+        TokenHierarchy tokenH = TokenHierarchy.create(text, VSGTokenId.language());
+        Lookup lookup = MimeLookup.getLookup(MimePath.get(VisageSourceUtils.JAVAFX_MIME_TYPE));
         FontColorSettings settings = lookup.lookup(FontColorSettings.class);
         TokenSequence tok = tokenH.tokenSequence();
         while (tok.moveNext()) {
-            Token<JFXTokenId> token = (Token) tok.token();
+            Token<VSGTokenId> token = (Token) tok.token();
             String category = token.id().primaryCategory();
             if (category == null) {
                 category = "whitespace"; //NOI18N
@@ -219,12 +219,12 @@ final public class SourceUtils {
         return html_color;
     }
 
-    public static boolean isJavaFXFile(FileObject f) {
-        return JavaFXSourceUtils.isJavaFXFile(f);
+    public static boolean isVisageFile(FileObject f) {
+        return VisageSourceUtils.isVisageFile(f);
     }
 
     public static boolean isPlatformOk(FileObject f) {
-        return JavaFXSourceUtils.isPlatformOk(f);
+        return VisageSourceUtils.isPlatformOk(f);
     }
 
     public static boolean isValidPackageName(String name) {
@@ -277,14 +277,14 @@ final public class SourceUtils {
                 }
             }
             // a story of interest ...
-            // for some reason, right now (as of 2009/10/12) javafx sources are referenced as "java sources"
+            // for some reason, right now (as of 2009/10/12) visage sources are referenced as "java sources"
             for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA)) {
                 if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
                     return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
                 }
             }
             // ---
-            for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(JavaFXProjectConstants.SOURCES_TYPE_JAVAFX)) {
+            for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(VisageProjectConstants.SOURCES_TYPE_JAVAFX)) {
                 if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
                     return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
                 }
@@ -320,11 +320,11 @@ final public class SourceUtils {
     }
 
     public static Collection<ExecutableElement> getOverridingMethods(ExecutableElement e, CompilationInfo info) {
-        return JavaFXSourceUtils.getOverridingMethods(e, info);
+        return VisageSourceUtils.getOverridingMethods(e, info);
     }
 
     public static Collection<ExecutableElement> getOverridenMethods(ExecutableElement e, CompilationInfo info) {
-        return JavaFXSourceUtils.getOverridenMethods(e, info);
+        return VisageSourceUtils.getOverridenMethods(e, info);
     }
 
     public static String getPackageName(FileObject folder) {
@@ -389,13 +389,13 @@ final public class SourceUtils {
     public static FileObject getFile(final Element element, final CompilationInfo cc) {
         final FileObject[] rslt = new FileObject[]{getFile(ElementHandle.create(element), cc.getClasspathInfo())};
         if (rslt[0] == null) {
-            rslt[0] = new JavaFXTreePathScanner<FileObject, Void>() {
+            rslt[0] = new VisageTreePathScanner<FileObject, Void>() {
 
                 @Override
                 public FileObject scan(Tree tree, Void p) {
                     if (tree == null) return null;
                     
-                    JavaFXTreePath tp = cc.getTrees().getPath(cc.getCompilationUnit(), tree);
+                    VisageTreePath tp = cc.getTrees().getPath(cc.getCompilationUnit(), tree);
                     if (tp != null) {
                         Element e = cc.getTrees().getElement(tp);
 
@@ -459,7 +459,7 @@ final public class SourceUtils {
                 } else {
                     dependentRoots.add(sourceRoot);
                 }
-                for (SourceGroup root:ProjectUtils.getSources(p).getSourceGroups(JavaFXProjectConstants.SOURCES_TYPE_JAVAFX)) {
+                for (SourceGroup root:ProjectUtils.getSources(p).getSourceGroups(VisageProjectConstants.SOURCES_TYPE_JAVAFX)) {
                     dependentRoots.add(URLMapper.findURL(root.getRootFolder(), URLMapper.INTERNAL));
                 }
             } else {
@@ -579,7 +579,7 @@ final public class SourceUtils {
      * Waits for the end of the initial scan, this helper method 
      * is designed for tests which require to wait for end of initial scan.
      * @throws InterruptedException is thrown when the waiting thread is interrupted.
-     * @deprecated use {@link JavaFXSource#runWhenScanFinished}
+     * @deprecated use {@link VisageSource#runWhenScanFinished}
      */
     public static void waitScanFinished () throws InterruptedException {
         try {
@@ -595,7 +595,7 @@ final public class SourceUtils {
                     return cpinfo;
                 }
             }
-            Future<Void> f = ParserManager.parseWhenScanFinished(JavaFXSourceUtils.JAVAFX_MIME_TYPE, new T());
+            Future<Void> f = ParserManager.parseWhenScanFinished(VisageSourceUtils.JAVAFX_MIME_TYPE, new T());
             if (!f.isDone()) {
                 f.get();
             }
@@ -647,20 +647,20 @@ final public class SourceUtils {
     }
 
     /**
-     * Workaround for JFXC-3787
+     * Workaround for VSGC-3787
      * @param e
      * @return
      */
-    public static JavaFXTreePath getPath(final Element e, CompilationInfo ci) {
-        final JavaFXTreePath[] result = new JavaFXTreePath[1];
-        new JavaFXTreePathScanner<Void, Void>() {
+    public static VisageTreePath getPath(final Element e, CompilationInfo ci) {
+        final VisageTreePath[] result = new VisageTreePath[1];
+        new VisageTreePathScanner<Void, Void>() {
 
             @Override
             public Void scan(Tree tree, Void p) {
                 if (result[0] != null) return null;
-                Element el = JavafxTreeInfo.symbolFor((JFXTree)tree);
+                Element el = JavafxTreeInfo.symbolFor((VSGTree)tree);
                 if (e.equals(el)) {
-                    result[0] = JavaFXTreePath.getPath(getCurrentPath(), tree);
+                    result[0] = VisageTreePath.getPath(getCurrentPath(), tree);
                     return null;
                 }
                 return super.scan(tree, p);
@@ -745,6 +745,6 @@ final public class SourceUtils {
     }
 
     public static boolean isRefactorable(FileObject file) {
-        return isJavaFXFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file) && isPlatformOk(file);
+        return isVisageFile(file) && isFileInOpenProject(file) && isOnSourceClasspath(file) && isPlatformOk(file);
     }
 }

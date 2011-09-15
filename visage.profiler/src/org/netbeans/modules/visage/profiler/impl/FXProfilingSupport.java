@@ -40,11 +40,11 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.profiler.impl;
+package org.netbeans.modules.visage.profiler.impl;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.client.ClientUtils.SourceCodeSelection;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.modules.profiler.spi.ProjectProfilingSupport;
@@ -56,7 +56,7 @@ import org.openide.filesystems.FileObject;
  *
  * @author Jaroslav Bachorik
  */
-@ProjectServiceProvider(projectTypes={@ProjectType(id="org-netbeans-modules-javafx-project")},
+@ProjectServiceProvider(projectTypes={@ProjectType(id="org-netbeans-modules-visage-project")},
                         service=ProjectProfilingSupport.class)
 public class FXProfilingSupport extends ProjectProfilingSupport {
     private String[][] packages = new String[2][];
@@ -90,10 +90,10 @@ public class FXProfilingSupport extends ProjectProfilingSupport {
     public SourceCodeSelection[] getRootMethods(FileObject profiledClassFile) {
         if (profiledClassFile == null) {
             // Profile Project, extract root methods from the project
-            return JavaFXProjectUtilities.getProjectDefaultRoots(getProject(), packages);
+            return VisageProjectUtilities.getProjectDefaultRoots(getProject(), packages);
         } else {
             // Profile Single, provide correct root methods
-            String profiledClass = JavaFXProjectUtilities.getToplevelClassName(getProject(), profiledClassFile);
+            String profiledClass = VisageProjectUtilities.getToplevelClassName(getProject(), profiledClassFile);
             return new SourceCodeSelection[]{new SourceCodeSelection(profiledClass, "<all>", "")}; // NOI18N // Covers all innerclasses incl. anonymous innerclasses
         }
     }

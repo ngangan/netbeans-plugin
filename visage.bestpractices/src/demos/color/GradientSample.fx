@@ -34,17 +34,17 @@
 
 package color;
 
-import javafx.scene.Group;
-import javafx.scene.CustomNode;
-import javafx.scene.Node;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
+import visage.scene.Group;
+import visage.scene.CustomNode;
+import visage.scene.Node;
+import visage.scene.shape.Rectangle;
+import visage.scene.paint.Color;
+import visage.scene.paint.LinearGradient;
+import visage.scene.paint.Stop;
+import visage.stage.Stage;
+import visage.scene.Scene;
 
-import javafx.lang.FX;
+import visage.lang.FX;
 
 /**
  * @author Michal Skvor

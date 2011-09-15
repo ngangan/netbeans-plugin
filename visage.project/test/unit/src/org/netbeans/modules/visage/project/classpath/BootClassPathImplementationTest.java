@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -60,8 +60,8 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.junit.NbTestCase;
 import org.netbeans.modules.java.platform.JavaPlatformProvider;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
-import org.netbeans.modules.javafx.project.TestUtil;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
+import org.netbeans.modules.visage.project.TestUtil;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
@@ -102,7 +102,7 @@ public class BootClassPathImplementationTest extends NbTestCase {
         ClassPath expBCP = ClassPathSupport.createClassPath(new URL[]{explicitPlatformBootRoot.getURL()});
         tp = new TestPlatformProvider (defBCP, expBCP);
         TestUtil.setLookup(new Object[] {
-            new org.netbeans.modules.javafx.project.JavaFXProjectType(),
+            new org.netbeans.modules.visage.project.VisageProjectType(),
             new org.netbeans.modules.projectapi.SimpleFileOwnerQueryImplementation(),
             tp
         });
@@ -119,7 +119,7 @@ public class BootClassPathImplementationTest extends NbTestCase {
 
     private void prepareProject (String platformName) throws IOException {
         projdir = scratch.createFolder("proj");
-        AntProjectHelper helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir), "org.netbeans.modules.java.javafxproject", null, null);
+        AntProjectHelper helper = null; // FIXME (not compilable): VisageProjectGenerator.createProject(FileUtil.toFile(projdir), "org.netbeans.modules.java.visageproject", null, null);
         pm = ProjectManager.getDefault();
         pp = pm.findProject(projdir);
         EditableProperties props = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);

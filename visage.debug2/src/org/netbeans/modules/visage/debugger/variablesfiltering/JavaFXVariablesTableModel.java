@@ -43,11 +43,11 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.variablesfiltering;
+package org.netbeans.modules.visage.debugger.variablesfiltering;
 
 import org.netbeans.api.debugger.jpda.Field;
 import org.netbeans.api.debugger.jpda.LocalVariable;
-import org.netbeans.modules.javafx.debugger.watchesfiltering.*;
+import org.netbeans.modules.visage.debugger.watchesfiltering.*;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TableModel;
@@ -59,9 +59,9 @@ import org.netbeans.spi.debugger.ui.Constants;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={org.netbeans.spi.viewmodel.TableModel.class} )
-public class JavaFXVariablesTableModel implements TableModel {
+public class VisageVariablesTableModel implements TableModel {
 
-    public JavaFXVariablesTableModel() {}
+    public VisageVariablesTableModel() {}
 
     public Object getValueAt( Object row, String columnID ) throws UnknownTypeException {
         if( row instanceof LocalVariable ) {
@@ -97,7 +97,7 @@ public class JavaFXVariablesTableModel implements TableModel {
     }
 
     public boolean isReadOnly( Object row, String columnID ) throws UnknownTypeException {
-        if( !( row instanceof JavaFXWatch )) throw new UnknownTypeException( row );
+        if( !( row instanceof VisageWatch )) throw new UnknownTypeException( row );
         return true;
     }
 

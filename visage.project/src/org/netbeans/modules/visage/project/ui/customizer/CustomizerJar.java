@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import javax.swing.JPanel;
 import org.openide.util.HelpCtx;
@@ -53,7 +53,7 @@ import org.openide.util.HelpCtx;
  */
 public class CustomizerJar extends JPanel implements HelpCtx.Provider {
     
-    public CustomizerJar( JavaFXProjectProperties uiProperties ) {
+    public CustomizerJar( VisageProjectProperties uiProperties ) {
         initComponents();
         
         jTextFieldDistDir.setDocument( uiProperties.DIST_JAR_MODEL );
@@ -133,7 +133,7 @@ public class CustomizerJar extends JPanel implements HelpCtx.Provider {
         jCheckBoxCommpress.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getBundle(CustomizerJar.class).getString("AD_jCheckBoxCompress")); // NOI18N
 
         excludeMessage.setLabelFor(jTextFieldExcludes);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle"); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(excludeMessage, bundle.getString("LBL_CustomizerJar_ExcludeMessage")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

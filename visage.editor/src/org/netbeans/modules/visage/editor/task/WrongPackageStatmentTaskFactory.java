@@ -28,21 +28,21 @@
  *
  * Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.task;
+package org.netbeans.modules.visage.editor.task;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  * @todo documentation
  */
-public class WrongPackageStatmentTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class WrongPackageStatmentTaskFactory extends EditorAwareVisageSourceTaskFactory {
     public WrongPackageStatmentTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     protected CancellableTask<CompilationInfo> createTask(FileObject file) {

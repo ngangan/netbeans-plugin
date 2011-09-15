@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.io.*;
 import java.net.URL;
@@ -62,7 +62,7 @@ import org.openide.modules.InstalledFileLocator;
  *
  * @author Svata Dedic
  */
-public class DefaultPlatformImpl extends JavaFXPlatformImpl {
+public class DefaultPlatformImpl extends VisagePlatformImpl {
 
 
     public static final String DEFAULT_PLATFORM_ANT_NAME = "default_fx_platform";           //NOI18N
@@ -81,9 +81,9 @@ public class DefaultPlatformImpl extends JavaFXPlatformImpl {
         } catch (MalformedURLException mue) {
             Exceptions.printStackTrace(mue);
         }
-        File fxPath = InstalledFileLocator.getDefault().locate("javafx-sdk/lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
-        if (fxPath == null) //try to find runtime in the root javafx folder as for public compiler
-            fxPath = InstalledFileLocator.getDefault().locate("lib/shared/javafxc.jar", "org.netbeans.modules.javafx", false); // NOI18N
+        File fxPath = InstalledFileLocator.getDefault().locate("visage-sdk/lib/shared/visagec.jar", "org.netbeans.modules.visage", false); // NOI18N
+        if (fxPath == null) //try to find runtime in the root visage folder as for public compiler
+            fxPath = InstalledFileLocator.getDefault().locate("lib/shared/visagec.jar", "org.netbeans.modules.visage", false); // NOI18N
         if (fxPath != null && fxPath.isFile()) try {
             fxPath = fxPath.getParentFile().getParentFile().getParentFile();
             fxFolder = fxPath.toURI().toURL();

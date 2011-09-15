@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -233,7 +233,7 @@ class Utils {
                     formatTypeParameters(typeParameters, stringBuilder, FQNs);
                 }
 
-                if (JavaFXMembersAndHierarchyOptions.isShowInherited()) {
+                if (VisageMembersAndHierarchyOptions.isShowInherited()) {
                     stringBuilder.append(" ["); // NOI18N
                     stringBuilder.append(getClassName(element.getEnclosingElement().toString(), FQNs));
                     stringBuilder.append("]"); // NOI18N
@@ -309,7 +309,7 @@ class Utils {
 
                 formatTypeMirror(fieldElement.asType(), stringBuilder, FQNs);
 
-                if (JavaFXMembersAndHierarchyOptions.isShowInherited()) {
+                if (VisageMembersAndHierarchyOptions.isShowInherited()) {
                     stringBuilder.append(" ["); // NOI18N
                     stringBuilder.append(getClassName(element.getEnclosingElement().toString(), FQNs));
                     stringBuilder.append("]"); // NOI18N
@@ -321,7 +321,7 @@ class Utils {
         case ENUM_CONSTANT:
             stringBuilder.append(element.toString());
 
-            if (JavaFXMembersAndHierarchyOptions.isShowInherited()) {
+            if (VisageMembersAndHierarchyOptions.isShowInherited()) {
                 stringBuilder.append(" ["); // NOI18N
                 stringBuilder.append(getClassName(element.getEnclosingElement().toString(), FQNs));
                 stringBuilder.append("]"); // NOI18N
@@ -617,13 +617,13 @@ class Utils {
 //
 //        try {
 //            Pattern compiledPattern = Pattern.compile(patternRegexpString,
-//                    JavaFXMembersAndHierarchyOptions.isCaseSensitive() ? 0
+//                    VisageMembersAndHierarchyOptions.isCaseSensitive() ? 0
 //                                                           : Pattern.CASE_INSENSITIVE);
 //            Matcher m = compiledPattern.matcher(name);
 //
 //            return m.matches();
 //        } catch (PatternSyntaxException pse) {
-//            if (JavaFXMembersAndHierarchyOptions.isCaseSensitive()) {
+//            if (VisageMembersAndHierarchyOptions.isCaseSensitive()) {
 //                return name.startsWith(pattern);
 //            }
 //

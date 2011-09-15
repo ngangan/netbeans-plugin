@@ -41,11 +41,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.schemamodel;
+package org.netbeans.modules.visage.fxd.schemamodel;
 
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
-import com.sun.javafx.tools.fxd.schema.model.FXDSchema;
-import com.sun.javafx.tools.fxd.schema.model.FXDSchemaException;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDException;
+import com.sun.visage.tools.fxd.schema.model.FXDSchema;
+import com.sun.visage.tools.fxd.schema.model.FXDSchemaException;
 import java.io.IOException;
 import java.net.URL;
 import org.openide.filesystems.FileObject;
@@ -61,7 +61,7 @@ public class FXDSchemaModelProvider {
     public static final String FXD_ROOT_NAME = "FXD"; //NOI18N
     public static final String FXD_CONTENT_NAME = "content"; //NOI18N
 
-    public static final String FXD_SCHEMA_FILE = "/com/sun/javafx/tools/fxd/schema/fxd-schema.fxdl"; //NOI18N
+    public static final String FXD_SCHEMA_FILE = "/com/sun/visage/tools/fxd/schema/fxd-schema.fxdl"; //NOI18N
 
     private static FXDSchema m_schema;
 

@@ -39,19 +39,19 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.editor.codecompletion;
+package qa.visage.functional.editor.codecompletion;
 
-import qa.javafx.functional.palette.*;
+import qa.visage.functional.palette.*;
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
 
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Constant;
+import qa.visage.functional.library.Util;
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXCodeCompletionFileTest extends JavaFXCodeCompletionTestCase {
+public class VisageCodeCompletionFileTest extends VisageCodeCompletionTestCase {
 
 
     static final String PATH = "file";
@@ -59,12 +59,12 @@ public class JavaFXCodeCompletionFileTest extends JavaFXCodeCompletionTestCase {
     static final String SAMPLE = "Keywords";
 
 
-    public JavaFXCodeCompletionFileTest(String name) {
+    public VisageCodeCompletionFileTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXCodeCompletionFileTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageCodeCompletionFileTest.class, ".*", ".*", TESTS);
 
     }
 

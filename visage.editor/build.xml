@@ -2,16 +2,16 @@
 <!-- You may freely edit this file. See harness/README in the NetBeans platform -->
 <!-- for some information on what you could do (e.g. targets to override). -->
 <!-- If you delete this file and reopen the project it will be recreated. -->
-<project name="org.netbeans.modules.javafx.editor" default="netbeans" basedir=".">
-    <description>Builds, tests, and runs the project org.netbeans.modules.javafx.editor.</description>
+<project name="org.netbeans.modules.visage.editor" default="netbeans" basedir=".">
+    <description>Builds, tests, and runs the project org.netbeans.modules.visage.editor.</description>
     <import file="nbproject/build-impl.xml"/>
     <target name="preview" depends="init">
         <mkdir dir="build/previewclasses"/>
         <javac srcdir="previewsrc" destdir="build/previewclasses" source="1.5" debug="true" deprecation="true" target="1.5"/>
         <mkdir dir="${cluster}/modules/ext"/>
-        <jar jarfile="${cluster}/modules/ext/org-netbeans-javafx-preview.jar">
+        <jar jarfile="${cluster}/modules/ext/org-netbeans-visage-preview.jar">
             <manifest>
-                <attribute name="Premain-Class" value="org.netbeans.javafx.preview.SilentPremain"/>
+                <attribute name="Premain-Class" value="org.netbeans.visage.preview.SilentPremain"/>
                 <attribute name="NetBeans-Own-Library" value="true"/>
             </manifest>
             <fileset dir="build/previewclasses"/>

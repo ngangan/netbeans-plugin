@@ -42,10 +42,10 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.javafx.tools.fxd.container.doc.DocumentParser;
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDException;
+import com.sun.visage.tools.fxd.container.doc.DocumentParser;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDException;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,19 +65,19 @@ import javax.swing.table.TableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.SwingUtilities;
 import org.netbeans.editor.BaseDocument;
-import org.netbeans.modules.javafx.fxd.composer.misc.ByteArrayBuffer;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.misc.ByteArrayBuffer;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle;
 
-import com.sun.javafx.tools.fxd.FXDRootElement;
-import com.sun.javafx.tools.fxd.container.FXZFileContainerImpl;
-import com.sun.javafx.tools.fxd.container.builder.FXZContainerBuilder;
+import com.sun.visage.tools.fxd.FXDRootElement;
+import com.sun.visage.tools.fxd.container.FXZFileContainerImpl;
+import com.sun.visage.tools.fxd.container.builder.FXZContainerBuilder;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDFileEncodingQueryImplementation;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZEditorSupport;
+import org.netbeans.modules.visage.fxd.dataloader.FXDFileEncodingQueryImplementation;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZEditorSupport;
 
 /**
  *

@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.layouts;
+package org.netbeans.modules.visage.palette.items.layouts;
 
 /**
  *
@@ -50,7 +50,7 @@ public final class ClipView extends AbstractLayout{
 
     public ClipView() {
         templateName = "TEMPLATE_ClipView"; // NOI18N
-        importString = "javafx.scene.layout.ClipView"; //NOI18N
+        importString = "visage.scene.layout.ClipView"; //NOI18N
     }
 
 }

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +53,7 @@ import javax.swing.tree.TreePath;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentElementEvent;
 import org.netbeans.modules.editor.structure.api.DocumentElementListener;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 
 /**
  * TreeNodeAdapter is an implementation of j.s.t.TreeNode encapsulating a DocumentElement

@@ -39,26 +39,26 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.util.Collections;
 import java.util.List;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.LookupBasedJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.support.LookupBasedVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
 /**
  *
  * @author Jan Lahoda, Petr Hrebejk
- * @author Anton Chechel - javafx modifications
+ * @author Anton Chechel - visage modifications
  */
-public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaFXSourceTaskFactory {
+public class ClassMemberNavigatorVisageSourceFactory extends LookupBasedVisageSourceTaskFactory {
     
-    private static ClassMemberNavigatorJavaFXSourceFactory instance;
+    private static ClassMemberNavigatorVisageSourceFactory instance;
 
     private static final CancellableTask<CompilationInfo> EMPTY_TASK = new CancellableTask<CompilationInfo>() {
         public void cancel() {}
@@ -68,14 +68,14 @@ public class ClassMemberNavigatorJavaFXSourceFactory extends LookupBasedJavaFXSo
     private ClassMemberPanelUI ui;
     
     static {
-        instance = Lookup.getDefault().lookup(ClassMemberNavigatorJavaFXSourceFactory.class);
+        instance = Lookup.getDefault().lookup(ClassMemberNavigatorVisageSourceFactory.class);
     }
 
-    static ClassMemberNavigatorJavaFXSourceFactory getInstance() {
+    static ClassMemberNavigatorVisageSourceFactory getInstance() {
         return instance;
     }
 
-    public ClassMemberNavigatorJavaFXSourceFactory() {
+    public ClassMemberNavigatorVisageSourceFactory() {
 //        super(Phase.ELEMENTS_RESOLVED, Priority.LOW, "text/x-java", "application/x-class-file");
         super(Phase.ANALYZED, Priority.LOW, "text/x-fx"); // NOI18N
     }

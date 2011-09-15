@@ -41,14 +41,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
 import java.io.IOException;
@@ -66,10 +66,10 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSourceUtils;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -79,24 +79,24 @@ import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
  *
  * @author cms
  */
-public class JavaFXPackageNode extends ContainerNode {
+public class VisagePackageNode extends ContainerNode {
     
-    private static class JavaFXPackageChildren extends SelectorChildren<JavaFXPackageNode> {
-        protected List<SelectorNode> prepareChildren(JavaFXPackageNode parent) {
+    private static class VisagePackageChildren extends SelectorChildren<VisagePackageNode> {
+        protected List<SelectorNode> prepareChildren(VisagePackageNode parent) {
             List<SelectorNode> nodes = new ArrayList<SelectorNode>();
-            List<JavaFXClassNode> classes = getClasses(parent);
-            List<JavaFXPackageNode> packages = getSubpackages(parent);
+            List<VisageClassNode> classes = getClasses(parent);
+            List<VisagePackageNode> packages = getSubpackages(parent);
             nodes.addAll(classes);
             nodes.addAll(packages);
 
             return nodes;
         }
 
-        private List<JavaFXClassNode> getClasses(final JavaFXPackageNode parent) {
-            final List<JavaFXClassNode> nodes = new ArrayList<JavaFXClassNode>();
+        private List<VisageClassNode> getClasses(final VisagePackageNode parent) {
+            final List<VisageClassNode> nodes = new ArrayList<VisageClassNode>();
 
             try {
-                parent.getJFXSource().runUserActionTask(new CancellableTask<CompilationController>() {
+                parent.getVSGSource().runUserActionTask(new CancellableTask<CompilationController>() {
                     public void cancel() {
                     }
 
@@ -107,10 +107,10 @@ public class JavaFXPackageNode extends ContainerNode {
                         for(ElementHandle<TypeElement> teh : parent.cpInfo.getClassIndex().getDeclaredTypes((pkgName.equals(DEFAULT_NAME) ? "" : pkgName.replace(".", "\\.") + "\\.") + ".*", ClassIndex.NameKind.REGEXP, parent.scope)) {
                             TypeElement e = teh.resolve(cc);
                             if (e == null || e.getNestingKind() != NestingKind.TOP_LEVEL) continue;
-                            PackageElement pe = JavaFXSourceUtils.getEnclosingPackageElement(e);
+                            PackageElement pe = VisageSourceUtils.getEnclosingPackageElement(e);
                             if ((pe.isUnnamed() && pkgName.equals(DEFAULT_NAME)) ||
                                 (pe.getQualifiedName().contentEquals(pkgName))) {
-                                nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, e, parent));
+                                nodes.add(new VisageClassNode(parent.cpInfo, IconResource.CLASS_ICON, e, parent));
                             }
                         }
 //
@@ -121,7 +121,7 @@ public class JavaFXPackageNode extends ContainerNode {
 //                            for (TypeElement type : ElementFilter.typesIn(pelem.getEnclosedElements())) {
 //                                System.err.println(type);
 //                                if ((type.getKind() == ElementKind.CLASS) || (type.getKind() == ElementKind.ENUM)) {
-//                                    nodes.add(new JavaFXClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
+//                                    nodes.add(new VisageClassNode(parent.cpInfo, IconResource.CLASS_ICON, type, parent));
 //                                }
 //                            }
 //                        } else {
@@ -132,17 +132,17 @@ public class JavaFXPackageNode extends ContainerNode {
             } catch (IOException ex) {
                 LOGGER.severe(ex.getLocalizedMessage());
             }
-            Collections.sort(nodes, JavaFXClassNode.COMPARATOR);
+            Collections.sort(nodes, VisageClassNode.COMPARATOR);
 
             return nodes;
         }
 
-        private List<JavaFXPackageNode> getSubpackages(final JavaFXPackageNode parent) {
+        private List<VisagePackageNode> getSubpackages(final VisagePackageNode parent) {
             ClassIndex index = parent.cpInfo.getClassIndex();
-            List<JavaFXPackageNode> nodes = new ArrayList<JavaFXPackageNode>();
+            List<VisagePackageNode> nodes = new ArrayList<VisagePackageNode>();
 
             for (String pkgName : index.getPackageNames(parent.getName() + ".", true, parent.scope)) { // NOI18N
-                nodes.add(new JavaFXPackageNode(parent.cpInfo, pkgName, parent, parent.scope, parent.getJFXSource(), parent.isLibraryNode()));
+                nodes.add(new VisagePackageNode(parent.cpInfo, pkgName, parent, parent.scope, parent.getVSGSource(), parent.isLibraryNode()));
             }
 
             Collections.sort(nodes, COMPARATOR);
@@ -152,9 +152,9 @@ public class JavaFXPackageNode extends ContainerNode {
     }
 
     public static final String DEFAULT_NAME = "<default>"; // NOI18N
-    static final Comparator COMPARATOR = new Comparator<JavaFXPackageNode>() {
-        public int compare(JavaFXPackageNode o1, JavaFXPackageNode o2) {
-            if (o1.getNodeName().equals(JavaFXPackageNode.DEFAULT_NAME)) {
+    static final Comparator COMPARATOR = new Comparator<VisagePackageNode>() {
+        public int compare(VisagePackageNode o1, VisagePackageNode o2) {
+            if (o1.getNodeName().equals(VisagePackageNode.DEFAULT_NAME)) {
                 return -1;
             }
 
@@ -162,16 +162,16 @@ public class JavaFXPackageNode extends ContainerNode {
         }
     };
 
-    private static final Logger LOGGER = Logger.getLogger(JavaFXPackageNode.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VisagePackageNode.class.getName());
 
     private final ClientUtils.SourceCodeSelection signature;
     private final ClasspathInfo cpInfo;
     private final Set<SearchScope> scope;
     private final String name;
-    private final JavaFXSource js;
+    private final VisageSource js;
     private final boolean isLibraryNode;
 
-    public JavaFXPackageNode(final ClasspathInfo cpInfo, String name, final ContainerNode parent, final Set<SearchScope> scope, final JavaFXSource js, final boolean isLibraryNode) {
+    public VisagePackageNode(final ClasspathInfo cpInfo, String name, final ContainerNode parent, final Set<SearchScope> scope, final VisageSource js, final boolean isLibraryNode) {
         super(stripName(defaultizeName(name)), IconResource.PACKAGE_ICON, parent);
         this.name = name;
         this.cpInfo = cpInfo;
@@ -189,7 +189,7 @@ public class JavaFXPackageNode extends ContainerNode {
         return isLibraryNode;
     }
 
-    JavaFXSource getJFXSource() {
+    VisageSource getVSGSource() {
         return js;
     }
 
@@ -199,7 +199,7 @@ public class JavaFXPackageNode extends ContainerNode {
     }
 
     protected SelectorChildren getChildren() {
-        return new JavaFXPackageChildren();
+        return new VisagePackageChildren();
     }
 
     ClasspathInfo getCpInfo() {

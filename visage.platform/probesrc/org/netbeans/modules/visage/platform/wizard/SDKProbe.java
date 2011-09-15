@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.wizard;
+package org.netbeans.modules.visage.platform.wizard;
 
 import java.io.File;
 import java.io.FileOutputStream;

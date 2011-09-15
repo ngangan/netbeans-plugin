@@ -34,10 +34,10 @@
 
 package weatherfx;
 
-import javafx.scene.image.*;
+import visage.scene.image.*;
 import java.lang.*;
-import javafx.lang.*;
-import javafx.util.Sequences;
+import visage.lang.*;
+import visage.util.Sequences;
 
 /**
  * @author breh

@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette;
+package org.netbeans.modules.visage.palette;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import org.netbeans.api.javafx.source.Imports;
+import org.netbeans.api.visage.source.Imports;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.lib.editor.codetemplates.api.CodeTemplate;
@@ -59,7 +59,7 @@ import org.openide.util.NbBundle;
  *
  * @author Michal Skvor
  */
-public final class JavaFXPaletteUtilities {
+public final class VisagePaletteUtilities {
 
     private static boolean  insertSnippet(String code, Class c, String templateName, JTextComponent targetComponent, String... imp) {
         Document document = targetComponent.getDocument();

@@ -1,4 +1,4 @@
-package org.netbeans.modules.javafx.refactoring.issues;
+package org.netbeans.modules.visage.refactoring.issues;
 
 class A{};
 

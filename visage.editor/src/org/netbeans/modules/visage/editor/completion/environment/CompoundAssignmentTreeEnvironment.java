@@ -40,22 +40,22 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.CompoundAssignmentTree;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.CompoundAssignmentTree;
+import com.sun.visage.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 import org.netbeans.api.lexer.TokenUtilities;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 /**
  *
  * @author David Strupl
  */
-public class CompoundAssignmentTreeEnvironment extends JavaFXCompletionEnvironment<CompoundAssignmentTree> {
+public class CompoundAssignmentTreeEnvironment extends VisageCompletionEnvironment<CompoundAssignmentTree> {
     
     private static final Logger logger = Logger.getLogger(CompoundAssignmentTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);

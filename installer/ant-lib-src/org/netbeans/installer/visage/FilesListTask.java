@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.installer.javafx;
+package org.netbeans.installer.visage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

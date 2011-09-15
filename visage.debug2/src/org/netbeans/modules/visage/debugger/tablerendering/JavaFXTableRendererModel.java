@@ -3,9 +3,9 @@
  * and open the template in the editor.
  */
 
-package org.netbeans.modules.javafx.debugger.tablerendering;
+package org.netbeans.modules.visage.debugger.tablerendering;
 
-import com.sun.javafx.jdi.FXClassType;
+import com.sun.visage.jdi.FXClassType;
 import java.util.WeakHashMap;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -14,11 +14,11 @@ import org.netbeans.api.debugger.jpda.JPDAClassType;
 import org.netbeans.api.debugger.jpda.ObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.FieldVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
-import org.netbeans.modules.javafx.debugger.models.ScriptClass;
-import org.netbeans.modules.javafx.debugger.models.ScriptFieldVariable;
-import org.netbeans.modules.javafx.debugger.models.ScriptObjectVariable;
-import org.netbeans.modules.javafx.debugger.models.SequenceField;
-import org.netbeans.modules.javafx.debugger.models.SequenceObject;
+import org.netbeans.modules.visage.debugger.models.ScriptClass;
+import org.netbeans.modules.visage.debugger.models.ScriptFieldVariable;
+import org.netbeans.modules.visage.debugger.models.ScriptObjectVariable;
+import org.netbeans.modules.visage.debugger.models.SequenceField;
+import org.netbeans.modules.visage.debugger.models.SequenceObject;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.debugger.ui.Constants;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -30,14 +30,14 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  * @author Michal Skvor <michal.skvor at sun.com>
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TableRendererModel.class } )
-public class JavaFXTableRendererModel implements TableRendererModel {
+public class VisageTableRendererModel implements TableRendererModel {
 
     private WeakHashMap<Object, VariableCellRenderer> valueRenderers = 
             new WeakHashMap<Object,VariableCellRenderer>();
     private WeakHashMap<Object, VariableTypeRenderer> typeRenderers = 
             new WeakHashMap<Object, VariableTypeRenderer>();
 
-    public JavaFXTableRendererModel() {}
+    public VisageTableRendererModel() {}
 
     public boolean canRenderCell( Object o, String columnName ) throws UnknownTypeException {
         if( Constants.LOCALS_TYPE_COLUMN_ID.equals( columnName )) {

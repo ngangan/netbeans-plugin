@@ -42,8 +42,8 @@ is divided into following sections:
                 <path path="${javac.classpath}"/>
             </classpath>
         </nbprofiledirect>
-        <javafxproject:property name="profiler.current.path" value="${profiler.info.pathvar}" xmlns:javafxproject="http://www.netbeans.org/ns/javafx-project/1"/>
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}">
+        <visageproject:property name="profiler.current.path" value="${profiler.info.pathvar}" xmlns:visageproject="http://www.netbeans.org/ns/visage-project/1"/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}">
             <jvmarg value="${profiler.info.jvmargs.agent}"/>
             <jvmarg line="${profiler.info.jvmargs}"/>
             <env key="${profiler.info.pathvar}" path="${profiler.info.agentpath}:${profiler.current.path}"/>

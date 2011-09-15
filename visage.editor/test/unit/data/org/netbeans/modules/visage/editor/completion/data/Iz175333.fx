@@ -1,9 +1,9 @@
 package fxtestcases;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.Image;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.image.ImageView;
+import visage.scene.image.Image;
 
 Stage {
     title: "Application title"

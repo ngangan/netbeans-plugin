@@ -40,13 +40,13 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symtab;
 import com.sun.tools.mjavac.jvm.Target;
 import com.sun.tools.mjavac.model.JavacElements;
-import com.sun.tools.javafx.api.JavafxcTaskImpl;
+import com.sun.tools.visage.api.JavafxcTaskImpl;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
@@ -70,7 +70,7 @@ import java.util.logging.Logger;
  * </p>
  * <pre>
  * final ElementHandle[] elementHandle = new ElementHandle[1];
- * javafxSource.runUserActionTask(new Task&lt;CompilationController>() {
+ * visageSource.runUserActionTask(new Task&lt;CompilationController>() {
  *     public void run(CompilationController compilationController) {
  *         compilationController.toPhase(Phase.ANALYZED);
  *         CompilationUnitTree cu = compilationController.getTree();

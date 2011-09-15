@@ -59,10 +59,10 @@ public class ServiceTagGenerator {
         if(args.length>0) {
             for(String arg  : args )  {
                 System.out.println("Trying to create ST for " + arg);
-                if(arg.equals("javafx")) {
+                if(arg.equals("visage")) {
                     try {
-                         NbServiceTagSupport.createJavaFXServiceTag(ST_SOURCE, JAVA_VERSION);
-                         NbServiceTagSupport.createJavaFXSdkServiceTag(ST_SOURCE, JAVA_VERSION);
+                         NbServiceTagSupport.createVisageServiceTag(ST_SOURCE, JAVA_VERSION);
+                         NbServiceTagSupport.createVisageSdkServiceTag(ST_SOURCE, JAVA_VERSION);
                     } catch (Exception e) {
                         e.printStackTrace();
                         result = 1;

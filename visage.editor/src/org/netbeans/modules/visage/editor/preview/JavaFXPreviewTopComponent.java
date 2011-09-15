@@ -29,7 +29,7 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.preview;
+package org.netbeans.modules.visage.editor.preview;
 
 import java.awt.Graphics;
 import java.awt.geom.Rectangle2D;
@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
 import org.openide.filesystems.FileObject;
@@ -62,26 +62,26 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays JavaFX Preview.
+ * Top component which displays Visage Preview.
  */
-public final class JavaFXPreviewTopComponent extends TopComponent implements PropertyChangeListener {
+public final class VisagePreviewTopComponent extends TopComponent implements PropertyChangeListener {
 
-    private static JavaFXPreviewTopComponent instance;
+    private static VisagePreviewTopComponent instance;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
 
-    private static final String PREFERRED_ID = "JavaFXPreviewTopComponent"; //NOI18N
-    private static final Logger log = Logger.getLogger("org.netbeans.javafx.preview"); //NOI18N
+    private static final String PREFERRED_ID = "VisagePreviewTopComponent"; //NOI18N
+    private static final Logger log = Logger.getLogger("org.netbeans.visage.preview"); //NOI18N
 
-    private static final File fxHome = InstalledFileLocator.getDefault().locate("javafx-sdk", "org.netbeans.modules.javafx.platform", false); //NOI18N
-    private static final File previewLib = InstalledFileLocator.getDefault().locate("modules/ext/org-netbeans-javafx-preview.jar", "org.netbeans.modules.javafx.editor", false); //NOI18N
+    private static final File fxHome = InstalledFileLocator.getDefault().locate("visage-sdk", "org.netbeans.modules.visage.platform", false); //NOI18N
+    private static final File previewLib = InstalledFileLocator.getDefault().locate("modules/ext/org-netbeans-visage-preview.jar", "org.netbeans.modules.visage.editor", false); //NOI18N
 
     private BufferedImage bi;
     private DataObject oldD;
     private Process pr;
     private int timer;
 
-    private final RequestProcessor taskQueue = new RequestProcessor(JavaFXPreviewTopComponent.class.getName(), 1);
+    private final RequestProcessor taskQueue = new RequestProcessor(VisagePreviewTopComponent.class.getName(), 1);
 
     private static boolean isResource(String name) {
         if (name.endsWith(".class")) return false; //NOI18N
@@ -129,7 +129,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
 
     private final RequestProcessor.Task task = taskQueue.create(new Runnable() {
         public void run() {
-            synchronized (JavaFXPreviewTopComponent.this) {
+            synchronized (VisagePreviewTopComponent.this) {
                 if (pr != null) {
                     pr.destroy();
                     timer = 0;
@@ -138,7 +138,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                 }
             }
             if (oldD != null) {
-                oldD.removePropertyChangeListener(JavaFXPreviewTopComponent.this);
+                oldD.removePropertyChangeListener(VisagePreviewTopComponent.this);
                 oldD = null;
             }
             Node[] sel = TopComponent.getRegistry().getActivatedNodes();
@@ -148,12 +148,12 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                     FileObject f = d.getPrimaryFile();
                     if (f.isData())  bi = null;
                     if ("fx".equals(f.getExt())) { //NOI18N
-                        d.addPropertyChangeListener(JavaFXPreviewTopComponent.this);
+                        d.addPropertyChangeListener(VisagePreviewTopComponent.this);
                         oldD = d;
                         Project p = FileOwnerQuery.getOwner(f);
-                        if (p instanceof JavaFXProject) {
-                            PropertyEvaluator ev = ((JavaFXProject)p).evaluator();
-                            FileObject srcRoots[] = ((JavaFXProject)p).getFOSourceRoots();
+                        if (p instanceof VisageProject) {
+                            PropertyEvaluator ev = ((VisageProject)p).evaluator();
+                            FileObject srcRoots[] = ((VisageProject)p).getFOSourceRoots();
                             StringBuilder src = new StringBuilder();
                             String className = null;
                             File basedir = FileUtil.toFile(p.getProjectDirectory());
@@ -177,7 +177,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             String enc = ev.getProperty("source.encoding");  //NOI18N
                             if (enc == null || enc.trim().length() == 0) enc = "UTF-8"; //NOI18N
                             ArrayList<String> args = new ArrayList<String>();
-                            args.add(fxHome + "/bin/javafxc" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                            args.add(fxHome + "/bin/visagec" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
                             args.add("-cp"); //NOI18N
                             args.add(build.getAbsolutePath() + File.pathSeparator + cp);
                             args.add("-sourcepath"); //NOI18N
@@ -190,7 +190,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             try {
                                 build.mkdirs();
                                 log.info(args.toString());
-                                synchronized (JavaFXPreviewTopComponent.this) {
+                                synchronized (VisagePreviewTopComponent.this) {
                                     pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
                                 }
                                 if (log.isLoggable(Level.INFO)) {
@@ -212,7 +212,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                 String appargs = ev.getProperty("application.args");  //NOI18N
                                 if (pr.exitValue() == 0) {
                                     args = new ArrayList<String>();
-                                    args.add(fxHome + "/bin/javafx" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
+                                    args.add(fxHome + "/bin/visage" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
                                     args.add("-javaagent:" + previewLib.getAbsolutePath());//NOI18N
                                     args.add("-Xbootclasspath/p:" + previewLib.getAbsolutePath());//NOI18N
                                     args.add("-Dcom.apple.backgroundOnly=true"); //NOI18N
@@ -223,7 +223,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                                     args.add(className);
                                     if (appargs != null) for (String aa : appargs.trim().split("\\s+")) args.add(aa); //NOI18N
                                     log.info(args.toString());
-                                    synchronized (JavaFXPreviewTopComponent.this) {
+                                    synchronized (VisagePreviewTopComponent.this) {
                                         pr = Runtime.getRuntime().exec(args.toArray(new String[args.size()]), null, basedir);
                                     }
                                     if (log.isLoggable(Level.INFO)) {
@@ -263,7 +263,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
                             } catch (Exception ex) {
                                 //ignore
                             } finally {
-                                synchronized (JavaFXPreviewTopComponent.this) {
+                                synchronized (VisagePreviewTopComponent.this) {
                                     if (pr != null) pr.destroy();
                                     pr = null;
                                 }
@@ -283,16 +283,16 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
         if (b != null) g.drawImage(b, 0, 0, null);
         else {
             g.clearRect(0, 0, getWidth(), getHeight());
-            String noPreview = NbBundle.getMessage(JavaFXPreviewTopComponent.class, "MSG_NoPreview"); //NOI18N
+            String noPreview = NbBundle.getMessage(VisagePreviewTopComponent.class, "MSG_NoPreview"); //NOI18N
             Rectangle2D r = g.getFontMetrics().getStringBounds(noPreview, g);
             g.drawString(noPreview, (getWidth()-(int)r.getWidth())/2, (getHeight()-(int)r.getHeight())/2);
         }
     }
 
-    private JavaFXPreviewTopComponent() {
+    private VisagePreviewTopComponent() {
         initComponents();
-        setName(NbBundle.getMessage(JavaFXPreviewTopComponent.class, "CTL_JavaFXPreviewTopComponent")); //NOI18N
-        setToolTipText(NbBundle.getMessage(JavaFXPreviewTopComponent.class, "HINT_JavaFXPreviewTopComponent")); //NOI18N
+        setName(NbBundle.getMessage(VisagePreviewTopComponent.class, "CTL_VisagePreviewTopComponent")); //NOI18N
+        setToolTipText(NbBundle.getMessage(VisagePreviewTopComponent.class, "HINT_VisagePreviewTopComponent")); //NOI18N
 //        setIcon(Utilities.loadImage(ICON_PATH, true));
     }
 
@@ -315,26 +315,26 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
-    public static synchronized JavaFXPreviewTopComponent getDefault() {
+    public static synchronized VisagePreviewTopComponent getDefault() {
         if (instance == null) {
-            instance = new JavaFXPreviewTopComponent();
+            instance = new VisagePreviewTopComponent();
         }
         return instance;
     }
 
     /**
-     * Obtain the JavaFXPreviewTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the VisagePreviewTopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized JavaFXPreviewTopComponent findInstance() {
+    public static synchronized VisagePreviewTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
-            Logger.getLogger(JavaFXPreviewTopComponent.class.getName()).warning("Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system."); //NOI18N
+            Logger.getLogger(VisagePreviewTopComponent.class.getName()).warning("Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system."); //NOI18N
             return getDefault();
         }
-        if (win instanceof JavaFXPreviewTopComponent) {
-            return (JavaFXPreviewTopComponent) win;
+        if (win instanceof VisagePreviewTopComponent) {
+            return (VisagePreviewTopComponent) win;
         }
-        Logger.getLogger(JavaFXPreviewTopComponent.class.getName()).warning("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior."); //NOI18N
+        Logger.getLogger(VisagePreviewTopComponent.class.getName()).warning("There seem to be multiple components with the '" + PREFERRED_ID + "' ID. That is a potential source of errors and unexpected behavior."); //NOI18N
         return getDefault();
     }
 
@@ -376,7 +376,7 @@ public final class JavaFXPreviewTopComponent extends TopComponent implements Pro
         private static final long serialVersionUID = 1L;
 
         public Object readResolve() {
-            return JavaFXPreviewTopComponent.getDefault();
+            return VisagePreviewTopComponent.getDefault();
         }
     }
 }

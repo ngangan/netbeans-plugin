@@ -43,15 +43,15 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.variablesfiltering;
+package org.netbeans.modules.visage.debugger.variablesfiltering;
 
-import org.netbeans.modules.javafx.debugger.models.SequenceObject;
-import org.netbeans.modules.javafx.debugger.models.SequenceField;
-import com.sun.javafx.jdi.FXClassType;
-import com.sun.javafx.jdi.FXObjectReference;
-import com.sun.javafx.jdi.FXPrimitiveValue;
-import com.sun.javafx.jdi.FXReferenceType;
-import com.sun.javafx.jdi.FXSequenceReference;
+import org.netbeans.modules.visage.debugger.models.SequenceObject;
+import org.netbeans.modules.visage.debugger.models.SequenceField;
+import com.sun.visage.jdi.FXClassType;
+import com.sun.visage.jdi.FXObjectReference;
+import com.sun.visage.jdi.FXPrimitiveValue;
+import com.sun.visage.jdi.FXReferenceType;
+import com.sun.visage.jdi.FXSequenceReference;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
 import com.sun.jdi.VMDisconnectedException;
@@ -68,7 +68,7 @@ import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 //import org.netbeans.modules.debugger.jpda.models.FieldVariable;
 import org.netbeans.modules.debugger.jpda.models.ClassVariableImpl;
 import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
-import org.netbeans.modules.javafx.debugger.models.ScriptClass;
+import org.netbeans.modules.visage.debugger.models.ScriptClass;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
 import org.netbeans.spi.viewmodel.TreeModel;
@@ -80,10 +80,10 @@ import org.netbeans.spi.viewmodel.UnknownTypeException;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/LocalsView",types={ org.netbeans.spi.viewmodel.TreeModelFilter.class } )
-public class JavaFXVariablesFilter implements TreeModelFilter {
+public class VisageVariablesFilter implements TreeModelFilter {
 
-    /** Creates new JavaFXVariablesFilter instance */
-    public JavaFXVariablesFilter() {}
+    /** Creates new VisageVariablesFilter instance */
+    public VisageVariablesFilter() {}
 
     /**
      *

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor;
+package org.netbeans.modules.visage.fxd.composer.editor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +54,7 @@ import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
 
 /**
  * This static class groups the whole aspect of bracket
@@ -131,7 +131,7 @@ public class BracketCompletion {
      * @return FXDTokenId of brace/bracket that should be added.
      * NULL of paired bracket should not be added.
      */
-    // copied from org.netbeans.modules.javafx.editor.BracketCompletion with
+    // copied from org.netbeans.modules.visage.editor.BracketCompletion with
     // TokenId replacement. [] support is also added
     static FXDTokenId isAddRightBracket(BaseDocument doc, int caretOffset)
             throws BadLocationException {
@@ -394,7 +394,7 @@ public class BracketCompletion {
         if (token != null && token.id() == bracketId
                 // we are escaping right bracket inserted into RL_SL because it is correct statement.
                 // manowar: commented this weird line according issue #156157
-//                && !(bracketId == JFXTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
+//                && !(bracketId == VSGTokenId.RBRACE_LBRACE_STRING_LITERAL && c == '}') // NOI18N
                 ) {
             FXDTokenId leftBracketIntId = getOpositeBracket(bracketId, false);
 
@@ -569,7 +569,7 @@ public class BracketCompletion {
      * @return true if bracket completion is enabled
      */
     private static boolean completionSettingEnabled() {
-        //return ((Boolean)Settings.getValue(JavaFXEditorKit.class, JavaSettingsNames.PAIR_CHARACTERS_COMPLETION)).booleanV
+        //return ((Boolean)Settings.getValue(VisageEditorKit.class, JavaSettingsNames.PAIR_CHARACTERS_COMPLETION)).booleanV
         return true;
     }
 
@@ -601,12 +601,12 @@ public class BracketCompletion {
      * The same as braceBalance but generalized to any pairs of matching
      * tokens including optional scan of chars associated with 
      * the first two of specified tokens (got using {@link getBracketChar})
-     * inside the {@link org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId#UNKNOWN}
+     * inside the {@link org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId#UNKNOWN}
      * token text.
      *
      * @param doc                      document representing source code.
      * @param handleSpecialBracesToken if true, method manualy parses
-     *                                 {@link org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId#UNKNOWN}
+     *                                 {@link org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId#UNKNOWN}
      *                                 tokens to determine correct balance.
      * @param pairs                    pairs of oposite tokens to perform balance operation.
      * @return adjusted balance.
@@ -614,7 +614,7 @@ public class BracketCompletion {
     private static int tokenBalance(BaseDocument doc, boolean handleSpecialBracesToken, TokenId... pairs) {
         if (pairs == null || pairs.length == 0) return 0;
         if (pairs.length % 2 != 0)
-            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
+            throw new IllegalArgumentException(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/editor/Bundle").getString("The_odd_number_of_elements_should_not_be_paired!")); // NOI18N
 
         final List<TokenId> ids = Arrays.asList(pairs);
         TokenHierarchy<BaseDocument> th = TokenHierarchy.get(doc);
@@ -641,7 +641,7 @@ public class BracketCompletion {
     /**
      * Gets balance of chars associated with specified tokens
      * (got using {@link getBracketChar})
-     * in {@link org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId#UNKNOWN} token.
+     * in {@link org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId#UNKNOWN} token.
      * This is counted manualy based on characters occurence.
      *
      * @param balance current balance or zero if there is no balance precedens.

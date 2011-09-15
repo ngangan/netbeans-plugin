@@ -40,25 +40,25 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXIfExpression;
+import com.sun.tools.visage.tree.VSGIfExpression;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 /**
  *
  * @author Miloslav Metelka
  */
-public class ConditionalExpressionEnvironment extends JavaFXCompletionEnvironment<JFXIfExpression> {
+public class ConditionalExpressionEnvironment extends VisageCompletionEnvironment<VSGIfExpression> {
 
     private static final Logger logger = Logger.getLogger(ConditionalExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXIfExpression ifExp) throws IOException {
+    protected void inside(VSGIfExpression ifExp) throws IOException {
         localResult(null);
     }
 

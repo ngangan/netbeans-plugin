@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.wizards;
+package org.netbeans.modules.visage.project.ui.wizards;
 
 import javax.swing.JPanel;
 import org.openide.WizardDescriptor;
@@ -70,9 +70,9 @@ public class PanelConfigureProjectVisual extends JPanel {
 
     private PanelProjectTypesVisual projectTypesPanel;
     
-    private NewJavaFXProjectWizardIterator.WizardType type;
+    private NewVisageProjectWizardIterator.WizardType type;
     
-    public PanelConfigureProjectVisual(PanelConfigureProject panel, NewJavaFXProjectWizardIterator.WizardType type) {
+    public PanelConfigureProjectVisual(PanelConfigureProject panel, NewVisageProjectWizardIterator.WizardType type) {
         this.panel = panel;
         initComponents();                
         this.type = type;
@@ -102,7 +102,7 @@ public class PanelConfigureProjectVisual extends JPanel {
     }
     
     void read (WizardDescriptor d) {
-        NewJavaFXProjectWizardIterator.WizardType lastType = (NewJavaFXProjectWizardIterator.WizardType) d.getProperty("fxwizard-type");  //NOI18N
+        NewVisageProjectWizardIterator.WizardType lastType = (NewVisageProjectWizardIterator.WizardType) d.getProperty("fxwizard-type");  //NOI18N
         if (lastType == null || lastType != type) {
             //bugfix #46387 The type of project changed, reset values to defaults
             d.putProperty ("name", null); // NOI18N

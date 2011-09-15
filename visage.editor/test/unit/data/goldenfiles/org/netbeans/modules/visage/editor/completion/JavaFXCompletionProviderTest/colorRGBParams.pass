@@ -1,8 +1,8 @@
-javafx.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int) - parameters
-javafx.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int, arg3 : float) - parameters
-javafx.scene.paint.Color c
-com.sun.javafx.runtime.FXBase super
-javafxtester.Test this
+visage.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int) - parameters
+visage.scene.paint.Color rgb(arg0 : int, arg1 : int, arg2 : int, arg3 : float) - parameters
+visage.scene.paint.Color c
+com.sun.visage.runtime.FXBase super
+visagetester.Test this
 public static boolean isInitialized(arg0 : java.lang.Object)
 public static boolean isReadOnly(arg0 : java.lang.Object)
 public static boolean isSameObject(arg0 : java.lang.Object, arg1 : java.lang.Object)

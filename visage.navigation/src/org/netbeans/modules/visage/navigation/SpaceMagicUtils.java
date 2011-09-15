@@ -39,27 +39,27 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.javafx.api.tree.UnitTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.Tree.VisageKind;
+import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.javafx.api.JavafxcTrees;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
+import com.sun.tools.visage.api.JavafxcTrees;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.lang.model.element.Element;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.Task;
 import org.openide.util.Exceptions;
 
 /**
@@ -69,7 +69,7 @@ import org.openide.util.Exceptions;
  */
 public final class SpaceMagicUtils {
 
-    public static final String MAGIC_FUNCTION = "javafx$run$"; // NOI18N
+    public static final String MAGIC_FUNCTION = "visage$run$"; // NOI18N
 
     private SpaceMagicUtils() {
     }
@@ -95,10 +95,10 @@ public final class SpaceMagicUtils {
 
     /**
      * Determines whether a given element has spiritual invocation of magic function.
-     * In other words whether element belongs to javafx$run$
+     * In other words whether element belongs to visage$run$
      * 
      * @param element to check
-     * @return whether a given element belongs to javafx$run$
+     * @return whether a given element belongs to visage$run$
      */
     public static boolean hasSpiritualInvocation(Element element) {
         if (element instanceof Symbol.VarSymbol) {
@@ -111,10 +111,10 @@ public final class SpaceMagicUtils {
 
     /**
      * Determines whether a given element is a magic function.
-     * In other words whether element belongs to javafx$run$
+     * In other words whether element belongs to visage$run$
      * 
      * @param element to check
-     * @return whether a given element is a magic function javafx$run$
+     * @return whether a given element is a magic function visage$run$
      */
     public static boolean isSpiritualMethod(Element element) {
         if (element instanceof Symbol.MethodSymbol) {
@@ -127,10 +127,10 @@ public final class SpaceMagicUtils {
 
     /**
      * Gets all members from magic function
-     * In other words whether element belongs to javafx$run$
+     * In other words whether element belongs to visage$run$
      * 
      * @param info CompilationInfo
-     * @return whether a given element is a magic function javafx$run$
+     * @return whether a given element is a magic function visage$run$
      */
     public static List<Element> getSpiritualMembers(final CompilationInfo info) {
         final List<Element> elements = new ArrayList<Element>();
@@ -138,19 +138,19 @@ public final class SpaceMagicUtils {
         final UnitTree cut = info.getCompilationUnit();
 
         for (Tree tt : cut.getTypeDecls()) {
-            JavaFXKind kk = tt.getJavaFXKind();
-            if (kk == JavaFXKind.CLASS_DECLARATION) {
-                JFXClassDeclaration cd = (JFXClassDeclaration) tt;
+            VisageKind kk = tt.getVisageKind();
+            if (kk == VisageKind.CLASS_DECLARATION) {
+                VSGClassDeclaration cd = (VSGClassDeclaration) tt;
 
                 for (Tree jct : cd.getClassMembers()) {
-                    JavaFXKind k = jct.getJavaFXKind();
-                    if (k == JavaFXKind.FUNCTION_DEFINITION) {
-                        JFXFunctionDefinition fdt = (JFXFunctionDefinition) jct;
+                    VisageKind k = jct.getVisageKind();
+                    if (k == VisageKind.FUNCTION_DEFINITION) {
+                        VSGFunctionDefinition fdt = (VSGFunctionDefinition) jct;
                         if (MAGIC_FUNCTION.equals(fdt.name.toString())) {
 
                             for (ExpressionTree st : fdt.getBodyExpression().getStatements()) {
-                                JavaFXTreePath path = trees.getPath(cut, fdt);
-                                JavaFXTreePath expPath = new JavaFXTreePath(path, st);
+                                VisageTreePath path = trees.getPath(cut, fdt);
+                                VisageTreePath expPath = new VisageTreePath(path, st);
                                 Element element = trees.getElement(expPath);
                                 if (element != null) {
                                     elements.add(element);
@@ -168,8 +168,8 @@ public final class SpaceMagicUtils {
 
 //        JavafxcTrees trees = info.getTrees();
 //        TreePath path = trees.getPath(e);
-//        JFXFunctionDefinition tree = (JFXFunctionDefinition) trees.getTree(e);
-//        JFXBlockExpression bodyExpression = tree.getBodyExpression();
+//        VSGFunctionDefinition tree = (VSGFunctionDefinition) trees.getTree(e);
+//        VSGBlockExpression bodyExpression = tree.getBodyExpression();
 //        for (StatementTree st : bodyExpression.getStatements()) {
 //            if (canceled.get()) {
 //                return;

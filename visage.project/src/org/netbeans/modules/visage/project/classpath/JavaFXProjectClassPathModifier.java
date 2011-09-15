@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,8 +58,8 @@ import org.netbeans.api.project.Sources;
 import org.netbeans.api.project.ant.AntArtifact;
 import org.netbeans.api.project.libraries.Library;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.java.project.classpath.ProjectClassPathModifierImplementation;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -74,19 +74,19 @@ import org.openide.util.MutexException;
  *@author Tomas Zezula
  *
  */
-public class JavaFXProjectClassPathModifier extends ProjectClassPathModifierImplementation {
+public class VisageProjectClassPathModifier extends ProjectClassPathModifierImplementation {
     
     static final int ADD = 1;
     static final int REMOVE = 2;
     
-    private final JavaFXProject project;
+    private final VisageProject project;
     private final UpdateHelper helper;
     private final ReferenceHelper refHelper;
     private final PropertyEvaluator eval;    
     private final ClassPathSupport cs;    
     
-    /** Creates a new instance of JavaFXProjectClassPathModifier */
-    public JavaFXProjectClassPathModifier(final JavaFXProject project, final UpdateHelper helper, final PropertyEvaluator eval, final ReferenceHelper refHelper) {
+    /** Creates a new instance of VisageProjectClassPathModifier */
+    public VisageProjectClassPathModifier(final VisageProject project, final UpdateHelper helper, final PropertyEvaluator eval, final ReferenceHelper refHelper) {
         assert project != null;
         assert helper != null;
         assert eval != null;
@@ -96,10 +96,10 @@ public class JavaFXProjectClassPathModifier extends ProjectClassPathModifierImpl
         this.eval = eval;
         this.refHelper = refHelper;        
         this.cs = new ClassPathSupport( eval, refHelper, helper.getAntProjectHelper(), 
-                                        JavaFXProjectProperties.WELL_KNOWN_PATHS, 
-                                        JavaFXProjectProperties.LIBRARY_PREFIX, 
-                                        JavaFXProjectProperties.LIBRARY_SUFFIX, 
-                                        JavaFXProjectProperties.ANT_ARTIFACT_PREFIX );
+                                        VisageProjectProperties.WELL_KNOWN_PATHS, 
+                                        VisageProjectProperties.LIBRARY_PREFIX, 
+                                        VisageProjectProperties.LIBRARY_SUFFIX, 
+                                        VisageProjectProperties.ANT_ARTIFACT_PREFIX );
     }
     
     protected SourceGroup[] getExtensibleSourceGroups() {

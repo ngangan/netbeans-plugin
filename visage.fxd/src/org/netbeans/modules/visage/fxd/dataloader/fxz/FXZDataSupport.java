@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader.fxz;
+package org.netbeans.modules.visage.fxd.dataloader.fxz;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

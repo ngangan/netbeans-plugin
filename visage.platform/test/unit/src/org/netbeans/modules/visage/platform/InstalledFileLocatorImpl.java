@@ -39,7 +39,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform;
+package org.netbeans.modules.visage.platform;
 
 import java.io.File;
 import org.openide.modules.InstalledFileLocator;
@@ -48,16 +48,16 @@ import org.openide.modules.InstalledFileLocator;
 public final class InstalledFileLocatorImpl extends InstalledFileLocator {
 
     public @Override File locate(String relativePath, String codeNameBase, boolean localized) {
-        if ("javafx-sdk/lib/shared/javafxc.jar".equals(relativePath)) {
+        if ("visage-sdk/lib/shared/visagec.jar".equals(relativePath)) {
             // Serves for DefaultPlatformImpl#create which uses location of
-            // javafxc.jar for locating JavaFX SDK. DefaultPlatformImpl#create
-            // is subsequently used by JavaFXPlatform.getDefault() which is
+            // visagec.jar for locating Visage SDK. DefaultPlatformImpl#create
+            // is subsequently used by VisagePlatform.getDefault() which is
             // utilized in test to setup classpath for test environment.
-            String javafxcFile = System.getProperty("xtest.javafxc.jar");
-            if (javafxcFile == null) {
-                throw new RuntimeException("xtest.javafxc.jar property has to be set");
+            String visagecFile = System.getProperty("xtest.visagec.jar");
+            if (visagecFile == null) {
+                throw new RuntimeException("xtest.visagec.jar property has to be set");
             }
-            return new File(javafxcFile);
+            return new File(visagecFile);
         }
         return null;
     }

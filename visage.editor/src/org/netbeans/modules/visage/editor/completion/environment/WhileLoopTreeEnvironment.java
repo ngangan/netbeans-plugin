@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.WhileLoopTree;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.visage.api.tree.WhileLoopTree;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class WhileLoopTreeEnvironment extends JavaFXCompletionEnvironment<WhileLoopTree> {
+public class WhileLoopTreeEnvironment extends VisageCompletionEnvironment<WhileLoopTree> {
     
     private static final Logger logger = Logger.getLogger(WhileLoopTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);

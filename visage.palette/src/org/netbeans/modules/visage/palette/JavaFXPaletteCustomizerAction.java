@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette;
+package org.netbeans.modules.visage.palette;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -53,11 +53,11 @@ import org.openide.util.actions.CallableSystemAction;
  *
  * @author Michal Skvor
  */
-public class JavaFXPaletteCustomizerAction extends CallableSystemAction {
+public class VisagePaletteCustomizerAction extends CallableSystemAction {
 
     private String name;
 
-    public JavaFXPaletteCustomizerAction() {
+    public VisagePaletteCustomizerAction() {
         putValue( "noIconInMenu", Boolean.TRUE ); // NOI18N
     }
     
@@ -69,7 +69,7 @@ public class JavaFXPaletteCustomizerAction extends CallableSystemAction {
     @Override
     public void performAction() {
         try {
-            JavaFXPaletteFactory.getPalette().showCustomizer();
+            VisagePaletteFactory.getPalette().showCustomizer();
         } catch( IOException ioe ) {
             Logger.getLogger( "global" ).log( Level.WARNING, null, ioe ); // NOI18N
         }
@@ -78,7 +78,7 @@ public class JavaFXPaletteCustomizerAction extends CallableSystemAction {
     @Override
     public String getName() {
         if( name == null ) {
-            name = NbBundle.getMessage( JavaFXPaletteCustomizerAction.class, "ACT_OpenJavaFXCustomizer" ); // NOI18N
+            name = NbBundle.getMessage( VisagePaletteCustomizerAction.class, "ACT_OpenVisageCustomizer" ); // NOI18N
         }
         return name;
     }

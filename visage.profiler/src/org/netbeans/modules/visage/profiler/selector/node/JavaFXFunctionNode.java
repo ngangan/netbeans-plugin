@@ -41,12 +41,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.lib.profiler.client.ClientUtils;
 import java.io.IOException;
 import java.util.Comparator;
@@ -58,7 +58,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.Icon;
 import org.openide.filesystems.FileObject;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
@@ -68,9 +68,9 @@ import org.netbeans.modules.profiler.selector.spi.nodes.IconResource;
  *
  * @author cms
  */
-public class JavaFXFunctionNode extends SelectorNode {
-    public static final Comparator<JavaFXFunctionNode> COMPARATOR = new Comparator<JavaFXFunctionNode>() {
-        public int compare(JavaFXFunctionNode o1, JavaFXFunctionNode o2) {
+public class VisageFunctionNode extends SelectorNode {
+    public static final Comparator<VisageFunctionNode> COMPARATOR = new Comparator<VisageFunctionNode>() {
+        public int compare(VisageFunctionNode o1, VisageFunctionNode o2) {
             return o1.toString().compareTo(o2.toString());
         }
     };
@@ -79,17 +79,17 @@ public class JavaFXFunctionNode extends SelectorNode {
     private String signature = "";   // NOI18N
 
     /** Creates a new instance of MethodNode */
-    public JavaFXFunctionNode(ClasspathInfo cpInfo, final Element method, JavaFXFunctionsNode parent) {
+    public VisageFunctionNode(ClasspathInfo cpInfo, final Element method, VisageFunctionsNode parent) {
         super(method.toString(), method.getSimpleName().toString(), getIcon(method), SelectorChildren.LEAF, parent);
 
 
-        JavaFXSource js = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
+        VisageSource js = VisageSource.forFileObject(VisageProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
 
         // workaround for library class nodes
         if (js == null) {
             Vector<FileObject> v = new Vector<FileObject>();
-            v.add(JavaFXProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
-            js = JavaFXSource.create(cpInfo, v);
+            v.add(VisageProjectUtilities.getFile(getEnclosingClass(method), cpInfo));
+            js = VisageSource.create(cpInfo, v);
         }
         
         try {
@@ -99,9 +99,9 @@ public class JavaFXFunctionNode extends SelectorNode {
 
                     public void run(CompilationController controller)
                              throws Exception {
-                        if (controller.toPhase(JavaFXSource.Phase.ANALYZED) == JavaFXSource.Phase.ANALYZED) {
+                        if (controller.toPhase(VisageSource.Phase.ANALYZED) == VisageSource.Phase.ANALYZED) {
                             if (method instanceof ExecutableElement)
-                                signature = JavaFXProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
+                                signature = VisageProjectUtilities.getVMMethodSignature((ExecutableElement)method, controller);
                         } else {
                             System.err.println("Hups");
                         }
@@ -112,7 +112,7 @@ public class JavaFXFunctionNode extends SelectorNode {
         }
 
         if (signature != null) {
-        rootMethod = new ClientUtils.SourceCodeSelection(JavaFXProjectUtilities.getBinaryName((Element)getEnclosingClass(method), (Element)getEnclosingClass(getEnclosingClass(method))),
+        rootMethod = new ClientUtils.SourceCodeSelection(VisageProjectUtilities.getBinaryName((Element)getEnclosingClass(method), (Element)getEnclosingClass(getEnclosingClass(method))),
                                                          method.getSimpleName().toString(), signature);
         }
     }

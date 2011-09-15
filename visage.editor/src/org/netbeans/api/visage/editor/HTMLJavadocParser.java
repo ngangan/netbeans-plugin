@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.editor;
+package org.netbeans.api.visage.editor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +60,7 @@ import javax.swing.text.html.parser.ParserDelegator;
  *  HTML Parser. It retrieves sections of the javadoc HTML file.
  *
  * @author  Martin Roskanin
- * @author  Anton Chechel - javafx modifications
+ * @author  Anton Chechel - visage modifications
  */
 final class HTMLJavadocParser {
     static final String PACKAGE_SUMMARY = "package-summary"; // NOI18N
@@ -69,7 +69,7 @@ final class HTMLJavadocParser {
      *  @param url nbfs protocol URL
      *  @param pkg true if URL should be retrieved for a package
      */
-    public static String getJavadocText(URL url, boolean isJavaFXDoc) {
+    public static String getJavadocText(URL url, boolean isVisageDoc) {
         if (url == null) {
             return null;
         }
@@ -88,16 +88,16 @@ final class HTMLJavadocParser {
 
                 if (urlStr.indexOf(PACKAGE_SUMMARY) > 0) {
                     // package description
-                    offsets = isJavaFXDoc ? new int[] {0, is.available()} : parsePackage(reader, parser, charset != null);
+                    offsets = isVisageDoc ? new int[] {0, is.available()} : parsePackage(reader, parser, charset != null);
                 } else if (urlStr.indexOf('#') > 0) {
                     // member javadoc info
                     String memberName = urlStr.substring(urlStr.indexOf('#') + 1);
                     if (memberName.length() > 0) {
-                        offsets = parseMember(reader, memberName, parser, charset != null, isJavaFXDoc);
+                        offsets = parseMember(reader, memberName, parser, charset != null, isVisageDoc);
                     }
                 } else {
                     // class javadoc info
-                    offsets = parseClass(reader, parser, charset != null, isJavaFXDoc);
+                    offsets = parseClass(reader, parser, charset != null, isVisageDoc);
                 }
 
                 if (offsets != null && offsets[0] != -1 && offsets[1] > offsets[0]) {
@@ -203,7 +203,7 @@ final class HTMLJavadocParser {
 
     /** Retrieves the position (start offset and end offset) of class javadoc info
      * in the raw html file */
-    private static int[] parseClass(Reader reader, final HTMLEditorKit.Parser parser, boolean ignoreCharset, boolean isJavaFXDoc) throws IOException {
+    private static int[] parseClass(Reader reader, final HTMLEditorKit.Parser parser, boolean ignoreCharset, boolean isVisageDoc) throws IOException {
         final int offset[] = {-1, -1};
 
         class CallbackJava extends HTMLEditorKit.ParserCallback {
@@ -268,7 +268,7 @@ final class HTMLJavadocParser {
             }
         }
 
-        class CallbackJavaFX extends HTMLEditorKit.ParserCallback {
+        class CallbackVisage extends HTMLEditorKit.ParserCallback {
             @Override
             public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
                 if (t == HTML.Tag.DIV && a != null) {
@@ -289,7 +289,7 @@ final class HTMLJavadocParser {
             }
         }
 
-        HTMLEditorKit.ParserCallback callback = isJavaFXDoc ?  new CallbackJavaFX() :  new CallbackJava();
+        HTMLEditorKit.ParserCallback callback = isVisageDoc ?  new CallbackVisage() :  new CallbackJava();
         parser.parse(reader, callback, ignoreCharset);
         callback = null;
         return offset;
@@ -297,7 +297,7 @@ final class HTMLJavadocParser {
 
     /** Retrieves the position (start offset and end offset) of member javadoc info
      * in the raw html file */
-    private static int[] parseMember(Reader reader, final String name, final HTMLEditorKit.Parser parser, boolean ignoreCharset, boolean isJavaFXDoc) throws IOException {
+    private static int[] parseMember(Reader reader, final String name, final HTMLEditorKit.Parser parser, boolean ignoreCharset, boolean isVisageDoc) throws IOException {
         final int offset[] = {-1, -1};
         final int shortCommentOffset[] = { -1, -1 };
 
@@ -351,7 +351,7 @@ final class HTMLJavadocParser {
             }
         }
 
-        class CallbackJavaFX extends HTMLEditorKit.ParserCallback {
+        class CallbackVisage extends HTMLEditorKit.ParserCallback {
             private boolean insideFieldBlock = false;
             private boolean insideNameBlock = false;
             private boolean insideShortComment = false;
@@ -413,7 +413,7 @@ final class HTMLJavadocParser {
             }
         }
 
-        HTMLEditorKit.ParserCallback callback = isJavaFXDoc ?  new CallbackJavaFX() :  new CallbackJava();
+        HTMLEditorKit.ParserCallback callback = isVisageDoc ?  new CallbackVisage() :  new CallbackJava();
         parser.parse(reader, callback, ignoreCharset);
         callback = null;
         if (offset[0] == -1 || offset[1] == -1) {

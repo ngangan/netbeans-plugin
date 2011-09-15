@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -62,7 +62,7 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.WeakListeners;
 
 /**
- * Defines the various class paths for a JavaFX project.
+ * Defines the various class paths for a Visage project.
  */
 public final class ClassPathProviderImpl implements ClassPathProvider, PropertyChangeListener {
 

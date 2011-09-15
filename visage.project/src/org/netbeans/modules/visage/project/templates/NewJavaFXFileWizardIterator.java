@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.templates;
+package org.netbeans.modules.visage.project.templates;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -70,7 +70,7 @@ import org.openide.loaders.DataObject;
  *
  * @author answer
  */
-public class NewJavaFXFileWizardIterator implements WizardDescriptor.InstantiatingIterator{
+public class NewVisageFileWizardIterator implements WizardDescriptor.InstantiatingIterator{
 
     private static final long serialVersionUID = 1L;
     
@@ -80,19 +80,19 @@ public class NewJavaFXFileWizardIterator implements WizardDescriptor.Instantiati
     
     private int type = TYPE_FILE;
     
-    public NewJavaFXFileWizardIterator() {
+    public NewVisageFileWizardIterator() {
     }
 
-    private NewJavaFXFileWizardIterator( int type ) {
+    private NewVisageFileWizardIterator( int type ) {
         this.type = type;
     }    
     
-    public static NewJavaFXFileWizardIterator packageWizard() {
-        return new NewJavaFXFileWizardIterator( TYPE_PACKAGE );
+    public static NewVisageFileWizardIterator packageWizard() {
+        return new NewVisageFileWizardIterator( TYPE_PACKAGE );
     }
     
-    public static NewJavaFXFileWizardIterator packageInfoWizard () {
-        return new NewJavaFXFileWizardIterator( TYPE_PKG_INFO );
+    public static NewVisageFileWizardIterator packageInfoWizard () {
+        return new NewVisageFileWizardIterator( TYPE_PKG_INFO );
     }
             
     private WizardDescriptor.Panel[] createPanels (WizardDescriptor wizardDescriptor) {
@@ -109,12 +109,12 @@ public class NewJavaFXFileWizardIterator implements WizardDescriptor.Instantiati
         else {
             if ( this.type == TYPE_FILE ) {
                 return new WizardDescriptor.Panel[] {
-                    JavaFXTemplates.createPackageChooser( project, groups ),
+                    VisageTemplates.createPackageChooser( project, groups ),
                 };
             }
             else {                                
                 return new WizardDescriptor.Panel[] {
-                    new JavaFXTargetChooserPanel( project, groups, null, this.type, this.type == TYPE_PKG_INFO),
+                    new VisageTargetChooserPanel( project, groups, null, this.type, this.type == TYPE_PKG_INFO),
                 };
             }
         }

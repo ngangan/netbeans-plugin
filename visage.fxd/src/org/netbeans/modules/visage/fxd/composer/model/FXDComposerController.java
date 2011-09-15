@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -53,20 +53,20 @@ import java.util.Stack;
 import javax.swing.SwingUtilities;
 
 import org.openide.util.Utilities;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.ActionController;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.ComposerAction;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.SelectActionFactory;
-import org.netbeans.modules.javafx.fxd.composer.preview.PreviewTopComponent;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.model.actions.ActionController;
+import org.netbeans.modules.visage.fxd.composer.model.actions.ComposerAction;
+import org.netbeans.modules.visage.fxd.composer.model.actions.SelectActionFactory;
+import org.netbeans.modules.visage.fxd.composer.preview.PreviewTopComponent;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 
 
-import com.sun.javafx.tools.fxd.loader.Profile;
+import com.sun.visage.tools.fxd.loader.Profile;
 import java.util.Collection;
-import javafx.fxd.FXDNode;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+import visage.fxd.FXDNode;
+import visage.scene.Node;
+import visage.scene.Scene;
 import javax.swing.JComponent;
-import org.netbeans.modules.javafx.fxd.composer.source.SourceElement;
+import org.netbeans.modules.visage.fxd.composer.source.SourceElement;
 
 /**
  *

@@ -42,16 +42,16 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.repository;
+package org.netbeans.modules.visage.refactoring.repository;
 
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.JavafxTreeInfo;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.ElementHandle;
 
 /**
  *
@@ -82,11 +82,11 @@ public class LocalDef extends ElementDef {
     @Override
     public Element resolveElement(CompilationController cc) {
         final Element[] rslt = new Element[1];
-        new JavaFXTreePathScanner<Void, Void>() {
+        new VisageTreePathScanner<Void, Void>() {
             private int localCntr = 0;
             @Override
             public Void visitVariable(VariableTree node, Void p) {
-                Element e = JavafxTreeInfo.symbolFor((JFXTree)node);
+                Element e = JavafxTreeInfo.symbolFor((VSGTree)node);
                 if (e != null && (e.getKind() == ElementKind.PARAMETER || e.getKind() == ElementKind.LOCAL_VARIABLE)) {
                     if (localCntr++ == localId) {
                         rslt[0] = e;

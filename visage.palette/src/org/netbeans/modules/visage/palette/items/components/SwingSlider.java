@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.components;
+package org.netbeans.modules.visage.palette.items.components;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class SwingSlider implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(SwingSlider.class, "TEMPLATE_SwingSlider", targetComponent, "javafx.ext.swing.SwingSlider"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(SwingSlider.class, "TEMPLATE_SwingSlider", targetComponent, "visage.ext.swing.SwingSlider"); //NOI18N;
     }
 }

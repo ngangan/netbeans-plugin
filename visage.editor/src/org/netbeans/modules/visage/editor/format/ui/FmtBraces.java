@@ -42,12 +42,12 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.format.ui;
+package org.netbeans.modules.visage.editor.format.ui;
 
-import org.netbeans.modules.javafx.editor.format.CodeStyle.BracePlacement;
-import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.*;
-import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.CategorySupport.OPTION_ID;
-import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
+import org.netbeans.modules.visage.editor.format.CodeStyle.BracePlacement;
+import static org.netbeans.modules.visage.editor.format.ui.FmtOptions.*;
+import static org.netbeans.modules.visage.editor.format.ui.FmtOptions.CategorySupport.OPTION_ID;
+import org.netbeans.modules.visage.editor.format.CodeStyle.WrapStyle;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
 
 

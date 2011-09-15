@@ -29,7 +29,7 @@
  *  Portions Copyrighted 1997-2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.refactoring.transformations;
+package org.netbeans.modules.visage.refactoring.transformations;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.openide.ErrorManager;
@@ -65,7 +65,7 @@ import java.util.logging.Logger;
  */
 
 
-public class JavaFXDataLoader extends MultiFileLoader {
+public class VisageDataLoader extends MultiFileLoader {
     
     public static final String FX_MIME_TYPE = "text/x-fx";  //NOI18N
     
@@ -79,8 +79,8 @@ public class JavaFXDataLoader extends MultiFileLoader {
     /** Create the loader.
     * Should <em>not</em> be used by subclasses.
     */
-    public JavaFXDataLoader() {
-        super("org.netbeans.modules.javafx.dataloader.JavaFXDataObject"); // NOI18N
+    public VisageDataLoader() {
+        super("org.netbeans.modules.visage.dataloader.VisageDataObject"); // NOI18N
     }
 
     @Override
@@ -89,7 +89,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     }
     
     protected @Override String defaultDisplayName() {
-        return NbBundle.getMessage(JavaFXDataLoader.class, "PROP_JavaLoader_Name"); // NOI18N
+        return NbBundle.getMessage(VisageDataLoader.class, "PROP_JavaLoader_Name"); // NOI18N
     }
     
     /** Create the <code>JavaDataObject</code>.
@@ -102,7 +102,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     protected MultiDataObject createMultiObject (FileObject primaryFile)
     throws DataObjectExistsException, java.io.IOException {
         if (primaryFile.getExt().equals(FX_EXTENSION))
-            return new JavaFXDataObject(primaryFile, this);
+            return new VisageDataObject(primaryFile, this);
         return null;
     }
 
@@ -137,7 +137,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     protected MultiDataObject.Entry createPrimaryEntry (MultiDataObject obj, FileObject primaryFile) {
         if (FX_EXTENSION.equals(primaryFile.getExt())) {
 //            return new JavaFileEntry (obj, primaryFile);
-            return JavaFXDataSupport.createJavaFileEntry(obj, primaryFile);
+            return VisageDataSupport.createJavaFileEntry(obj, primaryFile);
         }
         else {
             return new FileEntry(obj, primaryFile);
@@ -154,7 +154,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
     protected MultiDataObject.Entry createSecondaryEntry (MultiDataObject obj, FileObject secondaryFile) {
         //The JavaDataObject itself has no secondary entries, but its subclasses have.
         //So we have to keep it as MultiFileLoader
-        ErrorManager.getDefault().log ("Subclass of JavaFXDataLoader ("+this.getClass().getName() // NOI18N
+        ErrorManager.getDefault().log ("Subclass of VisageDataLoader ("+this.getClass().getName() // NOI18N
                 +") has secondary entries but does not override createSecondaryEntries (MultidataObject, FileObject) method."); // NOI18N
         return new FileEntry.Numb(obj, secondaryFile);
     }   
@@ -184,10 +184,10 @@ public class JavaFXDataLoader extends MultiFileLoader {
     * Used to substitute keys in the source file.
     */
     
-    public static class JavaFXFileEntry extends IndentFileEntry {
+    public static class VisageFileEntry extends IndentFileEntry {
         static final long serialVersionUID =8244159045498569616L;
 
-        public JavaFXFileEntry(MultiDataObject obj, FileObject file) {
+        public VisageFileEntry(MultiDataObject obj, FileObject file) {
             super(obj, file);
         }
 
@@ -250,7 +250,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
         @Override
         public FileObject rename(String name) throws IOException {
             if (!PACKAGE_INFO.equals(name) && !Utilities.isJavaIdentifier(name))
-                throw new IOException(NbBundle.getMessage(JavaFXDataObject.class, "FMT_Not_Valid_FileName", name)); // NOI18N
+                throw new IOException(NbBundle.getMessage(VisageDataObject.class, "FMT_Not_Valid_FileName", name)); // NOI18N
             
             FileObject fo = super.rename(name);
             return fo;
@@ -268,7 +268,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
                 final String pkgNameNew = cpNew.getResourceName(f,'.',false); 
                 final String newName = fo.getName();
                 if (!pkgNameNew.equals(pkgNameOrig) || !newName.equals(origName)) {
-                    JavaFXDataObject.renameFO(fo, pkgNameNew, newName, origName);
+                    VisageDataObject.renameFO(fo, pkgNameNew, newName, origName);
                     // unfortunately JavaDataObject.renameFO creates JavaDataObject but it is too soon
                     // in this stage. Loaders reusing this FileEntry will create further files.
                     destroyDataObject(fo);
@@ -279,7 +279,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
         
         @Override
         public FileObject createFromTemplate(FileObject f, String name) throws IOException {
-            Logger.getLogger(JavaFXDataLoader.class.getName()).warning(
+            Logger.getLogger(VisageDataLoader.class.getName()).warning(
                     "Please replace template " + this.getFile().toString() + //NOI18N
                     " with the new scripting support. See " + //NOI18N
                     "http://www.netbeans.org/download/dev/javadoc/org-openide-loaders/apichanges.html#scripting"); //NOI18N
@@ -287,7 +287,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
                 // special case: name is null (unspecified or from one-parameter createFromTemplate)
                 name = FileUtil.findFreeFileName(f, f.getName(), "fx"); // NOI18N
             } else if (!PACKAGE_INFO.equals(name) && !Utilities.isJavaIdentifier(name)) {
-                throw new IOException(NbBundle.getMessage(JavaFXDataObject.class, "FMT_Not_Valid_FileName", name)); // NOI18N
+                throw new IOException(NbBundle.getMessage(VisageDataObject.class, "FMT_Not_Valid_FileName", name)); // NOI18N
             }
             
             this.initializeIndentEngine();
@@ -300,7 +300,7 @@ public class JavaFXDataLoader extends MultiFileLoader {
             } else {
                 pkgName = "";   //NOI18N
             }
-            JavaFXDataObject.renameFO(fo, pkgName, name, getFile().getName());
+            VisageDataObject.renameFO(fo, pkgName, name, getFile().getName());
             
             // unfortunately JavaDataObject.renameFO creates JavaDataObject but it is too soon
             // in this stage. Loaders reusing this FileEntry will create further files.

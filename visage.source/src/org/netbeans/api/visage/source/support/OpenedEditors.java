@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.api.javafx.source.support;
+package org.netbeans.api.visage.source.support;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -61,7 +61,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.EditorRegistry;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.VisageSource;
 //import org.netbeans.modules.java.source.JavaSourceSupportAccessor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -136,7 +136,7 @@ class OpenedEditors implements PropertyChangeListener {
         JTextComponent editor = EditorRegistry.lastFocusedComponent();
 
         FileObject fo = editor != null ? getFileObject(editor) : null;
-        if (editor instanceof JEditorPane && fo != null && JavaFXSource.forFileObject(fo) != null) {
+        if (editor instanceof JEditorPane && fo != null && VisageSource.forFileObject(fo) != null) {
             visibleEditors.add(editor);
         }
 
@@ -225,7 +225,7 @@ class OpenedEditors implements PropertyChangeListener {
         for (FileObject f : files) {
             Logger.getLogger(OpenedEditors.class.getName()).log(Level.FINER, "analyzing={0}", f); // NOI18N
             
-            if (JavaFXSource.forFileObject(f) == null)
+            if (VisageSource.forFileObject(f) == null)
                 continue;
             
             if (allowAll) {

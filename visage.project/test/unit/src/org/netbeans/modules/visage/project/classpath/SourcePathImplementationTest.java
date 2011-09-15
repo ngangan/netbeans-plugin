@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.classpath;
+package org.netbeans.modules.visage.project.classpath;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -58,10 +58,10 @@ import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.JavaFXProjectGenerator;
-import org.netbeans.modules.javafx.project.JavaFXProjectType;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.VisageProjectGenerator;
+import org.netbeans.modules.visage.project.VisageProjectType;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.openide.filesystems.FileObject;
@@ -87,7 +87,7 @@ public class SourcePathImplementationTest extends NbTestCase {
     private FileObject sources;
     private ProjectManager pm;
     private AntProjectHelper helper;
-    private JavaFXProject pp;
+    private VisageProject pp;
 
     protected void setUp() throws Exception {
         super.setUp();
@@ -96,11 +96,11 @@ public class SourcePathImplementationTest extends NbTestCase {
         scratchF.mkdir();
         scratch = FileUtil.toFileObject(scratchF);
         projdir = scratch.createFolder("proj");
-        JavaFXProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
-        helper = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
-        JavaFXProjectGenerator.setDefaultSourceLevel(null);
+        VisageProjectGenerator.setDefaultSourceLevel(new SpecificationVersion ("1.4"));   //NOI18N
+        helper = null; // FIXME (not compilable): VisageProjectGenerator.createProject(FileUtil.toFile(projdir),"proj",null,null); //NOI18N
+        VisageProjectGenerator.setDefaultSourceLevel(null);
         pm = ProjectManager.getDefault();
-        pp = pm.findProject(projdir).getLookup().lookup(JavaFXProject.class);
+        pp = pm.findProject(projdir).getLookup().lookup(VisageProject.class);
         sources = projdir.getFileObject("src");
     }
 
@@ -149,8 +149,8 @@ public class SourcePathImplementationTest extends NbTestCase {
         tl.forbid(ClassPath.PROP_ROOTS);
         cp.addPropertyChangeListener(tl);
         EditableProperties ep = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-        ep.setProperty(JavaFXProjectProperties.INCLUDES, "javax/swing/");
-        ep.setProperty(JavaFXProjectProperties.EXCLUDES, "**/doc-files/");
+        ep.setProperty(VisageProjectProperties.INCLUDES, "javax/swing/");
+        ep.setProperty(VisageProjectProperties.EXCLUDES, "**/doc-files/");
         helper.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
         pm.saveProject(pp);
         assertEquals(Collections.singleton(ClassPath.PROP_INCLUDES), tl.getEvents());
@@ -168,7 +168,7 @@ public class SourcePathImplementationTest extends NbTestCase {
         src1.mkdir();
         File src2 = new File(getWorkDir(), "src2");
         src2.mkdir();
-        AntProjectHelper h = null; // FIXME (not compilable): JavaFXProjectGenerator.createProject(new File(getWorkDir(), "prj"), "test", new File[] {src1, src2}, new File[0], null);
+        AntProjectHelper h = null; // FIXME (not compilable): VisageProjectGenerator.createProject(new File(getWorkDir(), "prj"), "test", new File[] {src1, src2}, new File[0], null);
         Project p = ProjectManager.getDefault().findProject(h.getProjectDirectory());
         FileOwnerQuery.markExternalOwner(src1.toURI(), p, FileOwnerQuery.EXTERNAL_ALGORITHM_TRANSIENT);
         ClassPath cp = ClassPath.getClassPath(FileUtil.toFileObject(src1), ClassPath.SOURCE);
@@ -189,19 +189,19 @@ public class SourcePathImplementationTest extends NbTestCase {
         L l = new L();
         cp.addPropertyChangeListener(l);
         EditableProperties ep = helper.getProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH);
-        ep.setProperty(JavaFXProjectProperties.INCLUDES, "whatever/");
+        ep.setProperty(VisageProjectProperties.INCLUDES, "whatever/");
         h.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
         ProjectManager.getDefault().saveProject(p);
         assertEquals(1, l.cnt);
         assertFalse(cpe2.includes("stuff/"));
         assertTrue(cpe2.includes("whatever/"));
-        ep.setProperty(JavaFXProjectProperties.INCLUDES, "whateverelse/");
+        ep.setProperty(VisageProjectProperties.INCLUDES, "whateverelse/");
         h.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
         ProjectManager.getDefault().saveProject(p);
         assertEquals(2, l.cnt);
         assertFalse(cpe2.includes("stuff/"));
         assertFalse(cpe2.includes("whatever/"));
-        ep.remove(JavaFXProjectProperties.INCLUDES);
+        ep.remove(VisageProjectProperties.INCLUDES);
         h.putProperties(AntProjectHelper.PROJECT_PROPERTIES_PATH, ep);
         ProjectManager.getDefault().saveProject(p);
         assertEquals(3, l.cnt);
@@ -234,11 +234,11 @@ public class SourcePathImplementationTest extends NbTestCase {
     private static FileObject addSourceRoot (AntProjectHelper helper, FileObject projdir,
                                             String propName, String folderName) throws Exception {
         Element data = helper.getPrimaryConfigurationData(true);
-        NodeList nl = data.getElementsByTagNameNS (JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");
+        NodeList nl = data.getElementsByTagNameNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"source-roots");
         assert nl.getLength() == 1;
         Element roots = (Element) nl.item(0);
         Document doc = roots.getOwnerDocument();
-        Element root = doc.createElementNS(JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");
+        Element root = doc.createElementNS(VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"root");
         root.setAttribute("id", propName);
         roots.appendChild (root);
         helper.putPrimaryConfigurationData (data,true);
@@ -256,7 +256,7 @@ public class SourcePathImplementationTest extends NbTestCase {
         if (value == null) {
             return null;
         }
-        JavaFXProject fxprj = (JavaFXProject) p.getLookup().lookup(JavaFXProject.class);
+        VisageProject fxprj = (VisageProject) p.getLookup().lookup(VisageProject.class);
         if (fxprj != null) {
             return fxprj.evaluator().evaluate(value);
         } else {

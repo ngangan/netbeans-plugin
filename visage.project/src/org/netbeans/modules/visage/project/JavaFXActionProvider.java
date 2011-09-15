@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.awt.Dialog;
 import java.awt.event.MouseEvent;
@@ -71,16 +71,16 @@ import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.java.queries.UnitTestForSourceQuery;
 import org.netbeans.api.java.source.ui.ScanDialog;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
-import org.netbeans.modules.javafx.project.ui.customizer.MainClassWarning;
+import org.netbeans.modules.visage.project.classpath.ClassPathProviderImpl;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.MainClassWarning;
 import org.netbeans.spi.project.ActionProvider;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -107,14 +107,14 @@ import org.openide.util.Task;
 import org.openide.util.TaskListener;
 import org.openide.util.Utilities;
 
-/** Action provider of the JavaFX project. This is the place where to do
- * strange things to JavaFX actions. E.g. compile-single.
+/** Action provider of the Visage project. This is the place where to do
+ * strange things to Visage actions. E.g. compile-single.
  */
-class JavaFXActionProvider implements ActionProvider {
+class VisageActionProvider implements ActionProvider {
 
     public static final String COMMAND_RUN_APPLET = "run.applet"; // NOI18N
     
-    // Commands available from JavaFX project
+    // Commands available from Visage project
     private static final String[] supportedActions = {
         COMMAND_BUILD,
         COMMAND_CLEAN,
@@ -146,7 +146,7 @@ class JavaFXActionProvider implements ActionProvider {
     };
 
     // Project
-    final JavaFXProject project;
+    final VisageProject project;
 
     // Ant project helper of the project
     private UpdateHelper updateHelper;
@@ -168,7 +168,7 @@ class JavaFXActionProvider implements ActionProvider {
     // is different from null it will be returned instead.
     String unitTestingSupport_fixClasses;
 
-    public JavaFXActionProvider(JavaFXProject project, UpdateHelper updateHelper) {
+    public VisageActionProvider(VisageProject project, UpdateHelper updateHelper) {
 
         commands = new HashMap<String,String[]>();
         commands.put(COMMAND_CLEAN, new String[] {"clean"}); // NOI18N
@@ -204,8 +204,8 @@ class JavaFXActionProvider implements ActionProvider {
     private final ChangeListener sourcesChangeListener = new ChangeListener() {
 
         public void stateChanged(ChangeEvent e) {
-            synchronized (JavaFXActionProvider.this) {
-                JavaFXActionProvider.this.roots = null;
+            synchronized (VisageActionProvider.this) {
+                VisageActionProvider.this.roots = null;
             }
         }
     };
@@ -268,7 +268,7 @@ class JavaFXActionProvider implements ActionProvider {
     }
 
     private FileObject findBuildXml() {
-        return JavaFXProjectUtil.getBuildXml(project);
+        return VisageProjectUtil.getBuildXml(project);
     }
 
     public String[] getSupportedActions() {
@@ -300,7 +300,7 @@ class JavaFXActionProvider implements ActionProvider {
             public void run () {
                 Properties p = new Properties();
                 String[] targetNames;
-                if (Utilities.isWindows() && "desktop".equalsIgnoreCase(project.evaluator().getProperty("javafx.profile"))) { // NOI18N
+                if (Utilities.isWindows() && "desktop".equalsIgnoreCase(project.evaluator().getProperty("visage.profile"))) { // NOI18N
                     String codeBaseURL = getCodebaseURL();
                     if (codeBaseURL != null) p.put("codebase.url", codeBaseURL); //NOI18N
                 }
@@ -318,7 +318,7 @@ class JavaFXActionProvider implements ActionProvider {
                     FileObject buildFo = findBuildXml();
                     if (buildFo == null || !buildFo.isValid()) {
                         //The build.xml was deleted after the isActionEnabled was called
-                        NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(JavaFXActionProvider.class,
+                        NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(VisageActionProvider.class,
                                 "LBL_No_Build_XML_Found"), NotifyDescriptor.WARNING_MESSAGE); // NOI18N
                         DialogDisplayer.getDefault().notify(nd);
                     }
@@ -326,7 +326,7 @@ class JavaFXActionProvider implements ActionProvider {
                         ActionUtils.runTarget(buildFo, targetNames, p).addTaskListener(new TaskListener() {
                             public void taskFinished(Task task) {
                                 if (((ExecutorTask) task).result() != 0) {
-                                    synchronized (JavaFXActionProvider.this) {
+                                    synchronized (VisageActionProvider.this) {
                                         // #120843: if a build fails, disable dirty-list optimization.
                                         dirty = null;
                                     }
@@ -342,7 +342,7 @@ class JavaFXActionProvider implements ActionProvider {
         };
 
         if (this.bkgScanSensitiveActions.contains(command)) {
-            ScanDialog.runWhenScanFinished(action, NbBundle.getMessage (JavaFXActionProvider.class,"ACTION_"+command));   //NOI18N
+            ScanDialog.runWhenScanFinished(action, NbBundle.getMessage (VisageActionProvider.class,"ACTION_"+command));   //NOI18N
         } else {
             action.run();
         }
@@ -352,7 +352,7 @@ class JavaFXActionProvider implements ActionProvider {
         URL base = URLMapper.findURL(Repository.getDefault().getDefaultFileSystem().findResource("HTTPServer_DUMMY"), URLMapper.NETWORK);// NOI18N
         if (base == null) return null;
         try {
-            return new URL(base.getProtocol(), "localhost", base.getPort(), encodeURL("/servlet/org.netbeans.modules.javafx.project.JnlpDownloadServlet/" + project.getProjectDirectory().getPath() + "/" + project.evaluator().evaluate("${dist.dir}/"))).toExternalForm(); // NOI18N
+            return new URL(base.getProtocol(), "localhost", base.getPort(), encodeURL("/servlet/org.netbeans.modules.visage.project.JnlpDownloadServlet/" + project.getProjectDirectory().getPath() + "/" + project.evaluator().evaluate("${dist.dir}/"))).toExternalForm(); // NOI18N
         } catch (MalformedURLException e) {
             ErrorManager.getDefault().notify(ErrorManager.INFORMATIONAL, e);
             return null;
@@ -383,7 +383,7 @@ class JavaFXActionProvider implements ActionProvider {
     /*private*/ String[] getTargetNames(String command, Lookup context, Properties p) throws IllegalArgumentException {
         if (Arrays.asList(platformSensitiveActions).contains(command)) {
             final String activePlatformId = this.project.evaluator().getProperty("platform.active");  //NOI18N
-            if (JavaFXProjectUtil.getActivePlatform (activePlatformId) == null) {
+            if (VisageProjectUtil.getActivePlatform (activePlatformId) == null) {
                 showPlatformWarning ();
                 return null;
             }
@@ -391,7 +391,7 @@ class JavaFXActionProvider implements ActionProvider {
         String[] targetNames = commands.get(command);
         if (targetNames == null) throw new IllegalArgumentException(command);
         if (command.equals (COMMAND_RUN) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_STEP_INTO) || command.equals(COMMAND_BUILD) || command.equals(COMMAND_REBUILD) || command.equals(JavaProjectConstants.COMMAND_JAVADOC)) {
-            String config = project.evaluator().getProperty(JavaFXConfigurationProvider.PROP_CONFIG);
+            String config = project.evaluator().getProperty(VisageConfigurationProvider.PROP_CONFIG);
             String path;
             if (config == null || config.length() == 0) {
                 path = AntProjectHelper.PROJECT_PROPERTIES_PATH;
@@ -405,11 +405,11 @@ class JavaFXActionProvider implements ActionProvider {
             // Check whether main class is defined in this config. Note that we use the evaluator,
             // not ep.getProperty(MAIN_CLASS), since it is permissible for the default pseudoconfig
             // to define a main class - in this case an active config need not override it.
-            String mainClass = project.evaluator().getProperty(JavaFXProjectProperties.MAIN_CLASS);
+            String mainClass = project.evaluator().getProperty(VisageProjectProperties.MAIN_CLASS);
             MainClassStatus result = isSetMainClass (project.getSourceRoots().getRoots(), mainClass);
             
-            if (context.lookup(JavaFXConfigurationProvider.Config.class) != null) {
-//            if(ep.getProperty(JavaFXProjectProperties.MAIN_CLASS) != null){
+            if (context.lookup(VisageConfigurationProvider.Config.class) != null) {
+//            if(ep.getProperty(VisageProjectProperties.MAIN_CLASS) != null){
                 // If a specific config was selected, just skip this check for now.
                 // XXX would ideally check that that config in fact had a main class.
                 // But then evaluator.getProperty(MAIN_CLASS) would be inaccurate.
@@ -424,7 +424,7 @@ class JavaFXActionProvider implements ActionProvider {
                         return null;
                     }
                     // No longer use the evaluator: have not called putProperties yet so it would not work.
-                    mainClass = ep.get(JavaFXProjectProperties.MAIN_CLASS);
+                    mainClass = ep.get(VisageProjectProperties.MAIN_CLASS);
                     result=isSetMainClass (project.getSourceRoots().getRoots(), mainClass);
                 } while (result != MainClassStatus.SET_AND_VALID);
                 try {
@@ -451,9 +451,9 @@ class JavaFXActionProvider implements ActionProvider {
                 }
             }
             if (clazz == null) return null;
-            p.setProperty(JavaFXProjectProperties.MAIN_CLASS, clazz.substring(0, clazz.length() - 3).replace('/', '.')); // NOI18N
+            p.setProperty(VisageProjectProperties.MAIN_CLASS, clazz.substring(0, clazz.length() - 3).replace('/', '.')); // NOI18N
         }
-        JavaFXConfigurationProvider.Config c = context.lookup(JavaFXConfigurationProvider.Config.class);
+        VisageConfigurationProvider.Config c = context.lookup(VisageConfigurationProvider.Config.class);
         if (c != null) {
             String config;
             if (c.name != null) {
@@ -462,7 +462,7 @@ class JavaFXActionProvider implements ActionProvider {
                 // Invalid but overrides any valid setting in config.properties.
                 config = ""; // NOI18N
             }
-            p.setProperty(JavaFXConfigurationProvider.PROP_CONFIG, config);
+            p.setProperty(VisageConfigurationProvider.PROP_CONFIG, config);
         }
         return targetNames;
     }
@@ -470,11 +470,11 @@ class JavaFXActionProvider implements ActionProvider {
     public boolean isActionEnabled( String command, Lookup context ) {
         FileObject buildXml = findBuildXml();
         if (  buildXml == null || !buildXml.isValid()) return false;
-        if ("mobile".equals(project.evaluator().getProperty("javafx.profile"))) {
-            JavaFXPlatform jp = JavaFXProjectUtil.getActivePlatform(project.evaluator().getProperty("platform.active")); //NOI18N
+        if ("mobile".equals(project.evaluator().getProperty("visage.profile"))) {
+            VisagePlatform jp = VisageProjectUtil.getActivePlatform(project.evaluator().getProperty("platform.active")); //NOI18N
             if (jp == null) return false;
             try {
-                File f = new File(jp.getJavaFXFolder().toURI());
+                File f = new File(jp.getVisageFolder().toURI());
                 if (!new File(f, "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
                 if (command.equals(COMMAND_RUN) || command.equals(COMMAND_RUN_SINGLE) || command.equals(COMMAND_DEBUG) || command.equals(COMMAND_DEBUG_SINGLE) || command.equals(COMMAND_DEBUG_STEP_INTO)) { //NOI18N
                     if (!new File(f, "emulator/mobile/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")).isFile()) return false; //NOI18N
@@ -522,7 +522,7 @@ class JavaFXActionProvider implements ActionProvider {
             ClassPath bootPath = ClassPath.getClassPath (sourcesRoots[0], ClassPath.BOOT);        //Single compilation unit
             ClassPath compilePath = ClassPath.getClassPath (sourcesRoots[0], ClassPath.EXECUTE);
             ClassPath sourcePath = ClassPath.getClassPath(sourcesRoots[0], ClassPath.SOURCE);
-            if (JavaFXProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
+            if (VisageProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
                 return MainClassStatus.SET_AND_VALID;
             }
         }
@@ -532,7 +532,7 @@ class JavaFXActionProvider implements ActionProvider {
                 ClassPath bootPath = cpProvider.getProjectSourcesClassPath(ClassPath.BOOT);
                 ClassPath compilePath = cpProvider.getProjectSourcesClassPath(ClassPath.EXECUTE);
                 ClassPath sourcePath = cpProvider.getProjectSourcesClassPath(ClassPath.SOURCE);   //Empty ClassPath
-                if (JavaFXProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
+                if (VisageProjectUtil.isMainClass (mainClass, bootPath, compilePath, sourcePath)) {
                     return MainClassStatus.SET_AND_VALID;
                 }
             }
@@ -599,7 +599,7 @@ class JavaFXActionProvider implements ActionProvider {
         } else {
             mainClass = panel.getSelectedMainClass ();
             canceled = false;
-            ep.put(JavaFXProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass); // NOI18N
+            ep.put(VisageProjectProperties.MAIN_CLASS, mainClass == null ? "" : mainClass); // NOI18N
         }
         dlg.dispose();
 
@@ -607,15 +607,15 @@ class JavaFXActionProvider implements ActionProvider {
     }
 
     private void showPlatformWarning () {
-        final JButton closeOption = new JButton (NbBundle.getMessage(JavaFXActionProvider.class, "CTL_BrokenPlatform_Close")); // NOI18N
-        closeOption.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(JavaFXActionProvider.class, "AD_BrokenPlatform_Close")); // NOI18N
+        final JButton closeOption = new JButton (NbBundle.getMessage(VisageActionProvider.class, "CTL_BrokenPlatform_Close")); // NOI18N
+        closeOption.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(VisageActionProvider.class, "AD_BrokenPlatform_Close")); // NOI18N
         final ProjectInformation pi = project.getLookup().lookup(ProjectInformation.class);
         final String projectDisplayName = pi == null ?
-            NbBundle.getMessage (JavaFXActionProvider.class,"TEXT_BrokenPlatform_UnknownProjectName") // NOI18N
+            NbBundle.getMessage (VisageActionProvider.class,"TEXT_BrokenPlatform_UnknownProjectName") // NOI18N
             : pi.getDisplayName();
         final DialogDescriptor dd = new DialogDescriptor(
-            NbBundle.getMessage(JavaFXActionProvider.class, "TEXT_BrokenPlatform", projectDisplayName), // NOI18N
-            NbBundle.getMessage(JavaFXActionProvider.class, "MSG_BrokenPlatform_Title"), // NOI18N
+            NbBundle.getMessage(VisageActionProvider.class, "TEXT_BrokenPlatform", projectDisplayName), // NOI18N
+            NbBundle.getMessage(VisageActionProvider.class, "MSG_BrokenPlatform_Title"), // NOI18N
             true,
             new Object[] {closeOption},
             closeOption,

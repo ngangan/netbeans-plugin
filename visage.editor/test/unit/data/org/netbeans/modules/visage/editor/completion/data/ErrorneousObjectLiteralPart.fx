@@ -1,7 +1,7 @@
-package javafxtester;
+package visagetester;
 
-import javafx.scene.text.Text;
-import javafx.scene.paint.Color;
+import visage.scene.text.Text;
+import visage.scene.paint.Color;
 
 Text {
     fill: Color.

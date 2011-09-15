@@ -28,7 +28,7 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +36,7 @@ import org.openide.nodes.AbstractNode;
 import java.util.List;
 import java.util.Locale;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 

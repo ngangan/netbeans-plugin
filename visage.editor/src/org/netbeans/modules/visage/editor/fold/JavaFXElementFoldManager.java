@@ -41,23 +41,23 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.fold;
+package org.netbeans.modules.visage.editor.fold;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.visage.api.tree.*;
+import com.sun.visage.api.tree.Tree.VisageKind;
 import org.netbeans.api.editor.fold.Fold;
 import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.editor.settings.SimpleValueNames;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.editor.ext.java.JavaFoldManager;
-import org.netbeans.modules.javafx.editor.JavaFXEditorKit;
+import org.netbeans.modules.visage.editor.VisageEditorKit;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.modules.javafx.editor.semantic.ScanningCancellableTask;
+import org.netbeans.modules.visage.editor.semantic.ScanningCancellableTask;
 import org.netbeans.spi.editor.fold.FoldHierarchyTransaction;
 import org.netbeans.spi.editor.fold.FoldOperation;
 import org.openide.ErrorManager;
@@ -81,14 +81,14 @@ import java.util.prefs.Preferences;
  *
  * @author Jan Lahoda
  */
-public class JavaFXElementFoldManager extends JavaFoldManager {
+public class VisageElementFoldManager extends JavaFoldManager {
     
-    private static final Logger logger = Logger.getLogger(JavaFXElementFoldManager.class.getName());
+    private static final Logger logger = Logger.getLogger(VisageElementFoldManager.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     private FoldOperation operation;
     private FileObject    file;
-    private JavaFXElementFoldTask task;
+    private VisageElementFoldTask task;
     
     // Folding presets
     private boolean foldImportsPreset;
@@ -97,13 +97,13 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
     private boolean foldCodeBlocksPreset;
     private boolean foldInitialCommentsPreset;
     
-    /** Creates a new instance of JavaFXElementFoldManager */
-    public JavaFXElementFoldManager() {
+    /** Creates a new instance of VisageElementFoldManager */
+    public VisageElementFoldManager() {
     }
 
     public void init(FoldOperation operation) {
         this.operation = operation;
-        Preferences prefs = MimeLookup.getLookup(JavaFXEditorKit.FX_MIME_TYPE).lookup(Preferences.class);
+        Preferences prefs = MimeLookup.getLookup(VisageEditorKit.FX_MIME_TYPE).lookup(Preferences.class);
         foldInitialCommentsPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_INITIAL_COMMENT, foldInitialCommentsPreset);
         foldImportsPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_IMPORT, foldImportsPreset);
         foldCodeBlocksPreset = prefs.getBoolean(SimpleValueNames.CODE_FOLDING_COLLAPSE_METHOD, foldCodeBlocksPreset);
@@ -117,8 +117,8 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
         
         if (od != null) {
             currentFolds = new HashMap<FoldInfo, Fold>();
-            task = JavaFXElementFoldTask.getTask(od.getPrimaryFile());
-            task.setJavaElementFoldManager(JavaFXElementFoldManager.this);
+            task = VisageElementFoldTask.getTask(od.getPrimaryFile());
+            task.setJavaElementFoldManager(VisageElementFoldManager.this);
         }
     }
     
@@ -173,31 +173,31 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
 
     }
     
-    static final class JavaFXElementFoldTask extends ScanningCancellableTask<CompilationInfo> {
-        //XXX: this will hold JavaFXElementFoldTask as long as the FileObject exists:
-        private static Map<FileObject, JavaFXElementFoldTask> file2Task = new WeakHashMap<FileObject, JavaFXElementFoldTask>();
+    static final class VisageElementFoldTask extends ScanningCancellableTask<CompilationInfo> {
+        //XXX: this will hold VisageElementFoldTask as long as the FileObject exists:
+        private static Map<FileObject, VisageElementFoldTask> file2Task = new WeakHashMap<FileObject, VisageElementFoldTask>();
         
-        static JavaFXElementFoldTask getTask(FileObject file) {
-            JavaFXSource.forFileObject(file); // make sure the JavaFXSource is loaded ...
-            JavaFXElementFoldTask task = file2Task.get(file);
+        static VisageElementFoldTask getTask(FileObject file) {
+            VisageSource.forFileObject(file); // make sure the VisageSource is loaded ...
+            VisageElementFoldTask task = file2Task.get(file);
             
             if (task == null) {
-                file2Task.put(file, task = new JavaFXElementFoldTask());
+                file2Task.put(file, task = new VisageElementFoldTask());
             }
             
             return task;
         }
         
-        private Reference<JavaFXElementFoldManager> manager;
+        private Reference<VisageElementFoldManager> manager;
         
-        synchronized void setJavaElementFoldManager(JavaFXElementFoldManager manager) {
-            this.manager = new WeakReference<JavaFXElementFoldManager>(manager);
+        synchronized void setJavaElementFoldManager(VisageElementFoldManager manager) {
+            this.manager = new WeakReference<VisageElementFoldManager>(manager);
         }
         
         public void run(final CompilationInfo info) {
             resume();
             
-            JavaFXElementFoldManager manager;
+            VisageElementFoldManager manager;
             
             //the synchronized section should be as limited as possible here
             //in particular, "scan" should not be called in the synchronized section
@@ -213,7 +213,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
             long startTime = System.currentTimeMillis();
 
             final UnitTree cu = info.getCompilationUnit();
-            final JavaFXElementFoldVisitor v = manager.new JavaFXElementFoldVisitor(info, cu, info.getTrees().getSourcePositions());
+            final VisageElementFoldVisitor v = manager.new VisageElementFoldVisitor(info, cu, info.getTrees().getSourcePositions());
             
             scan(v, cu, null);
             if (LOGGABLE) log("No of folds after scan: " + v.folds.size()); // NOI18N
@@ -342,15 +342,15 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
     private Fold initialCommentFold;
     private Fold importsFold;
     
-    private final class JavaFXElementFoldVisitor extends CancellableTreePathScanner<Object, Object> {
+    private final class VisageElementFoldVisitor extends CancellableTreePathScanner<Object, Object> {
 
-        private List<FoldInfo> folds = new ArrayList<JavaFXElementFoldManager.FoldInfo>();
+        private List<FoldInfo> folds = new ArrayList<VisageElementFoldManager.FoldInfo>();
         private CompilationInfo info;
         private UnitTree cu;
         private SourcePositions sp;
         private boolean stopped;
         
-        public JavaFXElementFoldVisitor(CompilationInfo info, UnitTree cu, SourcePositions sp) {
+        public VisageElementFoldVisitor(CompilationInfo info, UnitTree cu, SourcePositions sp) {
             this.info = info;
             this.cu = cu;
             this.sp = sp;
@@ -369,17 +369,17 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 return;
             }
 
-            TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+            TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
             boolean firstNormalFold = true;
             while (ts.moveNext()) {
-                Token<JFXTokenId> token = ts.token();
+                Token<VSGTokenId> token = ts.token();
                 try {
-                    if (token.id() == JFXTokenId.DOC_COMMENT) {
+                    if (token.id() == VSGTokenId.DOC_COMMENT) {
                         int startOffset = ts.offset();
                         if (LOGGABLE) log("addCommentsFolds (DOC_COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"] preset == " + foldJavadocsPreset); // NOI18N
                         folds.add(new FoldInfo(doc, startOffset, startOffset + token.length(), JAVADOC_FOLD_TEMPLATE, foldJavadocsPreset));
                     }
-                    if (token.id() == JFXTokenId.COMMENT) {
+                    if (token.id() == VSGTokenId.COMMENT) {
                         int startOffset = ts.offset();
                         if (LOGGABLE) log("addCommentsFolds (COMMENT) adding fold [" + startOffset + ":" + (startOffset + token.length())+"]"); // NOI18N
                         if (firstNormalFold) {
@@ -402,10 +402,10 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                     Document doc = operation.getHierarchy().getComponent().getDocument();
                     int start = (int)sp.getStartPosition(cu, node);
                     int end   = (int)sp.getEndPosition(cu, node);
-                    if (node.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+                    if (node.getVisageKind() == VisageKind.BLOCK_EXPRESSION) {
                         end = findBodyEnd(node, cu, sp, doc);
                     }
-                    JavaFXTreePath pa = getCurrentPath(); //JavaFXTreePath.getPath(cu, node);
+                    VisageTreePath pa = getCurrentPath(); //VisageTreePath.getPath(cu, node);
                     if (start != (-1) && end != (-1) &&
                             !info.getTreeUtilities().isSynthetic(pa)) {
                         
@@ -458,7 +458,7 @@ public class JavaFXElementFoldManager extends JavaFoldManager {
                 Document doc = operation.getHierarchy().getComponent().getDocument();
                 int start = findBodyStart(node, cu, sp, doc);
                 int end   = findBodyEnd(node, cu, sp, doc);
-                JavaFXTreePath pa = getCurrentPath();
+                VisageTreePath pa = getCurrentPath();
                 if (start != (-1) && end != (-1) &&
                         !info.getTreeUtilities().isSynthetic(pa)) {
                     if (LOGGABLE) log("visitClassDeclaration adding fold [" + start + ":" + end + "] for tree: " + node); // NOI18N

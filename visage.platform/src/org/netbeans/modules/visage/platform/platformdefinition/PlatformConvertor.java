@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.beans.*;
 import java.io.*;
@@ -56,7 +56,7 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
@@ -78,7 +78,7 @@ import org.xml.sax.*;
 
 import org.netbeans.api.java.platform.*;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.modules.javafx.platform.PlatformUiSupport;
+import org.netbeans.modules.visage.platform.PlatformUiSupport;
 
 /**
  * Reads and writes the standard platform format implemented by PlatformImpl2.
@@ -96,7 +96,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         "java", // NOI18N
     };
     
-    private static final String PLATFORM_DTD_ID = "-//NetBeans//DTD JavaFX PlatformDefinition 1.0//EN"; // NOI18N
+    private static final String PLATFORM_DTD_ID = "-//NetBeans//DTD Visage PlatformDefinition 1.0//EN"; // NOI18N
 
     private PlatformConvertor() {}
 
@@ -228,9 +228,9 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         } else {
             URL fxHome = null;
             try{
-                fxHome = new URL(handler.properties.get(JavaFXPlatformImpl.PLAT_PROP_FX_HOME));
+                fxHome = new URL(handler.properties.get(VisagePlatformImpl.PLAT_PROP_FX_HOME));
             }catch(Exception e){}
-            p = new JavaFXPlatformImpl(handler.name,handler.installFolders, fxHome, handler.properties, handler.sysProperties,handler.sources, handler.javadoc);
+            p = new VisagePlatformImpl(handler.name,handler.installFolders, fxHome, handler.properties, handler.sysProperties,handler.sources, handler.javadoc);
             defaultPlatform = false;
         }
         p.addPropertyChangeListener(this);
@@ -276,8 +276,8 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
     public Object convert(Object obj) {
         if (obj == Node.class) {
             try {
-                JavaFXPlatformImpl p = (JavaFXPlatformImpl) instanceCreate();
-                return new JavaFXPlatformNode (p,this.holder);
+                VisagePlatformImpl p = (VisagePlatformImpl) instanceCreate();
+                return new VisagePlatformNode (p,this.holder);
             } catch (IOException ex) {
                 ErrorManager.getDefault().notify(ex);
             } catch (ClassNotFoundException ex) {
@@ -318,7 +318,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
             if (platform instanceof DefaultPlatformImpl)
                 return;
             //Already defined warn user
-            String msg = NbBundle.getMessage(JavaFXWizardIterator.class,"ERROR_InvalidName"); //NOI18N
+            String msg = NbBundle.getMessage(VisageWizardIterator.class,"ERROR_InvalidName"); //NOI18N
             throw (IllegalStateException)ErrorManager.getDefault().annotate(
                     new IllegalStateException(msg), ErrorManager.USER, null, msg,null, null);
         }
@@ -355,8 +355,8 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                 }
             }
         }
-        if (platform instanceof JavaFXPlatform){
-            URL fxFolder = ((JavaFXPlatform)platform).getJavaFXFolder();
+        if (platform instanceof VisagePlatform){
+            URL fxFolder = ((VisagePlatform)platform).getVisageFolder();
             if (fxFolder != null){
                 props.setProperty(fxHomePropName,new File(URI.create(fxFolder.toExternalForm())).getAbsolutePath());
             }
@@ -474,7 +474,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         void write(final  OutputStream out) throws IOException {
             final Map<String,String> props = instance.getProperties();
             final Map<String,String> sysProps = instance.getSystemProperties();
-            final Document doc = XMLUtil.createDocument(ELEMENT_PLATFORM,null,PLATFORM_DTD_ID,"http://www.netbeans.org/dtds/javafx-platformdefinition-1_0.dtd"); //NOI18N
+            final Document doc = XMLUtil.createDocument(ELEMENT_PLATFORM,null,PLATFORM_DTD_ID,"http://www.netbeans.org/dtds/visage-platformdefinition-1_0.dtd"); //NOI18N
             final Element platformElement = doc.getDocumentElement();
             platformElement.setAttribute(ATTR_PLATFORM_NAME,instance.getDisplayName());
             platformElement.setAttribute(ATTR_PLATFORM_DEFAULT,defaultPlatform ? "yes" : "no"); //NOI18N

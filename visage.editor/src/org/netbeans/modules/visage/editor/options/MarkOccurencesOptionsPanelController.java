@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.options;
+package org.netbeans.modules.visage.editor.options;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -81,7 +81,7 @@ public final class MarkOccurencesOptionsPanelController extends OptionsPanelCont
     }
 
     public HelpCtx getHelpCtx() {
-        return new HelpCtx("netbeans.optionsDialog.javafx.markoccurrences"); // NOI18N
+        return new HelpCtx("netbeans.optionsDialog.visage.markoccurrences"); // NOI18N
     }
 
     public synchronized JComponent getComponent(Lookup masterLookup) {

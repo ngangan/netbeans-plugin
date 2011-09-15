@@ -41,9 +41,9 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor.completion;
+package org.netbeans.modules.visage.fxd.composer.editor.completion;
 
-import com.sun.javafx.tools.fxd.schema.model.Element;
+import com.sun.visage.tools.fxd.schema.model.Element;
 import javax.swing.text.Document;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.BaseDocument;
@@ -51,17 +51,17 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
 import org.netbeans.modules.editor.structure.api.DocumentModelException;
 import org.netbeans.modules.editor.structure.api.DocumentModelUtils;
-import org.netbeans.modules.javafx.fxd.composer.editor.BracketCompletion;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.editor.BracketCompletion;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.openide.util.Exceptions;
-import com.sun.javafx.tools.fxd.schema.model.FXDSchema;
-import com.sun.javafx.tools.fxd.schema.model.Function;
+import com.sun.visage.tools.fxd.schema.model.FXDSchema;
+import com.sun.visage.tools.fxd.schema.model.Function;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.providers.AbstractCompletionProvider;
-import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
-import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaModelProvider;
+import org.netbeans.modules.visage.fxd.composer.editor.completion.providers.AbstractCompletionProvider;
+import org.netbeans.modules.visage.fxd.composer.lexer.TokenUtils;
+import org.netbeans.modules.visage.fxd.schemamodel.FXDSchemaModelProvider;
 
 /**
  * TODO: support functions, documentation,

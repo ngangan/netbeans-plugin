@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package qa.javafx.functional.library.operator;
+package qa.visage.functional.library.operator;
 
 import java.awt.Point;
 import javax.swing.JComponent;
@@ -48,7 +48,7 @@ import org.netbeans.jellytools.PaletteOperator;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JComponentOperator;
 import org.netbeans.jemmy.operators.JListOperator;
-import qa.javafx.functional.library.MouseRobot;
+import qa.visage.functional.library.MouseRobot;
 
 /**
  *

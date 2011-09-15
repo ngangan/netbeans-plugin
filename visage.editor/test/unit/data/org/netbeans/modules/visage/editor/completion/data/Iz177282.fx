@@ -1,3 +1,3 @@
-package javafxtester;
+package visagetester;
 
 var c = Color.

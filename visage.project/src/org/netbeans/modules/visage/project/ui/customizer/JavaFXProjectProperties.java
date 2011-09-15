@@ -42,9 +42,9 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
-import org.netbeans.modules.javafx.platform.PlatformUiSupport;
+import org.netbeans.modules.visage.platform.PlatformUiSupport;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -78,14 +78,14 @@ import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.queries.FileEncodingQuery;
 import org.netbeans.modules.java.api.common.SourceRoots;
 import org.netbeans.modules.java.api.common.ant.UpdateHelper;
-import org.netbeans.modules.javafx.platform.PlatformUiSupport.PlatformKey;
-import org.netbeans.modules.javafx.platform.PlatformUiSupport.SourceLevelKey;
-import org.netbeans.modules.javafx.platform.platformdefinition.Util;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.JavaFXProjectType;
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
-import org.netbeans.modules.javafx.project.applet.AppletSupport;
-import org.netbeans.modules.javafx.project.classpath.ClassPathSupport;
+import org.netbeans.modules.visage.platform.PlatformUiSupport.PlatformKey;
+import org.netbeans.modules.visage.platform.PlatformUiSupport.SourceLevelKey;
+import org.netbeans.modules.visage.platform.platformdefinition.Util;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.VisageProjectType;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
+import org.netbeans.modules.visage.project.applet.AppletSupport;
+import org.netbeans.modules.visage.project.classpath.ClassPathSupport;
 import org.netbeans.spi.java.project.support.ui.IncludeExcludeVisualizer;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
@@ -110,7 +110,7 @@ import org.w3c.dom.NodeList;
 /**
  * @author Petr Hrebejk
  */
-public class JavaFXProjectProperties {
+public class VisageProjectProperties {
     
     //Hotfix of the issue #70058
     //Should be removed when the StoreGroup SPI will be extended to allow false default value in ToggleButtonModel
@@ -121,16 +121,16 @@ public class JavaFXProjectProperties {
     private Integer javadocPreviewBooleanKind;
     
     // Special properties of the project
-    public static final String JAVAFX_PROJECT_NAME = "javafx.project.name"; // NOI18N
+    public static final String JAVAFX_PROJECT_NAME = "visage.project.name"; // NOI18N
     public static final String JAVA_PLATFORM = "platform.active"; // NOI18N
     
     public static final String FX_RUN_CLASS_NAME 
-                = "net.java.javafx.FXShell";           // NOI18N
+                = "net.java.visage.FXShell";           // NOI18N
     
     // Properties stored in the PROJECT.PROPERTIES    
     public static final String DIST_DIR = "dist.dir"; // NOI18N
     public static final String DIST_JAR = "dist.jar"; // NOI18N
-    public static final String JAVAFX_PROFILE = "javafx.profile"; //NOI18N
+    public static final String JAVAFX_PROFILE = "visage.profile"; //NOI18N
     public static final String EXECUTION_TARGET = "execution.target"; //NOI18
     public static final String JAVAC_CLASSPATH = "javac.classpath"; // NOI18N
     public static final String RUN_CLASSPATH = "run.classpath"; // NOI18N
@@ -290,7 +290,7 @@ public class JavaFXProjectProperties {
     // CustomizerRunTest
 
     // Private fields ----------------------------------------------------------    
-    private JavaFXProject project;
+    private VisageProject project;
     private UpdateHelper updateHelper;
     private PropertyEvaluator evaluator;
     private ReferenceHelper refHelper;
@@ -305,12 +305,12 @@ public class JavaFXProjectProperties {
     
     WebStartProjectProperties webStartProjectProperties;
     
-    JavaFXProject getProject() {
+    VisageProject getProject() {
         return project;
     }
     
-    /** Creates a new instance of JavaFXUIProperties and initializes them */
-    public JavaFXProjectProperties( JavaFXProject project, 
+    /** Creates a new instance of VisageUIProperties and initializes them */
+    public VisageProjectProperties( VisageProject project, 
             UpdateHelper updateHelper, PropertyEvaluator evaluator, 
             ReferenceHelper refHelper, GeneratedFilesHelper genFileHelper) {
         this.project = project;
@@ -333,10 +333,10 @@ public class JavaFXProjectProperties {
      */
     private void init() {
         
-        CLASS_PATH_LIST_RENDERER = new JavaFXClassPathUi.ClassPathListCellRenderer( evaluator );
+        CLASS_PATH_LIST_RENDERER = new VisageClassPathUi.ClassPathListCellRenderer( evaluator );
         
         // CustomizerSources
-        SOURCE_ROOTS_MODEL = JavaFXSourceRootsUi.createModel( project.getSourceRoots() );
+        SOURCE_ROOTS_MODEL = VisageSourceRootsUi.createModel( project.getSourceRoots() );
         includes = evaluator.getProperty(INCLUDES);
         if (includes == null) {
             includes = "**"; // NOI18N
@@ -351,7 +351,7 @@ public class JavaFXProjectProperties {
         
         JAVAC_CLASSPATH_MODEL = ClassPathUiSupport.createListModel( cs.itemsIterator( (String)projectProperties.get( JAVAC_CLASSPATH )  ) );
         RUN_CLASSPATH_MODEL = ClassPathUiSupport.createListModel( cs.itemsIterator( (String)projectProperties.get( RUN_CLASSPATH ) ) );
-        PLATFORM_MODEL = PlatformUiSupport.createPlatformComboBoxModel (evaluator.getProperty(JAVA_PLATFORM), "JavaFX"); //NOI18N
+        PLATFORM_MODEL = PlatformUiSupport.createPlatformComboBoxModel (evaluator.getProperty(JAVA_PLATFORM), "Visage"); //NOI18N
         PLATFORM_LIST_RENDERER = PlatformUiSupport.createPlatformListCellRenderer();
         JAVAC_SOURCE_MODEL = PlatformUiSupport.createSourceLevelComboBoxModel (PLATFORM_MODEL, evaluator.getProperty(JAVAC_SOURCE), evaluator.getProperty(JAVAC_TARGET));
         JAVAC_SOURCE_RENDERER = PlatformUiSupport.createSourceLevelListCellRenderer ();
@@ -500,7 +500,7 @@ public class JavaFXProjectProperties {
         projectProperties.setProperty( RUN_CLASSPATH, run_cp );
         
         //Handle platform selection and javac.source javac.target properties
-        storePlatform (projectProperties, updateHelper, JavaFXProjectType.PROJECT_CONFIGURATION_NAMESPACE, PLATFORM_MODEL.getSelectedItem(), JAVAC_SOURCE_MODEL.getSelectedItem());
+        storePlatform (projectProperties, updateHelper, VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE, PLATFORM_MODEL.getSelectedItem(), JAVAC_SOURCE_MODEL.getSelectedItem());
                                 
         // Handle other special cases
         if ( NO_DEPENDENCIES_MODEL.isSelected() ) { // NOI18N
@@ -740,7 +740,7 @@ public class JavaFXProjectProperties {
         String []rootLabels = new String[data.size()];
         for (int i=0; i<data.size();i++) {
             File f = (File) ((Vector)data.elementAt(i)).elementAt(0);
-            rootURLs[i] = JavaFXProjectUtil.getRootURL(f,null);            
+            rootURLs[i] = VisageProjectUtil.getRootURL(f,null);            
             rootLabels[i] = (String) ((Vector)data.elementAt(i)).elementAt(1);
         }
         roots.putRoots(rootURLs,rootLabels);
@@ -752,10 +752,10 @@ public class JavaFXProjectProperties {
     }
     
     private static boolean showModifiedMessage (String title) {
-        String message = NbBundle.getMessage(JavaFXProjectProperties.class,"TXT_Regenerate"); // NOI18N
-        JButton regenerateButton = new JButton (NbBundle.getMessage(JavaFXProjectProperties.class,"CTL_RegenerateButton")); // NOI18N
+        String message = NbBundle.getMessage(VisageProjectProperties.class,"TXT_Regenerate"); // NOI18N
+        JButton regenerateButton = new JButton (NbBundle.getMessage(VisageProjectProperties.class,"CTL_RegenerateButton")); // NOI18N
         regenerateButton.setDefaultCapable(true);
-        regenerateButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(JavaFXProjectProperties.class,"AD_RegenerateButton")); // NOI18N
+        regenerateButton.getAccessibleContext().setAccessibleDescription (NbBundle.getMessage(VisageProjectProperties.class,"AD_RegenerateButton")); // NOI18N
         NotifyDescriptor d = new NotifyDescriptor.Message (message, NotifyDescriptor.WARNING_MESSAGE);
         d.setTitle(title);
         d.setOptionType(NotifyDescriptor.OK_CANCEL_OPTION);

@@ -45,11 +45,11 @@
 package mathematics.graph.simple;
 
 import mathematics.graph.GVertex;
-import javafx.scene.shape.Circle;
+import visage.scene.shape.Circle;
 
-import javafx.scene.Group;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
+import visage.scene.Group;
+import visage.scene.text.Font;
+import visage.scene.text.Text;
 import mathematics.graph.GView;
 
 

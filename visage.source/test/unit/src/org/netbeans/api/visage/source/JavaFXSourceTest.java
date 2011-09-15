@@ -40,16 +40,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
 
 /**
  *
  * @author nenik
  */
-public class JavaFXSourceTest extends SourceTestBase {
+public class VisageSourceTest extends SourceTestBase {
 
-    public JavaFXSourceTest(String testName) {
+    public VisageSourceTest(String testName) {
         super(testName);
     }
 
@@ -58,7 +58,7 @@ public class JavaFXSourceTest extends SourceTestBase {
         testInsideSourceTask(
                 "/* Top comment */\n" +
                 "\n" +
-                "import javafx.ui.Frame;\n" +
+                "import visage.ui.Frame;\n" +
                 "/** @author nemo */\n" +
                 "\n" +
                 "Frame {\n" +
@@ -66,8 +66,8 @@ public class JavaFXSourceTest extends SourceTestBase {
                 "}",
             new Task<CompilationController>() {
                 public void run(CompilationController controller) throws Exception {
-                    JavaFXSource.Phase p = controller.toPhase(JavaFXSource.Phase.PARSED);
-                    assertFalse(p.lessThan(JavaFXSource.Phase.PARSED));
+                    VisageSource.Phase p = controller.toPhase(VisageSource.Phase.PARSED);
+                    assertFalse(p.lessThan(VisageSource.Phase.PARSED));
                 }
             }
         );

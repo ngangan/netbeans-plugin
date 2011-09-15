@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import javax.swing.text.EditorKit;
 
@@ -51,15 +51,15 @@ import javax.swing.text.EditorKit;
  *
  * @author Miloslav Metelka
  */
-public class JavaFXBaseDocumentUnitTestCase extends BaseDocumentUnitTestCase {
+public class VisageBaseDocumentUnitTestCase extends BaseDocumentUnitTestCase {
     
-    public JavaFXBaseDocumentUnitTestCase(String testMethodName) {
+    public VisageBaseDocumentUnitTestCase(String testMethodName) {
         super(testMethodName);
     }
     
     @Override
     protected EditorKit createEditorKit() {
-        return new JavaFXEditorKit(); // XXX not compatible now
+        return new VisageEditorKit(); // XXX not compatible now
     }
 
 }

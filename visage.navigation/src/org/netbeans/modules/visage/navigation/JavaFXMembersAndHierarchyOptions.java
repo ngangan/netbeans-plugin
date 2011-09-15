@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -59,10 +59,10 @@ import org.openide.util.NbPreferences;
  *
  * @author Sandip Chitale (Sandip.Chitale@Sun.Com)
  */
-public final class JavaFXMembersAndHierarchyOptions {
+public final class VisageMembersAndHierarchyOptions {
     
     private static final Preferences getPreferences() {
-        return NbPreferences.forModule(JavaFXMembersAndHierarchyOptions.class);
+        return NbPreferences.forModule(VisageMembersAndHierarchyOptions.class);
     }
     
     private static final String PROP_caseSensitive = "caseSensitive"; // NOI18N
@@ -155,7 +155,7 @@ public final class JavaFXMembersAndHierarchyOptions {
 
     private static int subTypeHierarchyDepth = 1;
 
-    private JavaFXMembersAndHierarchyOptions() {
+    private VisageMembersAndHierarchyOptions() {
     }
 
     /**
@@ -400,6 +400,6 @@ public final class JavaFXMembersAndHierarchyOptions {
     }
 
     static void setSubTypeHierarchyDepth(int subTypeHierarchyDepth) {
-        JavaFXMembersAndHierarchyOptions.subTypeHierarchyDepth = subTypeHierarchyDepth;
+        VisageMembersAndHierarchyOptions.subTypeHierarchyDepth = subTypeHierarchyDepth;
     }
 }

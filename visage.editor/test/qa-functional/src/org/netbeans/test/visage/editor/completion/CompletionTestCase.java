@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.test.javafx.editor.completion;
+package org.netbeans.test.visage.editor.completion;
 
 import java.io.*;
 import java.util.Arrays;
@@ -59,7 +59,7 @@ import org.netbeans.editor.*;
 import org.netbeans.jellytools.EditorOperator;
 import org.netbeans.modules.editor.completion.CompletionImpl;
 import org.netbeans.modules.editor.completion.CompletionResultSetImpl;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionProvider;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionProvider;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionProvider;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -154,12 +154,12 @@ public class CompletionTestCase extends java.lang.Object {
         String mimeType = (String) doc.getProperty("mimeType");
         Lookup lookup = MimeLookup.getLookup(MimePath.get(mimeType));
         Collection<? extends CompletionProvider> col = lookup.lookupAll(CompletionProvider.class);
-        JavaFXCompletionProvider  jcp = null;
+        VisageCompletionProvider  jcp = null;
         for (Iterator<? extends CompletionProvider> it = col.iterator(); it.hasNext();) {
             CompletionProvider completionProvider = it.next();
-            if(completionProvider instanceof JavaFXCompletionProvider) jcp = (JavaFXCompletionProvider) completionProvider;
+            if(completionProvider instanceof VisageCompletionProvider) jcp = (VisageCompletionProvider) completionProvider;
         }
-        if(jcp==null) log.println("JavaFXCompletionProvider not found");
+        if(jcp==null) log.println("VisageCompletionProvider not found");
         CompletionTask task = jcp.createTask(queryType, editor);
         CompletionResultSetImpl result =  completion.createTestResultSet(task,queryType);
         task.query(result.getResultSet());

@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.debugger</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.debugger</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -83,7 +83,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -91,7 +91,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.runtime</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.runtime</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -99,7 +99,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.source</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.effects;
+package org.netbeans.modules.visage.palette.items.effects;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Bloom implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(Bloom.class, "TEMPLATE_Bloom", targetComponent, "javafx.scene.effect.Bloom"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(Bloom.class, "TEMPLATE_Bloom", targetComponent, "visage.scene.effect.Bloom"); //NOI18N;
     }
 }

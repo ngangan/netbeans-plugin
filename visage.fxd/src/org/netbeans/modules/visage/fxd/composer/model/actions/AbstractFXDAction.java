@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model.actions;
+package org.netbeans.modules.visage.fxd.composer.model.actions;
 
 import java.awt.Image;
 import java.awt.event.KeyEvent;
@@ -63,7 +63,7 @@ import org.openide.windows.TopComponent;
  * @author Pavel Benes
  */
 public abstract class AbstractFXDAction extends AbstractAction implements Presenter.Popup {
-    public static final String ICON_PATH_PREFIX = "org/netbeans/modules/javafx/fxd/composer/resources/"; //NOI18N
+    public static final String ICON_PATH_PREFIX = "org/netbeans/modules/visage/fxd/composer/resources/"; //NOI18N
     public static final String LBL_ID_PREFIX    = "LBL_"; //NOI18N
     public static final String ICON_ID_PREFIX   = "ICON_"; //NOI18N
     public static final String HINT_ID_PREFIX   = "HINT_"; //NOI18N

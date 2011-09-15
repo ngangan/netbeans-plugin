@@ -29,17 +29,17 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 /**
- * Manager of imports in JavaFX source code.
+ * Manager of imports in Visage source code.
  *
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
  */
-public interface JFXImportManager {
+public interface VSGImportManager {
 
 
     /**

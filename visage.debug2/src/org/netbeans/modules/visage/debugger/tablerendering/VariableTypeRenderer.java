@@ -9,11 +9,11 @@
  * Created on Jun 13, 2010, 4:28:07 PM
  */
 
-package org.netbeans.modules.javafx.debugger.tablerendering;
+package org.netbeans.modules.visage.debugger.tablerendering;
 
-import com.sun.javafx.jdi.FXSequenceReference;
-import com.sun.javafx.jdi.FXSequenceReference.Types;
-import com.sun.javafx.jdi.FXValue;
+import com.sun.visage.jdi.FXSequenceReference;
+import com.sun.visage.jdi.FXSequenceReference.Types;
+import com.sun.visage.jdi.FXValue;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;
 import java.awt.Component;
@@ -135,7 +135,7 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                                     
             if( types.containsKey( fieldTypeName )) {
                 fieldTypeName = types.get( fieldTypeName );
-            } else if( "com.sun.javafx.runtime.sequence.Sequence".equals( fieldTypeName )) {
+            } else if( "com.sun.visage.runtime.sequence.Sequence".equals( fieldTypeName )) {
                 
                 JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
                 if( thread == null ) {

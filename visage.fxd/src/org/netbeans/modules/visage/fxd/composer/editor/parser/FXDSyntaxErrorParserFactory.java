@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor.parser;
+package org.netbeans.modules.visage.fxd.composer.editor.parser;
 
 import java.util.Collection;
 import org.netbeans.modules.parsing.api.Snapshot;

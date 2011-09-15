@@ -1,10 +1,10 @@
 package frame.stage.content;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.shape.Rectangle;
+import visage.scene.paint.Color;
+import visage.scene.paint.LinearGradient;
 
 Stage {
     title: "MyApplication"

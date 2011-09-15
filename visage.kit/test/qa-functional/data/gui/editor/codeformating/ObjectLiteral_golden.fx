@@ -1,5 +1,5 @@
-import javafx.scene.text.Text;
-import javafx.scene.text.Font;
+import visage.scene.text.Text;
+import visage.scene.text.Font;
 
 Text {
     font: Font { size: 24 }

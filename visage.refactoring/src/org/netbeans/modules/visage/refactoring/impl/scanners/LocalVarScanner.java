@@ -42,19 +42,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.impl.scanners;
+package org.netbeans.modules.visage.refactoring.impl.scanners;
 
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.VariableTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.VariableTree;
 import javax.lang.model.element.*;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationInfo;
 
 /**
  *
  * @author Jan Becicka
  */
-public class LocalVarScanner extends JavaFXTreePathScanner<Boolean, Element> {
+public class LocalVarScanner extends VisageTreePathScanner<Boolean, Element> {
 
     private CompilationInfo info;
     private String newName;

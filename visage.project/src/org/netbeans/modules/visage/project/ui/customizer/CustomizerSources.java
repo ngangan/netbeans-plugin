@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -75,9 +75,9 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
     private String originalEncoding;
     private boolean notified;
 
-    private final JavaFXProjectProperties uiProperties;
+    private final VisageProjectProperties uiProperties;
 
-    public CustomizerSources( JavaFXProjectProperties uiProperties ) {
+    public CustomizerSources( VisageProjectProperties uiProperties ) {
         this.uiProperties = uiProperties;
         initComponents();
         
@@ -94,7 +94,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         this.projectLocation.setText( pf == null ? "" : pf.getPath() ); // NOI18N
         
         
-        JavaFXSourceRootsUi.EditMediator emSR = JavaFXSourceRootsUi.registerEditMediator(
+        VisageSourceRootsUi.EditMediator emSR = VisageSourceRootsUi.registerEditMediator(
             uiProperties.getProject(),
             uiProperties.getProject().getSourceRoots(),
             sourceRoots,
@@ -103,7 +103,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
             upSourceRoot, 
             downSourceRoot);
 /*        
-        JavaFXSourceRootsUi.EditMediator emTSR = JavaFXSourceRootsUi.registerEditMediator(
+        VisageSourceRootsUi.EditMediator emTSR = VisageSourceRootsUi.registerEditMediator(
             uiProperties.getProject(),
             uiProperties.getProject().getTestSourceRoots(),
             testRoots,
@@ -114,7 +114,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
 */        
 //        emSR.setRelatedEditMediator( emTSR );
 //        emTSR.setRelatedEditMediator( emSR );
-        this.originalEncoding = this.uiProperties.getProject().evaluator().getProperty(JavaFXProjectProperties.SOURCE_ENCODING);
+        this.originalEncoding = this.uiProperties.getProject().evaluator().getProperty(VisageProjectProperties.SOURCE_ENCODING);
         if (this.originalEncoding == null) {
             this.originalEncoding = FileEncodingQuery.getDefaultEncoding().name();
         }
@@ -152,7 +152,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
                         NbBundle.getMessage(CustomizerSources.class,"MSG_EncodingWarning"), NotifyDescriptor.WARNING_MESSAGE)); // NOI18N
                 notified=true;
             }
-            this.uiProperties.putAdditionalProperty(JavaFXProjectProperties.SOURCE_ENCODING, encName);
+            this.uiProperties.putAdditionalProperty(VisageProjectProperties.SOURCE_ENCODING, encName);
     }
 
 
@@ -243,9 +243,9 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
 
         setLayout(new java.awt.GridBagLayout());
 
-        jLabel1.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_ProjectFolder").charAt(0));
+        jLabel1.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("MNE_ProjectFolder").charAt(0));
         jLabel1.setLabelFor(projectLocation);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle"); // NOI18N
         jLabel1.setText(bundle.getString("CTL_ProjectFolder")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -263,7 +263,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
 
         sourceRootsPanel.setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_SourceRoots").charAt(0));
+        jLabel2.setDisplayedMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("MNE_SourceRoots").charAt(0));
         jLabel2.setLabelFor(sourceRoots);
         jLabel2.setText(bundle.getString("CTL_SourceRoots")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -313,7 +313,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 12);
         sourceRootsPanel.add(jScrollPane1, gridBagConstraints);
 
-        addSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_AddSourceRoot").charAt(0));
+        addSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("MNE_AddSourceRoot").charAt(0));
         addSourceRoot.setText(bundle.getString("CTL_AddSourceRoot")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -324,7 +324,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         sourceRootsPanel.add(addSourceRoot, gridBagConstraints);
         addSourceRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_addSourceRoot")); // NOI18N
 
-        removeSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_RemoveSourceRoot").charAt(0));
+        removeSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("MNE_RemoveSourceRoot").charAt(0));
         removeSourceRoot.setText(bundle.getString("CTL_RemoveSourceRoot")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -336,7 +336,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         sourceRootsPanel.add(removeSourceRoot, gridBagConstraints);
         removeSourceRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_removeSourceRoot")); // NOI18N
 
-        upSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_UpSourceRoot").charAt(0));
+        upSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("MNE_UpSourceRoot").charAt(0));
         upSourceRoot.setText(bundle.getString("CTL_UpSourceRoot")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -348,7 +348,7 @@ public class CustomizerSources extends javax.swing.JPanel implements HelpCtx.Pro
         sourceRootsPanel.add(upSourceRoot, gridBagConstraints);
         upSourceRoot.getAccessibleContext().setAccessibleDescription(bundle.getString("AD_CustomizerSources_upSourceRoot")); // NOI18N
 
-        downSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/project/ui/customizer/Bundle").getString("MNE_DownSourceRoot").charAt(0));
+        downSourceRoot.setMnemonic(java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/project/ui/customizer/Bundle").getString("MNE_DownSourceRoot").charAt(0));
         downSourceRoot.setText(bundle.getString("CTL_DownSourceRoot")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

@@ -28,12 +28,12 @@
  *
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
 import org.netbeans.spi.editor.highlighting.HighlightsLayer;
 import org.netbeans.spi.editor.highlighting.HighlightsLayerFactory;
 import org.netbeans.spi.editor.highlighting.ZOrder;
-import org.netbeans.modules.javafx.editor.rename.InstantRenamePerformer;
+import org.netbeans.modules.visage.editor.rename.InstantRenamePerformer;
 
 /**
  *

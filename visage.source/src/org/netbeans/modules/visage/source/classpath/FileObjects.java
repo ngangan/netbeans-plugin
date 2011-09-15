@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.source.classpath;
+package org.netbeans.modules.visage.source.classpath;
 
 
 import java.io.BufferedInputStream;
@@ -87,7 +87,7 @@ public class FileObjects {
     public static final Comparator<JavaFileObject> SIMPLE_NAME_FILEOBJECT_COMPARATOR = new SimpleNameFileObjectComparator();
   */  
     
-    public static final String JAVAFX  = "fx"; //JavaFXDataLoader.FX_EXTENSION; // NOI18N
+    public static final String JAVAFX  = "fx"; //VisageDataLoader.FX_EXTENSION; // NOI18N
     public static final String JAVA  = "java"; // NOI18N
     public static final String CLASS = "class"; //ClassDataLoader.CLASS_EXTENSION; // NOI18N
     public static final String JAR   = "jar";  //NOI18N

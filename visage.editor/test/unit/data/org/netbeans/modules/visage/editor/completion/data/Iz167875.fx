@@ -1,4 +1,4 @@
-import javafx.scene.chart.LineChart;
+import visage.scene.chart.LineChart;
 
 LineChart{
     data: LineChart.

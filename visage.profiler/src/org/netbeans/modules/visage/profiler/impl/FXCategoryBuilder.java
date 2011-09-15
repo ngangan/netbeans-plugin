@@ -40,7 +40,7 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.profiler.impl;
+package org.netbeans.modules.visage.profiler.impl;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.profiler.categories.CategoryBuilder;
@@ -50,12 +50,12 @@ import org.netbeans.modules.profiler.categories.CategoryBuilder;
  * @author Jaroslav Bachorik
  */
 //@ProjectServiceProvider(service = CategoryBuilder.class, projectTypes={
-//    @ProjectType(id="org-netbeans-modules-javafx-project")
+//    @ProjectType(id="org-netbeans-modules-visage-project")
 //})
 public class FXCategoryBuilder extends CategoryBuilder {
 
     public FXCategoryBuilder(Project proj) {
-        super(proj, "org-netbeans-modules-javafx-project");
+        super(proj, "org-netbeans-modules-visage-project");
     }
 
 }

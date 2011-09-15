@@ -39,29 +39,29 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.palette;
+package qa.visage.functional.palette;
 
 import junit.framework.Test;
 import org.netbeans.junit.NbModuleSuite;
 
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Constant;
+import qa.visage.functional.library.Util;
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXPaletteActionsTest extends JavaFXPaletteTestCase {
+public class VisagePaletteActionsTest extends VisagePaletteTestCase {
 
 
     static final String CATEGORY = "Actions";
 
 
-    public JavaFXPaletteActionsTest(String name) {
+    public VisagePaletteActionsTest(String name) {
         super(name);
     }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXPaletteActionsTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisagePaletteActionsTest.class, ".*", ".*", TESTS);
 
     }
 

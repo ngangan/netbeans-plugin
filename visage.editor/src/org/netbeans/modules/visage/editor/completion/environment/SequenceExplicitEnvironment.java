@@ -40,16 +40,16 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
+import com.sun.visage.api.tree.VisageTreePath;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXSequenceExplicit;
+import com.sun.tools.visage.code.JavafxTypes;
+import com.sun.tools.visage.tree.VSGSequenceExplicit;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
@@ -60,22 +60,22 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class SequenceExplicitEnvironment extends JavaFXCompletionEnvironment<JFXSequenceExplicit> {
+public class SequenceExplicitEnvironment extends VisageCompletionEnvironment<VSGSequenceExplicit> {
 
     private static final Logger logger = Logger.getLogger(SequenceExplicitEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXSequenceExplicit t) throws IOException {
-        if (LOGGABLE) log("inside JFXSequenceExplicit " + t + "  offset == " + offset); // NOI18N
-        TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+    protected void inside(VSGSequenceExplicit t) throws IOException {
+        if (LOGGABLE) log("inside VSGSequenceExplicit " + t + "  offset == " + offset); // NOI18N
+        TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
         if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         localResult(getSmartType(t));
         addValueKeywords();
     }
 
-    private TypeMirror getSmartType(JFXSequenceExplicit t) throws IOException {
-        final JavaFXTreePath treePath = new JavaFXTreePath(path, t);
+    private TypeMirror getSmartType(VSGSequenceExplicit t) throws IOException {
+        final VisageTreePath treePath = new VisageTreePath(path, t);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(1) == " + type); // NOI18N
         // handle sequences as their element type

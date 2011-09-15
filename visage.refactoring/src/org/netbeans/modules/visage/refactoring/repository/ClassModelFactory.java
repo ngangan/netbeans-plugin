@@ -42,29 +42,29 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.refactoring.repository;
+package org.netbeans.modules.visage.refactoring.repository;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionDefinitionTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.ImportTree;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.MemberSelectTree;
-import com.sun.javafx.api.tree.ObjectLiteralPartTree;
-import com.sun.javafx.api.tree.OnReplaceTree;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.SyntheticTree.SynthType;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.javafx.api.tree.VariableTree;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXIdent;
-import com.sun.tools.javafx.tree.JFXOverrideClassVar;
-import com.sun.tools.javafx.tree.JFXTree;
-import com.sun.tools.javafx.tree.JFXVar;
-import com.sun.tools.javafx.tree.JavafxTreeInfo;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.FunctionDefinitionTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.ImportTree;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.MemberSelectTree;
+import com.sun.visage.api.tree.ObjectLiteralPartTree;
+import com.sun.visage.api.tree.OnReplaceTree;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.SyntheticTree.SynthType;
+import com.sun.visage.api.tree.Tree;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.visage.api.tree.VariableTree;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGIdent;
+import com.sun.tools.visage.tree.VSGOverrideClassVar;
+import com.sun.tools.visage.tree.VSGTree;
+import com.sun.tools.visage.tree.VSGVar;
+import com.sun.tools.visage.tree.JavafxTreeInfo;
 import com.sun.tools.mjavac.tree.JCTree;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,22 +86,22 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.ElementUtilities;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.ClassIndex.SearchKind;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.ElementUtilities;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ui.OpenProjects;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -114,7 +114,7 @@ final public class ClassModelFactory {
 
 //    final private static Map<RefactoringSession, ClassModelFactory> factories = new WeakHashMap<RefactoringSession, ClassModelFactory>();
 
-    final private static class ClassModelPopulator extends JavaFXTreePathScanner<Void, ClassModel> {
+    final private static class ClassModelPopulator extends VisageTreePathScanner<Void, ClassModel> {
         private CompilationController cc;
         private SourcePositions positions;
         private int localCounter = 0;
@@ -134,22 +134,22 @@ final public class ClassModelFactory {
                 int endFQN = (int)positions.getEndPosition(node, pnt);
                 int startPos = startFQN;
                 int endPos = endFQN;
-                TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                TokenSequence<VSGTokenId> ts = cc.getTokenHierarchy().tokenSequence();
                 ts.move(startFQN);
                 while (ts.movePrevious()) {
-                    Token<JFXTokenId> t = ts.token();
+                    Token<VSGTokenId> t = ts.token();
                     startPos -= t.length();
-                    if (t.id() == JFXTokenId.PACKAGE) break;
+                    if (t.id() == VSGTokenId.PACKAGE) break;
                 }
                 ts.move(endFQN);
                 while (ts.moveNext()) {
-                    Token<JFXTokenId> t = ts.token();
+                    Token<VSGTokenId> t = ts.token();
                     endPos += t.length();
-                    if (t.id() == JFXTokenId.SEMI) break;
+                    if (t.id() == VSGTokenId.SEMI) break;
                 }
                 while (ts.moveNext()) {
-                    Token<JFXTokenId> t = ts.token();
-                    if (t.id() != JFXTokenId.WS) break;
+                    Token<VSGTokenId> t = ts.token();
+                    if (t.id() != VSGTokenId.WS) break;
                     endPos += t.length();
                     if (t.text().charAt(0) == '\n') break;
                 }
@@ -163,8 +163,8 @@ final public class ClassModelFactory {
         public Void visitClassDeclaration(ClassDeclarationTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitClassDeclaration(node, p);
 
-            Element e = ((JFXClassDeclaration)node).sym;
-            if (((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL || (!cc.getElementUtilities().isSynthetic(e) && ((JFXClassDeclaration)node).mods.getGenType() != SynthType.SYNTHETIC)) {
+            Element e = ((VSGClassDeclaration)node).sym;
+            if (((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL || (!cc.getElementUtilities().isSynthetic(e) && ((VSGClassDeclaration)node).mods.getGenType() != SynthType.SYNTHETIC)) {
                 superTypes.addAll(node.getSupertypeList());
                 ElementDef def = getClassDef((TypeElement)e, p);
                 if (def != null) {
@@ -174,7 +174,7 @@ final public class ClassModelFactory {
                     }
                     for(ExpressionTree et : superTypes) {
 
-                        Element se = JavafxTreeInfo.symbolFor((JFXTree)et);
+                        Element se = JavafxTreeInfo.symbolFor((VSGTree)et);
                         if (se != null) {
                             Tree t = cc.getTree(se);
                             if (t != null) {
@@ -213,7 +213,7 @@ final public class ClassModelFactory {
                 boolean wildcard = node.getQualifiedIdentifier().toString().endsWith(".*"); // NOI18N
                 Tree t = node.getQualifiedIdentifier();
                 Element e = null;
-                while ((e = ((JCTree)t).type != null ? ((JCTree)t).type.tsym : null) == null && t.getJavaFXKind() == Tree.JavaFXKind.MEMBER_SELECT) {
+                while ((e = ((JCTree)t).type != null ? ((JCTree)t).type.tsym : null) == null && t.getVisageKind() == Tree.VisageKind.MEMBER_SELECT) {
                     t = ((MemberSelectTree)t).getExpression();
                 }
                 if (e != null) {
@@ -223,13 +223,13 @@ final public class ClassModelFactory {
                     int endFQN = (int)positions.getEndPosition(cc.getCompilationUnit(), node.getQualifiedIdentifier());
 
                     boolean semiFound = false;
-                    TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                    TokenSequence<VSGTokenId> ts = cc.getTokenHierarchy().tokenSequence();
                     ts.move(endPos);
                     while (ts.moveNext()) {
-                        Token<JFXTokenId> token = ts.token();
+                        Token<VSGTokenId> token = ts.token();
                         endPos += token.length();
                         if (!semiFound) {
-                            if (token.id() == JFXTokenId.SEMI) {
+                            if (token.id() == VSGTokenId.SEMI) {
                                 semiFound = true;
                                 continue;
                             }
@@ -263,15 +263,15 @@ final public class ClassModelFactory {
             if (node != null) {
                 int startPos = (int)positions.getStartPosition(cc.getCompilationUnit(), node);
                 int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
-                // workaround for bug in javafxc reporting incorrect end position for an overridden variable
+                // workaround for bug in visagec reporting incorrect end position for an overridden variable
                 // not reporting it when it can be workaround ... what's the point, anyway?
-                Name n = ((JFXIdent)node).getName();
-                if (n == null) return super.visitIdentifier(node, p); // #182370; javafxc returns "null" as the name for identifier with certain kind of error
+                Name n = ((VSGIdent)node).getName();
+                if (n == null) return super.visitIdentifier(node, p); // #182370; visagec returns "null" as the name for identifier with certain kind of error
                 int expectedEndPos = startPos + n.length();
                 endPos = endPos > expectedEndPos ? endPos : expectedEndPos;
                 // *** tada ***
 
-                Element e = getElement((JFXTree)node);
+                Element e = getElement((VSGTree)node);
                 if (e != null) {
                     Tree t1 = cc.getTrees().getTree(e);
                     Tree t = cc.getTree(e);
@@ -287,12 +287,12 @@ final public class ClassModelFactory {
                             case PARAMETER:
                             case LOCAL_VARIABLE:
                             case METHOD: {
-                                if (t.getJavaFXKind() == Tree.JavaFXKind.VARIABLE) {
+                                if (t.getVisageKind() == Tree.VisageKind.VARIABLE) {
                                     ElementDef def= getVarDef(e, p);
                                     if (def != null) {
                                         p.addUsage(new Usage(startPos, endPos, def));
                                     }
-                                } else if (t.getJavaFXKind() == Tree.JavaFXKind.FUNCTION_DEFINITION) {
+                                } else if (t.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION) {
                                     ElementDef def = getMethodDef((ExecutableElement)e, p);
                                     if (def != null) {
                                         p.addUsage(new Usage(startPos, endPos, def));
@@ -337,7 +337,7 @@ final public class ClassModelFactory {
             int startFQN = findIdentifier(node, null, cc);
             int endFQN = startFQN + name.length();
 
-            Element e = getElement((JFXTree)node);
+            Element e = getElement((VSGTree)node);
             if (e != null) {
                 Tree t = cc.getTree(e);
                 if (t != null) {
@@ -361,7 +361,7 @@ final public class ClassModelFactory {
         public Void visitMemberSelect(MemberSelectTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitMemberSelect(node, p);
 
-            Element e = getElement((JFXTree)node);
+            Element e = getElement((VSGTree)node);
             if (e != null) {
                 ElementDef def = ElementDef.NULL;
                 switch (e.getKind()) {
@@ -400,7 +400,7 @@ final public class ClassModelFactory {
         public Void visitVariable(VariableTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitVariable(node, p);
 
-            Element e = getElement((JFXTree)node);
+            Element e = getElement((VSGTree)node);
             ElementDef def = getVarDef(e, p);
             if (def != null) {
                 p.addDef(def);
@@ -411,10 +411,10 @@ final public class ClassModelFactory {
 
         @Override
         public Void visitOnReplace(OnReplaceTree node, ClassModel p) {
-            ElementDef firstIndexDef = node.getFirstIndex() != null ? getVarDef(getElement((JFXTree)node.getFirstIndex()), p) : null;
-            ElementDef lastIndexDef = node.getLastIndex() != null ? getVarDef(getElement((JFXTree)node.getLastIndex()), p) : null;
-            ElementDef oldValueDef = node.getOldValue() != null ? getVarDef(getElement((JFXTree)node.getOldValue()), p) : null;
-            ElementDef newValuesDef = node.getNewElements() != null ? getVarDef(getElement((JFXTree)node.getNewElements()), p) : null;
+            ElementDef firstIndexDef = node.getFirstIndex() != null ? getVarDef(getElement((VSGTree)node.getFirstIndex()), p) : null;
+            ElementDef lastIndexDef = node.getLastIndex() != null ? getVarDef(getElement((VSGTree)node.getLastIndex()), p) : null;
+            ElementDef oldValueDef = node.getOldValue() != null ? getVarDef(getElement((VSGTree)node.getOldValue()), p) : null;
+            ElementDef newValuesDef = node.getNewElements() != null ? getVarDef(getElement((VSGTree)node.getNewElements()), p) : null;
 
             if (firstIndexDef != null) {
                 p.addDef(firstIndexDef);
@@ -445,7 +445,7 @@ final public class ClassModelFactory {
 
             ExecutableElement ee = (ExecutableElement)cc.getTrees().getElement(getCurrentPath());
             ElementDef def  = getMethodDef(ee, p);
-            if (def != null && !def.getName().equals("javafx$run$")) { // NOI18N
+            if (def != null && !def.getName().equals("visage$run$")) { // NOI18N
                 p.addDef(def);
                 p.addUsage(new Usage(def.getStartFQN(), def.getEndFQN(), def));
             }
@@ -455,7 +455,7 @@ final public class ClassModelFactory {
 
 
         private void processFunctionDef(ExecutableElement ee, ElementDef def, ClassModel p) {
-            for(ExecutableElement overriden : JavaFXSourceUtils.getOverridenMethods(ee, cc)) {
+            for(ExecutableElement overriden : VisageSourceUtils.getOverridenMethods(ee, cc)) {
                 GlobalDef otherDef = (GlobalDef)getMethodDef(overriden, p);
                 if (otherDef != null) {
                     ((GlobalDef)def).addOverridenDef(otherDef);
@@ -472,22 +472,22 @@ final public class ClassModelFactory {
 
         final private Map<Object, ElementDef> defCache = new WeakHashMap<Object, ElementDef>();
 
-        private Element getElement(JFXTree t) {
+        private Element getElement(VSGTree t) {
             Element e = JavafxTreeInfo.symbolFor(t);
             if (e == null) {
-                // #JFXC-3789 workaround
-                if (t instanceof JFXOverrideClassVar) {
-                    e = ((JFXOverrideClassVar)t).sym;
-                } else if (t instanceof JFXVar) {
-                    // #JFXC-3917 workaround
-                    e = ((JFXVar)t).getSymbol();
+                // #VSGC-3789 workaround
+                if (t instanceof VSGOverrideClassVar) {
+                    e = ((VSGOverrideClassVar)t).sym;
+                } else if (t instanceof VSGVar) {
+                    // #VSGC-3917 workaround
+                    e = ((VSGVar)t).getSymbol();
                 }
             }
             if (e == null && LOG.isLoggable(Level.FINE)) {
                 StringBuilder sb = new StringBuilder();
                 sb.append("Can not retrieve Symbol for Tree!\n");
                 sb.append("Tree class: ").append(t.getClass().getName()).append("\n");
-                sb.append("Tree kind: ").append(t.getJavaFXKind()).append("\n");
+                sb.append("Tree kind: ").append(t.getVisageKind()).append("\n");
                 sb.append("Tree content: \n").append(t).append("\n===\n");
                 LOG.log(Level.FINE, sb.toString());
             }
@@ -508,7 +508,7 @@ final public class ClassModelFactory {
                 int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
                 int startFQN = missingTree ? -1 : findIdentifier(node, null, cc);
                 int endFQN = missingTree ? -1 : startFQN + name.length();
-                // workaround for bug in javafxc reporting incorrect end position for an overridden variable
+                // workaround for bug in visagec reporting incorrect end position for an overridden variable
                 // not reporting it when it can be workaround ... what's the point, anyway?
                 endPos = endPos < endFQN ? endFQN : endPos;
 
@@ -541,16 +541,16 @@ final public class ClassModelFactory {
         }
 
         private ElementDef getMethodDef(ExecutableElement e, ClassModel p) {
-            Tree node = (JFXFunctionDefinition)cc.getTree(e);
+            Tree node = (VSGFunctionDefinition)cc.getTree(e);
             
-            boolean missingTree = (node == null || ((JFXFunctionDefinition)node).getName() == null);
+            boolean missingTree = (node == null || ((VSGFunctionDefinition)node).getName() == null);
 
             ElementDef edef = missingTree ? null : defCache.get(node);
             if (edef == null) {
                 String name = e.getSimpleName().toString();
                 int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
                 int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
-                int startFQN = missingTree ? -1 : findIdentifier(node, JFXTokenId.FUNCTION, cc);
+                int startFQN = missingTree ? -1 : findIdentifier(node, VSGTokenId.FUNCTION, cc);
                 int endFQN = missingTree ? -1 : startFQN + name.length();
                 if (e != null) {
                     PackageElement pe = ElementUtilities.enclosingPackageElement(e);
@@ -564,7 +564,7 @@ final public class ClassModelFactory {
                     );
                 }
             }
-            if (edef != null && !edef.getName().equals("javafx$run$")) { // NOI18N
+            if (edef != null && !edef.getName().equals("visage$run$")) { // NOI18N
                 processFunctionDef(e, edef, p);
             }
             return edef;
@@ -577,12 +577,12 @@ final public class ClassModelFactory {
             
             ElementDef edef = missingTree ? null : defCache.get(node);
             if (edef == null) {
-                boolean isSynth = missingTree ? cc.getElementUtilities().isSynthetic(te) : ((JFXClassDeclaration)node).mods.getGenType() == SynthType.SYNTHETIC;
+                boolean isSynth = missingTree ? cc.getElementUtilities().isSynthetic(te) : ((VSGClassDeclaration)node).mods.getGenType() == SynthType.SYNTHETIC;
 
                 int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
                 int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
 
-                int startFQN = missingTree ? -1 : findIdentifier(node, JFXTokenId.CLASS, cc);
+                int startFQN = missingTree ? -1 : findIdentifier(node, VSGTokenId.CLASS, cc);
                 String name = te.getSimpleName().toString();
                 PackageElement pe = ElementUtilities.enclosingPackageElement(te);
                 edef = new GlobalDef(
@@ -599,19 +599,19 @@ final public class ClassModelFactory {
             return edef;
         }
 
-        private int findIdentifier(Tree tree, JFXTokenId after, CompilationController cc) {
+        private int findIdentifier(Tree tree, VSGTokenId after, CompilationController cc) {
             int start = (int) cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), tree);
-            TokenSequence<JFXTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+            TokenSequence<VSGTokenId> ts = cc.getTokenHierarchy().tokenSequence();
             ts.move(start);
             boolean classFound = false;
 
             while (ts.moveNext()) {
-                Token<JFXTokenId> t = ts.token();
+                Token<VSGTokenId> t = ts.token();
                 if (t.id() == after) {
                     classFound = true;
                 } else {
                     if (after == null || classFound) {
-                        if (t.id() == JFXTokenId.IDENTIFIER) {
+                        if (t.id() == VSGTokenId.IDENTIFIER) {
                             break;
                         }
                     }
@@ -652,8 +652,8 @@ final public class ClassModelFactory {
     public ClassModel classModelFor(String className) {
         List<FileObject> roots = new ArrayList<FileObject>();
         for(Project p : OpenProjects.getDefault().getOpenProjects()) {
-            if (!(p instanceof JavaFXProject)) continue;
-            ClassPath pcp = ((JavaFXProject)p).getClassPathProvider().getProjectSourcesClassPath(ClassPath.SOURCE);
+            if (!(p instanceof VisageProject)) continue;
+            ClassPath pcp = ((VisageProject)p).getClassPathProvider().getProjectSourcesClassPath(ClassPath.SOURCE);
             if (pcp != null) {
                 roots.addAll(Arrays.asList(pcp.getRoots()));
             }
@@ -670,12 +670,12 @@ final public class ClassModelFactory {
 
     private static ClassModel createClassModel(FileObject fo) {
         final ClassModel result = new ClassModel(fo);
-        JavaFXSource jfxs = JavaFXSource.forFileObject(fo);
+        VisageSource jfxs = VisageSource.forFileObject(fo);
         try {
             jfxs.runUserActionTask(new Task<CompilationController>() {
 
                 public void run(CompilationController cc) throws Exception {
-                    if (!cc.toPhase(JavaFXSource.Phase.ANALYZED).lessThan(JavaFXSource.Phase.ANALYZED)) {
+                    if (!cc.toPhase(VisageSource.Phase.ANALYZED).lessThan(VisageSource.Phase.ANALYZED)) {
                         new ClassModelPopulator(cc).scan(cc.getCompilationUnit(), result);
                     }
                 }

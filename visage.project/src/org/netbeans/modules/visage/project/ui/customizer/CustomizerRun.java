@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.awt.Component;
 import java.awt.Dialog;
@@ -75,10 +75,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.plaf.UIResource;
 import javax.swing.text.JTextComponent;
 import org.netbeans.api.java.platform.JavaPlatform;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.modules.java.api.common.SourceRoots;
-import org.netbeans.modules.javafx.platform.PlatformUiSupport;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.platform.PlatformUiSupport;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
@@ -92,15 +92,15 @@ import org.openide.util.Utilities;
 
 public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
-    private JavaFXProject project;
+    private VisageProject project;
 
     private JTextComponent[] data;
     private JLabel[] dataLabels;
     private String[] keys;
     private Map<String, Map<String, String>> configs;
-    JavaFXProjectProperties uiProperties;
+    VisageProjectProperties uiProperties;
 
-    public CustomizerRun(JavaFXProjectProperties uiProperties) {
+    public CustomizerRun(VisageProjectProperties uiProperties) {
         this.uiProperties = uiProperties;
         initComponents();
 
@@ -109,8 +109,8 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         PlatformUiSupport.PlatformKey pk = (PlatformUiSupport.PlatformKey)uiProperties.PLATFORM_MODEL.getSelectedItem();
         if (pk != null) {
             JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
-            if (jp instanceof JavaFXPlatform) try {
-                jRadioButton4.setEnabled(new File(new File(((JavaFXPlatform)jp).getJavaFXFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()); //NOI18N
+            if (jp instanceof VisagePlatform) try {
+                jRadioButton4.setEnabled(new File(new File(((VisagePlatform)jp).getVisageFolder().toURI()), "emulator/mobile/bin/preverify" + (Utilities.isWindows() ? ".exe" : "")).isFile()); //NOI18N
             } catch (URISyntaxException e) {}
         }
         
@@ -118,7 +118,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
 
         data = new JTextComponent[]{jTextFieldMainClass, jTextArguments, jvmText, (JTextComponent)deviceCombo.getEditor().getEditorComponent()};
         dataLabels = new JLabel[]{jLabelMainClass, jLabelArguments, jvmLabel, deviceLabel};
-        keys = new String[]{JavaFXProjectProperties.MAIN_CLASS, JavaFXProjectProperties.APPLICATION_ARGS, JavaFXProjectProperties.RUN_JVM_ARGS, JavaFXProjectProperties.MOBILE_DEVICE};
+        keys = new String[]{VisageProjectProperties.MAIN_CLASS, VisageProjectProperties.APPLICATION_ARGS, VisageProjectProperties.RUN_JVM_ARGS, VisageProjectProperties.MOBILE_DEVICE};
         assert data.length == keys.length;
 
         configChanged(uiProperties.activeConfig);
@@ -184,9 +184,9 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
             public void actionPerformed(ActionEvent e) {
                 String config = (String) configCombo.getSelectedItem();
                 if (config.length() == 0) {
-                    configs.get(null).put(JavaFXProjectProperties.JAD_INSTALL, String.valueOf(installCheckBox1.isSelected()));
+                    configs.get(null).put(VisageProjectProperties.JAD_INSTALL, String.valueOf(installCheckBox1.isSelected()));
                 } else {
-                    configs.get(config).put(JavaFXProjectProperties.JAD_INSTALL, Boolean.parseBoolean(configs.get(null).get(JavaFXProjectProperties.JAD_INSTALL)) != installCheckBox1.isSelected() ? String.valueOf(installCheckBox1.isSelected()) : null);
+                    configs.get(config).put(VisageProjectProperties.JAD_INSTALL, Boolean.parseBoolean(configs.get(null).get(VisageProjectProperties.JAD_INSTALL)) != installCheckBox1.isSelected() ? String.valueOf(installCheckBox1.isSelected()) : null);
                 }
                 updateFont();
             }
@@ -195,7 +195,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
                 if (config.length() == 0) {
                     installCheckBox1.setFont(basefont);
                 } else {
-                    installCheckBox1.setFont(Boolean.parseBoolean(configs.get(null).get(JavaFXProjectProperties.JAD_INSTALL)) == installCheckBox1.isSelected() ? basefont : boldfont); // NOI18N
+                    installCheckBox1.setFont(Boolean.parseBoolean(configs.get(null).get(VisageProjectProperties.JAD_INSTALL)) == installCheckBox1.isSelected() ? basefont : boldfont); // NOI18N
                 }
             }
         });
@@ -519,7 +519,7 @@ public class CustomizerRun extends JPanel implements HelpCtx.Provider {
         if (!name.equals(config)) {
             m.put("$label", name); // NOI18N
         }
-        m.put("javafx.profile", "desktop"); //NOI18N
+        m.put("visage.profile", "desktop"); //NOI18N
         m.put("execution.target", "standard"); //NOI18N
         configs.put(config, m);
         configChanged(config);
@@ -548,28 +548,28 @@ private void enableDeviceCombo() {
     
 private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "desktop"); //NOI18N
+    m.put("visage.profile", "desktop"); //NOI18N
     m.put("execution.target", "standard"); //NOI18N
     enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton1ActionPerformed
 
 private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "desktop"); //NOI18N
+    m.put("visage.profile", "desktop"); //NOI18N
     m.put("execution.target", "jnlp"); //NOI18N
     enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton2ActionPerformed
 
 private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "desktop"); //NOI18N
+    m.put("visage.profile", "desktop"); //NOI18N
     m.put("execution.target", "applet"); //NOI18N
     enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton3ActionPerformed
 
 private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "mobile"); //NOI18N
+    m.put("visage.profile", "mobile"); //NOI18N
     m.put("execution.target", "midp"); //NOI18N
     enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton4ActionPerformed
@@ -586,8 +586,8 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
                     PlatformUiSupport.PlatformKey pk = (PlatformUiSupport.PlatformKey)uiProperties.PLATFORM_MODEL.getSelectedItem();
                     if (pk != null) {
                         JavaPlatform jp = PlatformUiSupport.getPlatform(pk);
-                        if (jp instanceof JavaFXPlatform) {
-                            FileObject fo = jp.findTool("javafxpackager"); //NOI18N
+                        if (jp instanceof VisagePlatform) {
+                            FileObject fo = jp.findTool("visagepackager"); //NOI18N
                             if (fo != null) {
                                 File em = new File(FileUtil.toFile(fo).getParentFile().getParentFile(), "emulator/mobile/bin/emulator" + (Utilities.isWindows() ? ".exe" : "")); //NOI18N
                                 if (em.isFile()) try {
@@ -620,7 +620,7 @@ private void deviceComboPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEv
     
 private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
     Map<String, String> m = configs.get(uiProperties.activeConfig);
-    m.put("javafx.profile", "tv"); //NOI18N
+    m.put("visage.profile", "tv"); //NOI18N
     m.put("execution.target", "cvm"); //NOI18N
     enableDeviceCombo();
 }//GEN-LAST:event_jRadioButton5ActionPerformed
@@ -678,10 +678,10 @@ private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN
                 }
                 data[i].setText(v);
             }
-            String v = m.get(JavaFXProjectProperties.JAD_INSTALL);
+            String v = m.get(VisageProjectProperties.JAD_INSTALL);
             if (v == null) {
                 // display default value
-                v = def.get(JavaFXProjectProperties.JAD_INSTALL);
+                v = def.get(VisageProjectProperties.JAD_INSTALL);
             }
             installCheckBox1.setSelected(Boolean.parseBoolean(v));
             for (ActionListener l : installCheckBox1.getActionListeners()) l.actionPerformed(null);

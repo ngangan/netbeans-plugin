@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.completion;
+package org.netbeans.modules.visage.editor.completion;
 
 public class ReportedIssuesTest extends CompletionTestBase {
 
@@ -132,7 +132,7 @@ public class ReportedIssuesTest extends CompletionTestBase {
     }
 
     public void testIssue182293() throws Exception {
-        checkCCForIssue(182293, "import javafx.scene.shape.Cir^");
+        checkCCForIssue(182293, "import visage.scene.shape.Cir^");
     }
 
     public void testIssue165928() throws Exception {

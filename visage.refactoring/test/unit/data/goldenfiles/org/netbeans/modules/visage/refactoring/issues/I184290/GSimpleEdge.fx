@@ -44,12 +44,12 @@
 
 package mathematics.graph.simple;
 
-import javafx.scene.shape.Line;
+import visage.scene.shape.Line;
 import mathematics.graph.GEdge;
-import javafx.scene.Group;
-import javafx.scene.text.Text;
-import javafx.scene.text.Font;
-import javafx.scene.paint.Color;
+import visage.scene.Group;
+import visage.scene.text.Text;
+import visage.scene.text.Font;
+import visage.scene.paint.Color;
 
 /**
  * @author andromeda

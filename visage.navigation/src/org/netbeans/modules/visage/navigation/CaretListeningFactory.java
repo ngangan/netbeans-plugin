@@ -42,14 +42,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.navigation;
+package org.netbeans.modules.visage.navigation;
 
 import java.util.List;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.CaretAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.support.CaretAwareVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
@@ -57,7 +57,7 @@ import org.openide.filesystems.FileObject;
  *
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  */
-public class CaretListeningFactory extends CaretAwareJavaFXSourceTaskFactory {
+public class CaretListeningFactory extends CaretAwareVisageSourceTaskFactory {
     
     private static CaretListeningFactory INSTANCE;
 

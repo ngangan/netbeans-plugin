@@ -48,10 +48,10 @@ made subject to such option by the copyright holder.
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:p="http://www.netbeans.org/ns/project/1"
                 xmlns:xalan="http://xml.apache.org/xslt"
-                xmlns:javafx="http://www.netbeans.org/ns/javafx-project/1"
-                xmlns:javafxproject="http://www.netbeans.org/ns/javafx-project/1"
+                xmlns:visage="http://www.netbeans.org/ns/visage-project/1"
+                xmlns:visageproject="http://www.netbeans.org/ns/visage-project/1"
                 xmlns:projdeps="http://www.netbeans.org/ns/ant-project-references/1"
-                exclude-result-prefixes="xalan p javafx projdeps">
+                exclude-result-prefixes="xalan p visage projdeps">
 <!-- XXX should use namespaces for NB in-VM tasks from ant/browsetask and profilerjpda/ant (Ant 1.6.1 and higher only) -->
     <xsl:output method="xml" indent="yes" encoding="UTF-8" xalan:indent-amount="4"/>
     <xsl:template match="/">
@@ -69,7 +69,7 @@ is divided into following sections:
 
 ]]></xsl:comment>
 
-        <xsl:variable name="name" select="/p:project/p:configuration/javafxproject:data/javafxproject:name"/>
+        <xsl:variable name="name" select="/p:project/p:configuration/visageproject:data/visageproject:name"/>
         <!-- Synch with build-impl.xsl: -->
         <xsl:variable name="codename" select="translate($name, ' ', '_')"/>
         <project name="{$codename}-profiler-impl">
@@ -169,8 +169,8 @@ is divided into following sections:
                         <path path="${{javac.classpath}}"/>
                     </classpath>
                 </nbprofiledirect>
-                <javafxproject:property name="profiler.current.path" value="${{profiler.info.pathvar}}"/>
-                <java classname="${{main.class}}" classpath="${{dist.dir}}/${{application.title}}.jar" fork="true" jvm="${{platform.fxhome}}/bin/javafx${{binary.extension}}">
+                <visageproject:property name="profiler.current.path" value="${{profiler.info.pathvar}}"/>
+                <java classname="${{main.class}}" classpath="${{dist.dir}}/${{application.title}}.jar" fork="true" jvm="${{platform.fxhome}}/bin/visage${{binary.extension}}">
                     <jvmarg value="${{profiler.info.jvmargs.agent}}"/>
                     <jvmarg line="${{profiler.info.jvmargs}}"/>
                     <env key="${{profiler.info.pathvar}}" path="${{profiler.info.agentpath}}:${{profiler.current.path}}"/>

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.navigator;
+package org.netbeans.modules.visage.fxd.composer.navigator;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -53,8 +53,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
 import org.netbeans.modules.editor.structure.api.DocumentModel;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.composer.model.FXDElement;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 
 /**
  *

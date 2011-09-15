@@ -40,9 +40,9 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.javafx.api.tree.BinaryTree;
+import com.sun.visage.api.tree.BinaryTree;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -50,14 +50,14 @@ import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 /**
  *
  * @author David Strupl
  */
-public class BinaryTreeEnvironment extends JavaFXCompletionEnvironment<BinaryTree> {
+public class BinaryTreeEnvironment extends VisageCompletionEnvironment<BinaryTree> {
     
     private static final Logger logger = Logger.getLogger(BinaryTreeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -72,7 +72,7 @@ public class BinaryTreeEnvironment extends JavaFXCompletionEnvironment<BinaryTre
         }
         pos = (int) sourcePositions.getEndPosition(root, bi.getLeftOperand());
         if (pos != Diagnostic.NOPOS) {
-            TokenSequence<JFXTokenId> last = findLastNonWhitespaceToken(pos, offset);
+            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken(pos, offset);
             if (last != null) {
                 localResult(null);
                 addValueKeywords();

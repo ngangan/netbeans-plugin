@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.visage.fxd.dataloader;
 
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObjectExistsException;

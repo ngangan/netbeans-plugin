@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library.project;
+package qa.visage.functional.library.project;
 
 import org.netbeans.jellytools.actions.OpenAction;
 import org.netbeans.jellytools.nodes.Node;
@@ -47,42 +47,42 @@ import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
 import org.netbeans.jemmy.operators.JRadioButtonOperator;
 import org.netbeans.jemmy.operators.JTreeOperator;
-import qa.javafx.functional.library.Constant;
+import qa.visage.functional.library.Constant;
 
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Util;
 
 /**
  *
  * @author Alexandr Scherbatiy
  */
-public class JavaFXProject extends JavaProject {
+public class VisageProject extends JavaProject {
 
 
     public DeploymentType deploymentType = DeploymentType.DESKTOP;
 
-    public JavaFXProject(String name) {
+    public VisageProject(String name) {
         super(name, ProjectType.JAVAFX_APPLICATION);
     }
 
-    public JavaFXProject(String name, DeploymentType deploymentType) {
+    public VisageProject(String name, DeploymentType deploymentType) {
         super(name, ProjectType.JAVAFX_APPLICATION);
         this.deploymentType = deploymentType;
     }
 
-    public JavaFXProject(JavaProject javaProject) {
+    public VisageProject(JavaProject javaProject) {
         this(javaProject.getName());
     }
 
-    public JavaFXProject(JavaProject javaProject, DeploymentType deploymentType) {
+    public VisageProject(JavaProject javaProject, DeploymentType deploymentType) {
         this(javaProject.getName(), deploymentType);
     }
 
-    public static JavaFXProject createProject(String name) {
-        return new JavaFXProject(JavaProject.createProject(name, ProjectType.JAVAFX_APPLICATION));
+    public static VisageProject createProject(String name) {
+        return new VisageProject(JavaProject.createProject(name, ProjectType.JAVAFX_APPLICATION));
     }
-    public static JavaFXProject createProject(String name, DeploymentType deploymentType) {
+    public static VisageProject createProject(String name, DeploymentType deploymentType) {
         JavaProject project = JavaProject.createProject(name, ProjectType.JAVAFX_APPLICATION);
-        return new JavaFXProject(project, deploymentType);
+        return new VisageProject(project, deploymentType);
     }
 
     public String getMainPackage() {

@@ -41,13 +41,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.format;
+package org.netbeans.modules.visage.editor.format;
 
-import com.sun.javafx.api.JavafxBindStatus;
-import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
-import com.sun.javafx.api.tree.UnitTree;
-import com.sun.tools.javafx.tree.*;
+import com.sun.visage.api.JavafxBindStatus;
+import com.sun.visage.api.tree.*;
+import com.sun.visage.api.tree.Tree.VisageKind;
+import com.sun.visage.api.tree.UnitTree;
+import com.sun.tools.visage.tree.*;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -55,14 +55,14 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Name;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-import org.netbeans.api.javafx.editor.FXSourceUtils;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.*;
+import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.*;
 import org.netbeans.api.lexer.*;
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ExtraLock;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
-import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
+import org.netbeans.modules.visage.editor.format.CodeStyle.WrapStyle;
 import org.netbeans.spi.lexer.MutableTextInput;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
@@ -74,26 +74,26 @@ import org.openide.loaders.DataObject;
  * This code based on org.netbeans.modules.java.source.save.Reformatter written by Dusan Balek.
  *
  * @see org.netbeans.modules.java.source.save.Reformatter
- * @see http://openjfx.java.sun.com/current-build/doc/reference/JavaFXReference.html
+ * @see http://openjfx.java.sun.com/current-build/doc/reference/VisageReference.html
  * @see http://wikis.sun.com/display/JavaFxCodeConv/Home
  * @author Anton Chechel
  */
-public class JFXReformatTask implements ReformatTask {
+public class VSGReformatTask implements ReformatTask {
 
     private static final Object CT_HANDLER_DOC_PROPERTY = "code-template-insert-handler"; // NOI18N
     private static final String NEWLINE = "\n"; //NOI18N
     private static final String LCBRACE = "{"; //NOI18N
     private static final String RCBRACE = "}"; //NOI18N
-    private static final String MAGIC_FUNCTION = "javafx$run$"; //NOI18N
+    private static final String MAGIC_FUNCTION = "visage$run$"; //NOI18N
 
-    private static Logger log = Logger.getLogger(JFXReformatTask.class.getName());
+    private static Logger log = Logger.getLogger(VSGReformatTask.class.getName());
 
     private final Context context;
     private CompilationController controller;
     private Document doc;
     private int shift;
 
-    public JFXReformatTask(Context context) {
+    public VSGReformatTask(Context context) {
         this.context = context;
         this.doc = context.document();
     }
@@ -101,16 +101,16 @@ public class JFXReformatTask implements ReformatTask {
     public void reformat() throws BadLocationException {
         if (controller == null) {
             try {
-                final JavaFXSource source = JavaFXSource.forDocument(context.document());
+                final VisageSource source = VisageSource.forDocument(context.document());
                 source.runUserActionTask(new Task<CompilationController>() {
                     public void run(CompilationController controller) throws Exception {
-                        JFXReformatTask.this.controller = controller;
+                        VSGReformatTask.this.controller = controller;
                     }
                 }, true);
                 if (controller == null) {
                     return;
                 }
-                if (controller.toPhase(JavaFXSource.Phase.PARSED).lessThan(JavaFXSource.Phase.PARSED)) {
+                if (controller.toPhase(VisageSource.Phase.PARSED).lessThan(VisageSource.Phase.PARSED)) {
                     return;
                 }
             } catch (Exception ex) {
@@ -149,16 +149,16 @@ public class JFXReformatTask implements ReformatTask {
             DataObject dObj = DataObject.find(fObj);
             EditorCookie ec = (EditorCookie) dObj.getCookie(EditorCookie.class);
             Document doc = ec.openDocument();
-            doc.putProperty(Language.class, JFXTokenId.language());
+            doc.putProperty(Language.class, VSGTokenId.language());
             doc.putProperty("mimeType", FXSourceUtils.MIME_TYPE_FX); // NOI18N
 
-            JavaFXSource src = JavaFXSource.forDocument(doc);
+            VisageSource src = VisageSource.forDocument(doc);
             src.runUserActionTask(new Task<CompilationController>() {
                 public void run(CompilationController controller) throws Exception {
-                    if (controller != null && !controller.toPhase(JavaFXSource.Phase.PARSED).lessThan(JavaFXSource.Phase.PARSED)) {
-                        TokenSequence<JFXTokenId> tokens = TokenHierarchy.create(text, JFXTokenId.language()).tokenSequence(JFXTokenId.language());
+                    if (controller != null && !controller.toPhase(VisageSource.Phase.PARSED).lessThan(VisageSource.Phase.PARSED)) {
+                        TokenSequence<VSGTokenId> tokens = TokenHierarchy.create(text, VSGTokenId.language()).tokenSequence(VSGTokenId.language());
                         UnitTree tree = controller.getCompilationUnit();
-                        for (Diff diff : Pretty.reformat(controller, text, tokens, new JavaFXTreePath(tree), style)) {
+                        for (Diff diff : Pretty.reformat(controller, text, tokens, new VisageTreePath(tree), style)) {
                             int start = diff.getStartOffset();
                             int end = diff.getEndOffset();
                             sb.delete(start, end);
@@ -194,7 +194,7 @@ public class JFXReformatTask implements ReformatTask {
         if (startOffset >= endOffset) {
             return;
         }
-        JavaFXTreePath path = getCommonPath(controller, startOffset);
+        VisageTreePath path = getCommonPath(controller, startOffset);
         if (path == null) {
             return;
         }
@@ -221,7 +221,7 @@ public class JFXReformatTask implements ReformatTask {
 
                 if (startOffset >= start) {
                     if (text != null && text.length() > 0) {
-                        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+                        TokenSequence<VSGTokenId> ts = controller.getTokenHierarchy().tokenSequence(VSGTokenId.language());
                         if (ts == null) {
                             continue;
                         }
@@ -234,13 +234,13 @@ public class JFXReformatTask implements ReformatTask {
                                 continue;
                             }
                         }
-                        if (ts.token().id() == JFXTokenId.WS) {
-                            // JavaFX diffenerce
+                        if (ts.token().id() == VSGTokenId.WS) {
+                            // Visage diffenerce
                             int tsOffset = ts.offset();
                             StringBuilder t1 = new StringBuilder();
                             do {
                                 t1.append(ts.token().text().toString());
-                            } while (ts.moveNext() && ts.token().id() == JFXTokenId.WS);
+                            } while (ts.moveNext() && ts.token().id() == VSGTokenId.WS);
 
                             String t = t1.toString();
 //                        String t = ts.token().text().toString();
@@ -298,16 +298,16 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 if (endOffset < end) {
                     if (text != null && text.length() > 0 && !templateEdit) {
-                        TokenSequence<JFXTokenId> ts = controller.getTokenHierarchy().tokenSequence(JFXTokenId.language());
+                        TokenSequence<VSGTokenId> ts = controller.getTokenHierarchy().tokenSequence(VSGTokenId.language());
                         if (ts != null) {
                             ts.move(endOffset);
-                            if (ts.moveNext() && ts.token().id() == JFXTokenId.WS) {
-                                // JavaFX diffenerce
+                            if (ts.moveNext() && ts.token().id() == VSGTokenId.WS) {
+                                // Visage diffenerce
                                 int tsOffset = ts.offset();
                                 StringBuilder t1 = new StringBuilder();
                                 do {
                                     t1.append(ts.token().text().toString());
-                                } while (ts.moveNext() && ts.token().id() == JFXTokenId.WS);
+                                } while (ts.moveNext() && ts.token().id() == VSGTokenId.WS);
 
                                 String t = t1.toString();
 //                            String t = ts.token().text().toString();
@@ -342,11 +342,11 @@ public class JFXReformatTask implements ReformatTask {
     }
 
     public ExtraLock reformatLock() {
-        return JavaFXReformatExtraLock.getInstance();
+        return VisageReformatExtraLock.getInstance();
     }
 
-    private static JavaFXTreePath getCommonPath(final CompilationController controller, final int offset) {
-        JavaFXTreePath path = controller.getTreeUtilities().pathFor(offset);
+    private static VisageTreePath getCommonPath(final CompilationController controller, final int offset) {
+        VisageTreePath path = controller.getTreeUtilities().pathFor(offset);
         if (offset > 0) {
             if (path.getLeaf() instanceof FunctionValueTree) {
                 path = path.getParentPath();
@@ -391,16 +391,16 @@ public class JFXReformatTask implements ReformatTask {
 
     /*
      * This scanner places trees in correct order how they presented actually in the source code.
-     * @see JFXC-3633
+     * @see VSGC-3633
      */
-    private static class FilterScanner<R,P> extends JavaFXTreePathScanner<R, P> {
+    private static class FilterScanner<R,P> extends VisageTreePathScanner<R, P> {
         private CompilationInfo ci;
         private TreeSet<Tree> displaced;
 
         public FilterScanner(final CompilationInfo ci) {
             this.ci = ci;
             displaced = new TreeSet<Tree>(new TreePosComparator(ci.getTrees().getSourcePositions(), ci.getCompilationUnit()));
-            ci.getCompilationUnit().accept(new JavaFXTreeScanner<Void, Void>() {
+            ci.getCompilationUnit().accept(new VisageTreeScanner<Void, Void>() {
                 int state = 0;
 
                 public @Override Void scan(Tree node, Void p) {
@@ -435,7 +435,7 @@ public class JFXReformatTask implements ReformatTask {
 
                 // TODO get "static" via flags when they will work in compiler
                 public @Override Void visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
-                    JFXFunctionDefinition funcDef = (JFXFunctionDefinition) node;
+                    VSGFunctionDefinition funcDef = (VSGFunctionDefinition) node;
                     boolean magicFunc = MAGIC_FUNCTION.contentEquals(funcDef.getName()) && isSynthetic(funcDef);
                     int oldState = state;
 
@@ -513,7 +513,7 @@ public class JFXReformatTask implements ReformatTask {
             Tree topLevelClass = null;
             for (Tree tree : typeDecls) {
                 // assume FXScript has only 1 top level class and it's named as a file (nice FX feature)
-                if (tree.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) {
+                if (tree.getVisageKind() == VisageKind.CLASS_DECLARATION) {
                     topLevelClass = tree;
                     if (!isSynthetic(tree)) {
                         cuTrees.add(tree);
@@ -524,7 +524,7 @@ public class JFXReformatTask implements ReformatTask {
             if (topLevelClass != null) {
                 List<Tree> members = ((ClassDeclarationTree) topLevelClass).getClassMembers();
                 for (Tree member : members) {
-                    if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION) {
+                    if (member.getVisageKind() == VisageKind.CLASS_DECLARATION) {
                         cuTrees.add(member);
                     }
                 }
@@ -536,23 +536,23 @@ public class JFXReformatTask implements ReformatTask {
         private boolean isSynthetic(Tree node) {
             if (node instanceof BlockExpressionTree) {
                 UnitTree cu = ci.getCompilationUnit();
-                final JavaFXTreePath path = ci.getTrees().getPath(cu, node);
+                final VisageTreePath path = ci.getTrees().getPath(cu, node);
                 if (path == null) {
                     return true;
                 }
-                JavaFXTreePath pp = path.getParentPath();
+                VisageTreePath pp = path.getParentPath();
                 if (pp != null && pp instanceof FunctionValueTree) {
                     pp = pp.getParentPath();
-                    JFXTree tree = (JFXTree) pp.getLeaf();
+                    VSGTree tree = (VSGTree) pp.getLeaf();
                     if (tree instanceof FunctionDefinitionTree) {
                         return synthetic(tree);
                     }
                 }
             }
-            return synthetic((JFXTree) node);
+            return synthetic((VSGTree) node);
         }
 
-        private boolean synthetic(JFXTree node) {
+        private boolean synthetic(VSGTree node) {
             SourcePositions sp = ci.getTrees().getSourcePositions();
             UnitTree cu = ci.getCompilationUnit();
             long startPos = sp.getStartPosition(cu, node);
@@ -567,7 +567,7 @@ public class JFXReformatTask implements ReformatTask {
     }
 
     private static class Pretty extends FilterScanner<Boolean, Void> {
-//    private static class Pretty extends JavaFXTreePathScanner<Boolean, Void> {
+//    private static class Pretty extends VisageTreePathScanner<Boolean, Void> {
 
         private static final String OPERATOR = "operator"; // NOI18N
         private static final String EMPTY = ""; // NOI18N
@@ -589,7 +589,7 @@ public class JFXReformatTask implements ReformatTask {
         private final int continuationIndentSize;
         private final boolean expandTabToSpaces;
 
-        private TokenSequence<JFXTokenId> tokens;
+        private TokenSequence<VSGTokenId> tokens;
         private int indent;
         private int col;
         private int endPos;
@@ -605,13 +605,13 @@ public class JFXReformatTask implements ReformatTask {
 
         private SortedSet<Tree> cuTrees;
 
-        private Pretty(CompilationInfo info, JavaFXTreePath path, CodeStyle cs, int startOffset, int endOffset, boolean templateEdit) {
-            this(info, FXSourceUtils.getText(info), info.getTokenHierarchy().tokenSequence(JFXTokenId.language()),
+        private Pretty(CompilationInfo info, VisageTreePath path, CodeStyle cs, int startOffset, int endOffset, boolean templateEdit) {
+            this(info, FXSourceUtils.getText(info), info.getTokenHierarchy().tokenSequence(VSGTokenId.language()),
                     path, cs, startOffset, endOffset);
             this.templateEdit = templateEdit;
         }
 
-        private Pretty(CompilationInfo info, String text, TokenSequence<JFXTokenId> tokens, JavaFXTreePath path,
+        private Pretty(CompilationInfo info, String text, TokenSequence<VSGTokenId> tokens, VisageTreePath path,
                 CodeStyle cs, int startOffset, int endOffset) {
             super(info);
 //            this.doc = info.getDocument();
@@ -632,7 +632,7 @@ public class JFXReformatTask implements ReformatTask {
             this.indent = tokens != null ? getIndentLevel(tokens, path) : 0;
             this.col = this.indent;
             this.tokens = tokens;
-            if (tree.getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
+            if (tree.getVisageKind() == VisageKind.COMPILATION_UNIT) {
                 tokens.moveEnd();
                 tokens.movePrevious();
             } else {
@@ -642,7 +642,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
             this.endPos = tokens.offset();
-            if (tree.getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
+            if (tree.getVisageKind() == VisageKind.COMPILATION_UNIT) {
                 tokens.moveStart();
             } else {
                 tokens.move((int) sp.getStartPosition(path.getCompilationUnit(), tree));
@@ -652,15 +652,15 @@ public class JFXReformatTask implements ReformatTask {
             this.endOffset = endOffset;
         }
 
-        public static LinkedList<Diff> reformat(CompilationInfo info, JavaFXTreePath path, CodeStyle cs, int startOffset, int endOffset, boolean templateEdit) {
+        public static LinkedList<Diff> reformat(CompilationInfo info, VisageTreePath path, CodeStyle cs, int startOffset, int endOffset, boolean templateEdit) {
             Pretty pretty = new Pretty(info, path, cs, startOffset, endOffset, templateEdit);
             if (pretty.indent >= 0) {
                 pretty.scan(path, null);
             }
-            if (path.getLeaf().getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
+            if (path.getLeaf().getVisageKind() == VisageKind.COMPILATION_UNIT) {
                 pretty.tokens.moveEnd();
                 pretty.tokens.movePrevious();
-                if (pretty.tokens.token().id() != JFXTokenId.WS || pretty.tokens.token().text().toString().indexOf(NEWLINE) < 0) {
+                if (pretty.tokens.token().id() != VSGTokenId.WS || pretty.tokens.token().text().toString().indexOf(NEWLINE) < 0) {
                     String text = FXSourceUtils.getText(info);
                     pretty.diffs.addFirst(new Diff(text.length(), text.length(), NEWLINE));
                 }
@@ -668,12 +668,12 @@ public class JFXReformatTask implements ReformatTask {
             return pretty.diffs;
         }
 
-        public static LinkedList<Diff> reformat(CompilationInfo info, String text, TokenSequence<JFXTokenId> tokens, JavaFXTreePath path, CodeStyle cs) {
+        public static LinkedList<Diff> reformat(CompilationInfo info, String text, TokenSequence<VSGTokenId> tokens, VisageTreePath path, CodeStyle cs) {
             Pretty pretty = new Pretty(info, text, tokens, path, cs, 0, text.length());
             pretty.scan(path, null);
             tokens.moveEnd();
             tokens.movePrevious();
-            if (tokens.token().id() != JFXTokenId.WS || tokens.token().text().toString().indexOf(NEWLINE) < 0) {
+            if (tokens.token().id() != VSGTokenId.WS || tokens.token().text().toString().indexOf(NEWLINE) < 0) {
                 pretty.diffs.addFirst(new Diff(text.length(), text.length(), NEWLINE));
             }
             return pretty.diffs;
@@ -690,7 +690,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             
             int lastEndPos = endPos;
-            if (tree != null && tree.getJavaFXKind() != JavaFXKind.COMPILATION_UNIT) {
+            if (tree != null && tree.getVisageKind() != VisageKind.COMPILATION_UNIT) {
                 if (tree instanceof FakeBlock) {
                     endPos = Integer.MAX_VALUE;
                 } else {
@@ -701,7 +701,7 @@ public class JFXReformatTask implements ReformatTask {
                 if (endPos < 0) {
                     return false;
                 }
-                // this endPos checking has been disabled due to string expression parsing bug in compiler JFXC-4061
+                // this endPos checking has been disabled due to string expression parsing bug in compiler VSGC-4061
 //                if (tokens.offset() <= endPos) {
                     final Boolean scan = super.scan(tree, p);
 //                    final Boolean scan = super.myScan(tree, p);
@@ -718,7 +718,7 @@ public class JFXReformatTask implements ReformatTask {
             ExpressionTree pkg = node.getPackageName();
             if (pkg != null) {
                 blankLines(cs.getBlankLinesBeforePackage());
-                accept(JFXTokenId.PACKAGE);
+                accept(VSGTokenId.PACKAGE);
                 int old = indent;
                 indent += continuationIndentSize;
                 space();
@@ -728,7 +728,7 @@ public class JFXReformatTask implements ReformatTask {
                 blankLines(cs.getBlankLinesAfterPackage());
             }
 
-            // imports in javafx could be where ever
+            // imports in visage could be where ever
             cuTrees = getCUTrees(node);
             if (cuTrees != null && !cuTrees.isEmpty()) {
 //                boolean semiRead = false;
@@ -737,7 +737,7 @@ public class JFXReformatTask implements ReformatTask {
                 for (int i = 0; i < treeArray.length; i++) {
                     Tree tree = treeArray[i];
                     boolean isLastInCU = i == treeArray.length - 1;
-                    JavaFXKind kind = tree.getJavaFXKind();
+                    VisageKind kind = tree.getVisageKind();
                     switch (kind) {
                         case IMPORT:
                             blankLines(cs.getBlankLinesBeforeImports());
@@ -805,32 +805,32 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        private static boolean isFirstMemberOfSuchKind(int i, final Tree[] treeArray, JavaFXKind kind) {
-            return (i == 0) || (i > 0 && treeArray[i - 1].getJavaFXKind() != kind);
+        private static boolean isFirstMemberOfSuchKind(int i, final Tree[] treeArray, VisageKind kind) {
+            return (i == 0) || (i > 0 && treeArray[i - 1].getVisageKind() != kind);
         }
 
-        private static boolean isLastMemberOfSuchKind(int i, final Tree[] treeArray, JavaFXKind kind) {
+        private static boolean isLastMemberOfSuchKind(int i, final Tree[] treeArray, VisageKind kind) {
             int l = treeArray.length;
-            return (i == l - 1) || (i < l - 2 && treeArray[i + 1].getJavaFXKind() != kind);
+            return (i == l - 1) || (i < l - 2 && treeArray[i + 1].getVisageKind() != kind);
         }
 
         @Override
         public Boolean visitInitDefinition(InitDefinitionTree node, Void p) {
-            accept(JFXTokenId.INIT);
+            accept(VSGTokenId.INIT);
             scan(node.getBody(), p);
             return true;
         }
 
         @Override
         public Boolean visitPostInitDefinition(InitDefinitionTree node, Void p) {
-            accept(JFXTokenId.POSTINIT);
+            accept(VSGTokenId.POSTINIT);
             scan(node.getBody(), p);
             return true;
         }
 
         @Override
         public Boolean visitImport(ImportTree node, Void p) {
-            accept(JFXTokenId.IMPORT);
+            accept(VSGTokenId.IMPORT);
             int old = indent;
             indent += continuationIndentSize;
             space();
@@ -843,7 +843,7 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitClassDeclaration(ClassDeclarationTree node, Void p) {
             // members without class belong to synthetic one
-            boolean isClassSynthetic = isSynthetic((JFXTree) node);
+            boolean isClassSynthetic = isSynthetic((VSGTree) node);
             if (!isClassSynthetic) {
                 int old = indent;
                 ModifiersTree mods = node.getModifiers();
@@ -858,14 +858,14 @@ public class JFXReformatTask implements ReformatTask {
                     }
                 }
 
-                accept(JFXTokenId.CLASS);
+                accept(VSGTokenId.CLASS);
                 if (indent == old) {
                     indent += continuationIndentSize;
                 }
                 space();
                 final Name simpleName = node.getSimpleName();
                 if (simpleName != null && !ERROR.contentEquals(simpleName)) {
-                    accept(JFXTokenId.IDENTIFIER);
+                    accept(VSGTokenId.IDENTIFIER);
                 }
 
                 List<ExpressionTree> exts = new ArrayList<ExpressionTree>();
@@ -882,7 +882,7 @@ public class JFXReformatTask implements ReformatTask {
                     exts.addAll(aMixins);
                 }
                 if (exts != null && !exts.isEmpty()) {
-                    wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, JFXTokenId.EXTENDS);
+                    wrapToken(cs.wrapExtendsImplementsKeyword(), -1, 1, VSGTokenId.EXTENDS);
                     wrapExtendsList(cs.wrapExtendsImplementsList(), cs.alignMultilineImplements(), true, exts); // TODO cs.alignMultilineExtends()
                 }
                 indent = old;
@@ -894,33 +894,33 @@ public class JFXReformatTask implements ReformatTask {
                 switch (bracePlacement) {
                     case SAME_LINE:
                         spaces(spaceBeforeLeftBrace ? 1 : 0);
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         indent += indentSize;
                         break;
                     case NEW_LINE:
                         newline();
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         indent += indentSize;
                         break;
                     case NEW_LINE_HALF_INDENTED:
                         indent += (indentSize >> 1);
                         halfIndent = indent;
                         newline();
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         indent = old + indentSize;
                         break;
                     case NEW_LINE_INDENTED:
                         indent += indentSize;
                         halfIndent = indent;
                         newline();
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         break;
                 }
 
                 boolean emptyClass = true;
                 final List<Tree> classMembers = node.getClassMembers();
                 for (Tree member : classMembers) {
-                    if (!isSynthetic((JFXTree) member)) {
+                    if (!isSynthetic((VSGTree) member)) {
                         emptyClass = false;
                         break;
                     }
@@ -939,7 +939,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 indent = halfIndent;
                 processWSBeforeRB();
-                accept(JFXTokenId.RBRACE);
+                accept(VSGTokenId.RBRACE);
                 indent = old;
             } else {
                 processClassMembers(node.getClassMembers(), p, false, true);
@@ -951,19 +951,19 @@ public class JFXReformatTask implements ReformatTask {
             boolean first = true;
             boolean semiRead = false;
             for (Tree member : members) {
-//                if (member.getJavaFXKind() == JavaFXKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
+//                if (member.getVisageKind() == VisageKind.CLASS_DECLARATION && cuTrees != null && cuTrees.contains(member)) {
                 if (ignoreTopLevel && cuTrees != null && cuTrees.contains(member)) {
                     // this member has been already processed in visitCompilationUnit()
                     continue;
                 }
 
                 boolean magicFunc = false;
-                if (member instanceof JFXFunctionDefinition) {
-                    String name = ((JFXFunctionDefinition) member).getName().toString();
-                    magicFunc = MAGIC_FUNCTION.contentEquals(name) && isSynthetic((JFXTree) member);
+                if (member instanceof VSGFunctionDefinition) {
+                    String name = ((VSGFunctionDefinition) member).getName().toString();
+                    magicFunc = MAGIC_FUNCTION.contentEquals(name) && isSynthetic((VSGTree) member);
                 }
-                if (magicFunc || !isSynthetic((JFXTree) member)) {
-                    switch (member.getJavaFXKind()) {
+                if (magicFunc || !isSynthetic((VSGTree) member)) {
+                    switch (member.getVisageKind()) {
                         case VARIABLE:
                             boolean bool = tokens.moveNext();
                             if (bool) {
@@ -1046,11 +1046,11 @@ public class JFXReformatTask implements ReformatTask {
                     diffs.removeFirst();
                 }
             } else if (tokens.movePrevious()) {
-                if (tokens.token().id() == JFXTokenId.WS) {
+                if (tokens.token().id() == VSGTokenId.WS) {
                     StringBuilder t1 = new StringBuilder();
                     do {
                         t1.append(tokens.token().text().toString());
-                    } while (tokens.moveNext() && tokens.token().id() == JFXTokenId.WS);
+                    } while (tokens.moveNext() && tokens.token().id() == VSGTokenId.WS);
 
                     String text = t1.toString();
 
@@ -1063,7 +1063,7 @@ public class JFXReformatTask implements ReformatTask {
                             addDiff(new Diff(tokens.offset() + idx + 1, tokens.offset() + tokens.token().length(), ind));
                         }
                     } else if (tokens.movePrevious()) {
-                        if (tokens.token().id() == JFXTokenId.LINE_COMMENT) {
+                        if (tokens.token().id() == VSGTokenId.LINE_COMMENT) {
                             tokens.moveNext();
                             String ind = getIndent();
                             if (!ind.equals(text)) {
@@ -1089,13 +1089,13 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private Boolean _visitVariable(VariableTree node, Void p) {
-            if (isSynthetic((JFXTree) node)) {
+            if (isSynthetic((VSGTree) node)) {
                 return false;
             }
 
             int old = indent;
             Tree parent = getCurrentPath().getParentPath().getLeaf();
-            boolean insideFor = parent.getJavaFXKind() == JavaFXKind.FOR_EXPRESSION_FOR;
+            boolean insideFor = parent.getVisageKind() == VisageKind.FOR_EXPRESSION_FOR;
             ModifiersTree mods = node.getModifiers();
             if (ReformatUtils.hasModifiers(mods, tokens.token().id())) {
                 if (scan(mods, p)) {
@@ -1115,7 +1115,7 @@ public class JFXReformatTask implements ReformatTask {
                 indent += continuationIndentSize;
             }
 
-            JFXTokenId accepted = acceptAndRollback(ReformatUtils.VARIABLE_KEYWORDS);
+            VSGTokenId accepted = acceptAndRollback(ReformatUtils.VARIABLE_KEYWORDS);
             // put space if this VAR is not parameter
             if (ReformatUtils.VARIABLE_KEYWORDS.contains(accepted)) {
                 accept(ReformatUtils.VARIABLE_KEYWORDS);
@@ -1124,23 +1124,23 @@ public class JFXReformatTask implements ReformatTask {
 
             final Name name = node.getName();
             if (name != null && !ERROR.contentEquals(name)) {
-                accept(JFXTokenId.IDENTIFIER);
+                accept(VSGTokenId.IDENTIFIER);
             }
 
             final Tree type = node.getType();
-            if (type != null && type.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+            if (type != null && type.getVisageKind() != VisageKind.TYPE_UNKNOWN) {
                 // #180145
                 if (processColon()) {
                     if (type instanceof TypeArrayTree) {
-                        if (acceptAndRollback(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
-                            accept(JFXTokenId.NATIVEARRAY);
+                        if (acceptAndRollback(VSGTokenId.NATIVEARRAY) == VSGTokenId.NATIVEARRAY) {
+                            accept(VSGTokenId.NATIVEARRAY);
                             space();
-                            //                        accept(JFXTokenId.OF);
-                            accept(JFXTokenId.IDENTIFIER); // lexer bug?
+                            //                        accept(VSGTokenId.OF);
+                            accept(VSGTokenId.IDENTIFIER); // lexer bug?
                             space();
                         }
-                        //                } else if (type.getJavaFXKind() == JavaFXKind.TYPE_FUNCTIONAL) {
-                        //                    accept(JFXTokenId.FUNCTION);
+                        //                } else if (type.getVisageKind() == VisageKind.TYPE_FUNCTIONAL) {
+                        //                    accept(VSGTokenId.FUNCTION);
                         //                    spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
                     }
                     scan(type, p);
@@ -1157,21 +1157,21 @@ public class JFXReformatTask implements ReformatTask {
                     }
                 }
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                accept(JFXTokenId.EQ);
+                accept(VSGTokenId.EQ);
 
                 final JavafxBindStatus bindStatus = node.getBindStatus();
                 if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
                     spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                    accept(JFXTokenId.BIND);
+                    accept(VSGTokenId.BIND);
                 }
 
                 wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, false, initTree);
 
                 if (bindStatus.isBidiBind()) {
                     space();
-                    accept(JFXTokenId.WITH);
+                    accept(VSGTokenId.WITH);
                     space();
-                    accept(JFXTokenId.INVERSE);
+                    accept(VSGTokenId.INVERSE);
                 }
             }
 
@@ -1187,7 +1187,7 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitFunctionDefinition(FunctionDefinitionTree node, Void p) {
-            JFXFunctionDefinition funcDef = (JFXFunctionDefinition) node;
+            VSGFunctionDefinition funcDef = (VSGFunctionDefinition) node;
             boolean magicOverridenFunc = MAGIC_FUNCTION.contentEquals(funcDef.getName());
             boolean magicFunc = magicOverridenFunc && isSynthetic(funcDef);
 
@@ -1198,10 +1198,10 @@ public class JFXReformatTask implements ReformatTask {
             int old = indent;
 
             // TODO work around for magic function modifiers compiler bug
-            // JFXC-3633
+            // VSGC-3633
             if (magicOverridenFunc) { // even more magic!
                 // ---
-                JFXTokenId id = null;
+                VSGTokenId id = null;
                 while (tokens.offset() < endPos) {
                     if (id != null) {
                         space();
@@ -1230,42 +1230,42 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
-            accept(JFXTokenId.FUNCTION);
+            accept(VSGTokenId.FUNCTION);
             space();
 
             if (!ERROR.contentEquals(funcDef.getName())) {
-                accept(JFXTokenId.IDENTIFIER);
+                accept(VSGTokenId.IDENTIFIER);
             }
 
             if (indent == old) {
                 indent += continuationIndentSize;
             }
             spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
-            List<? extends JFXVar> params = funcDef.getParams();
+            accept(VSGTokenId.LPAREN);
+            List<? extends VSGVar> params = funcDef.getParams();
 //            if (params != null && !params.isEmpty() && !magicOverridenFunc) {
             if (params != null && !params.isEmpty()) {
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0, true);
                 // TODO work around for magic function modifiers compiler bug
-                // JFXC-4226
+                // VSGC-4226
                 if (magicOverridenFunc) {
-                    accept(JFXTokenId.IDENTIFIER);
+                    accept(VSGTokenId.IDENTIFIER);
                     processColon();
-                    accept(JFXTokenId.IDENTIFIER);
-                    accept(JFXTokenId.LBRACKET);
+                    accept(VSGTokenId.IDENTIFIER);
+                    accept(VSGTokenId.LBRACKET);
 //                    if (cs.spaceWithinArrayInitBrackets()) {
 //                        space();
 //                    }
-                    accept(JFXTokenId.RBRACKET);
+                    accept(VSGTokenId.RBRACKET);
                 } else {
                     wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, false, params);
                 }
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
             }
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
 
-            JFXType retType = funcDef.getJFXReturnType();
-            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+            VSGType retType = funcDef.getVSGReturnType();
+            if (retType != null && retType.getVisageKind() != VisageKind.TYPE_UNKNOWN) {
                 // #179454, if function is overriden then return type could be not specified
                 if (processColon()) {
                     scan(retType, p);
@@ -1273,7 +1273,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             indent = old;
 
-            JFXBlock body = funcDef.getBodyExpression();
+            VSGBlock body = funcDef.getBodyExpression();
             if (body != null) {
                 scan(body, p);
 //            } else if (!magicFunc) {
@@ -1285,22 +1285,22 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitFunctionValue(FunctionValueTree node, Void p) {
-            accept(JFXTokenId.FUNCTION);
+            accept(VSGTokenId.FUNCTION);
 
             int old = indent;
             indent += continuationIndentSize;
             spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
+            accept(VSGTokenId.LPAREN);
             List<? extends VariableTree> params = node.getParameters();
             if (params != null && !params.isEmpty()) {
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0, true);
                 wrapList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), false, false, params);
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
             }
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
 
             TypeTree retType = node.getType();
-            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+            if (retType != null && retType.getVisageKind() != VisageKind.TYPE_UNKNOWN) {
                 if (processColon()) {
                     scan(retType, p);
                 }
@@ -1316,7 +1316,7 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitModifiers(ModifiersTree node, Void p) {
-            JFXTokenId id = null;
+            VSGTokenId id = null;
             while (tokens.offset() < endPos) {
                 if (id != null) {
                     space();
@@ -1338,15 +1338,15 @@ public class JFXReformatTask implements ReformatTask {
 
             Tree parentTree = getCurrentPath().getParentPath().getLeaf();
             boolean magicFunc = false;
-            if (parentTree instanceof JFXFunctionDefinition) {
-                String name = ((JFXFunctionDefinition) parentTree).getName().toString();
-                magicFunc = MAGIC_FUNCTION.contentEquals(name) && isSynthetic((JFXTree) parentTree);
+            if (parentTree instanceof VSGFunctionDefinition) {
+                String name = ((VSGFunctionDefinition) parentTree).getName().toString();
+                magicFunc = MAGIC_FUNCTION.contentEquals(name) && isSynthetic((VSGTree) parentTree);
             }
 
             int halfIndent = 0;
             int old = 0;
             if (!magicFunc) {
-                switch (parentTree.getJavaFXKind()) {
+                switch (parentTree.getVisageKind()) {
                     case CLASS_DECLARATION:
                     case INSTANTIATE_NEW:
                         bracePlacement = cs.getClassDeclBracePlacement();
@@ -1395,7 +1395,7 @@ public class JFXReformatTask implements ReformatTask {
                         break;
                     case CONDITIONAL_EXPRESSION:
                         bracePlacement = cs.getOtherBracePlacement();
-                        if (((JFXIfExpression) parentTree).getTrueExpression() == node) {
+                        if (((VSGIfExpression) parentTree).getTrueExpression() == node) {
                             spaceBeforeLeftBrace = cs.spaceBeforeIfLeftBrace();
                         } else {
                             spaceBeforeLeftBrace = cs.spaceBeforeElseLeftBrace();
@@ -1417,7 +1417,7 @@ public class JFXReformatTask implements ReformatTask {
                             lastBlankLinesTokenIndex = -1;
                             lastBlankLinesDiff = null;
                         } else {
-                            accept(JFXTokenId.LBRACE);
+                            accept(VSGTokenId.LBRACE);
                         }
                         indent += indentSize;
                         break;
@@ -1430,7 +1430,7 @@ public class JFXReformatTask implements ReformatTask {
                             lastBlankLinesTokenIndex = -1;
                             lastBlankLinesDiff = null;
                         } else {
-                            accept(JFXTokenId.LBRACE);
+                            accept(VSGTokenId.LBRACE);
                             indent += indentSize;
                         }
                         break;
@@ -1445,7 +1445,7 @@ public class JFXReformatTask implements ReformatTask {
                             lastBlankLinesTokenIndex = -1;
                             lastBlankLinesDiff = null;
                         } else {
-                            accept(JFXTokenId.LBRACE);
+                            accept(VSGTokenId.LBRACE);
                             indent = old + indentSize;
                         }
                         break;
@@ -1459,7 +1459,7 @@ public class JFXReformatTask implements ReformatTask {
                             lastBlankLinesTokenIndex = -1;
                             lastBlankLinesDiff = null;
                         } else {
-                            accept(JFXTokenId.LBRACE);
+                            accept(VSGTokenId.LBRACE);
                         }
                         break;
                 }
@@ -1467,7 +1467,7 @@ public class JFXReformatTask implements ReformatTask {
 //            boolean isEmpty = true;
             final List<ExpressionTree> expressions = getBlockMembers(node);
             for (ExpressionTree expression : expressions) {
-                if (magicFunc || !isSynthetic((JFXTree) node)) {
+                if (magicFunc || !isSynthetic((VSGTree) node)) {
 //                    isEmpty = false;
                     if (node instanceof FakeBlock) {
                         appendToDiff(getNewlines(1) + getIndent());
@@ -1488,9 +1488,9 @@ public class JFXReformatTask implements ReformatTask {
             }
 
 // TODO do the same as in Reformatter - see processWSBeforeRB()
-//            if (acceptAndRollback(JFXTokenId.LINE_COMMENT) == JFXTokenId.LINE_COMMENT) {
+//            if (acceptAndRollback(VSGTokenId.LINE_COMMENT) == VSGTokenId.LINE_COMMENT) {
 //               spaces(0, true);
-//               accept(JFXTokenId.LINE_COMMENT);
+//               accept(VSGTokenId.LINE_COMMENT);
 //            }
 
 //            if (isEmpty || templateEdit) {
@@ -1546,7 +1546,7 @@ public class JFXReformatTask implements ReformatTask {
                         blankLines();
                     }
                     processWSBeforeRB();
-                    accept(JFXTokenId.RBRACE);
+                    accept(VSGTokenId.RBRACE);
                     indent = old;
                 }
             }
@@ -1561,8 +1561,8 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitMemberSelect(MemberSelectTree node, Void p) {
             scan(node.getExpression(), p);
-            accept(JFXTokenId.DOT);
-            accept(JFXTokenId.IDENTIFIER, JFXTokenId.STAR, JFXTokenId.THIS, JFXTokenId.SUPER, JFXTokenId.CLASS);
+            accept(VSGTokenId.DOT);
+            accept(VSGTokenId.IDENTIFIER, VSGTokenId.STAR, VSGTokenId.THIS, VSGTokenId.SUPER, VSGTokenId.CLASS);
             return true;
         }
 
@@ -1570,24 +1570,24 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitMethodInvocation(FunctionInvocationTree node, Void p) {
             ExpressionTree ms = node.getMethodSelect();
-            if (ms.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) {
+            if (ms.getVisageKind() == VisageKind.MEMBER_SELECT) {
                 ExpressionTree exp = ((MemberSelectTree) ms).getExpression();
                 scan(exp, p);
-                accept(JFXTokenId.DOT);
+                accept(VSGTokenId.DOT);
 
                 CodeStyle.WrapStyle wrapStyle = cs.wrapChainedMethodCalls();
-                if (exp.getJavaFXKind() == JavaFXKind.METHOD_INVOCATION) {
-                    wrapToken(wrapStyle, -1, 0, JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
+                if (exp.getVisageKind() == VisageKind.METHOD_INVOCATION) {
+                    wrapToken(wrapStyle, -1, 0, VSGTokenId.IDENTIFIER, VSGTokenId.THIS, VSGTokenId.SUPER);
                 } else {
                     int index = tokens.index();
                     int c = col;
                     Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                    accept(JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
+                    accept(VSGTokenId.IDENTIFIER, VSGTokenId.THIS, VSGTokenId.SUPER);
                     // TODO what is that?
                     if (wrapStyle != CodeStyle.WrapStyle.WRAP_NEVER && col > rightMargin && c > indent && (wrapDepth == 0 || c <= rightMargin)) {
                         rollback(index, c, d);
                         newline();
-                        accept(JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
+                        accept(VSGTokenId.IDENTIFIER, VSGTokenId.THIS, VSGTokenId.SUPER);
                     }
                 }
             } else {
@@ -1595,38 +1595,38 @@ public class JFXReformatTask implements ReformatTask {
             }
 
             spaces(cs.spaceBeforeMethodCallParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
+            accept(VSGTokenId.LPAREN);
             List<? extends ExpressionTree> args = node.getArguments();
             if (args != null && !args.isEmpty()) {
                 spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
                 wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, false, args);
                 spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0);
             }
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
             return true;
         }
 
         // Java NewClassTree --> InstantiateTree
         @Override
         public Boolean visitInstantiate(InstantiateTree node, Void p) {
-            // JFXC-3545
-            final boolean isNewKeyWordUsed = acceptAndRollback(JFXTokenId.NEW) == JFXTokenId.NEW;
+            // VSGC-3545
+            final boolean isNewKeyWordUsed = acceptAndRollback(VSGTokenId.NEW) == VSGTokenId.NEW;
             if (isNewKeyWordUsed) {
-                accept(JFXTokenId.NEW);
+                accept(VSGTokenId.NEW);
                 space();
             }
 
             scan(node.getIdentifier(), p);
 
             if (isNewKeyWordUsed) {
-                accept(JFXTokenId.LPAREN);
+                accept(VSGTokenId.LPAREN);
                 List<? extends ExpressionTree> args = node.getArguments();
                 if (args != null && !args.isEmpty()) {
                     spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0, true);
                     wrapList(cs.wrapMethodCallArgs(), cs.alignMultilineCallArgs(), false, false, args);
                     spaces(cs.spaceWithinFunctionCallParens() ? 1 : 0);
                 }
-                accept(JFXTokenId.RPAREN);
+                accept(VSGTokenId.RPAREN);
 
                 ClassDeclarationTree body = node.getClassBody();
                 if (body != null) {
@@ -1639,26 +1639,26 @@ public class JFXReformatTask implements ReformatTask {
                 switch (bracePlacement) {
                     case SAME_LINE:
                         spaces(cs.spaceBeforeObjectLiteralDeclLeftBrace() ? 1 : 0);
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         indent += indentSize;
                         break;
                     case NEW_LINE:
                         newline();
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         indent += indentSize;
                         break;
                     case NEW_LINE_HALF_INDENTED:
                         indent += (indentSize >> 1);
                         halfIndent = indent;
                         newline();
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         indent = old + indentSize;
                         break;
                     case NEW_LINE_INDENTED:
                         indent += indentSize;
                         halfIndent = indent;
                         newline();
-                        accept(JFXTokenId.LBRACE);
+                        accept(VSGTokenId.LBRACE);
                         break;
                 }
 
@@ -1678,7 +1678,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 indent = halfIndent;
                 spaces(cs.spaceWithinBraces() && !members.isEmpty() ? 1 : 0, true);
-                accept(JFXTokenId.RBRACE);
+                accept(VSGTokenId.RBRACE);
                 indent = old;
             }
             
@@ -1688,9 +1688,9 @@ public class JFXReformatTask implements ReformatTask {
         @Override
         public Boolean visitReturn(ReturnTree node, Void p) {
             // compiler bug with dissappearing return keyword
-            boolean accepted = acceptAndRollback(JFXTokenId.RETURN) == JFXTokenId.RETURN;
+            boolean accepted = acceptAndRollback(VSGTokenId.RETURN) == VSGTokenId.RETURN;
             if (accepted) {
-                accept(JFXTokenId.RETURN);
+                accept(VSGTokenId.RETURN);
             }
             int old = indent;
             indent += continuationIndentSize;
@@ -1707,7 +1707,7 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitThrow(ThrowTree node, Void p) {
-            accept(JFXTokenId.THROW);
+            accept(VSGTokenId.THROW);
             int old = indent;
             indent += continuationIndentSize;
             ExpressionTree exp = node.getExpression();
@@ -1722,7 +1722,7 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitTry(TryTree node, Void p) {
-            accept(JFXTokenId.TRY);
+            accept(VSGTokenId.TRY);
             scan(node.getBlock(), p);
             for (CatchTree catchTree : node.getCatches()) {
                 if (cs.placeCatchOnNewLine()) {
@@ -1739,7 +1739,7 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     spaces(cs.spaceBeforeFinally() ? 1 : 0);
                 }
-                accept(JFXTokenId.FINALLY);
+                accept(VSGTokenId.FINALLY);
                 scan(finallyBlockTree, p);
             }
             return true;
@@ -1747,15 +1747,15 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitCatch(CatchTree node, Void p) {
-            accept(JFXTokenId.CATCH);
+            accept(VSGTokenId.CATCH);
             int old = indent;
             indent += continuationIndentSize;
             spaces(cs.spaceBeforeCatchParen() ? 1 : 0);
-            accept(JFXTokenId.LPAREN);
+            accept(VSGTokenId.LPAREN);
             spaces(cs.spaceWithinCatchParens() ? 1 : 0);
             scan(node.getParameter(), p);
             spaces(cs.spaceWithinCatchParens() ? 1 : 0);
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
             indent = old;
             scan(node.getBlock(), p);
             return true;
@@ -1763,20 +1763,20 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitWhileLoop(WhileLoopTree node, Void p) {
-            accept(JFXTokenId.WHILE);
+            accept(VSGTokenId.WHILE);
             int old = indent;
             indent += continuationIndentSize;
             spaces(cs.spaceBeforeWhileParen() ? 1 : 0);
             // missing parenthesized work around
-            boolean wrapped = acceptAndRollback(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            boolean wrapped = acceptAndRollback(VSGTokenId.LPAREN) == VSGTokenId.LPAREN;
             if (wrapped) {
-                accept(JFXTokenId.LPAREN);
+                accept(VSGTokenId.LPAREN);
                 spaces(cs.spaceWithinWhileParens() ? 1 : 0, true);
             }
             scan(node.getCondition(), p);
             if (wrapped) {
                 spaces(cs.spaceWithinWhileParens() ? 1 : 0);
-                accept(JFXTokenId.RPAREN);
+                accept(VSGTokenId.RPAREN);
             }
             indent = old;
             CodeStyle.BracesGenerationStyle redundantWhileBraces = cs.redundantWhileBraces();
@@ -1789,12 +1789,12 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitForExpression(ForExpressionTree node, Void p) {
-            if (acceptAndRollback(JFXTokenId.FOR) == JFXTokenId.FOR) { // FOR_EXPRESSION
-                accept(JFXTokenId.FOR);
+            if (acceptAndRollback(VSGTokenId.FOR) == VSGTokenId.FOR) { // FOR_EXPRESSION
+                accept(VSGTokenId.FOR);
                 int old = indent;
                 indent += continuationIndentSize;
                 spaces(cs.spaceBeforeForParen() ? 1 : 0);
-                accept(JFXTokenId.LPAREN);
+                accept(VSGTokenId.LPAREN);
                 spaces(cs.spaceWithinForParens() ? 1 : 0, true);
 
                 List<? extends ForExpressionInClauseTree> clauses = node.getInClauses();
@@ -1804,13 +1804,13 @@ public class JFXReformatTask implements ReformatTask {
                         scan(feict, p);
                         if (it.hasNext()) {
                             spaces(cs.spaceBeforeComma() ? 1 : 0);
-                            accept(JFXTokenId.COMMA);
+                            accept(VSGTokenId.COMMA);
                             spaces(cs.spaceAfterComma() ? 1 : 0);
                         }
                     }
                 }
                 spaces(cs.spaceWithinForParens() ? 1 : 0);
-                accept(JFXTokenId.RPAREN);
+                accept(VSGTokenId.RPAREN);
                 indent = old;
 
                 ExpressionTree bodyExpression = node.getBodyExpression();
@@ -1827,18 +1827,18 @@ public class JFXReformatTask implements ReformatTask {
                 ForExpressionInClauseTree feict = node.getInClauses().get(0);
                 scan(feict.getSequenceExpression(), p);
                 spaces(cs.spaceBeforeSequenceInitLeftBrace() ? 1 : 0, false);
-                accept(JFXTokenId.LBRACKET);
+                accept(VSGTokenId.LBRACKET);
                 int old = indent;
                 indent += indentSize;
                 spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
                 scan(feict.getVariable(), p);
                 spaces(cs.spaceAroundBinaryOps() ? 1 : 0, false);
-                accept(JFXTokenId.PIPE);
+                accept(VSGTokenId.PIPE);
                 spaces(cs.spaceAroundBinaryOps() ? 1 : 0, false);
                 scan(feict.getWhereExpression(), p);
                 spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
                 indent = old;
-                accept(JFXTokenId.RBRACKET);
+                accept(VSGTokenId.RBRACKET);
             }
 
             return true;
@@ -1848,13 +1848,13 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitForExpressionInClause(ForExpressionInClauseTree node, Void p) {
             scan(node.getVariable(), p);
             space();
-            accept(JFXTokenId.IN);
+            accept(VSGTokenId.IN);
             space();
             scan(node.getSequenceExpression(), p);
             ExpressionTree whereExpression = node.getWhereExpression();
             if (whereExpression != null) {
                 space();
-                accept(JFXTokenId.WHERE);
+                accept(VSGTokenId.WHERE);
                 space();
                 scan(whereExpression, p);
             }
@@ -1863,12 +1863,12 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitBreak(BreakTree node, Void p) {
-            accept(JFXTokenId.BREAK);
-            // TODO check, there should be no label in javafx
+            accept(VSGTokenId.BREAK);
+            // TODO check, there should be no label in visage
             Name label = node.getLabel();
             if (label != null) {
                 space();
-                accept(JFXTokenId.IDENTIFIER);
+                accept(VSGTokenId.IDENTIFIER);
             }
             processSemicolon();
             return true;
@@ -1876,11 +1876,11 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitContinue(ContinueTree node, Void p) {
-            accept(JFXTokenId.CONTINUE);
-            Name label = node.getLabel(); // TODO there is no label in javafx, check it
+            accept(VSGTokenId.CONTINUE);
+            Name label = node.getLabel(); // TODO there is no label in visage, check it
             if (label != null) {
                 space();
-                accept(JFXTokenId.IDENTIFIER);
+                accept(VSGTokenId.IDENTIFIER);
             }
             processSemicolon();
             return true;
@@ -1894,7 +1894,7 @@ public class JFXReformatTask implements ReformatTask {
             boolean b = scan(node.getVariable(), p);
             if (b) {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                accept(JFXTokenId.EQ);
+                accept(VSGTokenId.EQ);
                 ExpressionTree expr = node.getExpression();
                 wrapTree(cs.wrapAssignOps(), alignIndent, cs.spaceAroundAssignOps() ? 1 : 0, false, expr);
             } else {
@@ -1933,17 +1933,17 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitTypeArray(TypeArrayTree node, Void p) {
-            if (acceptAndRollback(JFXTokenId.NATIVEARRAY) == JFXTokenId.NATIVEARRAY) {
-                accept(JFXTokenId.NATIVEARRAY);
+            if (acceptAndRollback(VSGTokenId.NATIVEARRAY) == VSGTokenId.NATIVEARRAY) {
+                accept(VSGTokenId.NATIVEARRAY);
                 space();
-                accept(JFXTokenId.IDENTIFIER); // non-reserved keyword "of"?
+                accept(VSGTokenId.IDENTIFIER); // non-reserved keyword "of"?
                 space();
             }
 
             boolean ret = scan(node.getElementType(), p);
-            if (acceptAndRollback(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
-                accept(JFXTokenId.LBRACKET);
-                accept(JFXTokenId.RBRACKET);
+            if (acceptAndRollback(VSGTokenId.LBRACKET) == VSGTokenId.LBRACKET) {
+                accept(VSGTokenId.LBRACKET);
+                accept(VSGTokenId.RBRACKET);
             }
             return ret;
         }
@@ -1953,48 +1953,48 @@ public class JFXReformatTask implements ReformatTask {
             // #177106: TypeClass before MemberSelect
             boolean dot = true;
             while (dot) {
-                accept(JFXTokenId.IDENTIFIER, JFXTokenId.STAR, JFXTokenId.THIS, JFXTokenId.SUPER, JFXTokenId.CLASS);
-                dot = acceptAndRollback(JFXTokenId.DOT) == JFXTokenId.DOT;
+                accept(VSGTokenId.IDENTIFIER, VSGTokenId.STAR, VSGTokenId.THIS, VSGTokenId.SUPER, VSGTokenId.CLASS);
+                dot = acceptAndRollback(VSGTokenId.DOT) == VSGTokenId.DOT;
                 if (dot) {
-                    accept(JFXTokenId.DOT);
+                    accept(VSGTokenId.DOT);
                 }
             }
 
-            // JFXC-3954
-            boolean quoted = acceptAndRollback(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            // VSGC-3954
+            boolean quoted = acceptAndRollback(VSGTokenId.LPAREN) == VSGTokenId.LPAREN;
             if (quoted) {
-                accept(JFXTokenId.LPAREN);
+                accept(VSGTokenId.LPAREN);
                 scan(node.getClassName(), p);
-                accept(JFXTokenId.RPAREN);
+                accept(VSGTokenId.RPAREN);
             }
 
             // sequence type
-            if (acceptAndRollback(JFXTokenId.LBRACKET) == JFXTokenId.LBRACKET) {
-                accept(JFXTokenId.LBRACKET);
+            if (acceptAndRollback(VSGTokenId.LBRACKET) == VSGTokenId.LBRACKET) {
+                accept(VSGTokenId.LBRACKET);
 //                if (cs.spaceWithinArrayInitBrackets()) {
 //                    space();
 //                }
-                accept(JFXTokenId.RBRACKET);
+                accept(VSGTokenId.RBRACKET);
             }
             return true;
         }
 
         @Override
         public Boolean visitTypeFunctional(TypeFunctionalTree node, Void p) {
-            if (acceptAndRollback(JFXTokenId.FUNCTION) == JFXTokenId.FUNCTION) {
-                accept(JFXTokenId.FUNCTION);
+            if (acceptAndRollback(VSGTokenId.FUNCTION) == VSGTokenId.FUNCTION) {
+                accept(VSGTokenId.FUNCTION);
                 spaces(cs.spaceBeforeMethodDeclParen() ? 1 : 0);
             }
-            accept(JFXTokenId.LPAREN);
+            accept(VSGTokenId.LPAREN);
             List<? extends TypeTree> params = node.getParameters();
             if (params != null && !params.isEmpty()) {
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0, true);
                 wrapFunctionalParamList(cs.wrapMethodParams(), cs.alignMultilineMethodParams(), params);
                 spaces(cs.spaceWithinFunctionDeclParens() ? 1 : 0);
             }
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
             TypeTree retType = node.getReturnType();
-            if (retType != null && retType.getJavaFXKind() != JavaFXKind.TYPE_UNKNOWN) {
+            if (retType != null && retType.getVisageKind() != VisageKind.TYPE_UNKNOWN) {
                 if (processColon()) {
                     scan(retType, p);
                 }
@@ -2016,28 +2016,28 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitIdentifier(IdentifierTree node, Void p) {
-            accept(JFXTokenId.IDENTIFIER, JFXTokenId.THIS, JFXTokenId.SUPER);
+            accept(VSGTokenId.IDENTIFIER, VSGTokenId.THIS, VSGTokenId.SUPER);
             return true;
         }
 
         @Override
         public Boolean visitUnary(UnaryTree node, Void p) {
-            final JFXTokenId id = tokens.token().id();
-            final JavaFXKind kind = node.getJavaFXKind();
-            if (kind == JavaFXKind.SIZEOF) {
-                accept(JFXTokenId.SIZEOF);
+            final VSGTokenId id = tokens.token().id();
+            final VisageKind kind = node.getVisageKind();
+            if (kind == VisageKind.SIZEOF) {
+                accept(VSGTokenId.SIZEOF);
                 space();
                 scan(node.getExpression(), p);
-            } else if (kind == JavaFXKind.INDEXOF) {
-                accept(JFXTokenId.INDEXOF);
+            } else if (kind == VisageKind.INDEXOF) {
+                accept(VSGTokenId.INDEXOF);
                 space();
                 scan(node.getExpression(), p);
-            } else if (kind == JavaFXKind.LOGICAL_COMPLEMENT) {
-                accept(JFXTokenId.NOT);
+            } else if (kind == VisageKind.LOGICAL_COMPLEMENT) {
+                accept(VSGTokenId.NOT);
                 space();
                 scan(node.getExpression(), p);
-            } else if (kind == JavaFXKind.REVERSE) {
-                accept(JFXTokenId.REVERSE);
+            } else if (kind == VisageKind.REVERSE) {
+                accept(VSGTokenId.REVERSE);
                 space();
                 scan(node.getExpression(), p);
             } else if (OPERATOR.equals(id.primaryCategory())) {
@@ -2081,33 +2081,33 @@ public class JFXReformatTask implements ReformatTask {
         // "if else" is here
         @Override
         public Boolean visitConditionalExpression(ConditionalExpressionTree node, Void p) {
-            JFXIfExpression ifExpr = (JFXIfExpression) node;
+            VSGIfExpression ifExpr = (VSGIfExpression) node;
             
-            accept(JFXTokenId.IF);
+            accept(VSGTokenId.IF);
             int old = indent;
             indent += continuationIndentSize;
             spaces(cs.spaceBeforeIfParen() ? 1 : 0);
 
             // missing parenthesized work around
-            boolean wrapped = acceptAndRollback(JFXTokenId.LPAREN) == JFXTokenId.LPAREN;
+            boolean wrapped = acceptAndRollback(VSGTokenId.LPAREN) == VSGTokenId.LPAREN;
             if (wrapped) {
-                accept(JFXTokenId.LPAREN);
+                accept(VSGTokenId.LPAREN);
                 spaces(cs.spaceWithinIfParens() ? 1 : 0, true);
             }
             scan(ifExpr.getCondition(), p);
             if (wrapped) {
                 spaces(cs.spaceWithinIfParens() ? 1 : 0);
-                accept(JFXTokenId.RPAREN);
+                accept(VSGTokenId.RPAREN);
             }
             indent = old;
 
-            if (acceptAndRollback(JFXTokenId.THEN) == JFXTokenId.THEN) {
+            if (acceptAndRollback(VSGTokenId.THEN) == VSGTokenId.THEN) {
                 space();
-                accept(JFXTokenId.THEN);
+                accept(VSGTokenId.THEN);
             }
 
-            JFXExpression trueExpr = ifExpr.getTrueExpression();
-            JFXExpression falseExpr = ifExpr.getFalseExpression();
+            VSGExpression trueExpr = ifExpr.getTrueExpression();
+            VSGExpression falseExpr = ifExpr.getFalseExpression();
             CodeStyle.BracesGenerationStyle redundantIfBraces = cs.redundantIfBraces();
             if ((falseExpr != null && redundantIfBraces == CodeStyle.BracesGenerationStyle.ELIMINATE && danglingElseChecker.hasDanglingElse(trueExpr)) ||
                     (redundantIfBraces == CodeStyle.BracesGenerationStyle.GENERATE && (startOffset > getStartPos(ifExpr) || endOffset < getEndPos(node)))) {
@@ -2127,8 +2127,8 @@ public class JFXReformatTask implements ReformatTask {
                 } else {
                     spaces(cs.spaceBeforeElse() ? 1 : 0);
                 }
-                accept(JFXTokenId.ELSE);
-                if (falseExpr.getJavaFXKind() == JavaFXKind.CONDITIONAL_EXPRESSION && cs.specialElseIf()) {
+                accept(VSGTokenId.ELSE);
+                if (falseExpr.getVisageKind() == VisageKind.CONDITIONAL_EXPRESSION && cs.specialElseIf()) {
                     space();
                     scan(falseExpr, p);
                 } else {
@@ -2153,7 +2153,7 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitInstanceOf(InstanceOfTree node, Void p) {
             scan(node.getExpression(), p);
             space();
-            accept(JFXTokenId.INSTANCEOF);
+            accept(VSGTokenId.INSTANCEOF);
             space();
             scan(node.getType(), p);
             return true;
@@ -2161,7 +2161,7 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitIndexof(IndexofTree node, Void p) {
-            accept(JFXTokenId.INDEXOF);
+            accept(VSGTokenId.INDEXOF);
             space();
             scan(node.getForVarIdentifier(), p);
             return true;
@@ -2171,7 +2171,7 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitTypeCast(TypeCastTree node, Void p) {
             scan(node.getExpression(), p);
             space();
-            accept(JFXTokenId.AS);
+            accept(VSGTokenId.AS);
             space();
             scan(node.getType(), p);
             return true;
@@ -2179,9 +2179,9 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitParenthesized(ParenthesizedTree node, Void p) {
-            accept(JFXTokenId.LPAREN);
+            accept(VSGTokenId.LPAREN);
             boolean spaceWithinParens;
-            switch (getCurrentPath().getParentPath().getLeaf().getJavaFXKind()) {
+            switch (getCurrentPath().getParentPath().getLeaf().getVisageKind()) {
                 case FUNCTION_DEFINITION:
                     spaceWithinParens = cs.spaceWithinFunctionDeclParens();
                     break;
@@ -2206,7 +2206,7 @@ public class JFXReformatTask implements ReformatTask {
             spaces(spaceWithinParens ? 1 : 0);
             scan(node.getExpression(), p);
             spaces(spaceWithinParens ? 1 : 0);
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
             return true;
         }
 
@@ -2214,13 +2214,13 @@ public class JFXReformatTask implements ReformatTask {
         public Boolean visitInterpolateValue(InterpolateValueTree node, Void p) {
             scan(node.getAttribute(), p);
             space();
-            accept(JFXTokenId.SUCHTHAT); // nice token, LOL
+            accept(VSGTokenId.SUCHTHAT); // nice token, LOL
             space();
             scan(node.getValue(), p);
             ExpressionTree interpolation = node.getInterpolation();
             if (interpolation != null) {
                 space();
-                accept(JFXTokenId.TWEEN);
+                accept(VSGTokenId.TWEEN);
                 space();
                 scan(interpolation, p);
             }
@@ -2229,14 +2229,14 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitKeyFrameLiteral(KeyFrameLiteralTree node, Void p) {
-            accept(JFXTokenId.AT);
+            accept(VSGTokenId.AT);
             space();
-            accept(JFXTokenId.LPAREN);
+            accept(VSGTokenId.LPAREN);
             scan(node.getStartDuration(), p);
-            accept(JFXTokenId.RPAREN);
+            accept(VSGTokenId.RPAREN);
             space();
 
-            accept(JFXTokenId.LBRACE);
+            accept(VSGTokenId.LBRACE);
             int old = indent;
             indent += indentSize;
 
@@ -2256,7 +2256,7 @@ public class JFXReformatTask implements ReformatTask {
             }
             indent = old;
             spaces(0, true);
-            accept(JFXTokenId.RBRACE);
+            accept(VSGTokenId.RBRACE);
 
             return true;
         }
@@ -2274,58 +2274,58 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitObjectLiteralPart(ObjectLiteralPartTree node, Void p) {
-            accept(JFXTokenId.IDENTIFIER);
+            accept(VSGTokenId.IDENTIFIER);
             spaces(cs.spaceBeforeColon() ? 1 : 0);
-            accept(JFXTokenId.COLON);
+            accept(VSGTokenId.COLON);
             spaces(cs.spaceAfterColon() ? 1 : 0);
 
             final JavafxBindStatus bindStatus = node.getBindStatus();
             if (bindStatus.isUnidiBind() || bindStatus.isBidiBind()) {
-                JFXTokenId accepted = accept(JFXTokenId.BIND);
+                VSGTokenId accepted = accept(VSGTokenId.BIND);
                 // #186032
-                if (accepted == JFXTokenId.BIND) {
+                if (accepted == VSGTokenId.BIND) {
                     space();
                 }
             }
             scan(node.getExpression(), p);
             if (bindStatus.isBidiBind()) {
                 space();
-                accept(JFXTokenId.WITH);
+                accept(VSGTokenId.WITH);
                 space();
-                accept(JFXTokenId.INVERSE);
+                accept(VSGTokenId.INVERSE);
             }
             return true;
         }
 
         @Override
         public Boolean visitOnReplace(OnReplaceTree node, Void p) {
-            accept(JFXTokenId.ON);
+            accept(VSGTokenId.ON);
             space();
-            accept(JFXTokenId.REPLACE);
+            accept(VSGTokenId.REPLACE);
             VariableTree oldValue = node.getOldValue();
             if (oldValue != null) {
                 space();
                 scan(oldValue, p);
                 if (node.getFirstIndex() != null) {
-                    accept(JFXTokenId.LBRACKET);
+                    accept(VSGTokenId.LBRACKET);
                     spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
                     scan(node.getFirstIndex(), p);
                     spaces(cs.spaceAroundRangeOps() ? 1 : 0);
-                    accept(JFXTokenId.DOTDOT);
+                    accept(VSGTokenId.DOTDOT);
                     spaces(cs.spaceAroundRangeOps() ? 1 : 0);
                     scan(node.getLastIndex(), p);
                     spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
-                    accept(JFXTokenId.RBRACKET);
+                    accept(VSGTokenId.RBRACKET);
                 }
             }
 
-            boolean hasInitializer = acceptAndRollback(JFXTokenId.EQ) == JFXTokenId.EQ;
+            boolean hasInitializer = acceptAndRollback(VSGTokenId.EQ) == VSGTokenId.EQ;
             if (hasInitializer) {
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                accept(JFXTokenId.EQ);
+                accept(VSGTokenId.EQ);
                 spaces(cs.spaceAroundAssignOps() ? 1 : 0);
-                if (acceptAndRollback(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
-                    accept(JFXTokenId.IDENTIFIER);
+                if (acceptAndRollback(VSGTokenId.IDENTIFIER) == VSGTokenId.IDENTIFIER) {
+                    accept(VSGTokenId.IDENTIFIER);
                 }
             }
             scan(node.getBody(), p);
@@ -2353,17 +2353,17 @@ public class JFXReformatTask implements ReformatTask {
                     // #178966
                     processTranslationKey();
 
-                    // JFXC-3494, #183894
+                    // VSGC-3494, #183894
                     ExpressionTree tree = it.next();
                     if (!isQuoted) {
-                        isQuoted = acceptAndRollback(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL) == JFXTokenId.QUOTE_LBRACE_STRING_LITERAL;
+                        isQuoted = acceptAndRollback(VSGTokenId.QUOTE_LBRACE_STRING_LITERAL) == VSGTokenId.QUOTE_LBRACE_STRING_LITERAL;
                         if (isQuoted) {
-                            accept(JFXTokenId.QUOTE_LBRACE_STRING_LITERAL);
+                            accept(VSGTokenId.QUOTE_LBRACE_STRING_LITERAL);
                             spaces(0, true);
                             continue;
                         }
                     } else {
-                        if (acceptAndRollback(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) == JFXTokenId.RBRACE_QUOTE_STRING_LITERAL) {
+                        if (acceptAndRollback(VSGTokenId.RBRACE_QUOTE_STRING_LITERAL) == VSGTokenId.RBRACE_QUOTE_STRING_LITERAL) {
                             isQuoted = false;
                             quoteFinished = true;
                         }
@@ -2371,7 +2371,7 @@ public class JFXReformatTask implements ReformatTask {
                     scan(tree, p);
                     if (quoteFinished) {
                         spaces(0, true);
-                        accept(JFXTokenId.RBRACE_QUOTE_STRING_LITERAL);
+                        accept(VSGTokenId.RBRACE_QUOTE_STRING_LITERAL);
                         quoteFinished = false;
                     }
                 }
@@ -2390,35 +2390,35 @@ public class JFXReformatTask implements ReformatTask {
             return true;
         }
 
-        // TODO remove that workarounds for JFXC-3528 after switching to SoMa
+        // TODO remove that workarounds for VSGC-3528 after switching to SoMa
         @Override
         public Boolean visitLiteral(LiteralTree node, Void p) {
-            // Missing return statement, compliler bug http://javafx-jira.kenai.com/browse/JFXC-3528
+            // Missing return statement, compliler bug http://visage-jira.kenai.com/browse/VSGC-3528
             // ---
-            if (acceptAndRollback(JFXTokenId.RETURN) == JFXTokenId.RETURN) {
-                accept(JFXTokenId.RETURN);
+            if (acceptAndRollback(VSGTokenId.RETURN) == VSGTokenId.RETURN) {
+                accept(VSGTokenId.RETURN);
                 space();
             }
             // ---
 
-            JavaFXKind kind = node.getJavaFXKind();
-            if (kind == JavaFXKind.STRING_LITERAL) {
+            VisageKind kind = node.getVisageKind();
+            if (kind == VisageKind.STRING_LITERAL) {
                 Tree parent = getCurrentPath().getParentPath().getLeaf();
-                boolean insideSE = parent.getJavaFXKind() == JavaFXKind.STRING_EXPRESSION;
+                boolean insideSE = parent.getVisageKind() == VisageKind.STRING_EXPRESSION;
                 if (insideSE) {
-                    JFXTokenId accepted = accept(JFXTokenId.STRING_LITERAL, JFXTokenId.RBRACE_LBRACE_STRING_LITERAL);
+                    VSGTokenId accepted = accept(VSGTokenId.STRING_LITERAL, VSGTokenId.RBRACE_LBRACE_STRING_LITERAL);
                     // #183894
-                    if (JFXTokenId.RBRACE_LBRACE_STRING_LITERAL == accepted) {
+                    if (VSGTokenId.RBRACE_LBRACE_STRING_LITERAL == accepted) {
                         spaces(0, true);
                     }
                 } else {
-                    // JFXC-4061
+                    // VSGC-4061
                     boolean isNextTokenStringLiteral = true;
                     while (isNextTokenStringLiteral) {
-                        boolean accepted = acceptAndRollback(JFXTokenId.STRING_LITERAL) != null;
+                        boolean accepted = acceptAndRollback(VSGTokenId.STRING_LITERAL) != null;
                         if (accepted) {
-                            accept(JFXTokenId.STRING_LITERAL);
-                            isNextTokenStringLiteral = acceptAndRollback(JFXTokenId.STRING_LITERAL) != null;
+                            accept(VSGTokenId.STRING_LITERAL);
+                            isNextTokenStringLiteral = acceptAndRollback(VSGTokenId.STRING_LITERAL) != null;
                             if (isNextTokenStringLiteral) {
                                 spaces(0, true);
                             }
@@ -2432,8 +2432,8 @@ public class JFXReformatTask implements ReformatTask {
                 // for literal "-10" AST literal tree only but lexer has SUB token and INT_LITERAL token
                 // workaround
                 // ---
-                if (acceptAndRollback(JFXTokenId.SUB) == JFXTokenId.SUB) {
-                    accept(JFXTokenId.SUB);
+                if (acceptAndRollback(VSGTokenId.SUB) == VSGTokenId.SUB) {
+                    accept(VSGTokenId.SUB);
                 }
                 // ---
                 accept(ReformatUtils.NON_STRING_LITERALS);
@@ -2444,12 +2444,12 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitSequenceDelete(SequenceDeleteTree node, Void p) {
-            accept(JFXTokenId.DELETE);
+            accept(VSGTokenId.DELETE);
             space();
             scan(node.getElement(), p);
             space();
-            if (acceptAndRollback(JFXTokenId.FROM) == JFXTokenId.FROM) {
-                accept(JFXTokenId.FROM);
+            if (acceptAndRollback(VSGTokenId.FROM) == VSGTokenId.FROM) {
+                accept(VSGTokenId.FROM);
                 space();
             }
             scan(node.getSequence(), p);
@@ -2458,16 +2458,16 @@ public class JFXReformatTask implements ReformatTask {
 
         @Override
         public Boolean visitSequenceEmpty(SequenceEmptyTree node, Void p) {
-            accept(JFXTokenId.LBRACKET);
+            accept(VSGTokenId.LBRACKET);
 //            spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
-            accept(JFXTokenId.RBRACKET);
+            accept(VSGTokenId.RBRACKET);
             return true;
         }
 
         @Override
         public Boolean visitSequenceExplicit(SequenceExplicitTree node, Void p) {
             List<ExpressionTree> itemList = node.getItemList();
-            accept(JFXTokenId.LBRACKET);
+            accept(VSGTokenId.LBRACKET);
             if (itemList != null) {
                 int old = indent;
                 indent += indentSize;
@@ -2481,92 +2481,92 @@ public class JFXReformatTask implements ReformatTask {
                 indent = old;
                 spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0, true);
             }
-            accept(JFXTokenId.RBRACKET);
+            accept(VSGTokenId.RBRACKET);
             return true;
         }
 
         @Override
         public Boolean visitSequenceIndexed(SequenceIndexedTree node, Void p) {
             scan(node.getSequence(), p);
-            accept(JFXTokenId.LBRACKET);
+            accept(VSGTokenId.LBRACKET);
             scan(node.getIndex(), p);
-            accept(JFXTokenId.RBRACKET);
+            accept(VSGTokenId.RBRACKET);
             return true;
         }
 
         @Override
         public Boolean visitSequenceInsert(SequenceInsertTree node, Void p) {
-            JFXSequenceInsert insertNode = (JFXSequenceInsert) node;
-            JFXExpression position = insertNode.getPosition();
+            VSGSequenceInsert insertNode = (VSGSequenceInsert) node;
+            VSGExpression position = insertNode.getPosition();
 
-            accept(JFXTokenId.INSERT);
+            accept(VSGTokenId.INSERT);
             space();
             scan(node.getElement(), p);
             space();
             if (position == null) { // INTO
-                accept(JFXTokenId.INTO);
+                accept(VSGTokenId.INTO);
                 space();
                 scan(node.getSequence(), p);
             } else { // BEFORE/AFTER
-                accept(insertNode.shouldInsertAfter() ? JFXTokenId.AFTER : JFXTokenId.BEFORE);
+                accept(insertNode.shouldInsertAfter() ? VSGTokenId.AFTER : VSGTokenId.BEFORE);
                 space();
 
                 // #189380
                 boolean dot = false;
                 do {
-                    accept(JFXTokenId.IDENTIFIER, JFXTokenId.STAR, JFXTokenId.THIS, JFXTokenId.SUPER);
-                    dot = acceptAndRollback(JFXTokenId.DOT) == JFXTokenId.DOT;
+                    accept(VSGTokenId.IDENTIFIER, VSGTokenId.STAR, VSGTokenId.THIS, VSGTokenId.SUPER);
+                    dot = acceptAndRollback(VSGTokenId.DOT) == VSGTokenId.DOT;
                     if (dot) {
-                        accept(JFXTokenId.DOT);
+                        accept(VSGTokenId.DOT);
                     }
                 } while (dot);
 
-                accept(JFXTokenId.LBRACKET);
+                accept(VSGTokenId.LBRACKET);
                 scan(position, p);
-                accept(JFXTokenId.RBRACKET);
+                accept(VSGTokenId.RBRACKET);
             }
             return true;
         }
 
         @Override
         public Boolean visitSequenceRange(SequenceRangeTree node, Void p) {
-            accept(JFXTokenId.LBRACKET);
+            accept(VSGTokenId.LBRACKET);
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             scan(node.getLower(), p);
             spaces(cs.spaceAroundRangeOps() ? 1 : 0);
-            accept(JFXTokenId.DOTDOT);
+            accept(VSGTokenId.DOTDOT);
             if (node.isExclusive()) {
-                accept(JFXTokenId.LT);
+                accept(VSGTokenId.LT);
             }
             spaces(cs.spaceAroundRangeOps() ? 1 : 0);
             scan(node.getUpper(), p);
             ExpressionTree stepOrNull = node.getStepOrNull();
             if (stepOrNull != null) {
                 space();
-                accept(JFXTokenId.STEP);
+                accept(VSGTokenId.STEP);
                 space();
                 scan(stepOrNull, p);
             }
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
-            accept(JFXTokenId.RBRACKET);
+            accept(VSGTokenId.RBRACKET);
             return true;
         }
 
         @Override
         public Boolean visitSequenceSlice(SequenceSliceTree node, Void p) {
             scan(node.getSequence(), p);
-            accept(JFXTokenId.LBRACKET);
+            accept(VSGTokenId.LBRACKET);
             spaces(cs.spaceWithinArrayInitBrackets() ? 1 : 0);
             scan(node.getFirstIndex(), p);
             spaces(cs.spaceAroundRangeOps() ? 1 : 0);
 //            scan(node.getEndKind(), p);
-            accept(JFXTokenId.DOTDOT);
-            if (acceptAndRollback(JFXTokenId.LT) == JFXTokenId.LT) {
-                accept(JFXTokenId.LT);
+            accept(VSGTokenId.DOTDOT);
+            if (acceptAndRollback(VSGTokenId.LT) == VSGTokenId.LT) {
+                accept(VSGTokenId.LT);
             }
             spaces(cs.spaceAroundRangeOps() ? 1 : 0);
             scan(node.getLastIndex(), p);
-            accept(JFXTokenId.RBRACKET);
+            accept(VSGTokenId.RBRACKET);
             return true;
         }
 
@@ -2608,23 +2608,23 @@ public class JFXReformatTask implements ReformatTask {
         /// === END OF THE VISITOR IMPLEMENTATION
         /// ===
 
-        private JFXTokenId accept(JFXTokenId first, JFXTokenId... rest) {
+        private VSGTokenId accept(VSGTokenId first, VSGTokenId... rest) {
             return accept(EnumSet.of(first, rest));
         }
 
-        private JFXTokenId accept(EnumSet<JFXTokenId> tokenIds) {
+        private VSGTokenId accept(EnumSet<VSGTokenId> tokenIds) {
             lastBlankLines = -1;
             lastBlankLinesTokenIndex = -1;
             lastBlankLinesDiff = null;
 
-            // JavaFX Non-reserved keywords feature, see v4Parser.g
-            if (tokenIds.contains(JFXTokenId.IDENTIFIER)) {
+            // Visage Non-reserved keywords feature, see v4Parser.g
+            if (tokenIds.contains(VSGTokenId.IDENTIFIER)) {
                 // #186035
                 tokenIds.addAll(ReformatUtils.RESERVED_KEYWORDS);
                 tokenIds.addAll(ReformatUtils.NON_RESERVED_KEYWORDS);
             }
 
-            // javafx lexer generates one token for each WS
+            // visage lexer generates one token for each WS
             // java - one for all
             // therefore StringBuilder is been used instead of Token
             StringBuilder lastWSToken = new StringBuilder(); // TODO do not use text var, use this builder.subSequence
@@ -2638,7 +2638,7 @@ public class JFXReformatTask implements ReformatTask {
                     }
                     return null;
                 }
-                JFXTokenId id = tokens.token().id();
+                VSGTokenId id = tokens.token().id();
                 if (tokenIds.contains(id)) {
                     String spaces = after == 1 //after line comment
                             ? getIndent()
@@ -2771,15 +2771,15 @@ public class JFXReformatTask implements ReformatTask {
             return null;
         }
 
-        private JFXTokenId acceptAndRollback(JFXTokenId tokenId) {
+        private VSGTokenId acceptAndRollback(VSGTokenId tokenId) {
             return acceptAndRollback(EnumSet.of(tokenId));
         }
 
-        private JFXTokenId acceptAndRollback(EnumSet<JFXTokenId> tokenIds) {
+        private VSGTokenId acceptAndRollback(EnumSet<VSGTokenId> tokenIds) {
             int index = tokens.index();
             int c = col;
             Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-            JFXTokenId tokenId = accept(tokenIds);
+            VSGTokenId tokenId = accept(tokenIds);
             rollback(index, c, d);
             return tokenId;
         }
@@ -2802,8 +2802,8 @@ public class JFXReformatTask implements ReformatTask {
             final int index = tokens.index();
             int count = 0;
             do {
-                final JFXTokenId id = tokens.token().id();
-                if (id == JFXTokenId.WS) {
+                final VSGTokenId id = tokens.token().id();
+                if (id == VSGTokenId.WS) {
                     String text = tokens.token().text().toString();
                     if (text.lastIndexOf(NEWLINE) >= 0) {
                         count++;
@@ -2818,7 +2818,7 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private void spaces(int count, boolean preserveNewline) {
-            // javafx lexer generates one token for each WS
+            // visage lexer generates one token for each WS
             // java - one for all
             // therefore StringBuilder is been used instead of Token
             StringBuilder lastWSToken = new StringBuilder(); // TODO do not use text var, use this builder.subSequence
@@ -3026,7 +3026,7 @@ public class JFXReformatTask implements ReformatTask {
                 }
             }
 
-            // javafx lexer generates one token for each WS
+            // visage lexer generates one token for each WS
             // java - one for all
             // therefore StringBuilder is been used instead of Token
             StringBuilder lastToken = new StringBuilder(); // TODO do not use text var, use this builder.subSequence
@@ -3228,7 +3228,7 @@ public class JFXReformatTask implements ReformatTask {
             }
         }
 
-        private int wrapToken(CodeStyle.WrapStyle wrapStyle, int alignIndent, int spacesCnt, JFXTokenId first, JFXTokenId... rest) {
+        private int wrapToken(CodeStyle.WrapStyle wrapStyle, int alignIndent, int spacesCnt, VSGTokenId first, VSGTokenId... rest) {
             int ret = -1;
             switch (wrapStyle) {
                 case WRAP_ALWAYS:
@@ -3353,7 +3353,7 @@ public class JFXReformatTask implements ReformatTask {
                     newline();
                     indent = old;
                     ret = col;
-                    accept(JFXTokenId.IDENTIFIER);
+                    accept(VSGTokenId.IDENTIFIER);
                     break;
                 case WRAP_IF_LONG:
                     int index = tokens.index();
@@ -3367,7 +3367,7 @@ public class JFXReformatTask implements ReformatTask {
                     indent = old;
                     ret = col;
                     wrapDepth++;
-                    accept(JFXTokenId.IDENTIFIER);
+                    accept(VSGTokenId.IDENTIFIER);
                     wrapDepth--;
                     if (col > rightMargin && (wrapDepth == 0 || c <= rightMargin)) {
                         rollback(index, c, d);
@@ -3378,7 +3378,7 @@ public class JFXReformatTask implements ReformatTask {
                         newline();
                         indent = old;
                         ret = col;
-                        accept(JFXTokenId.IDENTIFIER);
+                        accept(VSGTokenId.IDENTIFIER);
                     }
                     break;
                 case WRAP_NEVER:
@@ -3389,7 +3389,7 @@ public class JFXReformatTask implements ReformatTask {
                     spaces(spacesCnt, true);
                     indent = old;
                     ret = col;
-                    accept(JFXTokenId.IDENTIFIER);
+                    accept(VSGTokenId.IDENTIFIER);
                     break;
             }
             return ret;
@@ -3463,7 +3463,7 @@ public class JFXReformatTask implements ReformatTask {
                 lastBlankLinesTokenIndex = -1;
                 tokens.moveNext();
             } else {
-                final JFXTokenId accepted = acceptAndRollback(ReformatUtils.OPERATOR_KEYWORDS);
+                final VSGTokenId accepted = acceptAndRollback(ReformatUtils.OPERATOR_KEYWORDS);
                 if (ReformatUtils.OPERATOR_KEYWORDS.contains(accepted)) {
                     accept(ReformatUtils.OPERATOR_KEYWORDS);
                 }
@@ -3471,19 +3471,19 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private boolean wrapStatement(CodeStyle.WrapStyle wrapStyle, CodeStyle.BracesGenerationStyle bracesGenerationStyle, int spacesCnt, ExpressionTree tree) {
-            if (tree.getJavaFXKind() == JavaFXKind.EMPTY_STATEMENT) {
+            if (tree.getVisageKind() == VisageKind.EMPTY_STATEMENT) {
                 scan(tree, null);
                 return true;
             }
-            if (tree.getJavaFXKind() == JavaFXKind.BLOCK_EXPRESSION) {
+            if (tree.getVisageKind() == VisageKind.BLOCK_EXPRESSION) {
                 // check this elimination
                 if (bracesGenerationStyle == CodeStyle.BracesGenerationStyle.ELIMINATE) {
                     Iterator<? extends ExpressionTree> stats = getBlockMembers((BlockExpressionTree) tree).iterator();
                     if (stats.hasNext()) {
                         ExpressionTree stat = stats.next();
-                        if (!stats.hasNext() && stat.getJavaFXKind() != JavaFXKind.VARIABLE) {
+                        if (!stats.hasNext() && stat.getVisageKind() != VisageKind.VARIABLE) {
                             int start = tokens.offset();
-                            accept(JFXTokenId.LBRACE);
+                            accept(VSGTokenId.LBRACE);
                             Diff d;
                             while (!diffs.isEmpty() && (d = diffs.getFirst()) != null && d.getStartOffset() >= start) {
                                 diffs.removeFirst();
@@ -3494,7 +3494,7 @@ public class JFXReformatTask implements ReformatTask {
                             wrapTree(wrapStyle, -1, spacesCnt, false, stat);
                             indent = old;
                             start = tokens.offset();
-                            accept(JFXTokenId.RBRACE);
+                            accept(VSGTokenId.RBRACE);
                             while (!diffs.isEmpty() && (d = diffs.getFirst()) != null && d.getStartOffset() >= start) {
                                 diffs.removeFirst();
                             }
@@ -3524,7 +3524,7 @@ public class JFXReformatTask implements ReformatTask {
             int alignIndent = -1;
             for (Iterator<? extends Tree> it = trees.iterator(); it.hasNext();) {
                 Tree tree = it.next();
-                if (tree.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                if (tree.getVisageKind() == VisageKind.ERRONEOUS) {
                     scan(tree, null);
                 } else if (first) {
                     int index = tokens.index();
@@ -3547,9 +3547,9 @@ public class JFXReformatTask implements ReformatTask {
                 }
                 first = false;
 
-                if (acceptAndRollback(JFXTokenId.COMMA) == JFXTokenId.COMMA) {
+                if (acceptAndRollback(VSGTokenId.COMMA) == VSGTokenId.COMMA) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
-                    accept(JFXTokenId.COMMA);
+                    accept(VSGTokenId.COMMA);
                 }
             }
         }
@@ -3559,7 +3559,7 @@ public class JFXReformatTask implements ReformatTask {
             int alignIndent = -1;
             for (Iterator<? extends Tree> it = trees.iterator(); it.hasNext();) {
                 Tree tree = it.next();
-                if (tree.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                if (tree.getVisageKind() == VisageKind.ERRONEOUS) {
                     scan(tree, null);
                 } else if (first) {
                     int index = tokens.index();
@@ -3571,11 +3571,11 @@ public class JFXReformatTask implements ReformatTask {
                     if (align) {
                         alignIndent = col;
                     }
-                    accept(JFXTokenId.IDENTIFIER);
+                    accept(VSGTokenId.IDENTIFIER);
                     if (wrapStyle != CodeStyle.WrapStyle.WRAP_NEVER && col > rightMargin && c > indent && (wrapDepth == 0 || c <= rightMargin)) {
                         rollback(index, c, d);
                         newline();
-                        accept(JFXTokenId.IDENTIFIER);
+                        accept(VSGTokenId.IDENTIFIER);
                     }
                 } else {
                     wrapExtendsTree(wrapStyle, alignIndent, 0, tree);
@@ -3583,7 +3583,7 @@ public class JFXReformatTask implements ReformatTask {
                 first = false;
                 if (it.hasNext()) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
-                    accept(JFXTokenId.COMMA);
+                    accept(VSGTokenId.COMMA);
                     spaces(cs.spaceAfterComma() ? 1 : 0);
                 }
             }
@@ -3597,24 +3597,24 @@ public class JFXReformatTask implements ReformatTask {
                 int index = tokens.index();
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                if (accept(JFXTokenId.IDENTIFIER) == JFXTokenId.IDENTIFIER) {
-                    boolean colon = acceptAndRollback(JFXTokenId.COLON) == JFXTokenId.COLON;
+                if (accept(VSGTokenId.IDENTIFIER) == VSGTokenId.IDENTIFIER) {
+                    boolean colon = acceptAndRollback(VSGTokenId.COLON) == VSGTokenId.COLON;
                     if (colon) {
-                        accept(JFXTokenId.COLON);
+                        accept(VSGTokenId.COLON);
                         spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                     } else {
                         rollback(index, c, d);
                     }
                 } else {
-                    boolean colon = acceptAndRollback(JFXTokenId.COLON) == JFXTokenId.COLON;
+                    boolean colon = acceptAndRollback(VSGTokenId.COLON) == VSGTokenId.COLON;
                     if (colon) {
-                        accept(JFXTokenId.COLON);
+                        accept(VSGTokenId.COLON);
                         spaces(cs.spaceAroundAssignOps() ? 1 : 0);
                     }
                 }
 
                 TypeTree param = it.next();
-                if (param.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                if (param.getVisageKind() == VisageKind.ERRONEOUS) {
                     scan(param, null);
                 } else if (first) {
                     index = tokens.index();
@@ -3635,7 +3635,7 @@ public class JFXReformatTask implements ReformatTask {
                 first = false;
                 if (it.hasNext()) {
                     spaces(cs.spaceBeforeComma() ? 1 : 0);
-                    accept(JFXTokenId.COMMA);
+                    accept(VSGTokenId.COMMA);
                     spaces(cs.spaceAfterComma() ? 1 : 0);
                 }
             }
@@ -3646,7 +3646,7 @@ public class JFXReformatTask implements ReformatTask {
             int alignIndent = -1;
             for (Iterator<Tree> it = trees.iterator(); it.hasNext();) {
                 Tree part = it.next();
-                if (part.getJavaFXKind() == JavaFXKind.ERRONEOUS) {
+                if (part.getVisageKind() == VisageKind.ERRONEOUS) {
                     scan(part, null);
                 } else if (first) {
                     int index = tokens.index();
@@ -3669,15 +3669,15 @@ public class JFXReformatTask implements ReformatTask {
                 int index = tokens.index();
                 int c = col;
                 Diff d = diffs.isEmpty() ? null : diffs.getFirst();
-                JFXTokenId accepted = accept(JFXTokenId.COMMA, JFXTokenId.SEMI);
-                if (accepted != JFXTokenId.COMMA && accepted != JFXTokenId.SEMI) {
+                VSGTokenId accepted = accept(VSGTokenId.COMMA, VSGTokenId.SEMI);
+                if (accepted != VSGTokenId.COMMA && accepted != VSGTokenId.SEMI) {
                     rollback(index, c, d);
                 }
             }
         }
 
         private void indentComment() {
-            if (tokens.token().id() != JFXTokenId.COMMENT && tokens.token().id() != JFXTokenId.DOC_COMMENT) {
+            if (tokens.token().id() != VSGTokenId.COMMENT && tokens.token().id() != VSGTokenId.DOC_COMMENT) {
                 return;
             }
             String _indent = getIndent();
@@ -3743,8 +3743,8 @@ public class JFXReformatTask implements ReformatTask {
             return sb.toString();
         }
 
-        private int getIndentLevel(TokenSequence<JFXTokenId> tokens, JavaFXTreePath path) {
-            if (path.getLeaf().getJavaFXKind() == JavaFXKind.COMPILATION_UNIT) {
+        private int getIndentLevel(TokenSequence<VSGTokenId> tokens, VisageTreePath path) {
+            if (path.getLeaf().getVisageKind() == VisageKind.COMPILATION_UNIT) {
                 return 0;
             }
             Tree lastTree = null;
@@ -3757,13 +3757,13 @@ public class JFXReformatTask implements ReformatTask {
                 tokens.move(offset);
                 String text = null;
                 while (tokens.movePrevious()) {
-                    Token<JFXTokenId> token = tokens.token();
-                    // JavaFX diffenerce
-                    if (token.id() == JFXTokenId.WS) {
+                    Token<VSGTokenId> token = tokens.token();
+                    // Visage diffenerce
+                    if (token.id() == VSGTokenId.WS) {
                         StringBuilder t1 = new StringBuilder();
                         do {
                             t1.append(tokens.token().text().toString());
-                        } while (tokens.movePrevious() && tokens.token().id() == JFXTokenId.WS);
+                        } while (tokens.movePrevious() && tokens.token().id() == VSGTokenId.WS);
 //                        text = token.text().toString();
                         text = t1.toString();
                         int idx = text.lastIndexOf(NEWLINE);
@@ -3772,10 +3772,10 @@ public class JFXReformatTask implements ReformatTask {
                             _indent = getCol(text);
                             break;
                         }
-                    } else if (token.id() == JFXTokenId.LINE_COMMENT) {
+                    } else if (token.id() == VSGTokenId.LINE_COMMENT) {
                         _indent = text != null ? getCol(text) : 0;
                         break;
-                    } else if (token.id() == JFXTokenId.COMMENT || token.id() == JFXTokenId.DOC_COMMENT) {
+                    } else if (token.id() == VSGTokenId.COMMENT || token.id() == VSGTokenId.DOC_COMMENT) {
                         text = null;
                     } else {
                         break;
@@ -3788,7 +3788,7 @@ public class JFXReformatTask implements ReformatTask {
                 path = path.getParentPath();
             }
             if (lastTree != null && path != null) {
-                switch (path.getLeaf().getJavaFXKind()) {
+                switch (path.getLeaf().getVisageKind()) {
                     case CLASS_DECLARATION:
                         final ClassDeclarationTree classTree = (ClassDeclarationTree) path.getLeaf();
                         for (Tree tree : classTree.getClassMembers()) {
@@ -3826,7 +3826,7 @@ public class JFXReformatTask implements ReformatTask {
             if (statements != null && !statements.isEmpty()) {
                 expressions.addAll(statements);
             }
-            // JFXC-3284
+            // VSGC-3284
             if (expressions.isEmpty()) {
                 final ExpressionTree value = node.getValue();
                 if (value != null) {
@@ -3850,12 +3850,12 @@ public class JFXReformatTask implements ReformatTask {
             return _col;
         }
 
-        private boolean isSynthetic(JFXTree node) {
+        private boolean isSynthetic(VSGTree node) {
             if (node instanceof BlockExpressionTree) {
-                JavaFXTreePath pp = getCurrentPath().getParentPath();
+                VisageTreePath pp = getCurrentPath().getParentPath();
                 if (pp != null && pp instanceof FunctionValueTree) {
                     pp = pp.getParentPath();
-                    JFXTree tree = (JFXTree) pp.getLeaf();
+                    VSGTree tree = (VSGTree) pp.getLeaf();
                     if (tree instanceof FunctionDefinitionTree) {
                         return synthetic(tree);
                     }
@@ -3864,7 +3864,7 @@ public class JFXReformatTask implements ReformatTask {
             return synthetic(node);
         }
 
-        private boolean synthetic(JFXTree node) {
+        private boolean synthetic(VSGTree node) {
             return node.getGenType() == SyntheticTree.SynthType.SYNTHETIC || getStartPos(node) == getEndPos(node);
         }
 
@@ -3877,12 +3877,12 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private boolean processSemicolon() {
-            boolean accepted = acceptAndRollback(JFXTokenId.SEMI) == JFXTokenId.SEMI;
+            boolean accepted = acceptAndRollback(VSGTokenId.SEMI) == VSGTokenId.SEMI;
             if (accepted) {
                 if (cs.spaceBeforeSemi()) {
                     space();
                 }
-                accept(JFXTokenId.SEMI);
+                accept(VSGTokenId.SEMI);
                 if (cs.spaceAfterSemi()) {
                     space();
                 }
@@ -3891,12 +3891,12 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private boolean processColon() {
-            boolean accepted = acceptAndRollback(JFXTokenId.COLON) == JFXTokenId.COLON;
+            boolean accepted = acceptAndRollback(VSGTokenId.COLON) == VSGTokenId.COLON;
             if (accepted) {
                 if (cs.spaceBeforeColon()) {
                     space();
                 }
-                accept(JFXTokenId.COLON);
+                accept(VSGTokenId.COLON);
                 if (cs.spaceAfterColon()) {
                     space();
                 }
@@ -3905,8 +3905,8 @@ public class JFXReformatTask implements ReformatTask {
         }
 
         private void processTranslationKey() {
-            if (acceptAndRollback(JFXTokenId.TRANSLATION_KEY) == JFXTokenId.TRANSLATION_KEY) {
-                accept(JFXTokenId.TRANSLATION_KEY);
+            if (acceptAndRollback(VSGTokenId.TRANSLATION_KEY) == VSGTokenId.TRANSLATION_KEY) {
+                accept(VSGTokenId.TRANSLATION_KEY);
             }
         }
 
@@ -3918,35 +3918,35 @@ public class JFXReformatTask implements ReformatTask {
          * @return is given block simple
          */
         private static boolean isSimpleBlock(Tree tree) {
-            final JavaFXKind kind = tree.getJavaFXKind();
-            return kind == JavaFXKind.FUNCTION_DEFINITION
-                    || kind == JavaFXKind.INSTANTIATE_OBJECT_LITERAL
-                    || kind == JavaFXKind.INIT_DEFINITION
-                    || kind == JavaFXKind.POSTINIT_DEFINITION
-                    || kind == JavaFXKind.CONDITIONAL_EXPRESSION
-                    || kind == JavaFXKind.FOR_EXPRESSION_FOR
-                    || kind == JavaFXKind.WHILE_LOOP
-                    || kind == JavaFXKind.ON_REPLACE
-                    || kind == JavaFXKind.TRY
-                    || kind == JavaFXKind.CATCH
-                    || kind == JavaFXKind.EQUAL_TO
-                    || kind == JavaFXKind.LESS_THAN
-                    || kind == JavaFXKind.LESS_THAN_EQUAL
-                    || kind == JavaFXKind.GREATER_THAN
-                    || kind == JavaFXKind.GREATER_THAN_EQUAL
-                    || kind == JavaFXKind.NOT_EQUAL_TO;
+            final VisageKind kind = tree.getVisageKind();
+            return kind == VisageKind.FUNCTION_DEFINITION
+                    || kind == VisageKind.INSTANTIATE_OBJECT_LITERAL
+                    || kind == VisageKind.INIT_DEFINITION
+                    || kind == VisageKind.POSTINIT_DEFINITION
+                    || kind == VisageKind.CONDITIONAL_EXPRESSION
+                    || kind == VisageKind.FOR_EXPRESSION_FOR
+                    || kind == VisageKind.WHILE_LOOP
+                    || kind == VisageKind.ON_REPLACE
+                    || kind == VisageKind.TRY
+                    || kind == VisageKind.CATCH
+                    || kind == VisageKind.EQUAL_TO
+                    || kind == VisageKind.LESS_THAN
+                    || kind == VisageKind.LESS_THAN_EQUAL
+                    || kind == VisageKind.GREATER_THAN
+                    || kind == VisageKind.GREATER_THAN_EQUAL
+                    || kind == VisageKind.NOT_EQUAL_TO;
         }
 
-        private static class FakeBlock extends JFXBlock {
+        private static class FakeBlock extends VSGBlock {
 //            private ExpressionTree stat;
 
             private FakeBlock(ExpressionTree stat) {
-                super(0L, com.sun.tools.mjavac.util.List.of((JFXExpression) stat), (JFXExpression) stat);
+                super(0L, com.sun.tools.mjavac.util.List.of((VSGExpression) stat), (VSGExpression) stat);
 //                this.stat = stat;
             }
         }
 
-        private static class DanglingElseChecker extends SimpleJavaFXTreeVisitor<Void, Void> {
+        private static class DanglingElseChecker extends SimpleVisageTreeVisitor<Void, Void> {
 
             private boolean foundDanglingElse;
 

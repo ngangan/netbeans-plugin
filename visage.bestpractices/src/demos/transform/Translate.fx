@@ -34,13 +34,13 @@
 
 package transform;
 
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.animation.Interpolator;
+import visage.scene.shape.Rectangle;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
+import visage.animation.Interpolator;
 
 /**
  * @author Michal Skvor
@@ -74,13 +74,13 @@ Stage {
         content : [
             // Create Rectangle and bind its position to xPos variable
             Rectangle {
-                transforms : [ javafx.scene.transform.Translate { x : bind xPos, y : 60 }]
+                transforms : [ visage.scene.transform.Translate { x : bind xPos, y : 60 }]
                 width : 40, height : 40
                 fill : Color.WHITE
             },
             // Create Rectangle and bind its position to 2 * xPos variable
             Rectangle {
-                transforms : [ javafx.scene.transform.Translate { x : bind 2 * xPos, y : 100 }]
+                transforms : [ visage.scene.transform.Translate { x : bind 2 * xPos, y : 100 }]
                 width : 40, height : 40
                 fill : Color.BLACK
             }

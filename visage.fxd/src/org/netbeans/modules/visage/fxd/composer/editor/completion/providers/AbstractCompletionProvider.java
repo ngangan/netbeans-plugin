@@ -42,17 +42,17 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.editor.completion.providers;
+package org.netbeans.modules.visage.fxd.composer.editor.completion.providers;
 
-import com.sun.javafx.tools.fxd.schema.model.AbstractSchemaElement;
-import com.sun.javafx.tools.fxd.schema.model.Element;
-import com.sun.javafx.tools.fxd.schema.model.Enumeration;
-import com.sun.javafx.tools.fxd.schema.model.FXDSchema;
-import com.sun.javafx.tools.fxd.schema.model.PrimitiveType;
-import com.sun.javafx.tools.fxd.schema.model.Property;
-import com.sun.javafx.tools.fxd.schema.model.SchemaVisitor;
-import com.sun.javafx.tools.fxd.schema.model.Type;
-import com.sun.javafx.tools.fxd.schema.model.Value;
+import com.sun.visage.tools.fxd.schema.model.AbstractSchemaElement;
+import com.sun.visage.tools.fxd.schema.model.Element;
+import com.sun.visage.tools.fxd.schema.model.Enumeration;
+import com.sun.visage.tools.fxd.schema.model.FXDSchema;
+import com.sun.visage.tools.fxd.schema.model.PrimitiveType;
+import com.sun.visage.tools.fxd.schema.model.Property;
+import com.sun.visage.tools.fxd.schema.model.SchemaVisitor;
+import com.sun.visage.tools.fxd.schema.model.Type;
+import com.sun.visage.tools.fxd.schema.model.Value;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -61,13 +61,13 @@ import javax.swing.text.BadLocationException;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionItem;
-import org.netbeans.modules.javafx.fxd.composer.editor.completion.FXDCompletionQuery;
-import org.netbeans.modules.javafx.fxd.composer.lexer.FXDTokenId;
-import org.netbeans.modules.javafx.fxd.composer.lexer.TokenUtils;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
-import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaHelper;
-import org.netbeans.modules.javafx.fxd.schemamodel.FXDSchemaModelProvider;
+import org.netbeans.modules.visage.fxd.composer.editor.completion.FXDCompletionItem;
+import org.netbeans.modules.visage.fxd.composer.editor.completion.FXDCompletionQuery;
+import org.netbeans.modules.visage.fxd.composer.lexer.FXDTokenId;
+import org.netbeans.modules.visage.fxd.composer.lexer.TokenUtils;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.schemamodel.FXDSchemaHelper;
+import org.netbeans.modules.visage.fxd.schemamodel.FXDSchemaModelProvider;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 
 /**

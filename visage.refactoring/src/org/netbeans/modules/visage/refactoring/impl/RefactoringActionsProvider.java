@@ -28,7 +28,7 @@
  *
  * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.refactoring.impl;
+package org.netbeans.modules.visage.refactoring.impl;
 
 import java.awt.datatransfer.Transferable;
 import java.io.IOException;
@@ -55,26 +55,26 @@ import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.Task;
 import org.netbeans.api.java.source.TreePathHandle;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClassIndex.SearchKind;
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
-import org.netbeans.api.javafx.source.ClasspathInfo;
+import org.netbeans.api.visage.platform.VisagePlatform;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClassIndex.SearchKind;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.ClasspathInfo;
 import org.netbeans.api.progress.ProgressUtils;
-import org.netbeans.modules.javafx.refactoring.RefactoringSupport;
-import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.NodeToElementTask;
-import org.netbeans.modules.javafx.refactoring.impl.RefactoringActionsProvider.TextComponentTask;
-import org.netbeans.modules.javafx.refactoring.impl.javafxc.SourceUtils;
-import org.netbeans.modules.javafx.refactoring.impl.ui.CopyClassUI;
-import org.netbeans.modules.javafx.refactoring.impl.ui.CopyClassesUI;
-import org.netbeans.modules.javafx.refactoring.impl.ui.MoveClassUI;
-import org.netbeans.modules.javafx.refactoring.impl.ui.MoveClassesUI;
-import org.netbeans.modules.javafx.refactoring.impl.ui.RenameRefactoringUI;
-import org.netbeans.modules.javafx.refactoring.impl.ui.SafeDeleteUI;
-import org.netbeans.modules.javafx.refactoring.impl.ui.WhereUsedQueryUI;
-import org.netbeans.modules.javafx.refactoring.repository.ClassModel;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
-import org.netbeans.modules.javafx.refactoring.repository.PackageDef;
+import org.netbeans.modules.visage.refactoring.RefactoringSupport;
+import org.netbeans.modules.visage.refactoring.impl.RefactoringActionsProvider.NodeToElementTask;
+import org.netbeans.modules.visage.refactoring.impl.RefactoringActionsProvider.TextComponentTask;
+import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
+import org.netbeans.modules.visage.refactoring.impl.ui.CopyClassUI;
+import org.netbeans.modules.visage.refactoring.impl.ui.CopyClassesUI;
+import org.netbeans.modules.visage.refactoring.impl.ui.MoveClassUI;
+import org.netbeans.modules.visage.refactoring.impl.ui.MoveClassesUI;
+import org.netbeans.modules.visage.refactoring.impl.ui.RenameRefactoringUI;
+import org.netbeans.modules.visage.refactoring.impl.ui.SafeDeleteUI;
+import org.netbeans.modules.visage.refactoring.impl.ui.WhereUsedQueryUI;
+import org.netbeans.modules.visage.refactoring.repository.ClassModel;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.repository.PackageDef;
 import org.netbeans.modules.parsing.api.indexing.IndexingManager;
 import org.netbeans.modules.refactoring.api.AbstractRefactoring;
 import org.netbeans.modules.refactoring.api.MoveRefactoring;
@@ -121,7 +121,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         if (dobj == null) return false;
         if (!SourceUtils.isPlatformOk(dobj.getPrimaryFile())) return false;
 
-        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
+        return SourceUtils.isVisageFile(dobj.getPrimaryFile());
     }
     volatile private boolean isFindUsages;
 
@@ -201,7 +201,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         if (dobj == null) return false;
         if (!SourceUtils.isPlatformOk(dobj.getPrimaryFile())) return false;
         
-        return SourceUtils.isJavaFXFile(dobj.getPrimaryFile());
+        return SourceUtils.isVisageFile(dobj.getPrimaryFile());
     }
 
     @Override
@@ -360,7 +360,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                         return false;
                     }
                     folders.add((DataFolder) dob);
-                } else if (SourceUtils.isJavaFXFile(dob.getPrimaryFile())) {
+                } else if (SourceUtils.isVisageFile(dob.getPrimaryFile())) {
                     jdoFound = true;
                 }
             }
@@ -369,7 +369,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
             }
             for (DataFolder fold : folders) {
                 for (Enumeration<DataObject> e = (fold).children(true); e.hasMoreElements();) {
-                    if (SourceUtils.isJavaFXFile(e.nextElement().getPrimaryFile())) {
+                    if (SourceUtils.isVisageFile(e.nextElement().getPrimaryFile())) {
                         return true;
                     }
                 }
@@ -392,7 +392,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
                 if (!SourceUtils.isPlatformOk(dob.getPrimaryFile())) {
                     return false;
                 }
-                if (SourceUtils.isJavaFXFile(dob.getPrimaryFile())) {
+                if (SourceUtils.isVisageFile(dob.getPrimaryFile())) {
                     result = true;
                 }
             }
@@ -737,7 +737,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 //            for (ElementLocation location : locations) {
 //                FileObject f = location.getSourceFile();
 //                current = location;
-//                JavaFXSource source = JavaFXSource.forFileObject(f);
+//                VisageSource source = VisageSource.forFileObject(f);
 //                assert source != null;
 //                try {
 //                    source.runUserActionTask(this, true);
@@ -841,7 +841,7 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
 //            if (unit.getTypeDecls().isEmpty()) {
 //                ui = createRefactoringUI(null, factory, info);
 //            } else {
-//                ElementHandle eh = ElementHandle.create(JavafxTreeInfo.symbolFor((JFXTree)unit.getTypeDecls().get(0)));
+//                ElementHandle eh = ElementHandle.create(JavafxTreeInfo.symbolFor((VSGTree)unit.getTypeDecls().get(0)));
 //                ClassModel cm = factory.classModelFor(info.getFileObject());
 //                ElementDef def = null;
 //                for(ElementDef edef : cm.getElementDefs(EnumSet.of(ElementKind.CLASS, ElementKind.INTERFACE, ElementKind.ENUM))) {

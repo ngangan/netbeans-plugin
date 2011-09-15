@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.test.javafx.editor.lib;
+package org.netbeans.test.visage.editor.lib;
 
 import java.awt.Container;
 import java.io.BufferedReader;
@@ -84,7 +84,7 @@ public class Util {
     public static final long MAX_WAIT_TIME = 300000;
     public static String PATH_SEPARATOR = "|";
     public static String FILE_SEPARATOR = "/";
-    public static String _bundle = "org.netbeans.test.javafx.editor.lib.Bundle";
+    public static String _bundle = "org.netbeans.test.visage.editor.lib.Bundle";
     public static String _category = Bundle.getStringTrimmed(_bundle, "javaFX");
     public static String _project = Bundle.getStringTrimmed(_bundle, "javaFXProject");
     public static String _source = Bundle.getStringTrimmed(_bundle, "sourcePackages");
@@ -104,7 +104,7 @@ public class Util {
         return test;
     }
 
-    /** Creates a JavaFX project */
+    /** Creates a Visage project */
     public static Boolean createProject(String name, String location) {
         NewProjectWizardOperator projectWizard = NewProjectWizardOperator.invoke();
         projectWizard.selectCategory(_category);

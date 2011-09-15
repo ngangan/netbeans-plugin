@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.schemamodel;
+package org.netbeans.modules.visage.fxd.schemamodel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,23 +54,23 @@ import java.util.Map;
 public class FXDSchemaHelper {
 
     private static final String [] DEFAULT_IMPORTS = {
-        "javafx.scene.image.",
-        "javafx.scene.transform.",
-        "javafx.geometry.",
-        "javafx.scene.",
-        "javafx.scene.paint.",
-        "javafx.scene.effect.light.",
-        "javafx.scene.shape.",
-        "javafx.scene.text.",
-        "javafx.scene.effect.",
-        "javafx.fxd.",
-        "javafx.animation.",
-        "javafx.animation.transition.",
-        "javafx.scene.control.",
-        "javafx.scene.layout.",
+        "visage.scene.image.",
+        "visage.scene.transform.",
+        "visage.geometry.",
+        "visage.scene.",
+        "visage.scene.paint.",
+        "visage.scene.effect.light.",
+        "visage.scene.shape.",
+        "visage.scene.text.",
+        "visage.scene.effect.",
+        "visage.fxd.",
+        "visage.animation.",
+        "visage.animation.transition.",
+        "visage.scene.control.",
+        "visage.scene.layout.",
         "",
-        //because of the class com.sun.javafx.tools.fxd.FXD
-        "com.sun.javafx.tools.fxd."
+        //because of the class com.sun.visage.tools.fxd.FXD
+        "com.sun.visage.tools.fxd."
     };
 
     private static Map<String, String> FXD_ELEMENT_TO_SCHEMA_ID = new HashMap<String, String>();

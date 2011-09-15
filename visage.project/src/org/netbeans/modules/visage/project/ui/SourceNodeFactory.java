@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui;
+package org.netbeans.modules.visage.project.ui;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -58,8 +58,8 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.ui.customizer.CustomizerProviderImpl;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.ui.customizer.CustomizerProviderImpl;
 import org.netbeans.spi.java.project.support.ui.PackageView;
 import org.netbeans.spi.project.ui.support.NodeFactory;
 import org.netbeans.spi.project.ui.support.NodeList;
@@ -78,18 +78,18 @@ public final class SourceNodeFactory implements NodeFactory {
     }
     
     public NodeList createNodes(Project p) {
-        JavaFXProject project = (JavaFXProject)p.getLookup().lookup(JavaFXProject.class);
+        VisageProject project = (VisageProject)p.getLookup().lookup(VisageProject.class);
         assert project != null;
         return new SourcesNodeList(project);
     }
     
     private static class SourcesNodeList implements NodeList<SourceGroupKey>, ChangeListener {
         
-        private JavaFXProject project;
+        private VisageProject project;
         
         private final ChangeSupport changeSupport = new ChangeSupport(this);
         
-        public SourcesNodeList(JavaFXProject proj) {
+        public SourcesNodeList(VisageProject proj) {
             project = proj;
         }
         
@@ -219,7 +219,7 @@ public final class SourceNodeFactory implements NodeFactory {
         }
         
         public PreselectPropertiesAction(Project project, String nodeName, String panelName) {
-            super(NbBundle.getMessage(JavaFXLogicalViewProvider.class, "LBL_Properties_Action")); // NOI18N
+            super(NbBundle.getMessage(VisageLogicalViewProvider.class, "LBL_Properties_Action")); // NOI18N
             this.project = project;
             this.nodeName = nodeName;
             this.panelName = panelName;

@@ -28,14 +28,14 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.ReformatTask;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.javafx.editor.format.JFXReformatTask;
+import org.netbeans.modules.visage.editor.format.VSGReformatTask;
 import org.openide.util.NbBundle;
 
 /**
@@ -54,8 +54,8 @@ public class ReformatTaskFactory implements ReformatTask.Factory {
      */
     public ReformatTask createTask(Context context) {
         if (log.isLoggable(Level.FINE)) {
-            log.fine(NbBundle.getBundle("org/netbeans/modules/javafx/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
+            log.fine(NbBundle.getBundle("org/netbeans/modules/visage/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
         }
-        return new JFXReformatTask(context);
+        return new VSGReformatTask(context);
     }
 }

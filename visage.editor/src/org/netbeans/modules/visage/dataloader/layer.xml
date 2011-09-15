@@ -46,10 +46,10 @@ made subject to such option by the copyright holder.
 <filesystem>
     <folder name="Actions">
         <folder name="Window">
-            <file name="org-netbeans-modules-javafx-editor-preview-JavaFXPreviewAction.instance">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
-                <attr name="component" methodvalue="org.netbeans.modules.javafx.editor.preview.JavaFXPreviewTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="org.netbeans.modules.javafx.editor.preview.Bundle#CTL_JavaFXPreviewAction"/>
+            <file name="org-netbeans-modules-visage-editor-preview-VisagePreviewAction.instance">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
+                <attr name="component" methodvalue="org.netbeans.modules.visage.editor.preview.VisagePreviewTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="org.netbeans.modules.visage.editor.preview.Bundle#CTL_VisagePreviewAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>
@@ -58,8 +58,8 @@ made subject to such option by the copyright holder.
         <folder name="Window">
             <folder name="Other">
                 <attr name="position" intvalue="1700"/>
-                <file name="JavaFXPreviewAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Window/org-netbeans-modules-javafx-editor-preview-JavaFXPreviewAction.instance"/>
+                <file name="VisagePreviewAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Window/org-netbeans-modules-visage-editor-preview-VisagePreviewAction.instance"/>
                     <attr name="position" intvalue="51"/>
                 </file>
             </folder>
@@ -67,11 +67,11 @@ made subject to such option by the copyright holder.
     </folder>
     <folder name="Windows2">
         <folder name="Components">
-            <file name="JavaFXPreviewTopComponent.settings" url="JavaFXPreviewTopComponentSettings.xml"/>
+            <file name="VisagePreviewTopComponent.settings" url="VisagePreviewTopComponentSettings.xml"/>
         </folder>
         <folder name="Modes">
             <folder name="navigator">
-                <file name="JavaFXPreviewTopComponent.wstcref" url="JavaFXPreviewTopComponentWstcref.xml">
+                <file name="VisagePreviewTopComponent.wstcref" url="VisagePreviewTopComponentWstcref.xml">
                     <attr name="position" intvalue="2507"/>
                 </file>
             </folder>
@@ -79,9 +79,9 @@ made subject to such option by the copyright holder.
     </folder>
     <folder name="Services">
         <folder name="MIMEResolver">
-            <file name="JavaFXResolver.xml" url="JavaFXResolver.xml">
+            <file name="VisageResolver.xml" url="VisageResolver.xml">
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <attr name="position" intvalue="115"/>
             </file>
         </folder>
@@ -89,8 +89,8 @@ made subject to such option by the copyright holder.
     <!--
         <folder name="Actions">
             <folder name="FXProject">
-                <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.project.JavaFXProjectModule.runApplet"/>
+                <file name="org-netbeans-modules-visage-project-VisageProjectModule-RunApplet.instance">
+                    <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.project.VisageProjectModule.runApplet"/>
                 </file>
             </folder>
         </folder>
@@ -98,24 +98,24 @@ made subject to such option by the copyright holder.
         <folder name="Keymaps">
             <folder name="Emacs">
                 <file name="DS-F11.shadow">
-                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
+                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-visage-project-VisageProjectModule-RunApplet"/>
                 </file>
              </folder>
              <folder name="NetBeans55">
                  <file name="DS-F11.shadow">
-                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
+                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-visage-project-VisageProjectModule-RunApplet"/>
                 </file>
              </folder>
              <folder name="NetBeans">
                  <file name="DS-F11.shadow">
-                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet"/>
+                    <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-visage-project-VisageProjectModule-RunApplet"/>
                 </file>
              </folder>
         </folder>
 
         <folder name="Shortcuts">
             <file name="DS-F11.shadow">
-                <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
+                <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-visage-project-VisageProjectModule-RunApplet.instance"/>
             </file>
         </folder>
     -->
@@ -124,23 +124,23 @@ made subject to such option by the copyright holder.
         <folder name="text">
             <folder name="x-fx">
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
-                <file name="org-netbeans-modules-javafx-editor-semantic-HighlightsLayerFactoryImpl.instance"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
+                <file name="org-netbeans-modules-visage-editor-semantic-HighlightsLayerFactoryImpl.instance"/>
 
                 <folder name="UpToDateStatusProvider">
-                    <file name="org-netbeans-modules-javafx-editor-semantic-OccurrencesMarkProviderCreator.instance"/>
-                    <file name="org-netbeans-modules-javafx-editor-semantic-UpToDateStatusProviderFactoryImpl.instance"/>
+                    <file name="org-netbeans-modules-visage-editor-semantic-OccurrencesMarkProviderCreator.instance"/>
+                    <file name="org-netbeans-modules-visage-editor-semantic-UpToDateStatusProviderFactoryImpl.instance"/>
                 </folder>
 
 
-                <file name="org-netbeans-modules-javafx-editor-ReformatTaskFactory.instance"/>
-                <file name="org-netbeans-modules-javafx-editor-IndentTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-editor-ReformatTaskFactory.instance"/>
+                <file name="org-netbeans-modules-visage-editor-IndentTaskFactory.instance"/>
 
 
                 <folder name="HyperlinkProviders">
-                    <file name="JavaFXHyperlinkProvider.instance">
+                    <file name="VisageHyperlinkProvider.instance">
                         <attr name="instanceClass"
-                              stringvalue="org.netbeans.modules.javafx.editor.JavaFXHyperlinkProvider"/>
+                              stringvalue="org.netbeans.modules.visage.editor.VisageHyperlinkProvider"/>
                         <attr name="instanceOf"
                               stringvalue="org.netbeans.lib.editor.hyperlink.spi.HyperlinkProviderExt"/>
                     </file>
@@ -148,32 +148,32 @@ made subject to such option by the copyright holder.
 
                 <folder name="Macros">
                     <folder name="Defaults">
-                        <file name="org-netbeans-modules-javafx-editor-macros.xml" url="DefaultMacros.xml"/>
+                        <file name="org-netbeans-modules-visage-editor-macros.xml" url="DefaultMacros.xml"/>
                     </folder>
                 </folder>
 
                 <folder name="CodeTemplates">
                     <folder name="Defaults">
-                        <file name="org-netbeans-modules-editor-javafx-codetemplates.xml" url="DefaultAbbrevs.xml">
+                        <file name="org-netbeans-modules-editor-visage-codetemplates.xml" url="DefaultAbbrevs.xml">
                             <attr name="SystemFileSystem.localizingBundle"
-                                  stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                                  stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                         </file>
                     </folder>
                 </folder>
                 <folder name="SideBar">
-                    <file name="org-netbeans-modules-javafx-editor-fold-NbJavaFXCodeFoldingSideBarFactory.instance">
+                    <file name="org-netbeans-modules-visage-editor-fold-NbVisageCodeFoldingSideBarFactory.instance">
                         <attr name="position" intvalue="1500"/>
                     </file>
                 </folder>
 
                 <folder name="FoldManager">
                     <file name="org-netbeans-editor-CustomFoldManager$Factory.instance"/>
-                    <file name="org-netbeans-modules-javafx-editor-fold-JavaFXElementFoldManagerFactory.instance"/>
+                    <file name="org-netbeans-modules-visage-editor-fold-VisageElementFoldManagerFactory.instance"/>
                 </folder>
 
                 <folder name="Preferences">
                     <folder name="Defaults">
-                        <file name="org-netbeans-modules-javafx-editor-preferences.xml" url="DefaultPreferences.xml"/>
+                        <file name="org-netbeans-modules-visage-editor-preferences.xml" url="DefaultPreferences.xml"/>
                     </folder>
                 </folder>
 
@@ -181,18 +181,18 @@ made subject to such option by the copyright holder.
                     <folder name="NetBeans">
                         <folder name="Defaults">
                             <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml"
-                                  url="resources/NetBeans-JavaFX-fontsColors.xml">
+                                  url="resources/NetBeans-Visage-fontsColors.xml">
                                 <attr name="SystemFileSystem.localizingBundle"
-                                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                             </file>
                         </folder>
                     </folder>
                     <folder name="CityLights">
                         <folder name="Defaults">
                             <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml"
-                                  url="resources/CityLights-JavaFX-fontsColors.xml">
+                                  url="resources/CityLights-Visage-fontsColors.xml">
                                 <attr name="SystemFileSystem.localizingBundle"
-                                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                             </file>
                         </folder>
                     </folder>
@@ -201,9 +201,9 @@ made subject to such option by the copyright holder.
                 <folder name="Keybindings">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="org-netbeans-modules-javafx-editor-keybindings.xml"
+                            <file name="org-netbeans-modules-visage-editor-keybindings.xml"
                                   url="DefaultKeyBindings.xml"/>
-                            <file name="org-netbeans-modules-javafx-editor-keybindings-mac.xml"
+                            <file name="org-netbeans-modules-visage-editor-keybindings-mac.xml"
                                   url="DefaultKeyBindings-Mac.xml">
                                 <attr name="nbeditor-settings-targetOS" stringvalue="OS_MAC"/>
                             </file>
@@ -236,16 +236,16 @@ made subject to such option by the copyright holder.
                 </folder>
 
                 <folder name="CompletionProviders">
-                    <file name="org-netbeans-modules-javafx-editor-completion-JavaFXCompletionProvider.instance"/>
+                    <file name="org-netbeans-modules-visage-editor-completion-VisageCompletionProvider.instance"/>
                     <!--    <file name="org-netbeans-modules-java-editor-javadoc-JavadocCompletionProvider.instance"/> -->
                 </folder>
 
                 <file name="EditorKit.instance">
-                    <attr name="instanceClass" stringvalue="org.netbeans.modules.javafx.editor.JavaFXEditorKit"/>
+                    <attr name="instanceClass" stringvalue="org.netbeans.modules.visage.editor.VisageEditorKit"/>
                 </file>
 
                 <folder name="BracesMatchers">
-                    <file name="org-netbeans-modules-javafx-editor-JavaFXBracesMatcher.instance">
+                    <file name="org-netbeans-modules-visage-editor-VisageBracesMatcher.instance">
                         <attr name="position" intvalue="130"/>
                     </file>
                 </folder>
@@ -272,8 +272,8 @@ made subject to such option by the copyright holder.
                                             <attr name="position" intvalue="1950"/>
                                         </file>
 
-                                        <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
-                                            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
+                                        <file name="org-netbeans-modules-visage-project-VisageProjectModule-RunApplet.shadow">
+                                            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-visage-project-VisageProjectModule-RunApplet.instance"/>
                                             <attr name="position" intvalue="1955"/>
                                         </file>
                     -->
@@ -289,23 +289,23 @@ made subject to such option by the copyright holder.
             </folder>
         </folder>
         <folder name="AnnotationTypes">
-            <file name="org-netbeans-modules-javafx-editor-hints-overrides.xml" url="overrides-annotation.xml"/>
+            <file name="org-netbeans-modules-visage-editor-hints-overrides.xml" url="overrides-annotation.xml"/>
         </folder>
     </folder>
 
     <folder name="OptionsDialog">
         <folder name="PreviewExamples">
             <folder name="text">
-                <file name="x-fx" url="resources/JavaFXExample"/>
+                <file name="x-fx" url="resources/VisageExample"/>
             </folder>
         </folder>
         <folder name="Editor">
             <folder name="MarkOccurrences">
                 <folder name="text">
                     <folder name="x-fx">
-                        <file name="JavaFXMarkOccurences.instance">
+                        <file name="VisageMarkOccurences.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.spi.options.OptionsPanelController"/>
-                            <attr name="instanceCreate" newvalue="org.netbeans.modules.javafx.editor.options.MarkOccurencesOptionsPanelController"/>
+                            <attr name="instanceCreate" newvalue="org.netbeans.modules.visage.editor.options.MarkOccurencesOptionsPanelController"/>
                         </file>
                     </folder>
                 </folder>
@@ -315,37 +315,37 @@ made subject to such option by the copyright holder.
                     <folder name="x-fx">
                         <file name="TabsAndIndents.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtTabsIndents.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtTabsIndents.getController"/>
                             <attr name="position" intvalue="100"/>
                         </file>
                         <file name="Alignment.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtAlignment.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtAlignment.getController"/>
                             <attr name="position" intvalue="200"/>
                         </file>
                         <file name="Braces.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBraces.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtBraces.getController"/>
                             <attr name="position" intvalue="300"/>
                         </file>
                         <file name="Wrapping.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtWrapping.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtWrapping.getController"/>
                             <attr name="position" intvalue="400"/>
                         </file>
                         <file name="BlankLines.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtBlankLines.getController"/>
                             <attr name="position" intvalue="500"/>
                         </file>
                         <file name="BlankLines2.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtBlankLines2.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtBlankLines2.getController"/>
                             <attr name="position" intvalue="600"/>
                         </file>
                         <file name="Spaces.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
-                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.javafx.editor.format.ui.FmtSpaces.getController"/>
+                            <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtSpaces.getController"/>
                             <attr name="position" intvalue="700"/>
                         </file>
                     </folder>
@@ -358,12 +358,12 @@ made subject to such option by the copyright holder.
         <folder name="text">
             <folder name="x-fx">
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
-                <attr name="iconBase" stringvalue="/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
+                <attr name="iconBase" stringvalue="/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
 
                 <folder name="Factories">
-                    <file name="org-netbeans-modules-javafx-dataloader-JavaFXDataLoader.instance">
-                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                    <file name="org-netbeans-modules-visage-dataloader-VisageDataLoader.instance">
+                        <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                         <attr name="position" intvalue="100"/>
                     </file>
                 </folder>
@@ -402,8 +402,8 @@ made subject to such option by the copyright holder.
                         <attr name="position" intvalue="640"/>
                     </file>
                     <!--
-                                        <file name="org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.shadow">
-                                            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-javafx-project-JavaFXProjectModule-RunApplet.instance"/>
+                                        <file name="org-netbeans-modules-visage-project-VisageProjectModule-RunApplet.shadow">
+                                            <attr name="originalFile" stringvalue="Actions/FXProject/org-netbeans-modules-visage-project-VisageProjectModule-RunApplet.instance"/>
                                             <attr name="position" intvalue="680"/>
                                         </file>
                     -->
@@ -455,74 +455,74 @@ made subject to such option by the copyright holder.
     </folder>
 
     <folder name="Templates">
-        <folder name="JavaFX">
+        <folder name="Visage">
             <attr name="position" intvalue="910"/>
-            <file name="JavaFXEmpty.fx" url="JavaFXEmpty.fx_">
+            <file name="VisageEmpty.fx" url="VisageEmpty.fx_">
                 <attr name="position" intvalue="100"/>
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <attr name="templateWizardURL"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXEmpty.html"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/resources/VisageEmpty.html"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateCategory" stringvalue="javafx, java-classes"/>
+                <attr name="templateCategory" stringvalue="visage, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
                 <attr name="instantiatingIterator"
-                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                      methodvalue="org.netbeans.modules.visage.project.templates.VisageTemplates.createVisageTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
-            <file name="JavaFXClass.fx" url="JavaFXClass.fx_">
+            <file name="VisageClass.fx" url="VisageClass.fx_">
                 <attr name="position" intvalue="200"/>
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <attr name="templateWizardURL"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXClass.html"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/resources/VisageClass.html"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateCategory" stringvalue="javafx, java-classes"/>
+                <attr name="templateCategory" stringvalue="visage, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
                 <attr name="instantiatingIterator"
-                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                      methodvalue="org.netbeans.modules.visage.project.templates.VisageTemplates.createVisageTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
 
-            <file name="JavaFXStage.fx" url="JavaFXStage.fx_">
+            <file name="VisageStage.fx" url="VisageStage.fx_">
                 <attr name="position" intvalue="300"/>
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <attr name="templateWizardURL"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXStage.html"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/resources/VisageStage.html"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateCategory" stringvalue="javafx, java-classes"/>
+                <attr name="templateCategory" stringvalue="visage, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
                 <attr name="instantiatingIterator"
-                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                      methodvalue="org.netbeans.modules.visage.project.templates.VisageTemplates.createVisageTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
 
-            <file name="JavaFXCustomNode.fx" url="JavaFXCustomNode.fx_">
+            <file name="VisageCustomNode.fx" url="VisageCustomNode.fx_">
                 <attr name="position" intvalue="400"/>
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <attr name="templateWizardURL"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXCustomNode.html"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/resources/VisageCustomNode.html"/>
                 <attr name="template" boolvalue="true"/>
-                <attr name="templateCategory" stringvalue="javafx, java-classes"/>
+                <attr name="templateCategory" stringvalue="visage, java-classes"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>
                 <attr name="instantiatingIterator"
-                      methodvalue="org.netbeans.modules.javafx.project.templates.JavaFXTemplates.createJavaFXTemplateIterator"/>
+                      methodvalue="org.netbeans.modules.visage.project.templates.VisageTemplates.createVisageTemplateIterator"/>
                 <attr name="SystemFileSystem.icon"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/FX-filetype.png"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
 
 
-            <file name="JavaFXCascadeStyleSheet.css" url="JavaFXCascadeStyleSheet.css_">
+            <file name="VisageCascadeStyleSheet.css" url="VisageCascadeStyleSheet.css_">
                 <attr name="position" intvalue="500"/>
                 <attr name="SystemFileSystem.localizingBundle"
-                      stringvalue="org.netbeans.modules.javafx.dataloader.Bundle"/>
+                      stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <attr name="templateWizardURL"
-                      urlvalue="nbresloc:/org/netbeans/modules/javafx/dataloader/resources/JavaFXCSS.html"/>
+                      urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/resources/VisageCSS.html"/>
                 <attr name="template" boolvalue="true"/>
                 <attr name="templateCategory" stringvalue="simple-files"/>
                 <attr name="javax.script.ScriptEngine" stringvalue="freemarker"/>

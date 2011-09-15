@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.archive;
+package org.netbeans.modules.visage.fxd.composer.archive;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -52,14 +52,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableModel;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
-import org.netbeans.modules.javafx.fxd.composer.model.FXZArchive;
-import org.netbeans.modules.javafx.fxd.composer.model.actions.AbstractFXDAction;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookup;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookupUtils;
+import org.netbeans.modules.visage.fxd.composer.model.FXZArchive;
+import org.netbeans.modules.visage.fxd.composer.model.actions.AbstractFXDAction;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
-import com.sun.javafx.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
@@ -67,8 +67,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
-import org.netbeans.modules.javafx.fxd.composer.preview.PreviewToolbar;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.preview.PreviewToolbar;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.actions.Presenter;
 

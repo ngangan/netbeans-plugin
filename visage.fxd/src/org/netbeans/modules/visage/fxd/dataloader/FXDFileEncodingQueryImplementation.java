@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.dataloader;
+package org.netbeans.modules.visage.fxd.dataloader;
 
 import java.nio.charset.Charset;
 import org.netbeans.spi.queries.FileEncodingQueryImplementation;
@@ -55,7 +55,7 @@ public class FXDFileEncodingQueryImplementation extends FileEncodingQueryImpleme
 
     public final static Charset UTF_8 = Charset.forName("UTF-8");         // NOI18N
 
-    /** Creates a new instance of JavaFXProjectEncodingQueryImpl */
+    /** Creates a new instance of VisageProjectEncodingQueryImpl */
     public FXDFileEncodingQueryImplementation() {
     }
 

@@ -29,7 +29,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.lib.javafx.lexer;
+package org.netbeans.lib.visage.lexer;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.TreeMap;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.Language;
 
 /**
@@ -61,7 +61,7 @@ public class TokenIdGenerator {
             System.exit(-1);
         }
         BufferedReader r = null;
-        Language<JFXTokenId> language = JFXTokenId.language();
+        Language<VSGTokenId> language = VSGTokenId.language();
         Map<String, TokenIdDesc> name2Desc = new TreeMap<String, TokenIdDesc>();
         try {
             r = new BufferedReader(new FileReader(tokenF));
@@ -72,11 +72,11 @@ public class TokenIdGenerator {
                 String[] elements = line.split("=");
                 String name = elements[0];
                 String category;
-                JFXTokenId id = language.tokenId(name);
+                VSGTokenId id = language.tokenId(name);
                 if (id != null) {
                     category = id.primaryCategory();
                 } else {
-                    category = JFXTokenId.UNKNOWN.primaryCategory();
+                    category = VSGTokenId.UNKNOWN.primaryCategory();
                 }
                 name2Desc.put(name, new TokenIdDesc(name, category, Integer.parseInt(elements[1])));
             }

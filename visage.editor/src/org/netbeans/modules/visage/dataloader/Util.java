@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.dataloader;
+package org.netbeans.modules.visage.dataloader;
 
 import javax.swing.text.Document;
 import javax.swing.text.BadLocationException;
@@ -193,8 +193,8 @@ public final class Util extends Object {
         DataObject obj = DataObject.find(fo);
         EditorCookie editor = null;
 
-        if (obj instanceof JavaFXDataObject)
-            editor = ((JavaFXDataObject) obj).getCookie (EditorCookie.class);
+        if (obj instanceof VisageDataObject)
+            editor = ((VisageDataObject) obj).getCookie (EditorCookie.class);
 
 	final Document doc;
         if ((editor != null) && (doc = editor.getDocument()) != null) {

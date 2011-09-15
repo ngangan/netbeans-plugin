@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.test.javafx.bestpractices.lib;
+package org.netbeans.test.visage.bestpractices.lib;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -50,16 +50,16 @@ import org.netbeans.jemmy.ComponentChooser;
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXTestCase extends JellyTestCase {
+public class VisageTestCase extends JellyTestCase {
 
     public static final String BUILD_SUCCESS = "BUILD SUCCESS";
     public static final String BUILD_FAILED = "BUILD FAILED";
-    public static final String SAMPLE_PATH = "Samples|JavaFX|Building Blocks|";
+    public static final String SAMPLE_PATH = "Samples|Visage|Building Blocks|";
     public static final String COMPILE_FILE = "Compile File";
     public static final String CLOSE = "Close";
 
 
-    public JavaFXTestCase(String name) {
+    public VisageTestCase(String name) {
         super(name);
     }
 

@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.fold;
+package org.netbeans.modules.visage.editor.fold;
 
 import org.netbeans.spi.editor.fold.FoldManager;
 import org.netbeans.spi.editor.fold.FoldManagerFactory;
@@ -50,14 +50,14 @@ import org.netbeans.spi.editor.fold.FoldManagerFactory;
  *
  * @author Jan Lahoda
  */
-public class JavaFXElementFoldManagerFactory implements FoldManagerFactory {
+public class VisageElementFoldManagerFactory implements FoldManagerFactory {
 
-    /** Creates a new instance of JavaFXElementFoldManagerFactory */
-    public JavaFXElementFoldManagerFactory() {
+    /** Creates a new instance of VisageElementFoldManagerFactory */
+    public VisageElementFoldManagerFactory() {
     }
 
     public FoldManager createFoldManager() {
-        return new JavaFXElementFoldManager();
+        return new VisageElementFoldManager();
     }
 
 }

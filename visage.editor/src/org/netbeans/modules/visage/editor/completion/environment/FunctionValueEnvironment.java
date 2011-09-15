@@ -40,12 +40,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.javafx.tree.JFXBlock;
-import com.sun.tools.javafx.tree.JFXFunctionValue;
-import com.sun.tools.javafx.tree.JFXType;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.tools.visage.tree.VSGBlock;
+import com.sun.tools.visage.tree.VSGFunctionValue;
+import com.sun.tools.visage.tree.VSGType;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -55,16 +55,16 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class FunctionValueEnvironment extends JavaFXCompletionEnvironment<JFXFunctionValue> {
+public class FunctionValueEnvironment extends VisageCompletionEnvironment<VSGFunctionValue> {
 
     private static final Logger logger = Logger.getLogger(FunctionValueEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXFunctionValue val) throws IOException {
-        if (LOGGABLE) log("inside JFXFunctionValue " + val); // NOI18N
+    protected void inside(VSGFunctionValue val) throws IOException {
+        if (LOGGABLE) log("inside VSGFunctionValue " + val); // NOI18N
         int startPos = (int) sourcePositions.getStartPosition(root, val);
-        JFXType retType = val.getJFXReturnType();
+        VSGType retType = val.getVSGReturnType();
         if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
         if ((offset < startPos) || (startPos == 0)) {
             if (LOGGABLE) log("  before block: return types"); // NOI18N
@@ -72,7 +72,7 @@ public class FunctionValueEnvironment extends JavaFXCompletionEnvironment<JFXFun
             addBasicTypes();
             return;
         }
-        JFXBlock bl = val.getBodyExpression();
+        VSGBlock bl = val.getBodyExpression();
         if (bl != null) {
             insideFunctionBlock(bl.getStatements());
         }

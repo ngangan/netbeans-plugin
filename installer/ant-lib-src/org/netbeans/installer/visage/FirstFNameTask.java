@@ -29,7 +29,7 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package org.netbeans.installer.javafx;
+package org.netbeans.installer.visage;
 
 import java.io.File;
 import org.apache.tools.ant.BuildException;

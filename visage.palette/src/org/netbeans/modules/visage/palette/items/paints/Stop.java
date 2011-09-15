@@ -39,10 +39,10 @@
  *
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.paints;
+package org.netbeans.modules.visage.palette.items.paints;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Stop implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(LinearGradient.class, "TEMPLATE_Stop", targetComponent, "javafx.scene.paint.Stop", "javafx.scene.paint.Color"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(LinearGradient.class, "TEMPLATE_Stop", targetComponent, "visage.scene.paint.Stop", "visage.scene.paint.Color"); //NOI18N;
     }
 }

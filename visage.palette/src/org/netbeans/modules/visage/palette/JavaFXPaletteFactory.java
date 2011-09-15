@@ -39,7 +39,7 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette;
+package org.netbeans.modules.visage.palette;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -55,15 +55,15 @@ import org.openide.util.datatransfer.ExTransferable;
  *
  * @author Michal Skvor
  */
-public class JavaFXPaletteFactory {
+public class VisagePaletteFactory {
 
-    public static final String JAVAFX_PALETTE_FOLDER = "JavaFXPalette"; // NOI18N
+    public static final String JAVAFX_PALETTE_FOLDER = "VisagePalette"; // NOI18N
     static private PaletteController palette = null;
 
     public static synchronized PaletteController getPalette() throws IOException {
 
         if (palette == null) {
-            //palette = PaletteFactory.createPalette(JAVAFX_PALETTE_FOLDER, new JavaFXPaletteActions());
+            //palette = PaletteFactory.createPalette(JAVAFX_PALETTE_FOLDER, new VisagePaletteActions());
             PaletteFilter pf = new PaletteFilter() {
 
                 @Override
@@ -104,7 +104,7 @@ public class JavaFXPaletteFactory {
                 }
             };
 
-            palette = PaletteFactory.createPalette(JAVAFX_PALETTE_FOLDER, new JavaFXPaletteActions(), pf, dndh);
+            palette = PaletteFactory.createPalette(JAVAFX_PALETTE_FOLDER, new VisagePaletteActions(), pf, dndh);
         }
         return palette;
     }

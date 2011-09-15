@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl.ui;
+package org.netbeans.modules.visage.refactoring.impl.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -54,8 +54,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.fileinfo.NonRecursiveFolder;
-import org.netbeans.modules.javafx.refactoring.RefactoringModule;
-import org.netbeans.modules.javafx.refactoring.repository.ElementDef;
+import org.netbeans.modules.visage.refactoring.RefactoringModule;
+import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.netbeans.modules.refactoring.api.SafeDeleteRefactoring;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 import org.openide.filesystems.FileObject;
@@ -205,7 +205,7 @@ public class SafeDeletePanel extends JPanel implements CustomRefactoringPanel {
         checkBoxes.add(label, java.awt.BorderLayout.NORTH);
 
         searchInComments.setSelected(((Boolean) RefactoringModule.getOption("searchInComments.whereUsed", Boolean.FALSE)).booleanValue());
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/ui/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/refactoring/impl/ui/Bundle"); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(searchInComments, bundle.getString("LBL_SafeDelInComents")); // NOI18N
         searchInComments.setMargin(new java.awt.Insets(2, 14, 2, 2));
         searchInComments.addItemListener(new java.awt.event.ItemListener() {

@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.wizard;
+package org.netbeans.modules.visage.platform.wizard;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +50,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.java.platform.JavaPlatform;
-import org.netbeans.modules.javafx.platform.platformdefinition.PlatformConvertor;
+import org.netbeans.modules.visage.platform.platformdefinition.PlatformConvertor;
 import org.openide.ErrorManager;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
@@ -61,29 +61,29 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.NbBundle;
 
 /**
- * Wizard Iterator for standard JavaFX platforms. It assumes that there is a
+ * Wizard Iterator for standard Visage platforms. It assumes that there is a
  * 'bin{/}java[.exe]' underneath the platform's directory, which can be run to
  * produce the target platform's VM environment.
  *
  * @author Svata Dedic, Tomas Zezula
  */
-public class JavaFXWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
+public class VisageWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
-    private static JavaFXWizardIterator instance;
+    private static VisageWizardIterator instance;
     File installFolder, fxFolder;
     String platformName;
     DetectPanel.WizardPanel detectPanel;
     final ChangeSupport listeners = new ChangeSupport(this);
     WizardDescriptor wizard;
 
-    public static final JavaFXWizardIterator getDefault() {
+    public static final VisageWizardIterator getDefault() {
         if (instance == null) {
-            instance = new JavaFXWizardIterator();
+            instance = new VisageWizardIterator();
         }
         return instance;
     }
 
-    public JavaFXWizardIterator() {
+    public VisageWizardIterator() {
     }
 
     public void addChangeListener(ChangeListener l) {
@@ -114,14 +114,14 @@ public class JavaFXWizardIterator implements WizardDescriptor.InstantiatingItera
      */
     public java.util.Set instantiate() throws IOException {
         Set<JavaPlatform> result = new HashSet<JavaPlatform>();
-        NewJavaFXPlatform platform = NewJavaFXPlatform.create(platformName, installFolder, fxFolder);
+        NewVisagePlatform platform = NewVisagePlatform.create(platformName, installFolder, fxFolder);
         platform.run();
         if (platform.isValid()) {
             final String systemName = platform.getAntName();
             FileObject platformsFolder = Repository.getDefault().getDefaultFileSystem().findResource(
                     "Services/Platforms/org-netbeans-api-java-Platform"); //NOI18N
             if (platformsFolder.getFileObject(systemName, "xml") != null) {   //NOI18N
-                String msg = NbBundle.getMessage(JavaFXWizardIterator.class, "ERROR_InvalidName"); // NOI18N
+                String msg = NbBundle.getMessage(VisageWizardIterator.class, "ERROR_InvalidName"); // NOI18N
                 throw (IllegalStateException) ErrorManager.getDefault().annotate(
                         new IllegalStateException(msg), ErrorManager.USER, null, msg, null, null);
             }
@@ -132,7 +132,7 @@ public class JavaFXWizardIterator implements WizardDescriptor.InstantiatingItera
     }
 
     public String name() {
-        return NbBundle.getMessage(JavaFXWizardIterator.class, "TITLE_PlatformName"); // NOI18N
+        return NbBundle.getMessage(VisageWizardIterator.class, "TITLE_PlatformName"); // NOI18N
     }
 
     public void nextPanel() {

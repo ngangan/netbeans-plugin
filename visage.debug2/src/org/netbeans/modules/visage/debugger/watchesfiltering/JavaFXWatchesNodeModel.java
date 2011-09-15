@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,34 +63,34 @@ import org.openide.util.RequestProcessor;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.NodeModel.class } )
-public class JavaFXWatchesNodeModel implements NodeModel {
+public class VisageWatchesNodeModel implements NodeModel {
 
     private static final String ICON_BASE ="org/netbeans/modules/debugger/resources/watchesView/Watch";
 
     private final Collection<ModelListener> modelListeners = new HashSet<ModelListener>();
-    private final Map<JavaFXWatch, String> shortDescriptionMap = new HashMap<JavaFXWatch, String>();
+    private final Map<VisageWatch, String> shortDescriptionMap = new HashMap<VisageWatch, String>();
     private RequestProcessor evaluationRP;
 
-    public JavaFXWatchesNodeModel() {}
+    public VisageWatchesNodeModel() {}
     
-    public JavaFXWatchesNodeModel( ContextProvider lookupProvider ) {
+    public VisageWatchesNodeModel( ContextProvider lookupProvider ) {
         evaluationRP = lookupProvider.lookupFirst( null, RequestProcessor.class );
     }
 
     public String getDisplayName( Object node ) throws UnknownTypeException {
-        if( !( node instanceof JavaFXWatch )) throw new UnknownTypeException( node );
-        JavaFXWatch watch = (JavaFXWatch) node;
+        if( !( node instanceof VisageWatch )) throw new UnknownTypeException( node );
+        VisageWatch watch = (VisageWatch) node;
         return watch.getExpression();
     }
 
     public String getIconBase( Object node ) throws UnknownTypeException {
-        if(!( node instanceof JavaFXWatch )) throw new UnknownTypeException( node );
+        if(!( node instanceof VisageWatch )) throw new UnknownTypeException( node );
         return ICON_BASE;
     }
 
     public String getShortDescription( Object node ) throws UnknownTypeException {
-        if( !( node instanceof JavaFXWatch )) throw new UnknownTypeException( node );
-        final JavaFXWatch watch = (JavaFXWatch) node;
+        if( !( node instanceof VisageWatch )) throw new UnknownTypeException( node );
+        final VisageWatch watch = (VisageWatch) node;
 
         synchronized( shortDescriptionMap ) {
             String shortDescription = shortDescriptionMap.remove( watch );
@@ -106,7 +106,7 @@ public class JavaFXWatchesNodeModel implements NodeModel {
                     synchronized( shortDescriptionMap ) {
                         shortDescriptionMap.put( watch, shortDescription );
                     }
-                    fireModelChange( new ModelEvent.NodeChanged( JavaFXWatchesNodeModel.this,
+                    fireModelChange( new ModelEvent.NodeChanged( VisageWatchesNodeModel.this,
                         watch, ModelEvent.NodeChanged.SHORT_DESCRIPTION_MASK ));
                 }
             }
@@ -114,7 +114,7 @@ public class JavaFXWatchesNodeModel implements NodeModel {
         return "";
     }
 
-    private static String getShortDescriptionSynch( JavaFXWatch watch ) {
+    private static String getShortDescriptionSynch( VisageWatch watch ) {
         String t = watch.getType ();
         String e = watch.getExceptionDescription ();
         if (e != null) {

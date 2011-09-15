@@ -41,17 +41,17 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.*;
-import com.sun.javafx.api.tree.Tree.JavaFXKind;
+import com.sun.visage.api.tree.*;
+import com.sun.visage.api.tree.Tree.VisageKind;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.javafx.code.JavafxFlags;
-import com.sun.tools.javafx.tree.JFXClassDeclaration;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.TreeUtilities;
+import com.sun.tools.visage.code.JavafxFlags;
+import com.sun.tools.visage.tree.VSGClassDeclaration;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -81,12 +81,12 @@ public class Utilities {
     public Utilities() {
     }
     
-    private static Token<JFXTokenId> findTokenWithText(CompilationInfo info, String text, int start, int end) {
+    private static Token<VSGTokenId> findTokenWithText(CompilationInfo info, String text, int start, int end) {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language()).subSequence(start, end);
+        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language()).subSequence(start, end);
         
         while (ts.moveNext()) {
-            Token<JFXTokenId> t = ts.token();
+            Token<VSGTokenId> t = ts.token();
             
             if (text.equals(t.text().toString())) {
                 return t;
@@ -97,14 +97,14 @@ public class Utilities {
     }
     
     private static Tree normalizeLastLeftTree(Tree lastLeft) {
-/*        while (lastLeft != null && lastLeft.getJavaFXKind() == JavaFXKind.ARRAY_TYPE) {
+/*        while (lastLeft != null && lastLeft.getVisageKind() == VisageKind.ARRAY_TYPE) {
             lastLeft = ((ArrayTypeTree) lastLeft).getType();
         }
   */      
         return lastLeft;
     }
     
-    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, Tree decl, Tree lastLeft, List<? extends Tree> firstRight, String name, UnitTree cu, SourcePositions positions) {
+    private static Token<VSGTokenId> findIdentifierSpanImpl(CompilationInfo info, Tree decl, Tree lastLeft, List<? extends Tree> firstRight, String name, UnitTree cu, SourcePositions positions) {
         int declStart = (int) positions.getStartPosition(cu, decl);
         
         lastLeft = normalizeLastLeftTree(lastLeft);
@@ -145,7 +145,7 @@ public class Utilities {
         return findTokenWithText(info, name, start, end);
     }
     
-    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, MemberSelectTree tree, UnitTree cu, SourcePositions positions) {
+    private static Token<VSGTokenId> findIdentifierSpanImpl(CompilationInfo info, MemberSelectTree tree, UnitTree cu, SourcePositions positions) {
         int start = (int)positions.getStartPosition(cu, tree);
         int endPosition = (int)positions.getEndPosition(cu, tree);
         
@@ -155,7 +155,7 @@ public class Utilities {
         String member = tree.getIdentifier().toString();
 
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
 
         if (ts.move(endPosition) == Integer.MAX_VALUE) {
             return null;
@@ -163,7 +163,7 @@ public class Utilities {
 
         if (ts.moveNext()) {
             while (ts.offset() >= start) {
-                Token<JFXTokenId> t = ts.token();
+                Token<VSGTokenId> t = ts.token();
                 if (member.equals(t.text().toString())) {
                     return t;
                 }
@@ -175,33 +175,33 @@ public class Utilities {
         return null;
     }
     
-    private static final Map<Class, List<JavaFXKind>> class2Kind;
+    private static final Map<Class, List<VisageKind>> class2Kind;
     
     static {
-        class2Kind = new HashMap<Class, List<JavaFXKind>>();
+        class2Kind = new HashMap<Class, List<VisageKind>>();
         
-        for (JavaFXKind k : JavaFXKind.values()) {
+        for (VisageKind k : VisageKind.values()) {
             Class c = k.asInterface();
-            List<JavaFXKind> kinds = class2Kind.get(c);
+            List<VisageKind> kinds = class2Kind.get(c);
             
             if (kinds == null) {
-                class2Kind.put(c, kinds = new ArrayList<JavaFXKind>());
+                class2Kind.put(c, kinds = new ArrayList<VisageKind>());
             }
             
             kinds.add(k);
         }
     }
     
-    private static Token<JFXTokenId> findIdentifierSpanImpl(CompilationInfo info, JavaFXTreePath decl) {
+    private static Token<VSGTokenId> findIdentifierSpanImpl(CompilationInfo info, VisageTreePath decl) {
         TreeUtilities tu = TreeUtilities.create(info);
         if (tu.isSynthetic(decl))
             return null;
         
         Tree leaf = decl.getLeaf();
                 
-        if (leaf instanceof JFXFunctionDefinition) {
+        if (leaf instanceof VSGFunctionDefinition) {
             // XXX: should use FunctionDefinitionTree, but it lacks the API
-            JFXFunctionDefinition function = (JFXFunctionDefinition) leaf;
+            VSGFunctionDefinition function = (VSGFunctionDefinition) leaf;
             List<Tree> rightTrees = new ArrayList<Tree>();
 
             rightTrees.addAll(function.getParams());
@@ -210,13 +210,13 @@ public class Utilities {
 
             Name name = function.getName();
 
-            if (function.getJFXReturnType() == null)
+            if (function.getVSGReturnType() == null)
                 name = ((ClassDeclarationTree) decl.getParentPath().getLeaf()).getSimpleName();
 
-            return findIdentifierSpanImpl(info, leaf, function.getJFXReturnType(), rightTrees, name.toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
+            return findIdentifierSpanImpl(info, leaf, function.getVSGReturnType(), rightTrees, name.toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
-        if (class2Kind.get(VariableTree.class).contains(leaf.getJavaFXKind())) {
+        if (class2Kind.get(VariableTree.class).contains(leaf.getVisageKind())) {
             VariableTree var = (VariableTree) leaf;
             List<Tree> rightTrees = new ArrayList<Tree>();
 
@@ -230,11 +230,11 @@ public class Utilities {
             return findIdentifierSpanImpl(info, leaf, var.getModifiers(), rightTrees, var.getName().toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
-        if (class2Kind.get(MemberSelectTree.class).contains(leaf.getJavaFXKind())) {
+        if (class2Kind.get(MemberSelectTree.class).contains(leaf.getVisageKind())) {
             return findIdentifierSpanImpl(info, (MemberSelectTree) leaf, info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
-        if (class2Kind.get(ClassDeclarationTree.class).contains(leaf.getJavaFXKind())) {
+        if (class2Kind.get(ClassDeclarationTree.class).contains(leaf.getVisageKind())) {
             String name = ((ClassDeclarationTree) leaf).getSimpleName().toString();
             
             if (name.length() == 0)
@@ -253,8 +253,8 @@ public class Utilities {
         }
         
         
-        if (JavaFXKind.CLASS_DECLARATION == leaf.getJavaFXKind()) {
-            String name = ((JFXClassDeclaration) leaf).getName().toString();
+        if (VisageKind.CLASS_DECLARATION == leaf.getVisageKind()) {
+            String name = ((VSGClassDeclaration) leaf).getName().toString();
             
             if (name.length() == 0)
                 return null;
@@ -274,11 +274,11 @@ public class Utilities {
         throw new IllegalArgumentException("Only MethodDecl, VariableDecl and ClassDecl are accepted by this method."); // NOI18N
     }
 
-    public static int[] findIdentifierSpan( final JavaFXTreePath decl, final CompilationInfo info, final Document doc) {
+    public static int[] findIdentifierSpan( final VisageTreePath decl, final CompilationInfo info, final Document doc) {
         final int[] result = new int[] {-1, -1};
         doc.render(new Runnable() {
             public void run() {
-                Token<JFXTokenId> t = findIdentifierSpan(info, doc, decl);
+                Token<VSGTokenId> t = findIdentifierSpan(info, doc, decl);
                 if (t != null) {
                     result[0] = t.offset(null);
                     result[1] = t.offset(null) + t.length();
@@ -289,9 +289,9 @@ public class Utilities {
         return result;
     }
     
-    public static Token<JFXTokenId> findIdentifierSpan(final CompilationInfo info, final Document doc, final JavaFXTreePath decl) {
+    public static Token<VSGTokenId> findIdentifierSpan(final CompilationInfo info, final Document doc, final VisageTreePath decl) {
         @SuppressWarnings("unchecked")
-        final Token<JFXTokenId>[] result = new Token[1];
+        final Token<VSGTokenId>[] result = new Token[1];
         doc.render(new Runnable() {
             public void run() {
                 result[0] = findIdentifierSpanImpl(info, decl);
@@ -340,8 +340,8 @@ public class Utilities {
     }
     
     public static int findBodyStart(final Tree cltree, final UnitTree cu, final SourcePositions positions, final Document doc) {
-        JavaFXKind kind = cltree.getJavaFXKind();
-        if (kind != JavaFXKind.CLASS_DECLARATION && kind != JavaFXKind.FUNCTION_DEFINITION)
+        VisageKind kind = cltree.getVisageKind();
+        if (kind != VisageKind.CLASS_DECLARATION && kind != VisageKind.FUNCTION_DEFINITION)
             throw new IllegalArgumentException("Unsupported kind: "+ kind); // NOI18N
         final int[] result = new int[1];
         
@@ -398,7 +398,7 @@ public class Utilities {
         return result[0];
     }
     
-    private static Token<JFXTokenId> createHighlightImpl(CompilationInfo info, Document doc, JavaFXTreePath tree) {
+    private static Token<VSGTokenId> createHighlightImpl(CompilationInfo info, Document doc, VisageTreePath tree) {
         Tree leaf = tree.getLeaf();
 //        SourcePositions positions = info.getTrees().getSourcePositions();
 //        CompilationUnitTree cu = info.getCompilationUnit();
@@ -406,8 +406,8 @@ public class Utilities {
         //XXX: do not use instanceof:
         if (leaf instanceof VariableTree || 
 /*                leaf instanceof ClassTree || */
-                leaf instanceof JFXClassDeclaration || 
-                leaf instanceof JFXFunctionDefinition || 
+                leaf instanceof VSGClassDeclaration || 
+                leaf instanceof VSGFunctionDefinition || 
                 leaf instanceof MemberSelectTree) {
 //        Element element = info.getTrees().getElement(tree);
 //        ElementKind kind = element.getKind();
@@ -418,14 +418,14 @@ public class Utilities {
         int start = (int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), leaf);
         
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<JFXTokenId> ts = th.tokenSequence(JFXTokenId.language());
+        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
         
         if (ts.move(start) == Integer.MAX_VALUE) {
             return null;
         }
         
         if (ts.moveNext()) {
-            if (ts.offset() == start && ts.token().id() == JFXTokenId.IDENTIFIER) {
+            if (ts.offset() == start && ts.token().id() == VSGTokenId.IDENTIFIER) {
                 return ts.token();
             }
         }
@@ -433,9 +433,9 @@ public class Utilities {
         return null;
     }
     
-    public static Token<JFXTokenId> getToken(final CompilationInfo info, final Document doc, final JavaFXTreePath tree) {
+    public static Token<VSGTokenId> getToken(final CompilationInfo info, final Document doc, final VisageTreePath tree) {
         @SuppressWarnings("unchecked")
-        final Token<JFXTokenId>[] result = new Token[1];
+        final Token<VSGTokenId>[] result = new Token[1];
         
         doc.render(new Runnable() {
             public void run() {
@@ -460,13 +460,13 @@ public class Utilities {
     }
     
     public static boolean isKeyword(Tree tree) {
-        if (tree.getJavaFXKind() == JavaFXKind.IDENTIFIER) {
+        if (tree.getVisageKind() == VisageKind.IDENTIFIER) {
             final Name name = ((IdentifierTree) tree).getName();
             if (null != name) {
                 return keywords.contains(name.toString());
             }
         }
-        if (tree.getJavaFXKind() == JavaFXKind.MEMBER_SELECT) {
+        if (tree.getVisageKind() == VisageKind.MEMBER_SELECT) {
             final Name identifier = ((MemberSelectTree) tree).getIdentifier();
             if (null != identifier) {
                 return keywords.contains(identifier.toString());

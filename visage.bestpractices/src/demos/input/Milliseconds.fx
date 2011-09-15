@@ -34,12 +34,12 @@
 
 package input;
 
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.scene.paint.Color;
+import visage.scene.shape.Rectangle;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 /**
  * @author Michal Skvor

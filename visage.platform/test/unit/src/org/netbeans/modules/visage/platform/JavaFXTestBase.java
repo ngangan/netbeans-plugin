@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform;
+package org.netbeans.modules.visage.platform;
 
 import org.netbeans.junit.NbTestCase;
 
-public class JavaFXTestBase extends NbTestCase {
+public class VisageTestBase extends NbTestCase {
 
-    public JavaFXTestBase(final String name) {
+    public VisageTestBase(final String name) {
         super(name);
     }
 

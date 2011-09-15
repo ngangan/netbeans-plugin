@@ -28,13 +28,13 @@
  *
  * Portions Copyrighted 1997-2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.editor.imports;
+package org.netbeans.modules.visage.editor.imports;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-import org.netbeans.api.javafx.lexer.JFXTokenId;
+import org.netbeans.api.visage.lexer.VSGTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
@@ -44,7 +44,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.util.logging.Logger;
 import javax.swing.text.Caret;
-import org.netbeans.modules.javafx.editor.imports.ImportsModel.Declared;
+import org.netbeans.modules.visage.editor.imports.ImportsModel.Declared;
 
 /**
  * The publisher will use the information stored in the {@linkplain ImportsModel} instance
@@ -82,7 +82,7 @@ class Publisher implements Runnable {
     @SuppressWarnings("empty-statement")
     synchronized public void run() {
         // no need to guard against TS modifications, runs over locked Document
-        TokenSequence<JFXTokenId> ts = getTokenSequence(doc, 0);
+        TokenSequence<VSGTokenId> ts = getTokenSequence(doc, 0);
 
         // reformat not used for now
         Reformat reformat = null;
@@ -137,14 +137,14 @@ class Publisher implements Runnable {
     }
 
     @SuppressWarnings({"MethodWithMultipleLoops"})
-    private int moveBehindPackage(TokenSequence<JFXTokenId> ts) {
+    private int moveBehindPackage(TokenSequence<VSGTokenId> ts) {
         boolean wasWS = false;
         int lastNonWSOffset = 0;
         while (ts.moveNext()) {
-            JFXTokenId id = ts.token().id();
-            if (JFXTokenId.isComment(id)
-                    || id == JFXTokenId.WS) {
-                if (id == JFXTokenId.WS) {
+            VSGTokenId id = ts.token().id();
+            if (VSGTokenId.isComment(id)
+                    || id == VSGTokenId.WS) {
+                if (id == VSGTokenId.WS) {
                     if (!wasWS) {
                         lastNonWSOffset = ts.offset(); // don't decrement the offset; it makes the import appear inside the comments if there's no package declaration (#177269)
                         wasWS = true;
@@ -153,8 +153,8 @@ class Publisher implements Runnable {
                     wasWS= false;
                 }
                 continue;
-            } else if (id == JFXTokenId.PACKAGE) {
-                moveTo(ts, JFXTokenId.SEMI);
+            } else if (id == VSGTokenId.PACKAGE) {
+                moveTo(ts, VSGTokenId.SEMI);
                 return ts.offset() + 1;
             }
             break;
@@ -162,16 +162,16 @@ class Publisher implements Runnable {
         return lastNonWSOffset;
     }
 
-    private void moveTo(TokenSequence<JFXTokenId> ts, JFXTokenId id) {
+    private void moveTo(TokenSequence<VSGTokenId> ts, VSGTokenId id) {
         while (ts.moveNext()) {
             if (ts.token().id() == id) break;
         }
     }
 
     @SuppressWarnings({"unchecked"})
-    private static <JFXTokenId extends TokenId> TokenSequence<JFXTokenId> getTokenSequence(Document doc, int dotPos) {
+    private static <VSGTokenId extends TokenId> TokenSequence<VSGTokenId> getTokenSequence(Document doc, int dotPos) {
         TokenHierarchy<Document> th = TokenHierarchy.get(doc);
-        TokenSequence<JFXTokenId> ts = (TokenSequence<JFXTokenId>) th.tokenSequence();
+        TokenSequence<VSGTokenId> ts = (TokenSequence<VSGTokenId>) th.tokenSequence();
         ts.move(dotPos);
         return ts;
     }

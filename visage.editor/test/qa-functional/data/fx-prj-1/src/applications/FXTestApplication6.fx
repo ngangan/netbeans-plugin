@@ -1,9 +1,9 @@
 package applications;
 
-import javafx.scene.Scene;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.text.Font;
+import visage.scene.text.Text;
+import visage.stage.Stage;
 
 /** FontStyle should not return $ classes */
 Stage{

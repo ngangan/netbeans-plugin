@@ -42,27 +42,27 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.fxd.composer.preview;
+package org.netbeans.modules.visage.fxd.composer.preview;
 
 import java.awt.BorderLayout;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import javafx.scene.Scene;
+import visage.scene.Scene;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import org.openide.awt.UndoRedo;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookup;
-import org.netbeans.modules.javafx.fxd.composer.misc.ActionLookupUtils;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDElement;
-import org.netbeans.modules.javafx.fxd.composer.model.FXDFileModel;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookup;
+import org.netbeans.modules.visage.fxd.composer.misc.ActionLookupUtils;
+import org.netbeans.modules.visage.fxd.composer.model.FXDElement;
+import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 import org.openide.util.Lookup;
 
-import org.netbeans.modules.javafx.fxd.composer.navigator.SelectionCookie;
-import org.netbeans.modules.javafx.fxd.dataloader.FXDZDataObject;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.composer.navigator.SelectionCookie;
+import org.netbeans.modules.visage.fxd.dataloader.FXDZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Mutex;
 import org.openide.util.RequestProcessor;

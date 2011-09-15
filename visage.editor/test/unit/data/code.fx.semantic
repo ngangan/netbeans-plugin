@@ -5,21 +5,21 @@
  *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
-package javafxpad;
-import javafx.ui._all_classes;
-import javafx.ui.*;
-import javafx.ui.canvas.*;
-import javafx.ui.filter.*;
-import net.java.javafx.ui.UIContext;
-import net.java.javafx.type.expr.ValidationError;
-import net.java.javafx.type.expr.VariableDeclarator;
-import net.java.javafx.typeImpl.Compilation;
-import net.java.javafx.typeImpl.completion.CompletionProcessor;
-import net.java.javafx.typeImpl.completion.CompletionParserTokenManager;
-import net.java.javafx.typeImpl.completion.CompletionParserConstants;
-import net.java.javafx.typeImpl.completion.SimpleCharStream;
-import net.java.javafx.typeImpl.completion.Token;
-import net.java.javafx.typeImpl.SourceCodeWriter;
+package visagepad;
+import visage.ui._all_classes;
+import visage.ui.*;
+import visage.ui.canvas.*;
+import visage.ui.filter.*;
+import net.java.visage.ui.UIContext;
+import net.java.visage.type.expr.ValidationError;
+import net.java.visage.type.expr.VariableDeclarator;
+import net.java.visage.typeImpl.Compilation;
+import net.java.visage.typeImpl.completion.CompletionProcessor;
+import net.java.visage.typeImpl.completion.CompletionParserTokenManager;
+import net.java.visage.typeImpl.completion.CompletionParserConstants;
+import net.java.visage.typeImpl.completion.SimpleCharStream;
+import net.java.visage.typeImpl.completion.Token;
+import net.java.visage.typeImpl.SourceCodeWriter;
 import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -33,9 +33,9 @@ import java.lang.Character;
 import java.lang.reflect.Method;
 import javax.swing.KeyStroke as JKeyStroke;
 import javax.swing.UIManager;
-import javafx.ui.KeyEvent;
+import visage.ui.KeyEvent;
 import java.awt.event.KeyEvent as AWTKeyEvent;
-import javafx.ui.KeyStroke;
+import visage.ui.KeyStroke;
 import javax.swing.Action;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ import java.lang.Throwable;
 import java.net.URL;
 
 public class |>CLASS_DECLARATION:LineNumberPanel<| extends |>CLASS_USE:Widget<| {
-    private attribute |>ATTRIBUTE_USE:panel<|: <<net.java.javafx.ui.LineNumberPanel>>;
+    private attribute |>ATTRIBUTE_USE:panel<|: <<net.java.visage.ui.LineNumberPanel>>;
     public attribute |>ATTRIBUTE_USE:lineCount<|: Number;
     public operation |>OPERATION_DECLARATION:getCellBounds<|(|>ATTRIBUTE_USE:line<|:Integer);
 }
@@ -67,7 +67,7 @@ trigger on |>CLASS_USE:LineNumberPanel<|.lineCount = |>ATTRIBUTE_USE:value<| {
 }
 
 operation |>CLASS_USE:LineNumberPanel<|.|>OPERATION_DECLARATION:createComponent<|() {
-    |>ATTRIBUTE_USE:panel<| = new <<net.java.javafx.ui.LineNumberPanel>>;
+    |>ATTRIBUTE_USE:panel<| = new <<net.java.visage.ui.LineNumberPanel>>;
     |>ATTRIBUTE_USE:panel<|.setOpaque(false);
     |>ATTRIBUTE_USE:panel<|.setLineCount(|>ATTRIBUTE_USE:lineCount<|);
     return |>ATTRIBUTE_USE:panel<|;
@@ -87,7 +87,7 @@ class |>CLASS_DECLARATION:CompletionProposal<| {
     attribute |>ATTRIBUTE_USE:documentation<|: String?;
 }
 
-public class |>CLASS_DECLARATION:JavaFXPad<| extends |>CLASS_USE:CompositeWidget<| {
+public class |>CLASS_DECLARATION:VisagePad<| extends |>CLASS_USE:CompositeWidget<| {
     attribute |>ATTRIBUTE_USE:runAutomatically<|: Boolean;
     attribute |>ATTRIBUTE_USE:validateAutomatically<|: Boolean;
     operation |>OPERATION_DECLARATION:runNow<|();
@@ -159,7 +159,7 @@ public class |>CLASS_DECLARATION:JavaFXPad<| extends |>CLASS_USE:CompositeWidget
     operation |>OPERATION_DECLARATION:searchPrev<|();
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:doSearch<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:doSearch<|() {
     if (|>ATTRIBUTE_USE:searchActive<|) {
 	searchNext();
     } else {
@@ -167,7 +167,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:doSearch<|() {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:searchNext<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:searchNext<|() {
     var text = |>ATTRIBUTE_USE:editor<|.text;
     var value = |>ATTRIBUTE_USE:searchValue<|;
     if (not |>ATTRIBUTE_USE:matchCase<|) {
@@ -182,7 +182,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:searchNext<|() {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:searchPrev<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:searchPrev<|() {
     var text = |>ATTRIBUTE_USE:editor<|.text;
     var dot = |>ATTRIBUTE_USE:editor<|.caretDot-1;
     var value = |>ATTRIBUTE_USE:searchValue<|;
@@ -197,7 +197,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:searchPrev<|() {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:highlightAll<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:highlightAll<|() {
     if (|>ATTRIBUTE_USE:searchValue<| == "") {
 	|>ATTRIBUTE_USE:editor<|.highlight = null;
 	return;
@@ -222,7 +222,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:highlightAll<|() {
     }
 }
 
-trigger on |>CLASS_USE:JavaFXPad<|.searchActive = newValue {
+trigger on |>CLASS_USE:VisagePad<|.searchActive = newValue {
     //editor.jtextarea.getCaret().setSelectionVisible(newValue); // hack: fix me
     if (not newValue) {
 	|>ATTRIBUTE_USE:searchValue<| = "";
@@ -230,7 +230,7 @@ trigger on |>CLASS_USE:JavaFXPad<|.searchActive = newValue {
     }
 }
 
-trigger on |>CLASS_USE:JavaFXPad<|.searchValue = newValue {
+trigger on |>CLASS_USE:VisagePad<|.searchValue = newValue {
     if (|>ATTRIBUTE_USE:searchValue<| == "") {
 	|>ATTRIBUTE_USE:editor<|.highlight = null;
 	return;
@@ -250,15 +250,15 @@ trigger on |>CLASS_USE:JavaFXPad<|.searchValue = newValue {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:setSourcePath<|(urls: URL*) {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:setSourcePath<|(urls: URL*) {
     println("setting source path to : {urls}");
     |>ATTRIBUTE_USE:sourcePath<| = urls;
     |>ATTRIBUTE_USE:compilation<|.setSourcePath(urls);
 }
 
-attribute |>CLASS_USE:JavaFXPad<|.fontSize = 16;
+attribute |>CLASS_USE:VisagePad<|.fontSize = 16;
 
-trigger on new |>CLASS_USE:JavaFXPad<| {
+trigger on new |>CLASS_USE:VisagePad<| {
     var self = this;
     /*
    Thread.currentThread().getThreadGroup().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -271,36 +271,36 @@ trigger on new |>CLASS_USE:JavaFXPad<| {
 */
 }
 
-attribute |>CLASS_USE:JavaFXPad<|.validateAutomatically = true;
-attribute |>CLASS_USE:JavaFXPad<|.runAutomatically = true;
+attribute |>CLASS_USE:VisagePad<|.validateAutomatically = true;
+attribute |>CLASS_USE:VisagePad<|.runAutomatically = true;
 
-trigger on |>CLASS_USE:JavaFXPad<|.compileError = e {
+trigger on |>CLASS_USE:VisagePad<|.compileError = e {
     println(e);
 }
 
 
-attribute |>CLASS_USE:JavaFXPad<|.imageCache = (select i.getImage() from i in select |>CLASS_USE:Image<| {|>ATTRIBUTE_USE:url<|: |>ATTRIBUTE_USE:url<|} from |>ATTRIBUTE_USE:url<| in [|>ATTRIBUTE_USE:publicMethodImage<|, |>ATTRIBUTE_USE:publicFieldImage<|, |>ATTRIBUTE_USE:publicClassImage<|]);
+attribute |>CLASS_USE:VisagePad<|.imageCache = (select i.getImage() from i in select |>CLASS_USE:Image<| {|>ATTRIBUTE_USE:url<|: |>ATTRIBUTE_USE:url<|} from |>ATTRIBUTE_USE:url<| in [|>ATTRIBUTE_USE:publicMethodImage<|, |>ATTRIBUTE_USE:publicFieldImage<|, |>ATTRIBUTE_USE:publicClassImage<|]);
 
-attribute |>CLASS_USE:JavaFXPad<|.publicMethodImage = "{__DOCBASE__}/images/methpub_obj.gif";
-attribute |>CLASS_USE:JavaFXPad<|.publicFieldImage = "{__DOCBASE__}/images/field_public_obj.gif";
-attribute |>CLASS_USE:JavaFXPad<|.publicClassImage = "{__DOCBASE__}/images/class_obj.gif";
-attribute |>CLASS_USE:JavaFXPad<|.pageSize = 8;
+attribute |>CLASS_USE:VisagePad<|.publicMethodImage = "{__DOCBASE__}/images/methpub_obj.gif";
+attribute |>CLASS_USE:VisagePad<|.publicFieldImage = "{__DOCBASE__}/images/field_public_obj.gif";
+attribute |>CLASS_USE:VisagePad<|.publicClassImage = "{__DOCBASE__}/images/class_obj.gif";
+attribute |>CLASS_USE:VisagePad<|.pageSize = 8;
 
-attribute |>CLASS_USE:JavaFXPad<|.selectedProposal = bind |>ATTRIBUTE_USE:completionList<|.selection;
-attribute |>CLASS_USE:JavaFXPad<|.zoomOptions = [8.33, 12.5, 25, 50, 100, 125, 150, 200, 400, 800, 1600];
-attribute |>CLASS_USE:JavaFXPad<|.zoomSelection = 4;
-attribute |>CLASS_USE:JavaFXPad<|.zoomValue = bind |>ATTRIBUTE_USE:zoomOptions<|[|>ATTRIBUTE_USE:zoomSelection<|];
-attribute |>CLASS_USE:JavaFXPad<|.editorLineCount = bind |>ATTRIBUTE_USE:editor<|.lineCount;
+attribute |>CLASS_USE:VisagePad<|.selectedProposal = bind |>ATTRIBUTE_USE:completionList<|.selection;
+attribute |>CLASS_USE:VisagePad<|.zoomOptions = [8.33, 12.5, 25, 50, 100, 125, 150, 200, 400, 800, 1600];
+attribute |>CLASS_USE:VisagePad<|.zoomSelection = 4;
+attribute |>CLASS_USE:VisagePad<|.zoomValue = bind |>ATTRIBUTE_USE:zoomOptions<|[|>ATTRIBUTE_USE:zoomSelection<|];
+attribute |>CLASS_USE:VisagePad<|.editorLineCount = bind |>ATTRIBUTE_USE:editor<|.lineCount;
 
-trigger on |>CLASS_USE:JavaFXPad<|.zoomValue = |>ATTRIBUTE_USE:value<| {    
+trigger on |>CLASS_USE:VisagePad<|.zoomValue = |>ATTRIBUTE_USE:value<| {    
 //println("zoom = {value}");
 }
 
-trigger on |>CLASS_USE:JavaFXPad<|.editorLineCount = |>ATTRIBUTE_USE:value<| {
+trigger on |>CLASS_USE:VisagePad<|.editorLineCount = |>ATTRIBUTE_USE:value<| {
 //println("lineCount = {value}");
 }
 
-trigger on |>CLASS_USE:JavaFXPad<|.selectedProposal = |>ATTRIBUTE_USE:value<| {
+trigger on |>CLASS_USE:VisagePad<|.selectedProposal = |>ATTRIBUTE_USE:value<| {
     |>ATTRIBUTE_USE:selectedDoc<| = null;
     for (i in [false, true]) (dur 500 while |>ATTRIBUTE_USE:selectedProposal<| == |>ATTRIBUTE_USE:value<|) {
         if (i and |>ATTRIBUTE_USE:selectedProposal<| == |>ATTRIBUTE_USE:value<|) {
@@ -309,26 +309,26 @@ trigger on |>CLASS_USE:JavaFXPad<|.selectedProposal = |>ATTRIBUTE_USE:value<| {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeField<|(field:String): String {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:makeField<|(field:String): String {
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{|>ATTRIBUTE_USE:publicFieldImage<|}'></td><td>{field}</td></tr></html>";
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeAttr<|(|>ATTRIBUTE_USE:a<|:Attribute): String {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:makeAttr<|(|>ATTRIBUTE_USE:a<|:Attribute): String {
     var t = formatType(|>ATTRIBUTE_USE:a<|.Type);
     var s = formatType(|>ATTRIBUTE_USE:a<|.Scope);
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{|>ATTRIBUTE_USE:publicFieldImage<|}'></td><td>{|>ATTRIBUTE_USE:a<|.Name}&nbsp;&nbsp;&nbsp;&nbsp;{t}&nbsp;-&nbsp;{s}</td></tr></html>";
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeVar<|(decl:VariableDeclarator): String {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:makeVar<|(decl:VariableDeclarator): String {
     var t = formatType(decl.getType());
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{|>ATTRIBUTE_USE:publicFieldImage<|}'></td><td>{decl.getVarName()}&nbsp;&nbsp;&nbsp;&nbsp;{t}&nbsp;-&nbsp;</td></tr></html>";
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeType<|(|>ATTRIBUTE_USE:type<|:String): String {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:makeType<|(|>ATTRIBUTE_USE:type<|:String): String {
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{|>ATTRIBUTE_USE:publicClassImage<|}'></td><td>{|>ATTRIBUTE_USE:type<|}</td></tr></html>";
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeOp<|(op:Operation): String {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:makeOp<|(op:Operation): String {
     var content = "{op.Name}(";
     var sep = "";
     var ret = null;
@@ -351,7 +351,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeOp<|(op:Operation)
     
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeFunction<|(funName: String, op:Operation): String {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:makeFunction<|(funName: String, op:Operation): String {
     var content = "{funName}(";
     var sep = "";
     var ret = null;
@@ -364,12 +364,12 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:makeFunction<|(funName
     
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:go<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:go<|() {
     println("go...");
     |>ATTRIBUTE_USE:userCode<| = getResourceAsString(|>ATTRIBUTE_USE:url<|);
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:up<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:up<|() {
     var i = |>ATTRIBUTE_USE:completionList<|.selection;
     if (i < 0) {
         i = 0;
@@ -382,7 +382,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:up<|() {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:down<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:down<|() {
     var i = |>ATTRIBUTE_USE:completionList<|.selection;
     if (i < 0) {
         i = 0;
@@ -395,7 +395,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:down<|() {
     }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:pageUp<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:pageUp<|() {
     var i = |>ATTRIBUTE_USE:completionList<|.selection;
     if (i < |>ATTRIBUTE_USE:pageSize<|) {
         return;
@@ -407,7 +407,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:pageUp<|() {
     |>ATTRIBUTE_USE:completionList<|.selection = i;
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:pageDown<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:pageDown<|() {
     var i = |>ATTRIBUTE_USE:completionList<|.selection;
     if (i > sizeof |>ATTRIBUTE_USE:completionProposals<| - |>ATTRIBUTE_USE:pageSize<|) {
         return;
@@ -419,15 +419,15 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:pageDown<|() {
     |>ATTRIBUTE_USE:completionList<|.selection = i;
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:home<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:home<|() {
     |>ATTRIBUTE_USE:completionList<|.selection = 0;
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:end<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:end<|() {
     |>ATTRIBUTE_USE:completionList<|.selection = sizeof |>ATTRIBUTE_USE:completionProposals<| -1;
 }
 
-trigger on |>CLASS_USE:JavaFXPad<|.editor = |>ATTRIBUTE_USE:value<| {
+trigger on |>CLASS_USE:VisagePad<|.editor = |>ATTRIBUTE_USE:value<| {
     var comp = |>ATTRIBUTE_USE:editor<|.getNonScrollPaneComponent();
     var inputMap = comp.getInputMap();
     var tabKey = inputMap.get(JKeyStroke.getKeyStroke(AWTKeyEvent.VK_TAB, 0));
@@ -576,12 +576,12 @@ trigger on |>CLASS_USE:JavaFXPad<|.editor = |>ATTRIBUTE_USE:value<| {
     
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:formatCode<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:formatCode<|() {
     if (true) {
         var line = |>ATTRIBUTE_USE:editor<|.getLineOfOffset(|>ATTRIBUTE_USE:editor<|.caretDot) + 1;
         var lineOffset = |>ATTRIBUTE_USE:editor<|.getLineStartOffset(|>ATTRIBUTE_USE:line<|-1);
         var colOffset = |>ATTRIBUTE_USE:editor<|.caretDot - lineOffset + 1;
-        var fmt = new JFXCodeFormatter();
+        var fmt = new VSGCodeFormatter();
         var result = fmt.formatCode(|>ATTRIBUTE_USE:editor<|.text, |>ATTRIBUTE_USE:line<|, lineOffset, colOffset, |>ATTRIBUTE_USE:editor<|.caretDot);
         var newLineOff = fmt.getLineOffset();
         |>ATTRIBUTE_USE:editor<|.text = result;
@@ -740,7 +740,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:formatCode<|() {
     |>ATTRIBUTE_USE:editor<|.setCaretPosition(lineOff);
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:doCompletion<|(keyboard:Boolean) {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:doCompletion<|(keyboard:Boolean) {
     var selectedIndex = this.|>ATTRIBUTE_USE:completionList<|.selection;
     var completion = |>ATTRIBUTE_USE:completionProposals<|[|>ATTRIBUTE_USE:selectedIndex<|];
     if (completion == null) {
@@ -753,7 +753,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:doCompletion<|(keyboar
     |>ATTRIBUTE_USE:editor<|.setCaretPosition(|>ATTRIBUTE_USE:editor<|.caretDot + |>ATTRIBUTE_USE:cursorOffset<|);
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:formatType<|(t:Class) {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:formatType<|(t:Class) {
     var typeName = t.Name;
     var dot = typeName.lastIndexOf('.');
     if (dot > 0) {
@@ -762,7 +762,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:formatType<|(t:Class) 
     return typeName;
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:formatMethod<|(method:Method) {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:formatMethod<|(method:Method) {
     var name = method.getName();
     var buf = new StringBuffer();
     buf.append(|>ATTRIBUTE_USE:name<|);
@@ -785,7 +785,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:formatMethod<|(method:
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{|>ATTRIBUTE_USE:publicMethodImage<|}'></td><td>{buf.toString()}</td></tr></table></html>";
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:completionRequest<|(k:|>CLASS_USE:KeyStroke<|) {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:completionRequest<|(k:|>CLASS_USE:KeyStroke<|) {
     operation |>OPERATION_DECLARATION:getNodeAndDerived<|() {
         var set = new HashSet();
         operation |>OPERATION_DECLARATION:getDerivedTypes<|(|>ATTRIBUTE_USE:c<|:Class, result:Set) {
@@ -800,7 +800,7 @@ operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:completionRequest<|(k:
         getDerivedTypes(:|>CLASS_USE:Node<|, set);
         return set.toArray();
     }
-    var fileName = if |>ATTRIBUTE_USE:url<| == null then "JavaFXPad" else |>ATTRIBUTE_USE:url<|;
+    var fileName = if |>ATTRIBUTE_USE:url<| == null then "VisagePad" else |>ATTRIBUTE_USE:url<|;
     var sourceCode = |>ATTRIBUTE_USE:editor<|.text.replaceAll("\r\n", "\n"); //hack \r\n only counts as one character as far as the caret is concerned
     var processor = new CompletionProcessor();
     var members;
@@ -1004,7 +1004,7 @@ if (|>ATTRIBUTE_USE:y<| + 150 > h) {
 |>ATTRIBUTE_USE:inCompletion<| = sizeof proposals > 0;
 }
 
-trigger on |>CLASS_USE:JavaFXPad<|.inCompletion = |>ATTRIBUTE_USE:value<| {
+trigger on |>CLASS_USE:VisagePad<|.inCompletion = |>ATTRIBUTE_USE:value<| {
 if (not |>ATTRIBUTE_USE:value<|) {
     |>ATTRIBUTE_USE:updatingCompletions<| = true;
     delete |>ATTRIBUTE_USE:completionProposals<|;
@@ -1012,17 +1012,17 @@ if (not |>ATTRIBUTE_USE:value<|) {
 }
 }
 
-function |>CLASS_USE:JavaFXPad<|.|>FUNCTION_DECLARATION:isValid<|() {
+function |>CLASS_USE:VisagePad<|.|>FUNCTION_DECLARATION:isValid<|() {
     return sizeof |>ATTRIBUTE_USE:errMessages<| == 0;
 }
 
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:evaluate<|(sourceCode:String, run:Boolean) {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:evaluate<|(sourceCode:String, run:Boolean) {
 if (|>ATTRIBUTE_USE:compilation<| == null) {
     |>ATTRIBUTE_USE:compilation<| = new Compilation(context:UIContext.getModule());
     |>ATTRIBUTE_USE:compilation<|.setSourcePath(|>ATTRIBUTE_USE:sourcePath<|);
 }
-var fileName = if |>ATTRIBUTE_USE:url<| == null then "JavaFXPad" else |>ATTRIBUTE_USE:url<|;
+var fileName = if |>ATTRIBUTE_USE:url<| == null then "VisagePad" else |>ATTRIBUTE_USE:url<|;
 var unit;
 try {
     unit = |>ATTRIBUTE_USE:compilation<|.readCompilationUnit(fileName, new StringReader(sourceCode));
@@ -1124,7 +1124,7 @@ if (t == null and contextType == null) {
 }
 
 
-trigger on |>CLASS_USE:JavaFXPad<|.userCode[old] = |>ATTRIBUTE_USE:value<| {
+trigger on |>CLASS_USE:VisagePad<|.userCode[old] = |>ATTRIBUTE_USE:value<| {
 var req = ++|>ATTRIBUTE_USE:compileRequests<|;
 if (not |>ATTRIBUTE_USE:validateAutomatically<|) {
 	return;
@@ -1136,7 +1136,7 @@ for (compile in [false, true]) (dur 1000 linear) {
 }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:validateNow<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:validateNow<|() {
 try {
     this.compile();
 } catch (e:Throwable) {
@@ -1146,7 +1146,7 @@ try {
 }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:runNow<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:runNow<|() {
 try {
     this.evaluate(|>ATTRIBUTE_USE:userCode<|, true);
 } catch (e:Throwable) {
@@ -1156,7 +1156,7 @@ try {
 }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:compile<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:compile<|() {
 if (this.|>ATTRIBUTE_USE:inCompletion<|) {
     return;
 }
@@ -1175,7 +1175,7 @@ try {
 }
 }
 
-operation |>CLASS_USE:JavaFXPad<|.|>OPERATION_DECLARATION:composeWidget<|() {
+operation |>CLASS_USE:VisagePad<|.|>OPERATION_DECLARATION:composeWidget<|() {
 do later {if (|>ATTRIBUTE_USE:url<| <> null) {go();}}
 return |>CLASS_USE:Canvas<| {
     |>ATTRIBUTE_USE:border<|: null
@@ -1325,7 +1325,7 @@ return |>CLASS_USE:Canvas<| {
                                |>ATTRIBUTE_USE:center<|: SourceEditor {
 				//onMouseWheelMoved: operation(e) {println(e);}
                                 //preferredSize: {height: 500, width: 800}
-                                |>ATTRIBUTE_USE:editorKit<|: new <<net.java.javafx.ui.f3kit.F3EditorKit>>()
+                                |>ATTRIBUTE_USE:editorKit<|: new <<net.java.visage.ui.f3kit.F3EditorKit>>()
                                 |>ATTRIBUTE_USE:opaque<|: true
                                 selectedTextColor: white
                                 |>ATTRIBUTE_USE:foreground<|: black

@@ -39,12 +39,12 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package qa.javafx.functional.library.project;
+package qa.visage.functional.library.project;
 
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JListOperator;
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Util;
 import org.netbeans.jellytools.MainWindowOperator;
 
 import java.awt.event.KeyEvent;
@@ -54,7 +54,7 @@ import java.util.List;
 import javax.swing.ListModel;
 
 import javax.swing.SwingUtilities;
-import qa.javafx.functional.library.operator.ClassNameComponentChooser;
+import qa.visage.functional.library.operator.ClassNameComponentChooser;
 import org.netbeans.jellytools.modules.editor.CompletionJListOperator;
 
 

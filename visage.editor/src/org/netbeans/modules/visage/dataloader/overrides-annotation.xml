@@ -46,8 +46,8 @@ made subject to such option by the copyright holder.
        <!DOCTYPE type PUBLIC
                  "-//NetBeans//DTD annotation type 1.0//EN"
                  "http://www.netbeans.org/dtds/annotation-type-1_0.dtd">
-       <type name="org.netbeans.modules.javafx.editor.hints"
+       <type name="org.netbeans.modules.visage.editor.hints"
              description_key="LAB_IsOverridenAnnotation"
              localizing_bundle="org.netbeans.modules.java.Bundle"
              visible="true"
-             glyph="nbresloc:/org/netbeans/modules/javafx/editor/resources/overrides.png"/>
+             glyph="nbresloc:/org/netbeans/modules/visage/editor/resources/overrides.png"/>

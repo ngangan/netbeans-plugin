@@ -39,25 +39,25 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.api.javafx.editor;
+package org.netbeans.api.visage.editor;
 
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
-import org.netbeans.modules.javafx.editor.*;
+import org.netbeans.modules.visage.editor.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
-import org.netbeans.api.javafx.source.Task;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSourceUtils;
+import org.netbeans.api.visage.source.Task;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
 
@@ -81,7 +81,7 @@ public final class ElementOpen {
             return false;
         }
 
-        final JavaFXSource js = JavaFXSource.forFileObject(srcFile);
+        final VisageSource js = VisageSource.forFileObject(srcFile);
         if (js == null) {
             return false;
         }
@@ -101,7 +101,7 @@ public final class ElementOpen {
                                 return;
                             }
 
-                            JavaFXTreePath elpath = controller.getPath(el);
+                            VisageTreePath elpath = controller.getPath(el);
                             Tree tree = elpath != null ? elpath.getLeaf() : null;
 
                             if (tree != null) {
@@ -142,7 +142,7 @@ public final class ElementOpen {
         TypeElement tel = getEnclosingClassElement(el);
         ElementHandle elh = ElementHandle.create(el);
 
-        if (!comp.getJavafxTypes().isJFXClass((Symbol) tel)) { // java
+        if (!comp.getJavafxTypes().isVSGClass((Symbol) tel)) { // java
             return openThroughJavaSupport(comp.getFileObject(), elh);
         }
         // Find the source file
@@ -167,7 +167,7 @@ public final class ElementOpen {
     private static FileObject getFile(Element elem, final CompilationInfo comp) {
         FileObject ref = comp.getFileObject();
         ClasspathInfo cpi = ClasspathInfo.create(ref);
-        return JavaFXSourceUtils.getFile(elem, cpi);
+        return VisageSourceUtils.getFile(elem, cpi);
     }
     
     // All of the following code is a hack to call through to the java

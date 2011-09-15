@@ -40,12 +40,12 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.completion.environment;
+package org.netbeans.modules.visage.editor.completion.environment;
 
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.javafx.code.JavafxTypes;
-import com.sun.tools.javafx.tree.JFXInstanciate;
-import org.netbeans.modules.javafx.editor.completion.JavaFXCompletionEnvironment;
+import com.sun.tools.visage.code.JavafxTypes;
+import com.sun.tools.visage.tree.VSGInstanciate;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
@@ -57,13 +57,13 @@ import java.util.logging.Logger;
  *
  * @author David Strupl
  */
-public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInstanciate> {
+public class InstantiateEnvironment extends VisageCompletionEnvironment<VSGInstanciate> {
     
     private static final Logger logger = Logger.getLogger(InstantiateEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(JFXInstanciate it) throws IOException {
+    protected void inside(VSGInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
         int end = (int) sourcePositions.getEndPosition(root, it);
         if (LOGGABLE) log("inside InstantiateEnvironment " + it +  // NOI18N
@@ -88,7 +88,7 @@ public class InstantiateEnvironment extends JavaFXCompletionEnvironment<JFXInsta
         addMembers(tm, false, true, ":",controller.getTreeUtilities().getScope(path),true, true); // NOI18N
     }
 
-    public TypeMirror getSmartType(JFXInstanciate it) throws IOException {
+    public TypeMirror getSmartType(VSGInstanciate it) throws IOException {
         String s = it.getIdentifier().toString();
         TypeElement te = findTypeElement(s);
         TypeMirror type = te != null ? te.asType() : null;

@@ -40,31 +40,31 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.profiler.utilities;
+package org.netbeans.modules.visage.profiler.utilities;
 
 import com.sun.tools.mjavac.code.Kinds;
 import java.io.IOException;
 import java.util.LinkedList;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
 import org.netbeans.lib.profiler.common.filters.SimpleFilter;
 import org.netbeans.modules.profiler.projectsupport.utilities.SourceUtils;
 import org.netbeans.spi.project.SubprojectProvider;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.modules.profiler.projectsupport.utilities.ProjectUtilities;
 import org.openide.filesystems.FileUtil;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.modules.javafx.project.classpath.ClassPathProviderImpl;
-import org.netbeans.modules.javafx.source.classpath.FileObjects;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.modules.visage.project.classpath.ClassPathProviderImpl;
+import org.netbeans.modules.visage.source.classpath.FileObjects;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.TypeTags;
 import com.sun.tools.mjavac.util.Convert;
 import com.sun.tools.mjavac.util.Name;
-import org.netbeans.api.javafx.source.CompilationInfo;
+import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.lib.profiler.ProfilerLogger;
@@ -84,9 +84,9 @@ import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import org.netbeans.api.javafx.source.CancellableTask;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
+import org.netbeans.api.visage.source.CancellableTask;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
 import com.sun.source.tree.ClassTree;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.modules.profiler.utils.OutputParameter;
@@ -94,22 +94,22 @@ import org.netbeans.modules.profiler.utils.OutputParameter;
 /* 
  * @author cms
  */
-public class JavaFXProjectUtilities extends ProjectUtilities {
+public class VisageProjectUtilities extends ProjectUtilities {
     
     public static final String SOURCES_TYPE_JAVAFX = "fx";         // NOI18N
     public static final String SOURCES_TYPE_JAVA   = "java";       // NOI18N
     public static final String JAVAFX_MIME_TYPE    = "text/x-fx";  // NOI18N
     public static final String CLASS_MIME_TYPE    = "application/x-class-file";   // NOI18N
-    public static final String MAGIC_METHOD_NAME    = "javafx$run$";  // NOI18N
-    public static final String MAGIC_METHOD_SIGNATURE    = "(Lcom/sun/javafx/runtime/sequence/Sequence;)Ljava/lang/Object;";  // NOI18N
+    public static final String MAGIC_METHOD_NAME    = "visage$run$";  // NOI18N
+    public static final String MAGIC_METHOD_SIGNATURE    = "(Lcom/sun/visage/runtime/sequence/Sequence;)Ljava/lang/Object;";  // NOI18N
     public static final String INTERFACE_NAME_SUFFIX = "$Intf";  // NOI18N
-    public static final String JAVAFX_PREFIX = "javafx.";  // NOI18N
+    public static final String JAVAFX_PREFIX = "visage.";  // NOI18N
 
     public static String getEnclosingClassName(FileObject profiledClassFile, final int position) {
         final OutputParameter<String> result = new OutputParameter<String>(null);
 
-        if (isJavaFXFile(profiledClassFile)) {
-            JavaFXSource js = JavaFXSource.forFileObject(profiledClassFile);
+        if (isVisageFile(profiledClassFile)) {
+            VisageSource js = VisageSource.forFileObject(profiledClassFile);
 
             if (js == null) {
                 return null; // not java source
@@ -197,8 +197,8 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static String getToplevelClassName(FileObject profiledClassFile) {
         final String[] result = new String[1];
 
-        if (isJavaFXFile(profiledClassFile)) {
-            JavaFXSource js = JavaFXSource.forFileObject(profiledClassFile);
+        if (isVisageFile(profiledClassFile)) {
+            VisageSource js = VisageSource.forFileObject(profiledClassFile);
 
             if (js == null) {
                 return null; // not java source
@@ -216,7 +216,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                                return;
                             }
 
-                            JavaFXTreePathScanner<String, Void> scanner = new JavaFXTreePathScanner<String, Void>() {
+                            VisageTreePathScanner<String, Void> scanner = new VisageTreePathScanner<String, Void>() {
                                 public String visitClassDeclaration(ClassTree node, Void p) {
                                     try {
                                         TypeElement classElement = (TypeElement) controller.getTrees().getElement(getCurrentPath());
@@ -308,15 +308,15 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     public static String getToplevelClassName(final Project project, FileObject profiledClassFile) {
         if (SourceUtils.isJavaFile(profiledClassFile)) {
             return SourceUtils.getToplevelClassName(profiledClassFile);
-        } else if (isJavaFXFile(profiledClassFile)) {
-            JavaFXProject projectJFX = (JavaFXProject)project;
-            String clazz = FileUtil.getRelativePath(getRoot(projectJFX.getFOSourceRoots(),profiledClassFile), profiledClassFile);
+        } else if (isVisageFile(profiledClassFile)) {
+            VisageProject projectVSG = (VisageProject)project;
+            String clazz = FileUtil.getRelativePath(getRoot(projectVSG.getFOSourceRoots(),profiledClassFile), profiledClassFile);
             return (clazz.substring(0, clazz.length() - 3)).replace('/','.'); // NOI18N
         }
         return ""; //NOI18N // won't be here: other file types are not supported
     }   
     
-    public static boolean isJavaFXFile(FileObject f) {
+    public static boolean isVisageFile(FileObject f) {
         return JAVAFX_MIME_TYPE.equals(f.getMIMEType()) || CLASS_MIME_TYPE.equals(f.getMIMEType()); //NOI18N
     }        
     
@@ -365,11 +365,11 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     }    
     
     
-    private static ClassPathProviderImpl getCPProvider(JavaFXProject project) {
+    private static ClassPathProviderImpl getCPProvider(VisageProject project) {
         return project.getClassPathProvider();
     }
     
-    public static ClasspathInfo createClassPathInfo(JavaFXProject project) {
+    public static ClasspathInfo createClassPathInfo(VisageProject project) {
         ClassPath srcPath = null;
         ClassPath bootPath = null;
         ClassPath compilePath = null;
@@ -394,9 +394,9 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     }        
     
     
-    public static JavaFXSource getSources(JavaFXProject project) {
+    public static VisageSource getSources(VisageProject project) {
         final ClasspathInfo cpInfo = createClassPathInfo(project);
-        return JavaFXSource.create(cpInfo, getSourceFiles(project));
+        return VisageSource.create(cpInfo, getSourceFiles(project));
     }
     
     /**
@@ -434,7 +434,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
         return mainClass;
     }
 
-    public static List<FileObject> getSourceFiles(JavaFXProject project) {
+    public static List<FileObject> getSourceFiles(VisageProject project) {
         FileObject[] roots = project.getFOSourceRoots();
 
         List<FileObject> result = new ArrayList<FileObject>();
@@ -504,7 +504,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                 for (FileObject child : children) {
                     if (((caseSensitive && child.getName().equals (sourceFileName)) ||
                         (!caseSensitive && child.getName().equalsIgnoreCase (sourceFileName))) &&
-                        (child.isData() && isJavaFXFile(child))) {
+                        (child.isData() && isVisageFile(child))) {
                         return child;
                     }
                 }
@@ -611,7 +611,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     
     public static ResolvedMethod resolveMethodAtPosition(final FileObject fo, final int position) {
         // Get JavaSource for given FileObject
-        JavaFXSource js = JavaFXSource.forFileObject(fo);
+        VisageSource js = VisageSource.forFileObject(fo);
 
         if (js == null) {
             return null; // not java source
@@ -632,7 +632,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                        return;
                     }
                     
-                    JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
+                    VisageTreePath path = ci.getTreeUtilities().pathFor(position);
                     if (path == null) {
                         return;
                     }
@@ -660,11 +660,11 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
     }
     
     public static ResolvedClass resolveClassAtPosition(final FileObject fo, final int position, final boolean resolveField) {
-        // Get JavaFXSource for given FileObject
-        JavaFXSource js = JavaFXSource.forFileObject(fo);
+        // Get VisageSource for given FileObject
+        VisageSource js = VisageSource.forFileObject(fo);
 
         if (js == null) {
-            return null; // not javafx source
+            return null; // not visage source
         }
 
         // Final holder of resolved method
@@ -681,7 +681,7 @@ public class JavaFXProjectUtilities extends ProjectUtilities {
                         if (ci.toPhase(Phase.ANALYZED).lessThan(Phase.ANALYZED)) {
                            return;
                         }
-                        JavaFXTreePath path = ci.getTreeUtilities().pathFor(position);
+                        VisageTreePath path = ci.getTreeUtilities().pathFor(position);
 
                         if (path == null) {
                             return;

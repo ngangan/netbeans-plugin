@@ -41,19 +41,19 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
-import org.netbeans.api.javafx.source.ClassIndex.SearchScope;
+import org.netbeans.api.visage.source.ClassIndex.SearchScope;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.netbeans.api.javafx.source.ClassIndex;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
-import org.netbeans.modules.javafx.project.JavaFXProject;
+import org.netbeans.api.visage.source.ClassIndex;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.VisageSource;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
+import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
@@ -62,21 +62,21 @@ import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
  *
  * @author cms
  */
-public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
+public class VisageProjectPackages extends SelectorChildren<ContainerNode> {
     
-    JavaFXProject project;
-    JavaFXSource source;
+    VisageProject project;
+    VisageSource source;
     private boolean isLibraryNode;
 
     public static enum PackageType {
         Libraries, Source;
     }
 
-    private final JavaFXProjectPackages.PackageType packageType;
+    private final VisageProjectPackages.PackageType packageType;
     private final Set<SearchScope> scope = new HashSet<SearchScope>();
     private final boolean subprojects;
 
-    public JavaFXProjectPackages(final JavaFXProjectPackages.PackageType type, final JavaFXProject project, final boolean includeSubprojects) {
+    public VisageProjectPackages(final VisageProjectPackages.PackageType type, final VisageProject project, final boolean includeSubprojects) {
         this.packageType = type;
         this.project = project;
 
@@ -99,16 +99,16 @@ public class JavaFXProjectPackages extends SelectorChildren<ContainerNode> {
     protected List<SelectorNode> prepareChildren(ContainerNode parent) {
         List<SelectorNode> pkgs = new ArrayList<SelectorNode>();
 
-        source = JavaFXSource.forFileObject(JavaFXProjectUtilities.getSourceFiles(project).get(0));
+        source = VisageSource.forFileObject(VisageProjectUtilities.getSourceFiles(project).get(0));
 
         final ClasspathInfo cpInfo = source.getClasspathInfo();
         ClassIndex index = cpInfo.getClassIndex();
 
         for (String pkgName : index.getPackageNames("", true, scope)) { // NOI18N
-            pkgs.add( new JavaFXPackageNode(cpInfo, pkgName, parent, scope, source, isLibraryNode));
+            pkgs.add( new VisagePackageNode(cpInfo, pkgName, parent, scope, source, isLibraryNode));
         }
 
-        Collections.sort(pkgs, JavaFXPackageNode.COMPARATOR);
+        Collections.sort(pkgs, VisagePackageNode.COMPARATOR);
 
         return pkgs;
     }

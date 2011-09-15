@@ -41,11 +41,11 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.javafx.tools.fxd.FXDRootElement;
-import com.sun.javafx.tools.fxd.container.ContainerEntry;
-import com.sun.javafx.tools.fxd.container.FXDContainer;
+import com.sun.visage.tools.fxd.FXDRootElement;
+import com.sun.visage.tools.fxd.container.ContainerEntry;
+import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.modules.editor.structure.api.DocumentElement;

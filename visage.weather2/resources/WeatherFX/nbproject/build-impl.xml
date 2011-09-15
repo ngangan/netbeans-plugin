@@ -19,7 +19,7 @@ is divided into following sections:
   - cleanup
 
         -->
-<project xmlns:javafxproject1="http://www.netbeans.org/ns/javafx-project/1" xmlns:javafxproject2="http://www.netbeans.org/ns/javafx-project/2" xmlns:javafxproject3="http://www.netbeans.org/ns/javafx-project/3" basedir=".." default="default" name="JavaFXApplication6-impl">
+<project xmlns:visageproject1="http://www.netbeans.org/ns/visage-project/1" xmlns:visageproject2="http://www.netbeans.org/ns/visage-project/2" xmlns:visageproject3="http://www.netbeans.org/ns/visage-project/3" basedir=".." default="default" name="VisageApplication6-impl">
     <target depends="jar" description="Build whole project." name="default"/>
     <!--
                     ======================
@@ -31,7 +31,7 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file.-->
     </target>
     <target depends="-pre-init" name="-init-private">
-        <macrodef name="property" uri="http://www.netbeans.org/ns/javafx-project/1">
+        <macrodef name="property" uri="http://www.netbeans.org/ns/visage-project/1">
             <attribute name="name"/>
             <attribute name="value"/>
             <sequential>
@@ -50,8 +50,8 @@ is divided into following sections:
         <property file="nbproject/project.properties"/>
     </target>
     <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
-        <javafxproject1:property name="platform.fxhome" value="platforms.${platform.active}.fxhome"/>
-        <javafxproject1:property name="platform.javadoc.tmp" value="platforms.${platform.active}.javadoc"/>
+        <visageproject1:property name="platform.fxhome" value="platforms.${platform.active}.fxhome"/>
+        <visageproject1:property name="platform.javadoc.tmp" value="platforms.${platform.active}.javadoc"/>
         <condition property="platform.javadoc" value="${platform.home}/bin/javadoc">
             <equals arg1="${platform.javadoc.tmp}" arg2="$${platforms.${platform.active}.javadoc}"/>
         </condition>
@@ -90,19 +90,19 @@ is divided into following sections:
         <condition else="" property="binary.extension" value=".exe">
             <os family="windows"/>
         </condition>
-        <property name="javafx.profile" value="desktop"/>
+        <property name="visage.profile" value="desktop"/>
         <condition property="midp.execution.trigger">
-            <equals arg1="${javafx.profile}" arg2="mobile"/>
+            <equals arg1="${visage.profile}" arg2="mobile"/>
         </condition>
         <condition property="jnlp.execution.trigger">
             <and>
-                <equals arg1="${javafx.profile}" arg2="desktop"/>
+                <equals arg1="${visage.profile}" arg2="desktop"/>
                 <equals arg1="${execution.target}" arg2="jnlp"/>
             </and>
         </condition>
         <condition property="applet.execution.trigger">
             <and>
-                <equals arg1="${javafx.profile}" arg2="desktop"/>
+                <equals arg1="${visage.profile}" arg2="desktop"/>
                 <equals arg1="${execution.target}" arg2="applet"/>
                 <isset property="netbeans.home"/>
             </and>
@@ -140,7 +140,7 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file.-->
     </target>
     <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-        <exec executable="${platform.fxhome}/bin/javafxpackager${binary.extension}" failonerror="true">
+        <exec executable="${platform.fxhome}/bin/visagepackager${binary.extension}" failonerror="true">
             <arg value="-src"/>
             <arg value="${src.dir}"/>
             <arg value="-workdir"/>
@@ -161,7 +161,7 @@ is divided into following sections:
             <arg value="-encoding"/>
             <arg value="${source.encoding}"/>
             <arg value="-p"/>
-            <arg value="${javafx.profile}"/>
+            <arg value="${visage.profile}"/>
             <arg value="${verbose.arg}"/>
             <arg value="${draggable.arg}"/>
             <arg value="${pack200.arg}"/>
@@ -188,7 +188,7 @@ is divided into following sections:
     -->
     <target depends="init,compile,jar" description="Run a main class." if="standard.execution.trigger" name="standard-run">
         <property name="application.args" value=""/>
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}" jvmargs="${run.jvmargs}">
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}" jvmargs="${run.jvmargs}">
             <arg line="${application.args}"/>
         </java>
     </target>
@@ -224,29 +224,29 @@ is divided into following sections:
                     =================
     -->
     <target depends="init" if="netbeans.home" name="-debug-start-debugger">
-        <nbjavafxstart addressproperty="javafx.address" name="${application.title}" transport="dt_socket">
+        <nbvisagestart addressproperty="visage.address" name="${application.title}" transport="dt_socket">
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
             <sourcepath>
                 <path path="${src.dir}"/>
             </sourcepath>
-        </nbjavafxstart>
+        </nbvisagestart>
     </target>
     <target depends="init" if="netbeans.home" name="-debug-start-debugger-stepinto">
-        <nbjavafxstart addressproperty="javafx.address" name="${application.title}" stopclassname="${main.class}" transport="dt_socket">
+        <nbvisagestart addressproperty="visage.address" name="${application.title}" stopclassname="${main.class}" transport="dt_socket">
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
             <sourcepath>
                 <path path="${src.dir}"/>
             </sourcepath>
-        </nbjavafxstart>
+        </nbvisagestart>
     </target>
     <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
         <property name="application.args" value=""/>
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/javafx${binary.extension}">
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address}"/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}">
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${visage.address}"/>
             <jvmarg line="${run.jvmargs}"/>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
@@ -261,7 +261,7 @@ is divided into following sections:
             <arg value="${run.jvmargs}"/>
             <arg value="-Xdescriptor:${jad.file}"/>
             <arg value="-Xdebug"/>
-            <arg value="-Xrunjdwp:transport=dt_socket,address=${javafx.address},server=n"/>
+            <arg value="-Xrunjdwp:transport=dt_socket,address=${visage.address},server=n"/>
         </exec>
     </target>
     <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
@@ -269,7 +269,7 @@ is divided into following sections:
             <os family="mac"/>
         </condition>
         <exec executable="${javaws.home}/bin/javaws">
-            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${javafx.address} ${run.jvmargs}"/>
+            <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${visage.address} ${run.jvmargs}"/>
             <arg file="${dist.dir}/${application.title}.jnlp"/>
         </exec>
     </target>
@@ -282,7 +282,7 @@ is divided into following sections:
     -->
     <target depends="init" name="-javadoc-build">
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" executable="${platform.fxhome}/bin/javafxdoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true">
+        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" executable="${platform.fxhome}/bin/visagedoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true">
             <fileset dir="${src.dir}" includes="**/*.fx"/>
         </javadoc>
         <condition property="javadoc.available">

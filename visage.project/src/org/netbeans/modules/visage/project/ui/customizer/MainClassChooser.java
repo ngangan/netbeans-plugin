@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.ui.customizer;
+package org.netbeans.modules.visage.project.ui.customizer;
 
 import java.awt.Component;
 import java.awt.event.MouseEvent;
@@ -65,7 +65,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.api.java.source.SourceUtils;
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
 import org.openide.awt.Mnemonics;
 import org.openide.awt.MouseUtils;
 import org.openide.filesystems.FileObject;
@@ -131,7 +131,7 @@ public class MainClassChooser extends JPanel {
         
   RequestProcessor.getDefault ().post (new Runnable () {
             public void run () {
-                possibleMainClasses = JavaFXProjectUtil.getFXFiles(sourcesRoots);
+                possibleMainClasses = VisageProjectUtil.getFXFiles(sourcesRoots);
                 
                 possibleJavaMainClasses = SourceUtils.getMainClasses(sourcesRoots);
                 List<String> javaMainClasses = new Vector();
@@ -213,7 +213,7 @@ public class MainClassChooser extends JPanel {
      * or SourceCookie doesn't contain the main method
      */    
     public static boolean hasMainMethod (FileObject classFO) {
-        return true;//JavaFXProjectUtil.hasMainMethod (classFO);
+        return true;//VisageProjectUtil.hasMainMethod (classFO);
     }
 
     /** This method is called from within the constructor to

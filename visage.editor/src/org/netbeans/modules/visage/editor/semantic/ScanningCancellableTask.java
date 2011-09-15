@@ -41,13 +41,13 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.javafx.api.tree.Tree;
+import com.sun.visage.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.support.CancellableTreePathScanner;
-import org.netbeans.api.javafx.source.support.CancellableTreeScanner;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
+import org.netbeans.api.visage.source.support.CancellableTreeScanner;
 
 /**
  *

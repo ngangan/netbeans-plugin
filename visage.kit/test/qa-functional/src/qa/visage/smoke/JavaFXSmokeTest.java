@@ -29,9 +29,9 @@
  * Portions Copyrighted 2007 Sun Microsystems, Inc.
  */
 
-package qa.javafx.smoke;
+package qa.visage.smoke;
 
-import qa.javafx.functional.library.Util;
+import qa.visage.functional.library.Util;
 import java.io.File;
 import java.io.FileFilter;
 import org.netbeans.jellytools.Bundle;
@@ -49,23 +49,23 @@ import org.netbeans.jemmy.operators.JTableOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 import org.netbeans.jemmy.operators.JTextFieldOperator;
 
-import qa.javafx.functional.library.JavaFXTestCase;
-import qa.javafx.functional.library.project.EditorOperator;
-import qa.javafx.functional.library.project.JavaFXProject;
+import qa.visage.functional.library.VisageTestCase;
+import qa.visage.functional.library.project.EditorOperator;
+import qa.visage.functional.library.project.VisageProject;
 
 import junit.framework.Test;
 import junit.textui.TestRunner;
 import org.netbeans.junit.NbModuleSuite;
 import org.netbeans.junit.NbTestSuite;
-import qa.javafx.functional.library.Constant;
-import qa.javafx.functional.library.operator.FXPaletteOperator;
-import qa.javafx.functional.library.operator.FXPreviewOperator;
+import qa.visage.functional.library.Constant;
+import qa.visage.functional.library.operator.FXPaletteOperator;
+import qa.visage.functional.library.operator.FXPreviewOperator;
 
 /**
  *
  * @author Alexandr Scherbatiy sunflower@netbeans.org
  */
-public class JavaFXSmokeTest extends JavaFXTestCase {
+public class VisageSmokeTest extends VisageTestCase {
 
     static String[] TESTS = {
         "testLoadModule",
@@ -80,30 +80,30 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
 
 
 
-    public JavaFXSmokeTest(String name) {
+    public VisageSmokeTest(String name) {
         super(name);
     }
 
 //    public static NbTestSuite suite() {
 //        NbTestSuite suite = new NbTestSuite();
-//        suite.addTest(new JavaFXSmokeTest("testLoadModule"));
-//        suite.addTest(new JavaFXSmokeTest("testProjectCreation"));
-//        suite.addTest(new JavaFXSmokeTest("testMainFile"));
-//        suite.addTest(new JavaFXSmokeTest("testPalette"));
-//        suite.addTest(new JavaFXSmokeTest("testProjectBuilding"));
-//        suite.addTest(new JavaFXSmokeTest("testEditor"));
-//        suite.addTest(new JavaFXSmokeTest("testPreview"));
-//        //suite.addTest(new JavaFXSmokeTest("testProfiler"));
+//        suite.addTest(new VisageSmokeTest("testLoadModule"));
+//        suite.addTest(new VisageSmokeTest("testProjectCreation"));
+//        suite.addTest(new VisageSmokeTest("testMainFile"));
+//        suite.addTest(new VisageSmokeTest("testPalette"));
+//        suite.addTest(new VisageSmokeTest("testProjectBuilding"));
+//        suite.addTest(new VisageSmokeTest("testEditor"));
+//        suite.addTest(new VisageSmokeTest("testPreview"));
+//        //suite.addTest(new VisageSmokeTest("testProfiler"));
 //        return suite;
 //    }
 
     public static Test suite() {
-        return NbModuleSuite.create(JavaFXSmokeTest.class, ".*", ".*", TESTS);
+        return NbModuleSuite.create(VisageSmokeTest.class, ".*", ".*", TESTS);
 
     }
 
     public static void main(String[] args) {
-        TestRunner.run(new NbTestSuite(JavaFXSmokeTest.class));
+        TestRunner.run(new NbTestSuite(VisageSmokeTest.class));
     }
 
 
@@ -118,7 +118,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
         JTabbedPaneOperator tabbedPane = new JTabbedPaneOperator(plugin);
 
         tabbedPane.selectPage("Installed");
-        new JTextFieldOperator(tabbedPane).typeText("JavaFX");
+        new JTextFieldOperator(tabbedPane).typeText("Visage");
         Util.sleep(2000);
 
         JTableOperator table = new JTableOperator(tabbedPane);
@@ -203,7 +203,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     }
 
     public void testProjectCreation() {
-        JavaFXProject project = JavaFXProject.createProject(PROJECT_NAME_HELLO_WORLD);
+        VisageProject project = VisageProject.createProject(PROJECT_NAME_HELLO_WORLD);
         project.openOutput();
 
 
@@ -211,7 +211,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
 
     public void testMainFile() {
         try {
-            JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+            VisageProject project = new VisageProject(PROJECT_NAME_HELLO_WORLD);
             assertNotNull("Main fx file has not been found", project.getFileNode("helloworld|Main.fx"));
             
             
@@ -223,7 +223,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     }
 
     public void testProjectBuilding() {
-        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        VisageProject project = new VisageProject(PROJECT_NAME_HELLO_WORLD);
         project.build();
 
 
@@ -234,7 +234,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     public void testPalette() {
         //System.out.println("Test Palette!");
 
-        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        VisageProject project = new VisageProject(PROJECT_NAME_HELLO_WORLD);
         EditorOperator editor = project.getMainEditor();
         editor.setText("package helloworld;\n");
 
@@ -276,7 +276,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     
     public void testEditor() {
 
-        JavaFXProject project = new JavaFXProject(PROJECT_NAME_HELLO_WORLD);
+        VisageProject project = new VisageProject(PROJECT_NAME_HELLO_WORLD);
         EditorOperator editor = project.getMainEditor();
         editor.setText();
         
@@ -324,7 +324,7 @@ public class JavaFXSmokeTest extends JavaFXTestCase {
     }
     
      public void testProfiler() {
-        JavaFXProject profiler  = JavaFXProject.createProject("SmokeProfiler");
+        VisageProject profiler  = VisageProject.createProject("SmokeProfiler");
         EditorOperator main = profiler.openMainFile();
         String code = Util.getSampleText(Constant.SMOKE_PROFILER_FILE_PATH);
 

@@ -34,28 +34,28 @@
 
 package weatherfx;
 
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.CustomNode;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.FontPosture;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.LineTo;
-import javafx.scene.shape.Path;
-import javafx.scene.shape.ClosePath;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextOrigin;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.transform.Affine;
+import visage.scene.Group;
+import visage.scene.Node;
+import visage.scene.CustomNode;
+import visage.scene.text.Font;
+import visage.scene.text.FontWeight;
+import visage.scene.text.FontPosture;
+import visage.scene.shape.CubicCurveTo;
+import visage.scene.shape.MoveTo;
+import visage.scene.shape.LineTo;
+import visage.scene.shape.Path;
+import visage.scene.shape.ClosePath;
+import visage.scene.text.Text;
+import visage.scene.text.TextOrigin;
+import visage.scene.paint.Color;
+import visage.scene.paint.LinearGradient;
+import visage.scene.paint.Stop;
+import visage.scene.transform.Affine;
 
 
 /**
  * Class holding graphics data for the loading screen. Original imported from Adobe Illustrator
- * using SVG export and SVG -> JavaFX converter.
+ * using SVG export and SVG -> Visage converter.
  * 
  * @author breh
  */

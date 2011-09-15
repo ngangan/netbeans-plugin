@@ -332,9 +332,9 @@ made subject to such option by the copyright holder.
     <!-- JAR resources -->
     
     <target name="-init-resources-jars" depends="-preinit-resources-unsigned-jars,-preinit-resources-signed-jars,-preinit-resources-main-jar,-pack200-jars"/>
-    <target name="-preinit-resources-unsigned-jars" depends="-exclude-javaws-from-cp,-exclude-javafxrt-from-cp,-check-signing-possible" unless="jnlp.signed.true+signjarstask.available">
+    <target name="-preinit-resources-unsigned-jars" depends="-exclude-javaws-from-cp,-exclude-visagert-from-cp,-check-signing-possible" unless="jnlp.signed.true+signjarstask.available">
         <pathconvert pathsep="${line.separator}" property="jnlp.resources.jars.value">
-            <path path="${run.classpath.without.javafxrt.jar}"/>
+            <path path="${run.classpath.without.visagert.jar}"/>
             <mapper type="regexp" from="^.*[/\\]([^/\\]+\.jar)"
                 to='        &lt;jar href="lib/\1" download="eager"/&gt;'/>
         </pathconvert>
@@ -356,12 +356,12 @@ made subject to such option by the copyright holder.
             <map from="${path.element.to.be.removed}" to=""/>
         </pathconvert>
     </target>
-    <target name="-exclude-javafxrt-from-cp">
+    <target name="-exclude-visagert-from-cp">
         <pathconvert property="path.element.to.be.removed2">
             <path path="${run.classpath.without.javaws.jar}"/>
-            <mapper type="regexp" from="(^.*[/\\]javafxrt.jar)" to="\1"/>
+            <mapper type="regexp" from="(^.*[/\\]visagert.jar)" to="\1"/>
         </pathconvert>
-        <pathconvert property="run.classpath.without.javafxrt.jar">
+        <pathconvert property="run.classpath.without.visagert.jar">
             <path path="${run.classpath.without.javaws.jar}"/>
             <map from="${path.element.to.be.removed2}" to=""/>
         </pathconvert>
@@ -393,13 +393,13 @@ made subject to such option by the copyright holder.
                 componentsprop="jnlp.components">
             <fileset dir="dist/lib">
                 <include name="*.jar"/>
-                <exclude name="javafxrt.jar"/>
+                <exclude name="visagert.jar"/>
             </fileset>
         </jnlpsignjars>
-        <!-- Sign excluded javafxrt.jar -->
+        <!-- Sign excluded visagert.jar -->
         <jnlpsignjars keystore="${jnlp.signjar.keystore}" storepass="${jnlp.signjar.storepass}" 
                 keypass="${jnlp.signjar.keypass}" alias="${jnlp.signjar.alias}" mainjar="${dist.dir}/${jnlp.fx.main.jar.value}" destdir="dist"
-                codebase="${jnlp.codebase.value}" signedjarsprop="jnlp.signed.javafxrt.jar"
+                codebase="${jnlp.codebase.value}" signedjarsprop="jnlp.signed.visagert.jar"
                 componentsprop="jnlp.components">
         </jnlpsignjars>
     </target>

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor.format.ui;
+package org.netbeans.modules.visage.editor.format.ui;
 
 import java.awt.Component;
 import java.awt.Point;
@@ -59,11 +59,11 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.*;
-import org.netbeans.modules.javafx.editor.format.CodeStyle.BracePlacement;
-import org.netbeans.modules.javafx.editor.format.CodeStyle.WrapStyle;
+import org.netbeans.modules.visage.editor.format.CodeStyle.BracePlacement;
+import org.netbeans.modules.visage.editor.format.CodeStyle.WrapStyle;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
 import org.openide.util.NbBundle;
-import static org.netbeans.modules.javafx.editor.format.ui.FmtOptions.*;
+import static org.netbeans.modules.visage.editor.format.ui.FmtOptions.*;
 
 /**
  *

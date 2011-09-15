@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.templates;
+package org.netbeans.modules.visage.project.templates;
 
 import java.io.File;
 import org.netbeans.junit.NbTestCase;
@@ -53,11 +53,11 @@ import org.openide.filesystems.FileUtil;
  *
  * @author answer
  */
-public class JavaFXTargetChooserPanelTest extends NbTestCase {
+public class VisageTargetChooserPanelTest extends NbTestCase {
     
     FileObject root = null;
     
-    public JavaFXTargetChooserPanelTest(String testName) {
+    public VisageTargetChooserPanelTest(String testName) {
         super(testName);
     }
 
@@ -74,7 +74,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
 /*
     public void testGetComponent() {
         System.out.println("getComponent");
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         Component expResult = null;
         Component result = instance.getComponent();
         assertEquals(expResult, result);
@@ -83,7 +83,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
 
     public void testGetHelp() {
         System.out.println("getHelp");
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         HelpCtx expResult = null;
         HelpCtx result = instance.getHelp();
         assertEquals(expResult, result);
@@ -92,7 +92,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
 
     public void testIsValid() {
         System.out.println("isValid");
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         boolean expResult = false;
         boolean result = instance.isValid();
         assertEquals(expResult, result);
@@ -102,7 +102,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
     public void testAddChangeListener() {
         System.out.println("addChangeListener");
         ChangeListener l = null;
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         instance.addChangeListener(l);
         fail("The test case is a prototype.");
     } 
@@ -110,7 +110,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
     public void testRemoveChangeListener() {
         System.out.println("removeChangeListener");
         ChangeListener l = null;
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         instance.removeChangeListener(l);
         fail("The test case is a prototype.");
     } 
@@ -118,7 +118,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
     public void testReadSettings() {
         System.out.println("readSettings");
         Object settings = null;
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         instance.readSettings(settings);
         fail("The test case is a prototype.");
     } 
@@ -126,7 +126,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
     public void testStoreSettings() {
         System.out.println("storeSettings");
         Object settings = null;
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         instance.storeSettings(settings);
         fail("The test case is a prototype.");
     } 
@@ -134,7 +134,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
     public void testStateChanged() {
         System.out.println("stateChanged");
         ChangeEvent e = null;
-        JavaFXTargetChooserPanel instance = null;
+        VisageTargetChooserPanel instance = null;
         instance.stateChanged(e);
         fail("The test case is a prototype.");
     } 
@@ -143,7 +143,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
         System.out.println("isValidPackageName");
         String str = "";
         boolean expResult = false;
-        boolean result = JavaFXTargetChooserPanel.isValidPackageName(str);
+        boolean result = VisageTargetChooserPanel.isValidPackageName(str);
         assertEquals(expResult, result);
         fail("The test case is a prototype.");
     } 
@@ -152,7 +152,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
         System.out.println("isValidTypeIdentifier");
         String ident = "";
         boolean expResult = false;
-        boolean result = JavaFXTargetChooserPanel.isValidTypeIdentifier(ident);
+        boolean result = VisageTargetChooserPanel.isValidTypeIdentifier(ident);
         assertEquals(expResult, result);
         fail("The test case is a prototype.");
     } 
@@ -161,7 +161,7 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
         System.out.println("isValidFileName");
         String ident = "";
         boolean expResult = false;
-        boolean result = JavaFXTargetChooserPanel.isValidFileName(ident);
+        boolean result = VisageTargetChooserPanel.isValidFileName(ident);
         assertEquals(expResult, result);
         fail("The test case is a prototype.");
     } 
@@ -177,13 +177,13 @@ public class JavaFXTargetChooserPanelTest extends NbTestCase {
         root = root.createFolder ("testCanUseFileName");
 
         assertNotNull (root + " exists.", FileUtil.toFile (root));
-        assertTrue ("Package aaa.bbb.ccc can be created.", JavaFXTargetChooserPanel.canUseFileName (root, "", "aaa.bbb.ccc", "") == null);
+        assertTrue ("Package aaa.bbb.ccc can be created.", VisageTargetChooserPanel.canUseFileName (root, "", "aaa.bbb.ccc", "") == null);
 
         assertNotNull ("Package aaa.bbb.ccc was created.", root.createFolder ("aaa").createFolder ("bbb").createFolder ("ccc"));
-        assertTrue ("Package aaa cannot be created.", JavaFXTargetChooserPanel.canUseFileName (root, "", "aaa", "") != null);
-        assertTrue ("Package aaa.bbb cannot be created.", JavaFXTargetChooserPanel.canUseFileName (root, "", "aaa.bbb", "") != null);
-        assertTrue ("Package aaa.bbb.ccc cannot be created.", JavaFXTargetChooserPanel.canUseFileName (root, "", "aaa.bbb.ccc", "") != null);
-        assertTrue ("Package ddd can be created.", JavaFXTargetChooserPanel.canUseFileName (root, "", "ddd", "") == null);
+        assertTrue ("Package aaa cannot be created.", VisageTargetChooserPanel.canUseFileName (root, "", "aaa", "") != null);
+        assertTrue ("Package aaa.bbb cannot be created.", VisageTargetChooserPanel.canUseFileName (root, "", "aaa.bbb", "") != null);
+        assertTrue ("Package aaa.bbb.ccc cannot be created.", VisageTargetChooserPanel.canUseFileName (root, "", "aaa.bbb.ccc", "") != null);
+        assertTrue ("Package ddd can be created.", VisageTargetChooserPanel.canUseFileName (root, "", "ddd", "") == null);
     } 
     
 }

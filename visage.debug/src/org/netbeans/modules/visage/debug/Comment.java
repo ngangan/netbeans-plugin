@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.debug;
+package org.netbeans.modules.visage.debug;
 
 /**
  * TODO: this is a copy from Java Source - remove it?

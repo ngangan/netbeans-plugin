@@ -40,8 +40,8 @@
  * Portions Copyrighted 2009 Sun Microsystems, Inc.
  */
 
-@JavaFXSamples(pathToSamples="../../../../../../../release/javafx-sdk/samples")
-package org.netbeans.modules.javafx.sdk.mac;
+@VisageSamples(pathToSamples="../../../../../../../release/visage-sdk/samples")
+package org.netbeans.modules.visage.sdk.mac;
 
-import org.netbeans.modules.javafx.sdksamples.api.JavaFXSamples;
+import org.netbeans.modules.visage.sdksamples.api.VisageSamples;
  

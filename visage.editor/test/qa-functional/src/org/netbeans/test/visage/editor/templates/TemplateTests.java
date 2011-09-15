@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.test.javafx.editor.templates;
+package org.netbeans.test.visage.editor.templates;
 
 /**
  *
@@ -54,14 +54,14 @@ import org.netbeans.jellytools.actions.SaveAction;
 import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.JEditorPaneOperator;
 import org.netbeans.junit.NbModuleSuite;
-import org.netbeans.test.javafx.editor.lib.JavaFXTestCase;
-import org.netbeans.test.javafx.editor.lib.Util;
+import org.netbeans.test.visage.editor.lib.VisageTestCase;
+import org.netbeans.test.visage.editor.lib.Util;
 import org.openide.filesystems.FileObject;
 import org.netbeans.jellytools.nodes.Node;
 import org.netbeans.jemmy.operators.JPopupMenuOperator;
 import org.netbeans.junit.diff.LineDiff;
 
-public class TemplateTests extends JavaFXTestCase {
+public class TemplateTests extends VisageTestCase {
 
     static String[] TESTS = {
         "testOpenProject", //Must always do this

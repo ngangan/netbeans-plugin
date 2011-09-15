@@ -1,16 +1,16 @@
-<mconfig name="JavaFX JUnit test config">
+<mconfig name="Visage JUnit test config">
     
-    <testbag testattribs="ide,smoke" executor="ide" compiler="ide-compiler" name="JavaFX Smoke Tests">
+    <testbag testattribs="ide,smoke" executor="ide" compiler="ide-compiler" name="Visage Smoke Tests">
         <testset dir="../../test/qa-functional/src">
             <patternset>
 
-                <include name="**/smoke/JavaFXSmokeTest.*"/>
+                <include name="**/smoke/VisageSmokeTest.*"/>
 
             </patternset>
         </testset>
     </testbag>
 
-    <testbag testattribs="unit,editor" executor="jvm" compiler="jvm-compiler" name="JavaFX Editor Unit Tests">
+    <testbag testattribs="unit,editor" executor="jvm" compiler="jvm-compiler" name="Visage Editor Unit Tests">
         <testset dir="../../editor/test/unit/src">
             <patternset>
 
@@ -20,7 +20,7 @@
         </testset>
     </testbag>
 
-    <testbag testattribs="unit,project" executor="jvm" compiler="jvm-compiler" name="JavaFX Project Unit Tests">
+    <testbag testattribs="unit,project" executor="jvm" compiler="jvm-compiler" name="Visage Project Unit Tests">
         <testset dir="unit/src">
             <patternset>
 

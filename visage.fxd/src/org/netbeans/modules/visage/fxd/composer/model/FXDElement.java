@@ -41,16 +41,16 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.model;
+package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.javafx.geom.Bounds2D;
-import com.sun.javafx.geom.transform.Affine2D;
-import com.sun.javafx.geom.transform.BaseTransform;
-import com.sun.javafx.geom.transform.NoninvertibleTransformException;
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import com.sun.visage.geom.Bounds2D;
+import com.sun.visage.geom.transform.Affine2D;
+import com.sun.visage.geom.transform.BaseTransform;
+import com.sun.visage.geom.transform.NoninvertibleTransformException;
+import visage.scene.Node;
+import visage.scene.Parent;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
-import org.netbeans.modules.javafx.fxd.dataloader.fxz.FXZDataObject;
+import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 import org.openide.util.Exceptions;
 
 /**

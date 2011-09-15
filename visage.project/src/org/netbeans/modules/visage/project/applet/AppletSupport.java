@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.project.applet;
+package org.netbeans.modules.visage.project.applet;
 
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.tree.Tree;
@@ -59,19 +59,19 @@ import javax.swing.SpinnerNumberModel;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationController;
 import org.netbeans.api.java.source.JavaSource;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
-import org.netbeans.api.javafx.source.JavaFXSourceUtils;
+import org.netbeans.api.visage.platform.VisagePlatform;
+import org.netbeans.api.visage.source.VisageSourceUtils;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
-import org.netbeans.modules.javafx.project.JavaFXProject;
-import org.netbeans.modules.javafx.project.JavaFXProjectUtil;
+import org.netbeans.modules.visage.project.VisageProject;
+import org.netbeans.modules.visage.project.VisageProjectUtil;
 import org.openide.*;
 import org.openide.modules.SpecificationVersion;
 import org.openide.filesystems.*;
 import org.openide.util.*;
 import org.netbeans.api.java.classpath.*;
 import org.netbeans.api.java.platform.*;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyEvaluator;
 
@@ -95,7 +95,7 @@ public class AppletSupport {
 
     private final static String POLICY_FILE_NAME = "applet"; // NOI18N
     private final static String POLICY_FILE_EXT = "policy"; // NOI18N
-    private final static String APPLET_MAIN_CLASS = "com.sun.javafx.runtime.adapter.Applet"; // NOI18N
+    private final static String APPLET_MAIN_CLASS = "com.sun.visage.runtime.adapter.Applet"; // NOI18N
     private final static int defaultWidth=200;
     private final static int defaultHeight=150;
 
@@ -159,9 +159,9 @@ public class AppletSupport {
         return result[0];
     }
 
-    public static boolean isJavaFXApplet(final FileObject file) {
-        // this code was moved to the JavaFX Source module because in this module the wrong classes (from javac lib) are loaded
-        return JavaFXSourceUtils.isJavaFXApplet(file);
+    public static boolean isVisageApplet(final FileObject file) {
+        // this code was moved to the Visage Source module because in this module the wrong classes (from javac lib) are loaded
+        return VisageSourceUtils.isVisageApplet(file);
     }
 
     /**
@@ -188,26 +188,26 @@ public class AppletSupport {
 //                codebase = classesDir.getURL().toString();
 //            }
 //            String jnlpFileName = htmlFile.getName() + "." + JNLP_EXT;
-//            String draggable = ep.getProperty(JavaFXProjectProperties.APPLET_DRAGGABLE);
-//            String java_args = ep.getProperty(JavaFXProjectProperties.APPLET_ARGUMENTS);
+//            String draggable = ep.getProperty(VisageProjectProperties.APPLET_DRAGGABLE);
+//            String java_args = ep.getProperty(VisageProjectProperties.APPLET_ARGUMENTS);
 //            int width = defaultWidth;
 //            int height = defaultHeight;
 //            try {
-//                width = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_WIDTH));
-//                height = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_HEIGHT));
+//                width = Integer.parseInt(ep.getProperty(VisageProjectProperties.APPLET_WIDTH));
+//                height = Integer.parseInt(ep.getProperty(VisageProjectProperties.APPLET_HEIGHT));
 //            }catch(NumberFormatException nfe) {
 //            }
 //            if (appletFile.getExt().equals("fx")) {
-//                JavaFXProject project = (JavaFXProject) getProject(appletFile);
+//                VisageProject project = (VisageProject) getProject(appletFile);
 //		if (project == null) {
-//		    project = (JavaFXProject)getProject(buildDir);
+//		    project = (VisageProject)getProject(buildDir);
 //		}
 //
 //                String distJAR = project.evaluator().getProperty("dist.jar");
 //                distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
 //                String libs = distJAR;
 //                try {
-//                    File fxFolder = new File(((JavaFXPlatform) JavaFXProjectUtil.getActivePlatform(activePlatform)).getJavaFXFolder().toURI());
+//                    File fxFolder = new File(((VisagePlatform) VisageProjectUtil.getActivePlatform(activePlatform)).getVisageFolder().toURI());
 //                    String[] list = fxFolder.list(new FilenameFilter() {
 //
 //                        public boolean accept(File dir, String name) {
@@ -225,7 +225,7 @@ public class AppletSupport {
 //                }
 //
 //
-////                String libs = distJAR + ",lib/javafxrt.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
+////                String libs = distJAR + ",lib/visagert.jar,lib/Scenario.jar,lib/Reprise.jar";// REWRITE runtime jars
 //                path = path.substring(0, path.length() - 3);
 //                if (isJavaScript && isInBrowser) {
 //                    fillInFileJavaScript(writer, path.replaceAll("/", "."), " archive=\"" + libs + "\"", true, draggable, java_args, jnlpFileName, width,height); // NOI18N
@@ -277,20 +277,20 @@ public class AppletSupport {
             int width = defaultWidth;
             int height = defaultHeight;
             try {
-                width = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_WIDTH));
-                height = Integer.parseInt(ep.getProperty(JavaFXProjectProperties.APPLET_HEIGHT));
+                width = Integer.parseInt(ep.getProperty(VisageProjectProperties.APPLET_WIDTH));
+                height = Integer.parseInt(ep.getProperty(VisageProjectProperties.APPLET_HEIGHT));
             }catch(NumberFormatException nfe) {
 
             }
             if (appletFile.getExt().equals("fx")) { // NOI18N
-                JavaFXProject project = (JavaFXProject) getProject(appletFile);
+                VisageProject project = (VisageProject) getProject(appletFile);
 
                 String distJAR = project.evaluator().getProperty("dist.jar"); // NOI18N
                 distJAR = distJAR.substring(distJAR.indexOf('/') + 1); // NOI18N
                 String libs = distJAR;
                 String[] list = {""}; // NOI18N
                 try {
-                    File fxFolder = new File(((JavaFXPlatform) JavaFXProjectUtil.getActivePlatform(activePlatform)).getJavaFXFolder().toURI());
+                    File fxFolder = new File(((VisagePlatform) VisageProjectUtil.getActivePlatform(activePlatform)).getVisageFolder().toURI());
                     list = fxFolder.list(new FilenameFilter() {
 
                         public boolean accept(File dir, String name) {
@@ -359,7 +359,7 @@ public class AppletSupport {
 //            return null;
 //        }
 //        try {
-//            if ("true".equals(ep.getProperty(JavaFXProjectProperties.APPLET_JNLP))) {
+//            if ("true".equals(ep.getProperty(VisageProjectProperties.APPLET_JNLP))) {
 //                jnlp = generateJNLP(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
 //            }
 //            html = generateHtml(appletFile, buildDir, classesDir, distDir, activePlatform, ep);
@@ -384,7 +384,7 @@ public class AppletSupport {
         assert htmlFile != null : "htmlFile cannot be null";    //NOI18N
         // JDK issue #6193279: Appletviewer does not accept encoded URLs
 
-        JavaPlatform platform = JavaFXProjectUtil.getActivePlatform(activePlatform);
+        JavaPlatform platform = VisageProjectUtil.getActivePlatform(activePlatform);
         boolean workAround6193279 = platform != null //In case of nonexisting platform don't use the workaround
                 && platform.getSpecification().getVersion().compareTo(JDK_15) >= 0; //JDK1.5 and higher
 
@@ -612,7 +612,7 @@ public class AppletSupport {
 
         String mainJar = ""; // NOI18N
         for (int i = 0; i < libs.length; i++) {
-            if (libs[i].equals("javafxgui.jar")) { // NOI18N
+            if (libs[i].equals("visagegui.jar")) { // NOI18N
                 mainJar = " main=\"true\""; // NOI18N
             } else {
                 mainJar = ""; // NOI18N

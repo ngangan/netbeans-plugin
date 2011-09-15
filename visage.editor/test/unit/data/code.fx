@@ -5,21 +5,21 @@
  *  SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
-package javafxpad;
-import javafx.ui._all_classes;
-import javafx.ui.*;
-import javafx.ui.canvas.*;
-import javafx.ui.filter.*;
-import net.java.javafx.ui.UIContext;
-import net.java.javafx.type.expr.ValidationError;
-import net.java.javafx.type.expr.VariableDeclarator;
-import net.java.javafx.typeImpl.Compilation;
-import net.java.javafx.typeImpl.completion.CompletionProcessor;
-import net.java.javafx.typeImpl.completion.CompletionParserTokenManager;
-import net.java.javafx.typeImpl.completion.CompletionParserConstants;
-import net.java.javafx.typeImpl.completion.SimpleCharStream;
-import net.java.javafx.typeImpl.completion.Token;
-import net.java.javafx.typeImpl.SourceCodeWriter;
+package visagepad;
+import visage.ui._all_classes;
+import visage.ui.*;
+import visage.ui.canvas.*;
+import visage.ui.filter.*;
+import net.java.visage.ui.UIContext;
+import net.java.visage.type.expr.ValidationError;
+import net.java.visage.type.expr.VariableDeclarator;
+import net.java.visage.typeImpl.Compilation;
+import net.java.visage.typeImpl.completion.CompletionProcessor;
+import net.java.visage.typeImpl.completion.CompletionParserTokenManager;
+import net.java.visage.typeImpl.completion.CompletionParserConstants;
+import net.java.visage.typeImpl.completion.SimpleCharStream;
+import net.java.visage.typeImpl.completion.Token;
+import net.java.visage.typeImpl.SourceCodeWriter;
 import java.net.URL;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -33,9 +33,9 @@ import java.lang.Character;
 import java.lang.reflect.Method;
 import javax.swing.KeyStroke as JKeyStroke;
 import javax.swing.UIManager;
-import javafx.ui.KeyEvent;
+import visage.ui.KeyEvent;
 import java.awt.event.KeyEvent as AWTKeyEvent;
-import javafx.ui.KeyStroke;
+import visage.ui.KeyStroke;
 import javax.swing.Action;
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -53,7 +53,7 @@ import java.lang.Throwable;
 import java.net.URL;
 
 public class LineNumberPanel extends Widget {
-    private attribute panel: <<net.java.javafx.ui.LineNumberPanel>>;
+    private attribute panel: <<net.java.visage.ui.LineNumberPanel>>;
     public attribute lineCount: Number;
     public operation getCellBounds(line:Integer);
 }
@@ -67,7 +67,7 @@ trigger on LineNumberPanel.lineCount = value {
 }
 
 operation LineNumberPanel.createComponent() {
-    panel = new <<net.java.javafx.ui.LineNumberPanel>>;
+    panel = new <<net.java.visage.ui.LineNumberPanel>>;
     panel.setOpaque(false);
     panel.setLineCount(lineCount);
     return panel;
@@ -87,7 +87,7 @@ class CompletionProposal {
     attribute documentation: String?;
 }
 
-public class JavaFXPad extends CompositeWidget {
+public class VisagePad extends CompositeWidget {
     attribute runAutomatically: Boolean;
     attribute validateAutomatically: Boolean;
     operation runNow();
@@ -159,7 +159,7 @@ public class JavaFXPad extends CompositeWidget {
     operation searchPrev();
 }
 
-operation JavaFXPad.doSearch() {
+operation VisagePad.doSearch() {
     if (searchActive) {
 	searchNext();
     } else {
@@ -167,7 +167,7 @@ operation JavaFXPad.doSearch() {
     }
 }
 
-operation JavaFXPad.searchNext() {
+operation VisagePad.searchNext() {
     var text = editor.text;
     var value = searchValue;
     if (not matchCase) {
@@ -182,7 +182,7 @@ operation JavaFXPad.searchNext() {
     }
 }
 
-operation JavaFXPad.searchPrev() {
+operation VisagePad.searchPrev() {
     var text = editor.text;
     var dot = editor.caretDot-1;
     var value = searchValue;
@@ -197,7 +197,7 @@ operation JavaFXPad.searchPrev() {
     }
 }
 
-operation JavaFXPad.highlightAll() {
+operation VisagePad.highlightAll() {
     if (searchValue == "") {
 	editor.highlight = null;
 	return;
@@ -222,7 +222,7 @@ operation JavaFXPad.highlightAll() {
     }
 }
 
-trigger on JavaFXPad.searchActive = newValue {
+trigger on VisagePad.searchActive = newValue {
     //editor.jtextarea.getCaret().setSelectionVisible(newValue); // hack: fix me
     if (not newValue) {
 	searchValue = "";
@@ -230,7 +230,7 @@ trigger on JavaFXPad.searchActive = newValue {
     }
 }
 
-trigger on JavaFXPad.searchValue = newValue {
+trigger on VisagePad.searchValue = newValue {
     if (searchValue == "") {
 	editor.highlight = null;
 	return;
@@ -250,15 +250,15 @@ trigger on JavaFXPad.searchValue = newValue {
     }
 }
 
-operation JavaFXPad.setSourcePath(urls: URL*) {
+operation VisagePad.setSourcePath(urls: URL*) {
     println("setting source path to : {urls}");
     sourcePath = urls;
     compilation.setSourcePath(urls);
 }
 
-attribute JavaFXPad.fontSize = 16;
+attribute VisagePad.fontSize = 16;
 
-trigger on new JavaFXPad {
+trigger on new VisagePad {
     var self = this;
     /*
    Thread.currentThread().getThreadGroup().setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
@@ -271,36 +271,36 @@ trigger on new JavaFXPad {
 */
 }
 
-attribute JavaFXPad.validateAutomatically = true;
-attribute JavaFXPad.runAutomatically = true;
+attribute VisagePad.validateAutomatically = true;
+attribute VisagePad.runAutomatically = true;
 
-trigger on JavaFXPad.compileError = e {
+trigger on VisagePad.compileError = e {
     println(e);
 }
 
 
-attribute JavaFXPad.imageCache = (select i.getImage() from i in select Image {url: url} from url in [publicMethodImage, publicFieldImage, publicClassImage]);
+attribute VisagePad.imageCache = (select i.getImage() from i in select Image {url: url} from url in [publicMethodImage, publicFieldImage, publicClassImage]);
 
-attribute JavaFXPad.publicMethodImage = "{__DOCBASE__}/images/methpub_obj.gif";
-attribute JavaFXPad.publicFieldImage = "{__DOCBASE__}/images/field_public_obj.gif";
-attribute JavaFXPad.publicClassImage = "{__DOCBASE__}/images/class_obj.gif";
-attribute JavaFXPad.pageSize = 8;
+attribute VisagePad.publicMethodImage = "{__DOCBASE__}/images/methpub_obj.gif";
+attribute VisagePad.publicFieldImage = "{__DOCBASE__}/images/field_public_obj.gif";
+attribute VisagePad.publicClassImage = "{__DOCBASE__}/images/class_obj.gif";
+attribute VisagePad.pageSize = 8;
 
-attribute JavaFXPad.selectedProposal = bind completionList.selection;
-attribute JavaFXPad.zoomOptions = [8.33, 12.5, 25, 50, 100, 125, 150, 200, 400, 800, 1600];
-attribute JavaFXPad.zoomSelection = 4;
-attribute JavaFXPad.zoomValue = bind zoomOptions[zoomSelection];
-attribute JavaFXPad.editorLineCount = bind editor.lineCount;
+attribute VisagePad.selectedProposal = bind completionList.selection;
+attribute VisagePad.zoomOptions = [8.33, 12.5, 25, 50, 100, 125, 150, 200, 400, 800, 1600];
+attribute VisagePad.zoomSelection = 4;
+attribute VisagePad.zoomValue = bind zoomOptions[zoomSelection];
+attribute VisagePad.editorLineCount = bind editor.lineCount;
 
-trigger on JavaFXPad.zoomValue = value {    
+trigger on VisagePad.zoomValue = value {    
 //println("zoom = {value}");
 }
 
-trigger on JavaFXPad.editorLineCount = value {
+trigger on VisagePad.editorLineCount = value {
 //println("lineCount = {value}");
 }
 
-trigger on JavaFXPad.selectedProposal = value {
+trigger on VisagePad.selectedProposal = value {
     selectedDoc = null;
     for (i in [false, true]) (dur 500 while selectedProposal == value) {
         if (i and selectedProposal == value) {
@@ -309,26 +309,26 @@ trigger on JavaFXPad.selectedProposal = value {
     }
 }
 
-operation JavaFXPad.makeField(field:String): String {
+operation VisagePad.makeField(field:String): String {
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{publicFieldImage}'></td><td>{field}</td></tr></html>";
 }
 
-operation JavaFXPad.makeAttr(a:Attribute): String {
+operation VisagePad.makeAttr(a:Attribute): String {
     var t = formatType(a.Type);
     var s = formatType(a.Scope);
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{publicFieldImage}'></td><td>{a.Name}&nbsp;&nbsp;&nbsp;&nbsp;{t}&nbsp;-&nbsp;{s}</td></tr></html>";
 }
 
-operation JavaFXPad.makeVar(decl:VariableDeclarator): String {
+operation VisagePad.makeVar(decl:VariableDeclarator): String {
     var t = formatType(decl.getType());
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{publicFieldImage}'></td><td>{decl.getVarName()}&nbsp;&nbsp;&nbsp;&nbsp;{t}&nbsp;-&nbsp;</td></tr></html>";
 }
 
-operation JavaFXPad.makeType(type:String): String {
+operation VisagePad.makeType(type:String): String {
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{publicClassImage}'></td><td>{type}</td></tr></html>";
 }
 
-operation JavaFXPad.makeOp(op:Operation): String {
+operation VisagePad.makeOp(op:Operation): String {
     var content = "{op.Name}(";
     var sep = "";
     var ret = null;
@@ -351,7 +351,7 @@ operation JavaFXPad.makeOp(op:Operation): String {
     
 }
 
-operation JavaFXPad.makeFunction(funName: String, op:Operation): String {
+operation VisagePad.makeFunction(funName: String, op:Operation): String {
     var content = "{funName}(";
     var sep = "";
     var ret = null;
@@ -364,12 +364,12 @@ operation JavaFXPad.makeFunction(funName: String, op:Operation): String {
     
 }
 
-operation JavaFXPad.go() {
+operation VisagePad.go() {
     println("go...");
     userCode = getResourceAsString(url);
 }
 
-operation JavaFXPad.up() {
+operation VisagePad.up() {
     var i = completionList.selection;
     if (i < 0) {
         i = 0;
@@ -382,7 +382,7 @@ operation JavaFXPad.up() {
     }
 }
 
-operation JavaFXPad.down() {
+operation VisagePad.down() {
     var i = completionList.selection;
     if (i < 0) {
         i = 0;
@@ -395,7 +395,7 @@ operation JavaFXPad.down() {
     }
 }
 
-operation JavaFXPad.pageUp() {
+operation VisagePad.pageUp() {
     var i = completionList.selection;
     if (i < pageSize) {
         return;
@@ -407,7 +407,7 @@ operation JavaFXPad.pageUp() {
     completionList.selection = i;
 }
 
-operation JavaFXPad.pageDown() {
+operation VisagePad.pageDown() {
     var i = completionList.selection;
     if (i > sizeof completionProposals - pageSize) {
         return;
@@ -419,15 +419,15 @@ operation JavaFXPad.pageDown() {
     completionList.selection = i;
 }
 
-operation JavaFXPad.home() {
+operation VisagePad.home() {
     completionList.selection = 0;
 }
 
-operation JavaFXPad.end() {
+operation VisagePad.end() {
     completionList.selection = sizeof completionProposals -1;
 }
 
-trigger on JavaFXPad.editor = value {
+trigger on VisagePad.editor = value {
     var comp = editor.getNonScrollPaneComponent();
     var inputMap = comp.getInputMap();
     var tabKey = inputMap.get(JKeyStroke.getKeyStroke(AWTKeyEvent.VK_TAB, 0));
@@ -576,12 +576,12 @@ trigger on JavaFXPad.editor = value {
     
 }
 
-operation JavaFXPad.formatCode() {
+operation VisagePad.formatCode() {
     if (true) {
         var line = editor.getLineOfOffset(editor.caretDot) + 1;
         var lineOffset = editor.getLineStartOffset(line-1);
         var colOffset = editor.caretDot - lineOffset + 1;
-        var fmt = new JFXCodeFormatter();
+        var fmt = new VSGCodeFormatter();
         var result = fmt.formatCode(editor.text, line, lineOffset, colOffset, editor.caretDot);
         var newLineOff = fmt.getLineOffset();
         editor.text = result;
@@ -740,7 +740,7 @@ operation JavaFXPad.formatCode() {
     editor.setCaretPosition(lineOff);
 }
 
-operation JavaFXPad.doCompletion(keyboard:Boolean) {
+operation VisagePad.doCompletion(keyboard:Boolean) {
     var selectedIndex = this.completionList.selection;
     var completion = completionProposals[selectedIndex];
     if (completion == null) {
@@ -753,7 +753,7 @@ operation JavaFXPad.doCompletion(keyboard:Boolean) {
     editor.setCaretPosition(editor.caretDot + cursorOffset);
 }
 
-operation JavaFXPad.formatType(t:Class) {
+operation VisagePad.formatType(t:Class) {
     var typeName = t.Name;
     var dot = typeName.lastIndexOf('.');
     if (dot > 0) {
@@ -762,7 +762,7 @@ operation JavaFXPad.formatType(t:Class) {
     return typeName;
 }
 
-operation JavaFXPad.formatMethod(method:Method) {
+operation VisagePad.formatMethod(method:Method) {
     var name = method.getName();
     var buf = new StringBuffer();
     buf.append(name);
@@ -785,7 +785,7 @@ operation JavaFXPad.formatMethod(method:Method) {
     return "<html><table cellpadding='0 0 0 4' cellspacing='0'><tr><td><img src='{publicMethodImage}'></td><td>{buf.toString()}</td></tr></table></html>";
 }
 
-operation JavaFXPad.completionRequest(k:KeyStroke) {
+operation VisagePad.completionRequest(k:KeyStroke) {
     operation getNodeAndDerived() {
         var set = new HashSet();
         operation getDerivedTypes(c:Class, result:Set) {
@@ -800,7 +800,7 @@ operation JavaFXPad.completionRequest(k:KeyStroke) {
         getDerivedTypes(:Node, set);
         return set.toArray();
     }
-    var fileName = if url == null then "JavaFXPad" else url;
+    var fileName = if url == null then "VisagePad" else url;
     var sourceCode = editor.text.replaceAll("\r\n", "\n"); //hack \r\n only counts as one character as far as the caret is concerned
     var processor = new CompletionProcessor();
     var members;
@@ -1004,7 +1004,7 @@ completionY = y;
 inCompletion = sizeof proposals > 0;
 }
 
-trigger on JavaFXPad.inCompletion = value {
+trigger on VisagePad.inCompletion = value {
 if (not value) {
     updatingCompletions = true;
     delete completionProposals;
@@ -1012,17 +1012,17 @@ if (not value) {
 }
 }
 
-function JavaFXPad.isValid() {
+function VisagePad.isValid() {
     return sizeof errMessages == 0;
 }
 
 
-operation JavaFXPad.evaluate(sourceCode:String, run:Boolean) {
+operation VisagePad.evaluate(sourceCode:String, run:Boolean) {
 if (compilation == null) {
     compilation = new Compilation(context:UIContext.getModule());
     compilation.setSourcePath(sourcePath);
 }
-var fileName = if url == null then "JavaFXPad" else url;
+var fileName = if url == null then "VisagePad" else url;
 var unit;
 try {
     unit = compilation.readCompilationUnit(fileName, new StringReader(sourceCode));
@@ -1124,7 +1124,7 @@ if (t == null and contextType == null) {
 }
 
 
-trigger on JavaFXPad.userCode[old] = value {
+trigger on VisagePad.userCode[old] = value {
 var req = ++compileRequests;
 if (not validateAutomatically) {
 	return;
@@ -1136,7 +1136,7 @@ for (compile in [false, true]) (dur 1000 linear) {
 }
 }
 
-operation JavaFXPad.validateNow() {
+operation VisagePad.validateNow() {
 try {
     this.compile();
 } catch (e:Throwable) {
@@ -1146,7 +1146,7 @@ try {
 }
 }
 
-operation JavaFXPad.runNow() {
+operation VisagePad.runNow() {
 try {
     this.evaluate(userCode, true);
 } catch (e:Throwable) {
@@ -1156,7 +1156,7 @@ try {
 }
 }
 
-operation JavaFXPad.compile() {
+operation VisagePad.compile() {
 if (this.inCompletion) {
     return;
 }
@@ -1175,7 +1175,7 @@ try {
 }
 }
 
-operation JavaFXPad.composeWidget() {
+operation VisagePad.composeWidget() {
 do later {if (url <> null) {go();}}
 return Canvas {
     border: null
@@ -1325,7 +1325,7 @@ return Canvas {
                                center: SourceEditor {
 				//onMouseWheelMoved: operation(e) {println(e);}
                                 //preferredSize: {height: 500, width: 800}
-                                editorKit: new <<net.java.javafx.ui.f3kit.F3EditorKit>>()
+                                editorKit: new <<net.java.visage.ui.f3kit.F3EditorKit>>()
                                 opaque: true
                                 selectedTextColor: white
                                 foreground: black

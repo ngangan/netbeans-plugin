@@ -40,10 +40,10 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.shapes;
+package org.netbeans.modules.visage.palette.items.shapes;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -53,6 +53,6 @@ import org.openide.text.ActiveEditorDrop;
 public class Rectangle implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return  JavaFXPaletteUtilities.insertSnippet(Rectangle.class, "TEMPLATE_Rectangle" , targetComponent, "javafx.scene.shape.Rectangle", "javafx.scene.paint.Color" ); //NOI18N;
+        return  VisagePaletteUtilities.insertSnippet(Rectangle.class, "TEMPLATE_Rectangle" , targetComponent, "visage.scene.shape.Rectangle", "visage.scene.paint.Color" ); //NOI18N;
     }
 }

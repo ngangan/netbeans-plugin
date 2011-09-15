@@ -4,10 +4,10 @@
 **/*.png 
 **/*.css
 **/*.url
-javafx.kit/javahelp/**/*.hs
-javafx.kit/javahelp/**/*.jhm
-javafx.kit/javahelp/**/*.jpeg
-javafx.kit/javahelp/**/*.jpg
-javafx.kit/javahelp/**/*.toc
-javafx.kit/javahelp/**/*.xml
+visage.kit/javahelp/**/*.hs
+visage.kit/javahelp/**/*.jhm
+visage.kit/javahelp/**/*.jpeg
+visage.kit/javahelp/**/*.jpg
+visage.kit/javahelp/**/*.toc
+visage.kit/javahelp/**/*.xml
 

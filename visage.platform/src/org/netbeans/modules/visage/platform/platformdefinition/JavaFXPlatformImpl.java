@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -57,7 +57,7 @@ import java.net.MalformedURLException;
 import java.util.Map.Entry;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.platform.Specification;
-import org.netbeans.api.javafx.platform.JavaFXPlatform;
+import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.spi.java.classpath.PathResourceImplementation;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
@@ -74,10 +74,10 @@ import org.openide.util.Utilities;
  * Implementation of the JavaPlatform API class, which serves proper
  * bootstrap classpath information.
  */
-public class JavaFXPlatformImpl extends JavaFXPlatform {
+public class VisagePlatformImpl extends VisagePlatform {
     
     public static final String PROP_ANT_NAME = "antName";                   //NOI18N
-    public static final String PLATFORM_JAVAFX = "JavaFX";                      //NOI18N
+    public static final String PLATFORM_JAVAFX = "Visage";                      //NOI18N
 
     protected static final String PLAT_PROP_ANT_NAME="platform.ant.name";             //NOI18N
     protected static final String PLAT_PROP_FX_HOME="platform.fx.home";             //NOI18N
@@ -129,7 +129,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
      */
     private Specification spec;
 
-    JavaFXPlatformImpl (String dispName, List<URL> javaFolders, URL fxFolder, Map<String,String> initialProperties, Map<String,String> sysProperties, List<URL> sources, List<URL> javadoc) {
+    VisagePlatformImpl (String dispName, List<URL> javaFolders, URL fxFolder, Map<String,String> initialProperties, Map<String,String> sysProperties, List<URL> sources, List<URL> javadoc) {
         super();
         this.displayName = dispName;
         this.javaFolders = javaFolders;
@@ -150,7 +150,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         addPlatformProperties(this);
     }
 
-    protected JavaFXPlatformImpl (String dispName, String antName, List<URL> javaFolders, URL fxFolder, Map<String,String> initialProperties,
+    protected VisagePlatformImpl (String dispName, String antName, List<URL> javaFolders, URL fxFolder, Map<String,String> initialProperties,
         Map<String,String> sysProperties, List<URL> sources, List<URL> javadoc) {
         this (dispName,  javaFolders, fxFolder, initialProperties, sysProperties,sources, javadoc);
         this.properties.put (PLAT_PROP_ANT_NAME,antName);
@@ -282,7 +282,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         return result;
     }
 
-    public URL getJavaFXFolder() {
+    public URL getVisageFolder() {
         return fxFolder;
     }
 
@@ -365,7 +365,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             for (Entry e : p.entrySet()) {
                 String val = e.getValue().toString();
                 if (val.length() > 1 && val.endsWith("\"") && val.startsWith("\"")) val = val.substring(1, val.length() - 1); // NOI18N
-                properties.put(profile + e.getKey(), val.replace("${javafx_home}", fxFolder.getAbsolutePath())); // NOI18N
+                properties.put(profile + e.getKey(), val.replace("${visage_home}", fxFolder.getAbsolutePath())); // NOI18N
             }
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
@@ -384,7 +384,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
             final StringBuilder sb = new StringBuilder ();
             for (String pe : pes) {
                 if (probePath != null ?  probePath.equals(pe) : (pe != null &&
-                pe.endsWith("org-netbeans-modules-javafx-platform-probe.jar"))) { //NOI18N
+                pe.endsWith("org-netbeans-modules-visage-platform-probe.jar"))) { //NOI18N
                     //Skeep
                 }
                 else {
@@ -399,7 +399,7 @@ public class JavaFXPlatformImpl extends JavaFXPlatform {
         return v;
     }
     
-    private void addPlatformProperties(final JavaFXPlatformImpl platform){
+    private void addPlatformProperties(final VisagePlatformImpl platform){
         final Thread tt = Thread.currentThread();
         Thread t = new Thread(new Runnable(){
             public void run(){

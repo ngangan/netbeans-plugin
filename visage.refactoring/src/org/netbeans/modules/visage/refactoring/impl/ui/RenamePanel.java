@@ -41,14 +41,14 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.refactoring.impl.ui;
+package org.netbeans.modules.visage.refactoring.impl.ui;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import javax.swing.JPanel;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.netbeans.modules.javafx.refactoring.RefactoringModule;
+import org.netbeans.modules.visage.refactoring.RefactoringModule;
 import org.netbeans.modules.refactoring.spi.ui.CustomRefactoringPanel;
 
 
@@ -127,7 +127,7 @@ public class RenamePanel extends JPanel implements CustomRefactoringPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         add(nameField, gridBagConstraints);
-        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/javafx/refactoring/impl/ui/Bundle"); // NOI18N
+        java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("org/netbeans/modules/visage/refactoring/impl/ui/Bundle"); // NOI18N
         nameField.getAccessibleContext().setAccessibleDescription(bundle.getString("ACSD_nameField")); // NOI18N
 
         jPanel1.setMinimumSize(new java.awt.Dimension(0, 0));

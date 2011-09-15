@@ -41,7 +41,7 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.platform.platformdefinition;
+package org.netbeans.modules.visage.platform.platformdefinition;
 
 import org.openide.util.Utilities;
 import org.openide.util.NbBundle;
@@ -52,28 +52,28 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.awt.*;
 
-public class JavaFXPlatformImplBeanInfo extends SimpleBeanInfo {
+public class VisagePlatformImplBeanInfo extends SimpleBeanInfo {
 
-    public JavaFXPlatformImplBeanInfo () {
+    public VisagePlatformImplBeanInfo () {
     }
 
 
     public PropertyDescriptor[] getPropertyDescriptors () {
         try {
             PropertyDescriptor[] descs =  new PropertyDescriptor[] {
-                new PropertyDescriptor (JavaFXPlatformImpl.PROP_DISPLAY_NAME, JavaFXPlatformImpl.class),
-                new PropertyDescriptor (JavaFXPlatformImpl.PROP_ANT_NAME, JavaFXPlatformImpl.class),
-                new PropertyDescriptor (JavaFXPlatformImpl.PROP_SOURCE_FOLDER, JavaFXPlatformImpl.class),
-                new PropertyDescriptor (JavaFXPlatformImpl.PROP_JAVADOC_FOLDER, JavaFXPlatformImpl.class),
+                new PropertyDescriptor (VisagePlatformImpl.PROP_DISPLAY_NAME, VisagePlatformImpl.class),
+                new PropertyDescriptor (VisagePlatformImpl.PROP_ANT_NAME, VisagePlatformImpl.class),
+                new PropertyDescriptor (VisagePlatformImpl.PROP_SOURCE_FOLDER, VisagePlatformImpl.class),
+                new PropertyDescriptor (VisagePlatformImpl.PROP_JAVADOC_FOLDER, VisagePlatformImpl.class),
             };
-            descs[0].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_Name")); // NOI18N
+            descs[0].setDisplayName(NbBundle.getMessage(VisagePlatformImplBeanInfo.class,"TXT_Name")); // NOI18N
             descs[0].setBound(true);
-            descs[1].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_AntName")); // NOI18N
+            descs[1].setDisplayName(NbBundle.getMessage(VisagePlatformImplBeanInfo.class,"TXT_AntName")); // NOI18N
             descs[1].setWriteMethod(null);
-            descs[2].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_SourcesFolder")); // NOI18N
+            descs[2].setDisplayName(NbBundle.getMessage(VisagePlatformImplBeanInfo.class,"TXT_SourcesFolder")); // NOI18N
             descs[2].setPropertyEditorClass(FileObjectPropertyEditor.class);
             descs[2].setBound(true);
-            descs[3].setDisplayName(NbBundle.getMessage(JavaFXPlatformImplBeanInfo.class,"TXT_JavaDocFolder")); // NOI18N
+            descs[3].setDisplayName(NbBundle.getMessage(VisagePlatformImplBeanInfo.class,"TXT_JavaDocFolder")); // NOI18N
             descs[3].setPropertyEditorClass(FileObjectPropertyEditor.class);
             descs[3].setBound(true);
             return descs;
@@ -85,7 +85,7 @@ public class JavaFXPlatformImplBeanInfo extends SimpleBeanInfo {
 
     public Image getIcon(int iconKind) {
         if ((iconKind == BeanInfo.ICON_COLOR_16x16) || (iconKind == BeanInfo.ICON_MONO_16x16)) {
-            return Utilities.loadImage("org/netbeans/modules/javafx/platform/resources/platform.gif"); // NOI18N
+            return Utilities.loadImage("org/netbeans/modules/visage/platform/resources/platform.gif"); // NOI18N
         } else {
             return null;
         }

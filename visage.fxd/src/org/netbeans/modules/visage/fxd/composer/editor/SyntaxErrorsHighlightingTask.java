@@ -41,9 +41,9 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.fxd.composer.editor;
+package org.netbeans.modules.visage.fxd.composer.editor;
 
-import com.sun.javafx.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
+import com.sun.visage.tools.fxd.container.scene.fxd.FXDSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.text.BadLocationException;
@@ -51,7 +51,7 @@ import javax.swing.text.Document;
 import org.netbeans.editor.BaseDocument;
 import org.netbeans.editor.Utilities;
 import org.netbeans.modules.editor.indent.api.IndentUtils;
-import org.netbeans.modules.javafx.fxd.composer.source.FXDDocumentModelProvider;
+import org.netbeans.modules.visage.fxd.composer.source.FXDDocumentModelProvider;
 import org.netbeans.modules.parsing.spi.Parser.Result;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;

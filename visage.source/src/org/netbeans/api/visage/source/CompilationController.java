@@ -40,9 +40,9 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.api.javafx.source;
+package org.netbeans.api.visage.source;
 
-import org.netbeans.modules.javafx.source.CompilationInfoImpl;
+import org.netbeans.modules.visage.source.CompilationInfoImpl;
 import java.io.IOException;
 import org.openide.util.Exceptions;
 
@@ -52,7 +52,7 @@ import org.openide.util.Exceptions;
  */
 public final class CompilationController extends CompilationInfo {
 
-    public static CompilationController create(JavaFXParserResult result) {
+    public static CompilationController create(VisageParserResult result) {
         if (result == null)
             throw new IllegalArgumentException("Null result");
         CompilationInfoImpl impl = new CompilationInfoImpl(result.impl());
@@ -66,17 +66,17 @@ public final class CompilationController extends CompilationInfo {
     /** Moves the state to required phase. If given state was already reached 
      * the state is not changed. The method will throw exception if a state is 
      * illegal required. Acceptable parameters for thid method are <BR>
-     * <LI>{@link JavaFXSource.Phase.PARSED}
-     * <LI>{@link JavaFXSource.Phase.ELEMENTS_RESOLVED}
-     * <LI>{@link JavaFXSource.Phase.RESOLVED}
-     * <LI>{@link JavaFXSource.Phase.UP_TO_DATE}   
+     * <LI>{@link VisageSource.Phase.PARSED}
+     * <LI>{@link VisageSource.Phase.ELEMENTS_RESOLVED}
+     * <LI>{@link VisageSource.Phase.RESOLVED}
+     * <LI>{@link VisageSource.Phase.UP_TO_DATE}   
      * @param phase The required phase
      * @return the reached state
      * @throws IllegalArgumentException in case that given state can not be 
      *         reached using this method
      * @throws IOException when the file cannot be red
      */    
-    public JavaFXSource.Phase toPhase(JavaFXSource.Phase phase ) throws IOException {
+    public VisageSource.Phase toPhase(VisageSource.Phase phase ) throws IOException {
         return impl().toPhase(phase);
     }
         

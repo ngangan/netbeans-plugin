@@ -41,13 +41,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.profiler.selector.node;
+package org.netbeans.modules.visage.profiler.selector.node;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.ClasspathInfo;
-import org.netbeans.api.javafx.source.CompilationController;
-import org.netbeans.api.javafx.source.ElementHandle;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.ClasspathInfo;
+import org.netbeans.api.visage.source.CompilationController;
+import org.netbeans.api.visage.source.ElementHandle;
+import org.netbeans.api.visage.source.VisageSource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +57,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
-import org.netbeans.modules.javafx.profiler.utilities.JavaFXProjectUtilities;
+import org.netbeans.modules.visage.profiler.utilities.VisageProjectUtilities;
 import org.netbeans.modules.profiler.selector.spi.nodes.ContainerNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorNode;
 import org.netbeans.modules.profiler.selector.spi.nodes.SelectorChildren;
@@ -70,34 +70,34 @@ import org.openide.util.NbBundle;
  *
  * @author cms
  */
-public class JavaFXFunctionsNode extends ContainerNode {    
+public class VisageFunctionsNode extends ContainerNode {    
     
-    private static class Children extends GreedySelectorChildren<JavaFXFunctionsNode> {
+    private static class Children extends GreedySelectorChildren<VisageFunctionsNode> {
 
-        protected List<?extends SelectorNode> prepareChildren(final JavaFXFunctionsNode parent) {
-            final List<JavaFXFunctionNode> functionNodes = new ArrayList<JavaFXFunctionNode>();
+        protected List<?extends SelectorNode> prepareChildren(final VisageFunctionsNode parent) {
+            final List<VisageFunctionNode> functionNodes = new ArrayList<VisageFunctionNode>();
 
             try {
-                FileObject fo = JavaFXProjectUtilities.getFile(classElement, parent.cpInfo);
-                JavaFXSource source = JavaFXSource.forFileObject(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
+                FileObject fo = VisageProjectUtilities.getFile(classElement, parent.cpInfo);
+                VisageSource source = VisageSource.forFileObject(VisageProjectUtilities.getFile(classElement, parent.cpInfo));
 
 //                final FileObject fo = source.getCpInfo().getClassPath(ClasspathInfo.PathKind.SOURCE).findResource(getFXFileName(className));
 
                 // workaround for library class nodes
                 if (source == null) {
                     Vector<FileObject> v = new Vector<FileObject>();
-                    v.add(JavaFXProjectUtilities.getFile(classElement, parent.cpInfo));
-                    source = JavaFXSource.create(parent.cpInfo, v);
+                    v.add(VisageProjectUtilities.getFile(classElement, parent.cpInfo));
+                    source = VisageSource.create(parent.cpInfo, v);
                 }
 
-                final JavaFXSource js = source;
+                final VisageSource js = source;
                 source.runUserActionTask(new CancellableTask<CompilationController>() {
                         public void cancel() {
                         }
 
                         public void run(CompilationController controller)
                                  throws Exception {
-                            if (JavaFXSource.Phase.ANALYZED.compareTo(controller.toPhase(JavaFXSource.Phase.ANALYZED))<=0) {
+                            if (VisageSource.Phase.ANALYZED.compareTo(controller.toPhase(VisageSource.Phase.ANALYZED))<=0) {
                                 classElement = parent.getClassHandle().resolve(controller);
                                 List<? extends Element> methods = controller.getElements().getAllMembers((TypeElement)classElement);
                                 for (int k = 0; k < methods.size(); k++){
@@ -108,7 +108,7 @@ public class JavaFXFunctionsNode extends ContainerNode {
                                             (tek.getKind() == ElementKind.STATIC_INIT))) {
                                         ((ExecutableElement)tek).getReturnType();
                                         
-                                        JavaFXFunctionNode functionNode = new JavaFXFunctionNode(js.getClasspathInfo(), tek, parent);
+                                        VisageFunctionNode functionNode = new VisageFunctionNode(js.getClasspathInfo(), tek, parent);
                                         if (functionNode.getSignature() != null) {
                                             functionNodes.add(functionNode);
                                         }
@@ -117,7 +117,7 @@ public class JavaFXFunctionsNode extends ContainerNode {
                             }
                         }
                     }, true);
-                Collections.sort(functionNodes, JavaFXFunctionNode.COMPARATOR);
+                Collections.sort(functionNodes, VisageFunctionNode.COMPARATOR);
             } catch (IllegalArgumentException ex) {
                 ex.printStackTrace();
             } catch (IOException ex) {
@@ -131,14 +131,14 @@ public class JavaFXFunctionsNode extends ContainerNode {
     private final ClasspathInfo cpInfo;
     private static Element classElement;
 
-    public JavaFXFunctionsNode(final ClasspathInfo cpInfo, final JavaFXClassNode parent) {
-        super(NbBundle.getMessage(JavaFXFunctionsNode.class, "Functions_DisplayName"), IconResource.METHODS_ICON, parent); // NOI18N
+    public VisageFunctionsNode(final ClasspathInfo cpInfo, final VisageClassNode parent) {
+        super(NbBundle.getMessage(VisageFunctionsNode.class, "Functions_DisplayName"), IconResource.METHODS_ICON, parent); // NOI18N
         classElement = parent.getClassElement();
         this.cpInfo = cpInfo;
     }
 
     public ElementHandle<TypeElement> getClassHandle() {
-        return ((JavaFXClassNode) getParent()).getClassHandle();
+        return ((VisageClassNode) getParent()).getClassHandle();
     }
 
     protected SelectorChildren getChildren() {

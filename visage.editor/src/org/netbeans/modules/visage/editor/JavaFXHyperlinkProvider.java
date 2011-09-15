@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -52,18 +52,18 @@ import org.netbeans.lib.editor.hyperlink.spi.HyperlinkType;
 import org.openide.util.RequestProcessor;
 
 /**
- * Implementation of the hyperlink provider for the JavaFX language.
+ * Implementation of the hyperlink provider for the Visage language.
  * <br>
  * The hyperlinks are constructed for identifiers.
  * <br>
  * The click action corresponds to performing the goto-declaration action.
  *
  */
-public final class JavaFXHyperlinkProvider implements HyperlinkProviderExt {
+public final class VisageHyperlinkProvider implements HyperlinkProviderExt {
     private String toolTip = null;
 
-    /** Creates a new instance of JavaFXHyperlinkProvider */
-    public JavaFXHyperlinkProvider() {
+    /** Creates a new instance of VisageHyperlinkProvider */
+    public VisageHyperlinkProvider() {
     }
 
     public Set<HyperlinkType> getSupportedHyperlinkTypes() {

@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.source.indexing;
+package org.netbeans.modules.visage.source.indexing;
 
 import java.util.StringTokenizer;
 import javax.lang.model.element.Element;
@@ -52,7 +52,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
-import org.netbeans.api.javafx.source.ElementHandle;
+import org.netbeans.api.visage.source.ElementHandle;
 
 /**
  *

@@ -34,10 +34,10 @@
 
  package shapes;
 
-import javafx.scene.shape.Line;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
+import visage.scene.shape.Line;
+import visage.scene.paint.Color;
+import visage.stage.Stage;
+import visage.scene.Scene;
 
 /**
  * @author Michal Skvor

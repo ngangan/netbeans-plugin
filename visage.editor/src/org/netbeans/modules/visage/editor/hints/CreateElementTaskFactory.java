@@ -41,22 +41,22 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-package org.netbeans.modules.javafx.editor.hints;
+package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.javafx.api.tree.ClassDeclarationTree;
-import com.sun.javafx.api.tree.ExpressionTree;
-import com.sun.javafx.api.tree.FunctionInvocationTree;
-import com.sun.javafx.api.tree.IdentifierTree;
-import com.sun.javafx.api.tree.InstantiateTree;
-import com.sun.javafx.api.tree.JavaFXTreePath;
-import com.sun.javafx.api.tree.JavaFXTreePathScanner;
-import com.sun.javafx.api.tree.SourcePositions;
-import com.sun.javafx.api.tree.Tree;
-import com.sun.tools.javafx.code.JavafxClassSymbol;
-import com.sun.tools.javafx.tree.JFXBlock;
-import com.sun.tools.javafx.tree.JFXFunctionDefinition;
-import com.sun.tools.javafx.tree.JFXVar;
-import com.sun.tools.javafx.tree.JFXVarInit;
+import com.sun.visage.api.tree.ClassDeclarationTree;
+import com.sun.visage.api.tree.ExpressionTree;
+import com.sun.visage.api.tree.FunctionInvocationTree;
+import com.sun.visage.api.tree.IdentifierTree;
+import com.sun.visage.api.tree.InstantiateTree;
+import com.sun.visage.api.tree.VisageTreePath;
+import com.sun.visage.api.tree.VisageTreePathScanner;
+import com.sun.visage.api.tree.SourcePositions;
+import com.sun.visage.api.tree.Tree;
+import com.sun.tools.visage.code.JavafxClassSymbol;
+import com.sun.tools.visage.tree.VSGBlock;
+import com.sun.tools.visage.tree.VSGFunctionDefinition;
+import com.sun.tools.visage.tree.VSGVar;
+import com.sun.tools.visage.tree.VSGVarInit;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.util.*;
@@ -66,9 +66,9 @@ import javax.lang.model.element.Element;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.tools.Diagnostic;
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -87,17 +87,17 @@ import org.openide.util.NbBundle;
  *
  * @author karol harezlak
  */
-public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
+public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
 
     private final AtomicBoolean cancel = new AtomicBoolean();
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
-    private static final String TEMPLATE_JAVAFX = "Templates/JavaFX/JavaFXClass.fx"; //NOI18N
-    private static final String JAVAFX_RUN = "public static synthetic function javafx$run$"; //NOI18N
+    private static final String TEMPLATE_JAVAFX = "Templates/Visage/VisageClass.fx"; //NOI18N
+    private static final String JAVAFX_RUN = "public static synthetic function visage$run$"; //NOI18N
     private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public CreateElementTaskFactory() {
-        super(JavaFXSource.Phase.ANALYZED, JavaFXSource.Priority.LOW);
+        super(VisageSource.Phase.ANALYZED, VisageSource.Priority.LOW);
     }
 
     enum Kind {
@@ -177,13 +177,13 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
         if (diagnostic.getArgs().length >= 6 && diagnostic.getArgs()[5] instanceof String) {
             classFQN[0] = (String) diagnostic.getArgs()[5];
         }
-        new JavaFXTreePathScanner<Void, Void>() {
+        new VisageTreePathScanner<Void, Void>() {
 
             private String currentClassFQN;
 
             @Override
             public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
-                JavaFXTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
+                VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                 Element element = compilationInfo.getTrees().getElement(path);
                 if (element instanceof JavafxClassSymbol) {
                     JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
@@ -214,7 +214,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             @Override
             public Void visitIdentifier(IdentifierTree node, Void p) {
                 if (currentClassFQN != null && checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
-                    if (getCurrentPath().getParentPath().getLeaf() instanceof JFXBlock) {
+                    if (getCurrentPath().getParentPath().getLeaf() instanceof VSGBlock) {
                         array.add(Kind.LOCAL_VARIABLE);
                     }
                     array.add(Kind.VARIABLE);
@@ -335,7 +335,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             Object name = diagnostic.getArgs()[1];
 
             final int position[] = new int[1];
-            new JavaFXTreePathScanner<Void, Void>() {
+            new VisageTreePathScanner<Void, Void>() {
 
                 private ClassDeclarationTree currentClass;
 
@@ -388,7 +388,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
             position[0] = -1;
-            new JavaFXTreePathScanner<Void, Void>() {
+            new VisageTreePathScanner<Void, Void>() {
 
                 @Override
                 public Void visitIdentifier(IdentifierTree node, Void p) {
@@ -416,7 +416,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
             final StringBuffer code = new StringBuffer();
             position[0] = -1;
-            new JavaFXTreePathScanner<Void, Void>() {
+            new VisageTreePathScanner<Void, Void>() {
 
                 private ClassDeclarationTree currentClass;
 
@@ -436,7 +436,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                         Iterator<Tree> iterator = currentClass.getClassMembers().iterator();
                         if (iterator.hasNext()) {
                             Tree tree = iterator.next();
-                            if (tree instanceof JFXVar) {
+                            if (tree instanceof VSGVar) {
                                 firstVar = tree;
                             }
                         }
@@ -455,14 +455,14 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
                             //TODO Workaround for this problem
 
                             for (Tree tree : currentClass.getClassMembers()) {
-                                if (tree instanceof JFXFunctionDefinition && tree.toString().contains(JAVAFX_RUN)) {
-                                    //position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(),((JFXFunctionDefinition) tree).getBodyExpression());
-                                    List<ExpressionTree> statements = ((JFXFunctionDefinition) tree).getBodyExpression().getStatements();
+                                if (tree instanceof VSGFunctionDefinition && tree.toString().contains(JAVAFX_RUN)) {
+                                    //position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(),((VSGFunctionDefinition) tree).getBodyExpression());
+                                    List<ExpressionTree> statements = ((VSGFunctionDefinition) tree).getBodyExpression().getStatements();
                                     if (!statements.isEmpty()) {
                                         ExpressionTree treeForPosition = statements.iterator().next();
                                         //FIXME Bug in compiler - getStartPostion and getEndPosition return same value!
                                         code.append("\n").append("var ").append(varName).append(";\n"); //NOI18N
-                                        if (treeForPosition instanceof JFXVarInit) {
+                                        if (treeForPosition instanceof VSGVarInit) {
                                             position[0] = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), treeForPosition);
                                         } else {
                                             code.append("\n"); //NOI18N
@@ -501,7 +501,7 @@ public final class CreateElementTaskFactory extends JavaFXAbstractEditorHint {
             Object name = diagnostic.getArgs()[1];
             final int position[] = new int[1];
             final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
-            new JavaFXTreePathScanner<Void, Void>() {
+            new VisageTreePathScanner<Void, Void>() {
 
                 @Override
                 public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {

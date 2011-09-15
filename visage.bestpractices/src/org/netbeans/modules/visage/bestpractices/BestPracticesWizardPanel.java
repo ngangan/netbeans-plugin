@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.bestpractices;
+package org.netbeans.modules.visage.bestpractices;
 
 import java.awt.Component;
 import java.util.HashSet;

@@ -34,12 +34,12 @@
 
 package math;
 
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.shape.Circle;
-import javafx.scene.paint.Color;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
+import visage.stage.Stage;
+import visage.scene.Scene;
+import visage.scene.shape.Circle;
+import visage.scene.paint.Color;
+import visage.animation.Timeline;
+import visage.animation.KeyFrame;
 
 import java.lang.Math;
 

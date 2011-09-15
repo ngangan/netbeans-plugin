@@ -43,7 +43,7 @@
  */
 
 
-package org.netbeans.modules.javafx.debugger.watchesfiltering;
+package org.netbeans.modules.visage.debugger.watchesfiltering;
 
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
 import org.netbeans.spi.viewmodel.ModelListener;
@@ -56,13 +56,13 @@ import org.netbeans.spi.debugger.ui.Constants;
  * @author Michal Skvor
  */
 @DebuggerServiceRegistration( path="netbeans-JPDASession/FX/WatchesView", types={ org.netbeans.spi.viewmodel.TableModel.class } )
-public class JavaFXWatchesTableModel implements TableModel {
+public class VisageWatchesTableModel implements TableModel {
 
-    public JavaFXWatchesTableModel() {}
+    public VisageWatchesTableModel() {}
 
     public Object getValueAt( Object row, String columnID ) throws UnknownTypeException {
-        if( !( row instanceof JavaFXWatch )) throw new UnknownTypeException(row);
-        JavaFXWatch watch = (JavaFXWatch) row;
+        if( !( row instanceof VisageWatch )) throw new UnknownTypeException(row);
+        VisageWatch watch = (VisageWatch) row;
         if( columnID.equals( Constants.WATCH_TO_STRING_COLUMN_ID )) {
             return watch.getValue();
         } else if( columnID.equals( Constants.WATCH_TYPE_COLUMN_ID )) {
@@ -83,7 +83,7 @@ public class JavaFXWatchesTableModel implements TableModel {
     }
 
     public boolean isReadOnly( Object row, String columnID ) throws UnknownTypeException {
-        if( !( row instanceof JavaFXWatch )) throw new UnknownTypeException( row );
+        if( !( row instanceof VisageWatch )) throw new UnknownTypeException( row );
         return true;
     }
 

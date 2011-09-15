@@ -40,20 +40,20 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
-import org.netbeans.api.javafx.source.CancellableTask;
-import org.netbeans.api.javafx.source.CompilationInfo;
-import org.netbeans.api.javafx.source.JavaFXSource.Phase;
-import org.netbeans.api.javafx.source.JavaFXSource.Priority;
-import org.netbeans.api.javafx.source.support.EditorAwareJavaFXSourceTaskFactory;
+import org.netbeans.api.visage.source.CancellableTask;
+import org.netbeans.api.visage.source.CompilationInfo;
+import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.netbeans.api.visage.source.VisageSource.Priority;
+import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
 import org.openide.filesystems.FileObject;
 
 /**
  *
  * @author David Strupl
  */
-public class UpToDateTaskFactory extends EditorAwareJavaFXSourceTaskFactory {
+public class UpToDateTaskFactory extends EditorAwareVisageSourceTaskFactory {
 
     public UpToDateTaskFactory() {
         super(Phase.ANALYZED, Priority.NORMAL);

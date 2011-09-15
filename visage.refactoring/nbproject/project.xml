@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>org.netbeans.modules.javafx.refactoring</code-name-base>
+            <code-name-base>org.netbeans.modules.visage.refactoring</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -94,7 +94,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.lexer</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.lexer</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -103,7 +103,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -111,7 +111,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.project</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.project</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -119,7 +119,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.source</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -288,22 +288,22 @@
                         <code-name-base>org.netbeans.modules.java.editor</code-name-base>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.editor</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.editor</code-name-base>
                         <recursive/>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.refactoring</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.refactoring</code-name-base>
                         <compile-dependency/>
                         <test/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.platform</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                         <compile-dependency/>
                         <test/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.source</code-name-base>
                         <recursive/>
                         <compile-dependency/>
                         <test/>
@@ -358,12 +358,12 @@
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.editor</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.editor</code-name-base>
                         <recursive/>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>
-                        <code-name-base>org.netbeans.modules.javafx.source</code-name-base>
+                        <code-name-base>org.netbeans.modules.visage.source</code-name-base>
                         <compile-dependency/>
                     </test-dependency>
                     <test-dependency>

@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.test.javafx.weather2.sample.lib;
+package org.netbeans.test.visage.weather2.sample.lib;
 
 import java.awt.Container;
 import org.netbeans.jellytools.MainWindowOperator;
@@ -74,7 +74,7 @@ public class Util {
     private static final int WAIT_TIME = 2000;
     public static final long MAX_WAIT_TIME = 300000;
 
-    /** Performs New Project > Samples > JavaFX > ...*/
+    /** Performs New Project > Samples > Visage > ...*/
     public static Boolean createSampleProject(String path, String projName, String location) {
         NewProjectWizardOperator projectWizard = NewProjectWizardOperator.invoke();
         projectWizard.selectCategory(path);

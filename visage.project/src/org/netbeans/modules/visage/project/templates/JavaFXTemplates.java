@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project.templates;
+package org.netbeans.modules.visage.project.templates;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.SourceGroup;
@@ -52,9 +52,9 @@ import org.openide.WizardDescriptor;
  *
  * @author answer
  */
-public class JavaFXTemplates {
+public class VisageTemplates {
 
-    public JavaFXTemplates() {
+    public VisageTemplates() {
     }
 
     public static WizardDescriptor.Panel createPackageChooser(Project project, SourceGroup[] folders) throws IllegalArgumentException {
@@ -70,10 +70,10 @@ public class JavaFXTemplates {
         if (folders.length == 0) {
             throw new IllegalArgumentException("No folders selected"); // NOI18N
         }
-        return new JavaFXTargetChooserPanel(project, folders, bottomPanel, NewJavaFXFileWizardIterator.TYPE_FILE, validPackageRequired);
+        return new VisageTargetChooserPanel(project, folders, bottomPanel, NewVisageFileWizardIterator.TYPE_FILE, validPackageRequired);
     } 
     
-    public static WizardDescriptor.InstantiatingIterator createJavaFXTemplateIterator() {
-        return new NewJavaFXFileWizardIterator();
+    public static WizardDescriptor.InstantiatingIterator createVisageTemplateIterator() {
+        return new NewVisageFileWizardIterator();
     }
 }

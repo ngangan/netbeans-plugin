@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.editor.semantic;
+package org.netbeans.modules.visage.editor.semantic;
 
 import javax.swing.text.Document;
 import org.netbeans.spi.editor.errorstripe.UpToDateStatusProvider;

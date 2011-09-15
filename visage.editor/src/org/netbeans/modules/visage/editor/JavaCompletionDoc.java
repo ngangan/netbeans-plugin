@@ -42,13 +42,13 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.editor;
+package org.netbeans.modules.visage.editor;
 
 import java.net.URL;
 import javax.lang.model.element.Element;
 import javax.swing.Action;
-import org.netbeans.api.javafx.editor.ElementJavadoc;
-import org.netbeans.api.javafx.source.CompilationController;
+import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
 
 /**

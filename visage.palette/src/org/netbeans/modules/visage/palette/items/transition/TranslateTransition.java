@@ -39,10 +39,10 @@
  * 
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
-package org.netbeans.modules.javafx.palette.items.transition;
+package org.netbeans.modules.visage.palette.items.transition;
 
 import javax.swing.text.JTextComponent;
-import org.netbeans.modules.javafx.palette.JavaFXPaletteUtilities;
+import org.netbeans.modules.visage.palette.VisagePaletteUtilities;
 import org.openide.text.ActiveEditorDrop;
 
 /**
@@ -52,6 +52,6 @@ import org.openide.text.ActiveEditorDrop;
 public class TranslateTransition implements ActiveEditorDrop {
 
     public boolean handleTransfer(JTextComponent targetComponent) {
-        return JavaFXPaletteUtilities.insertSnippet(TranslateTransition.class, "TEMPLATE_TranslateTransition", targetComponent, "javafx.animation.transition.TranslateTransition"); //NOI18N;
+        return VisagePaletteUtilities.insertSnippet(TranslateTransition.class, "TEMPLATE_TranslateTransition", targetComponent, "visage.animation.transition.TranslateTransition"); //NOI18N;
     }
 }

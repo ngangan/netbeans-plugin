@@ -42,14 +42,14 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.project;
+package org.netbeans.modules.visage.project;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.junit.NbTestCase;
-import org.netbeans.modules.javafx.project.ui.customizer.JavaFXProjectProperties;
+import org.netbeans.modules.visage.project.ui.customizer.VisageProjectProperties;
 import org.netbeans.spi.project.support.ant.AntProjectHelper;
 import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.openide.filesystems.FileUtil;
@@ -60,16 +60,16 @@ public class ProjectPropertiesTest extends NbTestCase {
         super(name);
     }
 
-    private JavaFXProject p;
-    private JavaFXProjectProperties pp;
+    private VisageProject p;
+    private VisageProjectProperties pp;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         clearWorkDir();
-        // FIXME (not compilable): JavaFXProjectGenerator.createProject(getWorkDir(), "test", null, null);
-        p = (JavaFXProject) ProjectManager.getDefault().findProject(FileUtil.toFileObject(getWorkDir()));
-        pp = new JavaFXProjectProperties(p, p.getUpdateHelper(), p.evaluator(), null, null);
+        // FIXME (not compilable): VisageProjectGenerator.createProject(getWorkDir(), "test", null, null);
+        p = (VisageProject) ProjectManager.getDefault().findProject(FileUtil.toFileObject(getWorkDir()));
+        pp = new VisageProjectProperties(p, p.getUpdateHelper(), p.evaluator(), null, null);
     }
 
     public void testRunConfigs() throws Exception {

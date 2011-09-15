@@ -42,7 +42,7 @@
  * made subject to such option by the copyright holder.
  */
 
-package org.netbeans.modules.javafx.weather2;
+package org.netbeans.modules.visage.weather2;
 
 import java.io.File;
 import javax.swing.JFileChooser;

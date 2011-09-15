@@ -40,7 +40,7 @@
  * Portions Copyrighted 2008 Sun Microsystems, Inc.
  */
 
-package org.netbeans.modules.javafx.palette.items.layouts;
+package org.netbeans.modules.visage.palette.items.layouts;
 
 /**
  *
@@ -51,7 +51,7 @@ public final class Stack extends AbstractLayout{
 
     public Stack() {
         templateName = "TEMPLATE_Stack"; // NOI18N
-        importString = "javafx.scene.layout.Stack"; //NOI18N
+        importString = "visage.scene.layout.Stack"; //NOI18N
     }
 
 }
