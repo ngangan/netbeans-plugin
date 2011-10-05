@@ -54,7 +54,7 @@ import java.util.Set;
 import javax.swing.text.Document;
 
 import org.netbeans.api.visage.editor.TestUtilities;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.visage.source.SourceTestBase;
 import org.netbeans.api.lexer.Language;
@@ -112,9 +112,9 @@ public class CompletionTestBase extends SourceTestBase {
     }
 
     protected void checkCompletion(final String source, final String caretLine, final String insert, final String goldenFileName) throws Exception {
-        File testSource = new File(getWorkDir(), "test/Test.fx");
+        File testSource = new File(getWorkDir(), "test/Test.visage");
         testSource.getParentFile().mkdirs();
-        String sourceText = slurpDataFile("org/netbeans/modules/visage/editor/completion/data/" + source + ".fx");
+        String sourceText = slurpDataFile("org/netbeans/modules/visage/editor/completion/data/" + source + ".visage");
         int caretPos = getCaretOffset(sourceText, caretLine);
         if (insert != null) {
             // insert a code snippet at the caret and move the caret accordingly,
@@ -134,8 +134,8 @@ public class CompletionTestBase extends SourceTestBase {
         assertNotNull(ec);
         final Document doc = ec.openDocument();
         assertNotNull(doc);
-        doc.putProperty(Language.class, VSGTokenId.language());
-        doc.putProperty("mimeType", "text/x-fx");
+        doc.putProperty(Language.class, VisageTokenId.language());
+        doc.putProperty("mimeType", "text/x-visage");
         VisageSource s = VisageSource.forDocument(doc);
         Set<? extends CompletionItem> items0 = VisageCompletionProvider.query(
                 s, CompletionProvider.COMPLETION_QUERY_TYPE, caretPos, caretPos);

@@ -44,14 +44,14 @@
 
 package org.netbeans.modules.visage.refactoring.repository;
 
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.VariableTree;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.JavafxTreeInfo;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.ElementHandle;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageTree;
+import org.visage.tools.tree.VisageTreeInfo;
 
 /**
  *
@@ -86,7 +86,7 @@ public class LocalDef extends ElementDef {
             private int localCntr = 0;
             @Override
             public Void visitVariable(VariableTree node, Void p) {
-                Element e = JavafxTreeInfo.symbolFor((VSGTree)node);
+                Element e = VisageTreeInfo.symbolFor((VisageTree)node);
                 if (e != null && (e.getKind() == ElementKind.PARAMETER || e.getKind() == ElementKind.LOCAL_VARIABLE)) {
                     if (localCntr++ == localId) {
                         rslt[0] = e;

@@ -43,15 +43,7 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.ImportTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
-import com.sun.tools.visage.tree.VSGInstanciate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.lang.model.element.Element;
@@ -66,6 +58,14 @@ import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.ImportTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageInstanciate;
 
 /**
  *
@@ -151,7 +151,7 @@ public final class AddImportTaskFactory extends VisageAbstractEditorHint {
                     if (element != null && element instanceof ClassSymbol) {
                         ClassSymbol classSymbol = (ClassSymbol) element;
                         potentialClassSimpleName = classSymbol.getSimpleName().toString();
-                    } else if (superTree instanceof VSGInstanciate) {
+                    } else if (superTree instanceof VisageInstanciate) {
                         final SourcePositions sourcePositions = compilationInfo.getTrees().getSourcePositions();
                         final Tree[] tree = new Tree[1];
                         VisageTreePathScanner<Void, Void> scaner = new VisageTreePathScanner<Void, Void>() {

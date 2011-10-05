@@ -43,7 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.*;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
 
@@ -54,6 +53,19 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import javax.swing.text.Document;
 import java.util.*;
+
+import org.visage.api.tree.BlockExpressionTree;
+import org.visage.api.tree.CatchTree;
+import org.visage.api.tree.ConditionalExpressionTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.ReturnTree;
+import org.visage.api.tree.ThrowTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.TryTree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *

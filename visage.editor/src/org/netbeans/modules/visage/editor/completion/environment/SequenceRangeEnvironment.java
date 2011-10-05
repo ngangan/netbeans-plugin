@@ -42,8 +42,7 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGSequenceRange;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
@@ -51,13 +50,14 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.lexer.TokenHierarchy;
+import org.visage.tools.tree.VisageSequenceRange;
 
 /**
  * Env for range expressions like [1..10 step 2]
  *
  * @author Miloslav Metelka
  */
-public class SequenceRangeEnvironment extends VisageCompletionEnvironment<VSGSequenceRange> {
+public class SequenceRangeEnvironment extends VisageCompletionEnvironment<VisageSequenceRange> {
 
     private static final Logger logger = Logger.getLogger(SequenceRangeEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
@@ -71,9 +71,9 @@ public class SequenceRangeEnvironment extends VisageCompletionEnvironment<VSGSeq
     };
 
     @Override
-    protected void inside(VSGSequenceRange t) throws IOException {
+    protected void inside(VisageSequenceRange t) throws IOException {
         int start = (int)sourcePositions.getStartPosition(root, t);
-        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
         ts.move(start);
         State state = State.INIT;
         while (ts.moveNext() && ts.offset() <= offset) {

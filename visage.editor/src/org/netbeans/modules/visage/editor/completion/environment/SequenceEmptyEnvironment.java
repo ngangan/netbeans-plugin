@@ -42,32 +42,32 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.visage.code.JavafxTypes;
-import com.sun.tools.visage.tree.VSGSequenceEmpty;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.code.VisageTypes;
+import org.visage.tools.tree.VisageSequenceEmpty;
 
 /**
  * @author David Strupl
  */
-public class SequenceEmptyEnvironment extends VisageCompletionEnvironment<VSGSequenceEmpty> {
+public class SequenceEmptyEnvironment extends VisageCompletionEnvironment<VisageSequenceEmpty> {
 
     private static final Logger logger = Logger.getLogger(SequenceEmptyEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGSequenceEmpty t) throws IOException {
+    protected void inside(VisageSequenceEmpty t) throws IOException {
         if (LOGGABLE) {
-            log("inside VSGSequenceEmpty " + t + "  offset == " + offset); // NOI18N
-            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken(
+            log("inside VisageSequenceEmpty " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken(
                     (int) sourcePositions.getStartPosition(root, t), offset);
             log("    last(1) == " + (last == null ? "null" : last.token().id()));  // NOI18N
         }
@@ -75,12 +75,12 @@ public class SequenceEmptyEnvironment extends VisageCompletionEnvironment<VSGSeq
         addValueKeywords();
     }
 
-    private TypeMirror getSmartType(VSGSequenceEmpty t) throws IOException {
+    private TypeMirror getSmartType(VisageSequenceEmpty t) throws IOException {
         final VisageTreePath treePath = new VisageTreePath(path, t);
         TypeMirror type = controller.getTrees().getTypeMirror(treePath);
         if (LOGGABLE) log("getSmartType path == " + path.getLeaf() + "  type(1) == " + type); // NOI18N
         // handle sequences as their element type
-        JavafxTypes types = controller.getJavafxTypes();
+        VisageTypes types = controller.getVisageTypes();
         if (types.isSequence((Type) type)) {
             type = types.elementType((Type) type);
         } 

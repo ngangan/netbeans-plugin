@@ -61,7 +61,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.tree.TreePath;
-import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.editor.ElementVisagedoc;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.ElementHandle;
@@ -268,7 +268,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         return manager;
     }
 
-    protected ElementJavadoc getJavaDocFor(ElementNode node) {
+    protected ElementVisagedoc getJavaDocFor(ElementNode node) {
         ElementNode root = getRootNode();
         if (root == null) {
             return null;
@@ -296,7 +296,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
     private static class JavaDocCalculator implements Task<CompilationController> {
 
         private ElementHandle<? extends Element> handle;
-        private ElementJavadoc doc;
+        private ElementVisagedoc doc;
 
         public JavaDocCalculator(ElementHandle<? extends Element> handle) {
             this.handle = handle;
@@ -314,7 +314,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
             if (e == null) {
                 return;
             }
-            doc = ElementJavadoc.create(cc, e);
+            doc = ElementVisagedoc.create(cc, e);
         }
     };
 
@@ -337,11 +337,11 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
         }
 
         public String getToolTipText(Point loc) {
-            ElementJavadoc doc = getDocumentation(loc);
+            ElementVisagedoc doc = getDocumentation(loc);
             return null == doc ? null : doc.getText();
         }
 
-        private ElementJavadoc getDocumentation(Point loc) {
+        private ElementVisagedoc getDocumentation(Point loc) {
             TreePath path = tree.getPathForLocation(loc.x, loc.y);
             if (null == path) {
                 return null;
@@ -421,7 +421,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
 
                 public void run() {
                     if (null != me) {
-                        ElementJavadoc doc = getDocumentation(me.getPoint());
+                        ElementVisagedoc doc = getDocumentation(me.getPoint());
                         JavafxdocTopComponent tc = JavafxdocTopComponent.findInstance();
                         if (null != tc) {
                             tc.open();

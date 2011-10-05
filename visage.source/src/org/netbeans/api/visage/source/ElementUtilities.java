@@ -44,9 +44,6 @@
 package org.netbeans.api.visage.source;
 
 import com.sun.javadoc.Doc;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Source;
 import com.sun.tools.mjavac.code.Symbol;
@@ -60,14 +57,6 @@ import com.sun.tools.mjavac.code.Type.ClassType;
 import com.sun.tools.mjavac.code.Types;
 import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.Name;
-import com.sun.tools.visage.api.JavafxcScope;
-import com.sun.tools.visage.code.JavafxTypes;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGOverrideClassVar;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.JavafxTreeInfo;
-import com.sun.tools.visagedoc.ClassDocImpl;
-import com.sun.tools.visagedoc.DocEnv;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,9 +73,20 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
-import org.netbeans.modules.visage.source.JavadocEnv;
+import org.netbeans.modules.visage.source.VisagedocEnv;
 import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 import org.openide.util.Exceptions;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.api.VisagecScope;
+import org.visage.tools.code.VisageTypes;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageOverrideClassVar;
+import org.visage.tools.tree.VisageTree;
+import org.visage.tools.tree.VisageTreeInfo;
+import org.visage.tools.visagedoc.ClassDocImpl;
+import org.visage.tools.visagedoc.DocEnv;
 
 /**
  *
@@ -105,7 +105,7 @@ public final class ElementUtilities {
 
     ElementUtilities(VisageParserResultImpl parserResultImpl) {
         this.parserResultImpl = parserResultImpl;
-        this.ctx = parserResultImpl.getJavafxcTaskImpl().getContext();
+        this.ctx = parserResultImpl.getVisagecTaskImpl().getContext();
 //        this.delegate = ElementsService.instance(ctx);
     }
 
@@ -267,7 +267,7 @@ public final class ElementUtilities {
      * Find a {@link Element} corresponding to a given {@link Doc}.
      */
     public Element elementFor(Doc doc) {
-        return (doc instanceof JavadocEnv.ElementHolder) ? ((JavadocEnv.ElementHolder) doc).getElement() : null;
+        return (doc instanceof VisagedocEnv.ElementHolder) ? ((VisagedocEnv.ElementHolder) doc).getElement() : null;
     }
 
     public Element elementFor(final  int pos) {
@@ -291,10 +291,10 @@ public final class ElementUtilities {
                     if (tree.getVisageKind() != Tree.VisageKind.STRING_LITERAL || !(tree.toString().equals("\"\"") || tree.toString().equals(""))) {
                         if (tree.getVisageKind() != Tree.VisageKind.MODIFIERS && tree.getVisageKind() != Tree.VisageKind.FUNCTION_VALUE && start != -1 && start != end && start <= pos && end >=pos) {
                             // check for visage$run$ magic
-                            if (!(tree.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION && ((VSGFunctionDefinition)tree).getName().contentEquals("visage$run$"))) {
+                            if (!(tree.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION && ((VisageFunctionDefinition)tree).getName().contentEquals("visage$run$"))) {
                                 long span = end - start + 1;
                                 if (span < lastValidSpan) {
-                                    e[0] = JavafxTreeInfo.symbolFor((VSGTree)tree);
+                                    e[0] = VisageTreeInfo.symbolFor((VisageTree)tree);
                                     if (e[0] != null) {
                                         lastValidSpan = span;
                                     } else {
@@ -303,8 +303,8 @@ public final class ElementUtilities {
                                             e[0] = getPackageElement(tree.toString());
                                             lastValidSpan = span;
                                         } else if (tree.getVisageKind() == Tree.VisageKind.VARIABLE) {
-                                            if (tree instanceof VSGOverrideClassVar) {
-                                                e[0] = ((VSGOverrideClassVar)tree).sym;
+                                            if (tree instanceof VisageOverrideClassVar) {
+                                                e[0] = ((VisageOverrideClassVar)tree).sym;
                                                 lastValidSpan = span;
                                             }
                                         }
@@ -349,7 +349,7 @@ public final class ElementUtilities {
             switch (type.getKind()) {
                 case DECLARED:
                     HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
-                    Types types = JavafxTypes.instance(ctx);
+                    Types types = VisageTypes.instance(ctx);
                     TypeElement te = (TypeElement) ((DeclaredType) type).asElement();
                     for (Element member : getAllMembers(elements, te)) {
                         if (acceptor == null || acceptor.accept(member, type)) {
@@ -409,12 +409,12 @@ public final class ElementUtilities {
     /**
      * Return members declared in the given scope.
      */
-    public Iterable<? extends Element> getLocalMembersAndVars(JavafxcScope scope, ElementAcceptor acceptor) {
+    public Iterable<? extends Element> getLocalMembersAndVars(VisagecScope scope, ElementAcceptor acceptor) {
         ArrayList<Element> members = new ArrayList<Element>();
         HashMap<CharSequence, ArrayList<Element>> hiders = new HashMap<CharSequence, ArrayList<Element>>();
 //        Elements elements = JavacElements.instance(ctx);
         Elements elements = parserResultImpl.getElements();
-        Types types = JavafxTypes.instance(ctx);
+        Types types = VisageTypes.instance(ctx);
         TypeElement cls;
         while (scope != null) {
             final Iterable<? extends Element> localElements = scope.getLocalElements();
@@ -585,7 +585,8 @@ public final class ElementUtilities {
             for (Element hider : hiders) {
                 if (hider == member || (hider.getClass() == member.getClass() && //TODO: getClass() should not be used here
                         hider.getSimpleName() == member.getSimpleName() &&
-                        ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR)))) //                if (hider == member || (hider.getClass() == member.getClass() && //TODO: getClass() should not be used here
+                        ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR)))) 
+                //                if (hider == member || (hider.getClass() == member.getClass() && //TODO: getClass() should not be used here
                 //                    hider.getSimpleName() == member.getSimpleName() &&
                 //                    ((hider.getKind() != ElementKind.METHOD && hider.getKind() != ElementKind.CONSTRUCTOR)
                 //                    || types.isSubsignature((ExecutableType)hider.asType(), (ExecutableType)member.asType()))))

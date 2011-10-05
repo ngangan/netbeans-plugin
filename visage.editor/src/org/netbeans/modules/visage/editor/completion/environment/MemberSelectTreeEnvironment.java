@@ -42,8 +42,6 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.*;
-import com.sun.tools.visage.api.JavafxcScope;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.logging.Level;
@@ -56,12 +54,18 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.ClassIndex.NameKind;
 import org.netbeans.api.visage.source.ElementHandle;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.api.VisagecScope;
 
 /**
  * @author David Strupl
@@ -77,8 +81,8 @@ public class MemberSelectTreeEnvironment extends VisageCompletionEnvironment<Mem
         if (LOGGABLE) log("inside MemberSelectTree " + fa); // NOI18N
         int expEndPos = (int)sourcePositions.getEndPosition(root, fa.getExpression());
         boolean afterDot = false;
-        VSGTokenId lastNonWhitespaceTokenId = null;
-        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+        VisageTokenId lastNonWhitespaceTokenId = null;
+        TokenSequence<VisageTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
         ts.move(expEndPos);
         while (ts.moveNext()) {
             if (ts.offset() >= offset) {
@@ -109,7 +113,7 @@ public class MemberSelectTreeEnvironment extends VisageCompletionEnvironment<Mem
             return;
         }
 
-        if (lastNonWhitespaceTokenId != VSGTokenId.STAR) {
+        if (lastNonWhitespaceTokenId != VisageTokenId.STAR) {
             VisageTreePath parentPath = path.getParentPath();
             Tree parent = parentPath != null ? parentPath.getLeaf() : null;
             if (LOGGABLE) log("  parent == " + parent); // NOI18N
@@ -176,7 +180,7 @@ public class MemberSelectTreeEnvironment extends VisageCompletionEnvironment<Mem
         }
     }
 
-    private JavafxcScope getScope() {
+    private VisagecScope getScope() {
         return controller.getTreeUtilities().getScope(path);
     }
 

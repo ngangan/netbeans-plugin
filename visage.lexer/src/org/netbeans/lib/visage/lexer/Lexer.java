@@ -48,7 +48,6 @@ import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import com.sun.tools.mjavac.util.Log;
 import com.sun.tools.mjavac.util.Convert;
-import com.sun.tools.visage.util.MsgSym;
 import org.antlr.runtime.*;
 
 import java.util.ArrayList;
@@ -56,6 +55,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.tools.util.MsgSym;
 
 /**
  * Lexer base class provide user code for grammar. This code is called from antlr generated lexer. The main
@@ -315,7 +315,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
 
         // Record the error for later output or capture by development tools
         //
-        log.error(getCharIndex(), MsgSym.MESSAGE_JAVAFX_GENERALERROR, msg);
+        log.error(getCharIndex(), MsgSym.MESSAGE_VISAGE_GENERALERROR, msg);
     }
 
     protected boolean checkIntLiteralRange(String text, int pos, int radix, boolean negative) {
@@ -335,7 +335,7 @@ public abstract class Lexer extends org.antlr.runtime.Lexer {
 
             // Number form was too outrageous even for the converter
             //
-            log.error(pos, MsgSym.MESSAGE_JAVAFX_LITERAL_OUT_OF_RANGE, "Long", checkText);
+            log.error(pos, MsgSym.MESSAGE_VISAGE_LITERAL_OUT_OF_RANGE, "Long", checkText);
 
             return false;
         }

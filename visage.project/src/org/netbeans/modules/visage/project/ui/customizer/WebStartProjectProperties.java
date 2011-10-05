@@ -96,7 +96,7 @@ public class WebStartProjectProperties {
     public static final String PACK200_ENABLE_MODEL = "jnlp.packEnabled"; // NOI18N
     // special value to persist Ant script handling
     public static final String CB_URL_WEB_PROP_VALUE = "$$$$codebase"; // NOI18N
-    public static final String JNLP_FX_MAIN_JAR = "jnlp.fx.main.jar.value"; // NOI18N
+    public static final String JNLP_VISAGE_MAIN_JAR = "jnlp.visage.main.jar.value"; // NOI18N
     private StoreGroup jnlpPropGroup = new StoreGroup();
     private PropertyEvaluator evaluator;
     private VisageProject visageProject;

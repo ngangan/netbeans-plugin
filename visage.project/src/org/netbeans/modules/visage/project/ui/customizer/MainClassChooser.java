@@ -131,7 +131,7 @@ public class MainClassChooser extends JPanel {
         
   RequestProcessor.getDefault ().post (new Runnable () {
             public void run () {
-                possibleMainClasses = VisageProjectUtil.getFXFiles(sourcesRoots);
+                possibleMainClasses = VisageProjectUtil.getVisageFiles(sourcesRoots);
                 
                 possibleJavaMainClasses = SourceUtils.getMainClasses(sourcesRoots);
                 List<String> javaMainClasses = new Vector();

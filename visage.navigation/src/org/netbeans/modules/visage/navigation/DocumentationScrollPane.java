@@ -64,7 +64,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
 import javax.swing.text.html.HTMLDocument;
 
-import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.editor.ElementVisagedoc;
 import org.netbeans.editor.*;
 
 import org.openide.awt.HtmlBrowser;
@@ -97,9 +97,9 @@ public class DocumentationScrollPane extends JScrollPane {
     private HTMLDocView view;
     
     // doc browser history
-    private List<ElementJavadoc> history = new ArrayList<ElementJavadoc>(5);
+    private List<ElementVisagedoc> history = new ArrayList<ElementVisagedoc>(5);
     private int currentHistoryIndex = -1;
-    protected ElementJavadoc currentDocumentation = null;
+    protected ElementVisagedoc currentDocumentation = null;
     
     /** Creates a new instance of ScrollJavaDocPane */
     public DocumentationScrollPane( boolean keepDefaultBorder ) {
@@ -122,13 +122,13 @@ public class DocumentationScrollPane extends JScrollPane {
             setBorder( BorderFactory.createEmptyBorder() );
     }
     
-    public void setData(ElementJavadoc doc) {
+    public void setData(ElementVisagedoc doc) {
         setData(doc, true);
     }
     
-    private void setData(ElementJavadoc doc, boolean clearHistory) {
+    private void setData(ElementVisagedoc doc, boolean clearHistory) {
         if ( doc == null || clearHistory ) {
-            history = new ArrayList<ElementJavadoc>(5);
+            history = new ArrayList<ElementVisagedoc>(5);
         }
         setDocumentation(doc);
         if( null != doc )
@@ -214,7 +214,7 @@ public class DocumentationScrollPane extends JScrollPane {
         installKeybindings(view);
     }
     
-    private synchronized void setDocumentation(ElementJavadoc doc) {
+    private synchronized void setDocumentation(ElementVisagedoc doc) {
         currentDocumentation = doc;
         if( null != doc ) {
             String text = currentDocumentation.getText();
@@ -244,7 +244,7 @@ public class DocumentationScrollPane extends JScrollPane {
         }
     }
     
-    private synchronized void addToHistory(ElementJavadoc doc) {
+    private synchronized void addToHistory(ElementVisagedoc doc) {
         int histSize = history.size();
         for (int i = currentHistoryIndex + 1; i < histSize; i++){
             history.remove(history.size() - 1);
@@ -431,7 +431,7 @@ public class DocumentationScrollPane extends JScrollPane {
             if (e != null && HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
                 final String desc = e.getDescription();
                 if (desc != null) {
-                    ElementJavadoc doc = currentDocumentation.resolveLink(desc);
+                    ElementVisagedoc doc = currentDocumentation.resolveLink(desc);
                     setData(doc, false);
                 }                    
             }

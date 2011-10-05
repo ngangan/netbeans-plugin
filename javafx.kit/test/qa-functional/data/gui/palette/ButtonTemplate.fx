@@ -1,6 +1,0 @@
-javafx.scene.control.Button{
-    
-    
-
-
-}

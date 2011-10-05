@@ -43,20 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.CatchTree;
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.ForExpressionTree;
-import com.sun.visage.api.tree.FunctionDefinitionTree;
-import com.sun.visage.api.tree.FunctionInvocationTree;
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.InstantiateTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.VariableTree;
-import com.sun.tools.visage.tree.VSGForExpressionInClause;
-import com.sun.tools.visage.tree.VSGVar;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
 import org.netbeans.api.visage.source.VisageSource;
@@ -80,9 +66,9 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.Document;
 import org.netbeans.api.editor.settings.EditorStyleConstants;
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
@@ -90,6 +76,20 @@ import org.netbeans.spi.editor.highlighting.HighlightsSequence;
 import org.netbeans.spi.editor.highlighting.support.OffsetsBag;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.CatchTree;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.ForExpressionTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.InstantiateTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageForExpressionInClause;
+import org.visage.tools.tree.VisageVar;
 
 /**
  *
@@ -114,7 +114,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareVisageSourceTaskFa
             }
 
             public void run(final CompilationInfo compilationInfo) throws Exception {
-                final Document document = FXSourceUtils.getDocument(file);
+                final Document document = VisageSourceUtils.getDocument(file);
                 if (document == null) {
                     return;
                 }
@@ -202,8 +202,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareVisageSourceTaskFa
                             return null;
                         }
                         for (Tree tree : node.getInClauses()) {
-                            if (tree instanceof VSGForExpressionInClause) {
-                                Tree variable = ((VSGForExpressionInClause) tree).getVariable();
+                            if (tree instanceof VisageForExpressionInClause) {
+                                Tree variable = ((VisageForExpressionInClause) tree).getVariable();
                                 addElementToAdd(variable);
                             }
                         }
@@ -282,8 +282,8 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareVisageSourceTaskFa
                 }
                 for (Element element : elementsToAdd.keySet()) {
                     Tree tree = elementsToAdd.get(element);
-                    if (tree instanceof VSGVar && element.getSimpleName() != null) {
-                        if (((VSGVar) elementsToAdd.get(element)).isBound()) {
+                    if (tree instanceof VisageVar && element.getSimpleName() != null) {
+                        if (((VisageVar) elementsToAdd.get(element)).isBound()) {
                             elementsToRemove.put(element, tree);
                             elementsNames.put(tree, element.getSimpleName().toString());
                         }
@@ -331,7 +331,7 @@ public class MarkUnusedElementsTaskFactory extends EditorAwareVisageSourceTaskFa
                         continue;
                     }
                     TreeUtilities treeUtilities = compilationInfo.getTreeUtilities();
-                    TokenSequence<VSGTokenId> tokenSequence = treeUtilities.tokensFor(tree);
+                    TokenSequence<VisageTokenId> tokenSequence = treeUtilities.tokensFor(tree);
                     if (tokenSequence == null) {
                         return;
                     }

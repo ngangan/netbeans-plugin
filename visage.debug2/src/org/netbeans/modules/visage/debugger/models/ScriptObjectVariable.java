@@ -5,8 +5,6 @@
 
 package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.visage.jdi.FXClassType;
-import com.sun.visage.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
@@ -27,6 +25,8 @@ import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 import org.netbeans.modules.visage.debugger.utils.Utils;
+import org.visage.jdi.VisageClassType;
+import org.visage.jdi.VisageObjectReference;
 
 /**
  *
@@ -36,15 +36,15 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
 
     private static final Logger logger = Logger.getLogger( "org.netbeans.modules.debugger.jpda.getValue" ); // NOI18N
     
-    private FXClassType parentClass;
+    private VisageClassType parentClass;
     private Field field;
     
     private boolean valueSet = false;
     private final Object valueLock = new Object();
     private boolean valueRetrieved = false;
-    private FXObjectReference value;
+    private VisageObjectReference value;
     
-    public ScriptObjectVariable( JPDADebuggerImpl debugger, Field field, FXClassType parentClass, String parentID, FXObjectReference value ) {
+    public ScriptObjectVariable( JPDADebuggerImpl debugger, Field field, VisageClassType parentClass, String parentID, VisageObjectReference value ) {
         super( debugger, null, parentID );
         
         this.field = field;
@@ -98,7 +98,7 @@ public class ScriptObjectVariable extends AbstractObjectVariable implements org.
             if( !valueRetrieved ) {
                 try {
                     Value v = Utils.getClassValue( getDebugger(), parentClass, field );
-                    this.value = (FXObjectReference) v;
+                    this.value = (VisageObjectReference) v;
                     this.valueRetrieved = true;
                 } catch( RuntimeException e ) {
                     //

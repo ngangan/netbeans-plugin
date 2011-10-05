@@ -35,18 +35,11 @@
 package org.netbeans.lib.visage.lexer;
 
 import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.mjavac.util.Convert;
 import com.sun.tools.mjavac.util.Log;
-import com.sun.tools.visage.util.MsgSym;
-
-
-
 import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
+import org.visage.tools.util.MsgSym;
+
+
 public class v4Lexer extends AbstractGeneratedLexerV4 {
     public static final int FUNCTION=28;
     public static final int PACKAGE=49;
@@ -2521,7 +2514,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                               										
                               							// Report the error
                               							//
-                              							log.error(sPos, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                              							log.error(sPos, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
                               										
                               							// Always use a defined string as the value
                               							//
@@ -2642,7 +2635,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                               							
                               							// Report the error
                               							//
-                              							log.error(sPos, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                              							log.error(sPos, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
                               							
                               							// Always use a defined string as the value
                               							//
@@ -2830,7 +2823,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
 
                             if ( state.backtracking==0 ) {
 
-                              								log.error(eStringStart, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                              								log.error(eStringStart, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
                               								input.rewind();
                               								setText(getText() + "\"");
                               							
@@ -2932,7 +2925,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
 
                             if ( state.backtracking==0 ) {
 
-                              							log.error(eStringStart, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                              							log.error(eStringStart, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
                               							input.rewind();
                               							setText(getText() + "'");
                               						
@@ -3106,7 +3099,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
             	    match('}'); if (state.failed) return ;
             	    if ( state.backtracking==0 ) {
 
-            	      					log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_UNESCAPED_RBRACE);
+            	      					log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_UNESCAPED_RBRACE);
             	      				
             	    }
 
@@ -3181,7 +3174,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
             	    match('}'); if (state.failed) return ;
             	    if ( state.backtracking==0 ) {
 
-            	      					log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_UNESCAPED_RBRACE);
+            	      					log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_UNESCAPED_RBRACE);
             	      				
             	    }
 
@@ -3662,7 +3655,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                                           			  	  		{
                                           			  	  			// Error - malformed hex constant
                                           			  	  			//
-                                          			  	  			log.error(sPos, MsgSym.MESSAGE_JAVAFX_HEX_MALFORMED);
+                                          			  	  			log.error(sPos, MsgSym.MESSAGE_VISAGE_HEX_MALFORMED);
                                           			  	  			setText("0");
                                           			  	  		}
                                           			  	  		else
@@ -3733,7 +3726,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                                                
                                                   			  	  					// Error - malformed hex constant
                                                   			  	  					//
-                                                  			  	  					log.error(sPos, MsgSym.MESSAGE_JAVAFX_HEX_FLOAT);
+                                                  			  	  					log.error(sPos, MsgSym.MESSAGE_VISAGE_HEX_FLOAT);
                                                   			  	  					setText("0");
                                                   			  	  				
                                             }
@@ -3756,7 +3749,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                                     {
                                     if ( state.backtracking==0 ) {
 
-                                          			  			log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_HEX_MISSING);
+                                          			  			log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_HEX_MISSING);
                                           			  			setText("0");
                                           			  		
                                     }
@@ -3828,7 +3821,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                                   					
                                   					if	(rangeError)
                                   					{
-                                  						log.error(sPos, MsgSym.MESSAGE_JAVAFX_OCTAL_MALFORMED);
+                                  						log.error(sPos, MsgSym.MESSAGE_VISAGE_OCTAL_MALFORMED);
                                   						setText("0");
                                   					}
                                   					else
@@ -3881,7 +3874,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
 
                                     if ( state.backtracking==0 ) {
                                        
-                                          			  	  				log.error(sPos, MsgSym.MESSAGE_JAVAFX_OCTAL_FLOAT);
+                                          			  	  				log.error(sPos, MsgSym.MESSAGE_VISAGE_OCTAL_FLOAT);
                                           			  	  				setText("0");
                                           			  	  			
                                     }
@@ -4832,7 +4825,7 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
                     {
                     if ( state.backtracking==0 ) {
                        
-                      						log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_EXPONENT_MALFORMED); 
+                      						log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_EXPONENT_MALFORMED); 
                       						setText("0.0");
                       					
                     }
@@ -5296,11 +5289,11 @@ public class v4Lexer extends AbstractGeneratedLexerV4 {
               			
               				// Something very strange happened
               				//
-              				log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_BAD_CHARACTER, "<unknown>");
+              				log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_BAD_CHARACTER, "<unknown>");
               				
               			} else {
               			
-              				log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_BAD_CHARACTER, getCharErrorDisplay( disp.charAt(0) ) );
+              				log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_BAD_CHARACTER, getCharErrorDisplay( disp.charAt(0) ) );
               			}
               		
             }

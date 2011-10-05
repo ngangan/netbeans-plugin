@@ -47,7 +47,7 @@ package org.netbeans.modules.visage.editor;
 import java.net.URL;
 import javax.lang.model.element.Element;
 import javax.swing.Action;
-import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.editor.ElementVisagedoc;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
 
@@ -57,14 +57,14 @@ import org.netbeans.spi.editor.completion.CompletionDocumentation;
  */
 public class JavaCompletionDoc implements CompletionDocumentation {
 
-    private ElementJavadoc elementJavadoc;
+    private ElementVisagedoc elementJavadoc;
     
-    public JavaCompletionDoc(ElementJavadoc elementJavadoc) {
+    public JavaCompletionDoc(ElementVisagedoc elementJavadoc) {
         this.elementJavadoc = elementJavadoc;
     }
 
     public JavaCompletionDoc resolveLink(String link) {
-        ElementJavadoc doc = elementJavadoc.resolveLink(link);
+        ElementVisagedoc doc = elementJavadoc.resolveLink(link);
         return doc != null ? new JavaCompletionDoc(doc) : null;
     }
 
@@ -81,7 +81,7 @@ public class JavaCompletionDoc implements CompletionDocumentation {
     }
 
     public static final JavaCompletionDoc create(CompilationController controller, Element element) {
-        return new JavaCompletionDoc( ElementJavadoc.create(controller, element) );
+        return new JavaCompletionDoc( ElementVisagedoc.create(controller, element) );
     }
     
 }

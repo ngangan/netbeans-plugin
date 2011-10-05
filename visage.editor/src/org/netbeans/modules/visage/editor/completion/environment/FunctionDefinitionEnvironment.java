@@ -42,31 +42,31 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGType;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.lexer.TokenUtilities;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageType;
 
 /**
  *
  * @author David Strupl
  */
-public class FunctionDefinitionEnvironment extends VisageCompletionEnvironment<VSGFunctionDefinition> {
+public class FunctionDefinitionEnvironment extends VisageCompletionEnvironment<VisageFunctionDefinition> {
     
     private static final Logger logger = Logger.getLogger(FunctionDefinitionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGFunctionDefinition t) throws IOException {
-        if (LOGGABLE) log("inside VSGFunctionDefinition " + t); // NOI18N
-        VSGFunctionDefinition def = t;
+    protected void inside(VisageFunctionDefinition t) throws IOException {
+        if (LOGGABLE) log("inside VisageFunctionDefinition " + t); // NOI18N
+        VisageFunctionDefinition def = t;
         int startPos = (int) sourcePositions.getStartPosition(root, def);
-        VSGType retType = def.getVSGReturnType();
+        VisageType retType = def.getVisageReturnType();
         if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
         CharSequence headerText = controller.getText().subSequence(startPos, offset > startPos ? offset : startPos);
         if (LOGGABLE) log("  headerText(1) == " + headerText); // NOI18N
@@ -77,7 +77,7 @@ public class FunctionDefinitionEnvironment extends VisageCompletionEnvironment<V
             if (parEnd > parStart) {
                 headerText = TokenUtilities.trim(headerText.subSequence(parEnd + 1, headerText.length()));
             } else {
-//                for (VSGVar param : def.getParams()) {
+//                for (VisageVar param : def.getParams()) {
 //                    int parPos = (int) sourcePositions.getEndPosition(root, param);
 //                    if (parPos == Diagnostic.NOPOS || offset <= parPos) {
 //                        break;

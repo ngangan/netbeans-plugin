@@ -42,16 +42,15 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.BinaryTree;
-
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import org.visage.api.tree.BinaryTree;
 
 /**
  *
@@ -72,7 +71,7 @@ public class BinaryTreeEnvironment extends VisageCompletionEnvironment<BinaryTre
         }
         pos = (int) sourcePositions.getEndPosition(root, bi.getLeftOperand());
         if (pos != Diagnostic.NOPOS) {
-            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken(pos, offset);
+            TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken(pos, offset);
             if (last != null) {
                 localResult(null);
                 addValueKeywords();

@@ -66,7 +66,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
 
     private static final String PLATFORM_ACTIVE = "platform.active";        //NOI18N
     private static final String ANT_NAME = "platform.ant.name";             //NOI18N
-    private static final String JAVAFX_PROFILE = "visage.profile";          //NOI18N
+    private static final String VISAGE_PROFILE = "visage.profile";          //NOI18N
 
     private final PropertyEvaluator evaluator;
     private JavaPlatformManager platformManager;
@@ -91,7 +91,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
             if (jp != null) {
                 //TODO: May also listen on CP, but from Platform it should be fixed.
                 List<PathResourceImplementation> result = new ArrayList<PathResourceImplementation>();                
-                for (ClassPath.Entry entry : jp.getBootstrapLibraries(this.evaluator.getProperty(JAVAFX_PROFILE)).entries()) {
+                for (ClassPath.Entry entry : jp.getBootstrapLibraries(this.evaluator.getProperty(VISAGE_PROFILE)).entries()) {
                     result.add(ClassPathSupport.createResource(entry.getURL()));
                 }
                 rc = Collections.unmodifiableList (result);
@@ -123,7 +123,7 @@ final class BootClassPathImplementation implements ClassPathImplementation, Prop
     }
     
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getSource() == this.evaluator && (evt.getPropertyName().equals(PLATFORM_ACTIVE) || evt.getPropertyName().equals(JAVAFX_PROFILE))) {
+        if (evt.getSource() == this.evaluator && (evt.getPropertyName().equals(PLATFORM_ACTIVE) || evt.getPropertyName().equals(VISAGE_PROFILE))) {
             //Active platform or Visage profile was changed
             resetCache ();
         }

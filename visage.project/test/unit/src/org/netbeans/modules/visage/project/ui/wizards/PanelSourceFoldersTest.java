@@ -71,7 +71,7 @@ public class PanelSourceFoldersTest extends NbTestCase {
     public void testCheckValidity () throws Exception {
 
         File root = getWorkDir();
-        File projectDir = new File (root, "FXProject");
+        File projectDir = new File (root, "VisageProject");
         File test = new File (root,  "tests");
         test.mkdir();
         File src = new File (root, "src");

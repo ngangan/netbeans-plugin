@@ -43,8 +43,6 @@
 package org.netbeans.modules.visage.editor.completion.environment;
 
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.visage.code.JavafxTypes;
-import com.sun.tools.visage.tree.VSGInstanciate;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.TypeElement;
@@ -52,18 +50,20 @@ import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.tools.code.VisageTypes;
+import org.visage.tools.tree.VisageInstanciate;
 
 /**
  *
  * @author David Strupl
  */
-public class InstantiateNewEnvironment extends VisageCompletionEnvironment<VSGInstanciate> {
+public class InstantiateNewEnvironment extends VisageCompletionEnvironment<VisageInstanciate> {
     
     private static final Logger logger = Logger.getLogger(InstantiateNewEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGInstanciate it) throws IOException {
+    protected void inside(VisageInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
         if (LOGGABLE) log("inside InstantiateNewEnvironment " + it + " pos == " + pos + "  offset == " + offset + "  prefix == " + prefix + "\n"); // NOI18N
         if (pos < 0) {
@@ -72,7 +72,7 @@ public class InstantiateNewEnvironment extends VisageCompletionEnvironment<VSGIn
         addLocalAndImportedTypes(null, null, null, false, getSmartType(it));
     }
 
-    public TypeMirror getSmartType(VSGInstanciate it) throws IOException {
+    public TypeMirror getSmartType(VisageInstanciate it) throws IOException {
         String s = it.getIdentifier().toString();
         TypeElement te = findTypeElement(s);
         TypeMirror type = te != null ? te.asType() : null;
@@ -81,7 +81,7 @@ public class InstantiateNewEnvironment extends VisageCompletionEnvironment<VSGIn
             return null;
         }
         
-        JavafxTypes types = controller.getJavafxTypes();
+        VisageTypes types = controller.getVisageTypes();
         if (types.isSequence((Type) type)) {
             type = types.elementType((Type) type);
         } 

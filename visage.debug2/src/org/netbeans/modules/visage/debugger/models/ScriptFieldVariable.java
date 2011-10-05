@@ -5,8 +5,6 @@
 
 package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.visage.jdi.FXClassType;
-import com.sun.visage.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.InternalException;
 import com.sun.jdi.ObjectCollectedException;
@@ -24,6 +22,8 @@ import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 import org.netbeans.modules.visage.debugger.utils.Utils;
+import org.visage.jdi.VisageClassType;
+import org.visage.jdi.VisageObjectReference;
 
 /**
  *
@@ -31,11 +31,11 @@ import org.netbeans.modules.visage.debugger.utils.Utils;
  */
 public class ScriptFieldVariable extends AbstractVariable implements org.netbeans.api.debugger.jpda.Field {
 
-    private FXClassType parentClass;
+    private VisageClassType parentClass;
     private Field field;
-    private FXObjectReference value;
+    private VisageObjectReference value;
     
-    public ScriptFieldVariable( JPDADebuggerImpl debugger, Field field, FXClassType parentClass, String parentID, FXObjectReference value ) {
+    public ScriptFieldVariable( JPDADebuggerImpl debugger, Field field, VisageClassType parentClass, String parentID, VisageObjectReference value ) {
         super( debugger, null, parentID );
         
         this.field = field;

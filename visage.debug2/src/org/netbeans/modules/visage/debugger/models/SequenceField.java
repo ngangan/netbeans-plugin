@@ -1,8 +1,5 @@
 package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.visage.jdi.FXPrimitiveValue;
-import com.sun.visage.jdi.FXSequenceReference;
-import com.sun.visage.jdi.FXValue;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;
@@ -17,24 +14,27 @@ import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ValueWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.visage.jdi.VisagePrimitiveValue;
+import org.visage.jdi.VisageSequenceReference;
+import org.visage.jdi.VisageValue;
 
 /**
  * Helper representation of Sequence
  */
 public class SequenceField extends AbstractVariable implements Field {
 
-    private FXSequenceReference sequence;
+    private VisageSequenceReference sequence;
     private ObjectVariable parent;
     private String name;
-    private FXValue value;
+    private VisageValue value;
     private int index;
 
-    public SequenceField(JPDADebuggerImpl debugger, FXPrimitiveValue value, ObjectVariable parent, int index, String parentID) {
+    public SequenceField(JPDADebuggerImpl debugger, VisagePrimitiveValue value, ObjectVariable parent, int index, String parentID) {
         super(debugger, value, parentID + "." + index);
         this.index = index;
         this.parent = parent;
         this.value = value;
-        this.sequence = (FXSequenceReference) ((JDIVariable) parent).getJDIValue();
+        this.sequence = (VisageSequenceReference) ((JDIVariable) parent).getJDIValue();
     }
 
     public String getName() {

@@ -256,9 +256,9 @@ public class SourcePathImplementationTest extends NbTestCase {
         if (value == null) {
             return null;
         }
-        VisageProject fxprj = (VisageProject) p.getLookup().lookup(VisageProject.class);
-        if (fxprj != null) {
-            return fxprj.evaluator().evaluate(value);
+        VisageProject visageprj = (VisageProject) p.getLookup().lookup(VisageProject.class);
+        if (visageprj != null) {
+            return visageprj.evaluator().evaluate(value);
         } else {
             return null;
         }

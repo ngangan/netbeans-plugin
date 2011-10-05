@@ -70,8 +70,8 @@ public class AllCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "fxprj1/FXTest1.fx",
+                "visage-prj-1",
+                "visageprj1/FXTest1.visage",
                 13, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }

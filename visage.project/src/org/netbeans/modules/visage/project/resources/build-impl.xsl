@@ -53,7 +53,7 @@ made subject to such option by the copyright holder.
                 xmlns:projdeps="http://www.netbeans.org/ns/ant-project-references/1"
                 xmlns:projdeps2="http://www.netbeans.org/ns/ant-project-references/2"
                 exclude-result-prefixes="xalan p projdeps projdeps2">
-<xsl:comment> XXX should use namespaces for NB in-VM tasks from ant/browsetask and debuggervisage/ant (Ant 1.6.1 and higher only)</xsl:comment>
+    <xsl:comment> XXX should use namespaces for NB in-VM tasks from ant/browsetask and debuggervisage/ant (Ant 1.6.1 and higher only)</xsl:comment>
     <xsl:output method="xml" indent="yes" encoding="UTF-8" xalan:indent-amount="4" cdata-section-elements="script"/>
     <xsl:template match="/">
         
@@ -76,7 +76,8 @@ is divided into following sections:
   - applet
   - cleanup
 
-        ]]></xsl:comment>
+        ]]>
+        </xsl:comment>
         
         <xsl:variable name="name" select="/p:project/p:configuration/visageproject3:data/visageproject3:name"/>
     <!-- Synch with build-impl.xsl: -->
@@ -90,411 +91,414 @@ is divided into following sections:
                 <xsl:attribute name="description">Build whole project.</xsl:attribute>
             </target>
             
-    <xsl:comment>
+            <xsl:comment>
                     ======================
                     INITIALIZATION SECTION
                     ======================
-    </xsl:comment>
-        <target name="-pre-init">
-        <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
-        <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
-        </target>
-        <target depends="-pre-init" name="-init-private">
-            <macrodef name="property" uri="http://www.netbeans.org/ns/visage-project/1">
-                <attribute name="name"/>
-                <attribute name="value"/>
-                <sequential>
-                    <property name="@{{name}}" value="${{@{{value}}}}"/>
-                </sequential>
-            </macrodef>
-            <property file="nbproject/private/config.properties"/>
-            <property file="nbproject/private/configs/${{config}}.properties"/>
-            <property file="nbproject/private/private.properties"/>
-        </target>
-        <target depends="-pre-init,-init-private" name="-init-user">
-            <property file="${{user.properties.file}}"/>
-        </target>
-        <target depends="-pre-init,-init-private,-init-user" name="-init-project">
-            <property file="nbproject/configs/${{config}}.properties"/>
-            <property file="nbproject/project.properties"/>
-        </target>
-        <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
-            <visageproject1:property name="platform.fxhome" value="platforms.${{platform.active}}.fxhome"/>
-            <visageproject1:property name="platform.javadoc.tmp" value="platforms.${{platform.active}}.javadoc"/>
-            <condition property="platform.javadoc" value="${{platform.home}}/bin/javadoc">
-                <equals arg1="${{platform.javadoc.tmp}}" arg2="$${{platforms.${{platform.active}}.javadoc}}"/>
-            </condition>
-            <property name="platform.javadoc" value="${{platform.javadoc.tmp}}"/>
-            <condition property="no.javadoc.preview">
-                <and>
-                    <isset property="javadoc.preview"/>
-                    <isfalse value="${{javadoc.preview}}"/>
-                </and>
-            </condition>
-            <property name="work.dir" value="${{basedir}}"/>
-            <condition property="no.deps">
-                <istrue value="${{no.dependencies}}"/>
-            </condition>
-            <condition property="codebase.arg" value="-appCodebase ${{codebase.url}}" else="">
-                <isset property="codebase.url"/>
-            </condition>
-            <property file="${{user.properties.file}}/../config/preferences/org/apache/tools/ant/module.properties" prefix="ant.module"/>
-            <condition property="verbose.arg" value="-v" else="">
-                <or>
-                    <equals arg1="${{ant.module.verbosity}}" arg2="3"/>
-                    <equals arg1="${{ant.module.verbosity}}" arg2="4"/>
-                </or>
-            </condition>
-            <condition property="draggable.arg" value="-draggable" else="">
-                <istrue value="${{applet.draggable}}"/>
-            </condition>
-            <condition property="pack200.arg" value="-pack200" else="">
-                <istrue value="${{jnlp.packEnabled}}"/>
-            </condition>
-            <condition property="sign.arg" value="-sign" else="">
-                <istrue value="${{jnlp.signed}}"/>
-            </condition>
-            <property name="jnlp.update.model" value="always"/>
-            <property name="javadoc.preview" value="true"/>
-            <property name="source.encoding" value="${{file.encoding}}"/>
-            <condition property="binary.extension" value=".exe" else="">
-                <os family="windows"/>
-            </condition>
-            <property environment="env"/>
-            <condition property="java.home.value" value="${{env.JAVA_HOME}}">
-                <available file="${{env.JAVA_HOME}}/bin/javac${{binary.extension}}"/>
-            </condition>
-            <condition property="java.home.value" value="${{java.home}}">
-                <available file="${{java.home}}/bin/javac${{binary.extension}}"/>
-            </condition>
-            <condition property="java.home.value" value="${{java.home}}/..">
-                <available file="${{java.home}}/../bin/javac${{binary.extension}}"/>
-            </condition>
-            <condition property="java.home.key" value="JAVA_HOME" else="NOTHING_IMPORTANT">
-                <isset property="java.home.value"/>
-            </condition>
-            <property name="visage.profile" value="desktop"/>
-            <condition property="midp.execution.trigger">
-                <equals arg1="${{visage.profile}}" arg2="mobile"/>
-            </condition>
-            <condition property="tv.execution.trigger">
-                <equals arg1="${{visage.profile}}" arg2="tv"/>
-            </condition>
-            <condition property="jnlp.execution.trigger">
-                <and>
-                    <equals arg1="${{visage.profile}}" arg2="desktop"/>
-                    <equals arg1="${{execution.target}}" arg2="jnlp"/>
-                </and>    
-            </condition>
-            <condition property="applet.execution.trigger">
-                <and>
-                    <equals arg1="${{visage.profile}}" arg2="desktop"/>
-                    <equals arg1="${{execution.target}}" arg2="applet"/>
-                    <isset property="netbeans.home"/>
-                </and>    
-            </condition>
-            <condition property="standard.execution.trigger">
-                <not>
-                    <or>
-                         <isset property="jnlp.execution.trigger"/>
-                         <isset property="applet.execution.trigger"/>
-                         <isset property="midp.execution.trigger"/>
-                         <isset property="tv.execution.trigger"/>
-                    </or>
-                </not>
-            </condition>
-            <property name="run.jvmargs" value=""/>
-            <property name="packager.options" value=""/>
-            <available property="emulator.available" file="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}"/>
-            <available property="tvemulator.available" file="${{platform.fxhome}}/emulator/tv/bin/cvm${{binary.extension}}"/>
-        </target>
-        <target name="-post-init">
-        <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
-        <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
-        </target>
-        <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init" name="-init-check">
-            <fail unless="build.dir">Must set build.dir</fail>
-            <fail unless="dist.dir">Must set dist.dir</fail>
-            <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
-            <fail message="Must set application main class">
-                <condition>
-                    <length string="${{main.class}}" length="0"/>
+            </xsl:comment>
+            <target name="-pre-init">
+                <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
+                <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
+            </target>
+            <target depends="-pre-init" name="-init-private">
+                <macrodef name="property" uri="http://www.netbeans.org/ns/visage-project/1">
+                    <attribute name="name"/>
+                    <attribute name="value"/>
+                    <sequential>
+                        <property name="@{{name}" value="${@{{value}}"/>
+                    </sequential>
+                </macrodef>
+                <property file="nbproject/private/config.properties"/>
+                <property file="nbproject/private/configs/${config}.properties"/>
+                <property file="nbproject/private/private.properties"/>
+            </target>
+            <target depends="-pre-init,-init-private" name="-init-user">
+                <property file="${user.properties.file}"/>
+            </target>
+            <target depends="-pre-init,-init-private,-init-user" name="-init-project">
+                <property file="nbproject/configs/${config}.properties"/>
+                <property file="nbproject/project.properties"/>
+            </target>
+            <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
+                <visageproject1:property name="platform.visagehome" value="platforms.${platform.active}.visagehome"/>
+                <visageproject1:property name="platform.javadoc.tmp" value="platforms.${platform.active}.javadoc"/>
+                <condition property="platform.javadoc" value="${platform.home}/bin/javadoc">
+                    <equals arg1="${platform.javadoc.tmp}" arg2="$${platforms.${platform.active}.javadoc}"/>
                 </condition>
-            </fail>
-        </target>
-        <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check" name="init"/>
-    <xsl:comment>
+                <property name="platform.javadoc" value="${platform.javadoc.tmp}"/>
+                <condition property="no.javadoc.preview">
+                    <and>
+                        <isset property="javadoc.preview"/>
+                        <isfalse value="${javadoc.preview}"/>
+                    </and>
+                </condition>
+                <property name="work.dir" value="${basedir}"/>
+                <condition property="no.deps">
+                    <istrue value="${no.dependencies}"/>
+                </condition>
+                <condition property="codebase.arg" value="-appCodebase ${codebase.url}" else="">
+                    <isset property="codebase.url"/>
+                </condition>
+                <property file="${user.properties.file}/../config/preferences/org/apache/tools/ant/module.properties" prefix="ant.module"/>
+                <condition property="verbose.arg" value="-v" else="">
+                    <or>
+                        <equals arg1="${ant.module.verbosity}" arg2="3"/>
+                        <equals arg1="${ant.module.verbosity}" arg2="4"/>
+                    </or>
+                </condition>
+                <condition property="draggable.arg" value="-draggable" else="">
+                    <istrue value="${applet.draggable}"/>
+                </condition>
+                <condition property="pack200.arg" value="-pack200" else="">
+                    <istrue value="${jnlp.packEnabled}"/>
+                </condition>
+                <condition property="sign.arg" value="-sign" else="">
+                    <istrue value="${jnlp.signed}"/>
+                </condition>
+                <property name="jnlp.update.model" value="always"/>
+                <property name="javadoc.preview" value="true"/>
+                <property name="source.encoding" value="${file.encoding}"/>
+                <condition property="binary.extension" value=".exe" else="">
+                    <os family="windows"/>
+                </condition>
+                <property environment="env"/>
+                <condition property="java.home.value" value="${env.JAVA_HOME}">
+                    <available file="${env.JAVA_HOME}/bin/javac${binary.extension}"/>
+                </condition>
+                <condition property="java.home.value" value="${java.home}">
+                    <available file="${java.home}/bin/javac${binary.extension}"/>
+                </condition>
+                <condition property="java.home.value" value="${java.home}/..">
+                    <available file="${java.home}/../bin/javac${binary.extension}"/>
+                </condition>
+                <condition property="java.home.key" value="JAVA_HOME" else="NOTHING_IMPORTANT">
+                    <isset property="java.home.value"/>
+                </condition>
+                <property name="visage.profile" value="desktop"/>
+                <condition property="midp.execution.trigger">
+                    <equals arg1="${visage.profile}" arg2="mobile"/>
+                </condition>
+                <condition property="tv.execution.trigger">
+                    <equals arg1="${visage.profile}" arg2="tv"/>
+                </condition>
+                <condition property="jnlp.execution.trigger">
+                    <and>
+                        <equals arg1="${visage.profile}" arg2="desktop"/>
+                        <equals arg1="${execution.target}" arg2="jnlp"/>
+                    </and>    
+                </condition>
+                <condition property="applet.execution.trigger">
+                    <and>
+                        <equals arg1="${visage.profile}" arg2="desktop"/>
+                        <equals arg1="${execution.target}" arg2="applet"/>
+                        <isset property="netbeans.home"/>
+                    </and>    
+                </condition>
+                <condition property="standard.execution.trigger">
+                    <not>
+                        <or>
+                            <isset property="jnlp.execution.trigger"/>
+                            <isset property="applet.execution.trigger"/>
+                            <isset property="midp.execution.trigger"/>
+                            <isset property="tv.execution.trigger"/>
+                        </or>
+                    </not>
+                </condition>
+                <property name="run.jvmargs" value=""/>
+                <property name="packager.options" value=""/>
+                <available property="emulator.available" file="${platform.visagehome}/emulator/mobile/bin/emulator${binary.extension}"/>
+                <available property="tvemulator.available" file="${platform.visagehome}/emulator/tv/bin/cvm${binary.extension}"/>
+            </target>
+            <target name="-post-init">
+                <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
+                <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
+            </target>
+            <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init" name="-init-check">
+                <fail unless="build.dir">Must set build.dir</fail>
+                <fail unless="dist.dir">Must set dist.dir</fail>
+                <fail unless="dist.javadoc.dir">Must set dist.javadoc.dir</fail>
+                <fail message="Must set application main class">
+                    <condition>
+                        <length string="${main.class}" length="0"/>
+                    </condition>
+                </fail>
+            </target>
+            <target depends="-pre-init,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check" name="init"/>
+            <xsl:comment>
                     ===================
                     COMPILATION SECTION
                     ===================
-    </xsl:comment>
+            </xsl:comment>
         
-        <xsl:call-template name="deps.target">
-            <xsl:with-param name="targetname" select="'deps-jar'"/>
-            <xsl:with-param name="type" select="'jar'"/>
-        </xsl:call-template>
+            <xsl:call-template name="deps.target">
+                <xsl:with-param name="targetname" select="'deps-jar'"/>
+                <xsl:with-param name="type" select="'jar'"/>
+            </xsl:call-template>
             
-        <target name="-pre-compile">
-        <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
-        <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
-        </target>
-        <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-            <exec executable="${{platform.fxhome}}/bin/visagepackager${{binary.extension}}" failonerror="true" logerror="true">
-                <arg value="-src"/>
-                <arg>
-                    <xsl:attribute name="value">
-                        <xsl:call-template name="createPath">
-                            <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
-                        </xsl:call-template>
-                    </xsl:attribute>
-                </arg>
-                <arg value="-workdir"/>
-                <arg file="${{build.dir}}"/>
-                <arg value="-d"/>
-                <arg file="${{dist.dir}}"/>
-                <arg value="-appname"/>
-                <arg value="${{application.title}}"/>
-                <arg value="-appvendor"/>
-                <arg value="${{application.vendor}}"/>
-                <arg value="-appwidth"/>
-                <arg value="${{applet.width}}"/>
-                <arg value="-appheight"/>
-                <arg value="${{applet.height}}"/>
-                <arg value="-appclass"/>
-                <arg value="${{main.class}}"/>
-                <arg line="${{codebase.arg}}"/>
-                <arg value="-encoding"/>
-                <arg value="${{source.encoding}}"/>
-                <arg value="-p"/>
-                <arg value="${{visage.profile}}"/>
-                <arg value="${{verbose.arg}}"/>
-                <arg value="${{draggable.arg}}"/>
-                <arg value="${{pack200.arg}}"/>
-                <arg value="${{sign.arg}}"/>
-                <arg value="-updatecheck"/>
-                <arg value="${{jnlp.update.model}}"/>
-                <arg line="${{packager.options}}"/>
-                <arg value="-cp"/>
-                <arg path="${{javac.classpath}}"/>
-                <env key="${{java.home.key}}" file="${{java.home.value}}"/>
-            </exec>
-        </target>
-        <target name="-post-compile">
-        <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
-        <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
-        </target>
-        <target depends="init,deps-jar,-pre-compile,-do-compile,-post-compile" description="Compile project." name="compile"/>
-    <xsl:comment>
+            <target name="-pre-compile">
+                <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
+                <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
+            </target>
+            <target depends="init,deps-jar,-pre-compile" name="-do-compile">
+                <exec executable="${platform.visagehome}/bin/visagec${binary.extension}" failonerror="true" logerror="true">
+                    <arg value="-d"/>
+                    <arg file="${dist.dir}"/>
+                    <arg value="-sourcepath"/>
+                    <arg>
+                        <xsl:attribute name="value">
+                            <xsl:call-template name="createPath">
+                                <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
+                            </xsl:call-template>
+                        </xsl:attribute>
+                    </arg>
+                    <arg value="-cp"/>
+                    <arg path="${javac.classpath}"/>
+                    <arg line="${codebase.arg}"/>
+                    <arg value="-encoding"/>
+                    <arg value="${source.encoding}"/>
+                    <arg value="${verbose.arg}"/>
+                </exec>
+            </target>
+            <target name="-post-compile">
+                <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
+                <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
+            </target>
+            <target depends="init,deps-jar,-pre-compile,-do-compile,-post-compile" description="Compile project." name="compile"/>
+            <xsl:comment>
                     ====================
                     JAR BUILDING SECTION
                     ====================
-    </xsl:comment>
-        <target depends="init,compile" description="Build." name="jar"/>
-    <xsl:comment>
+            </xsl:comment>
+            <target depends="init,compile" description="Build." name="jar">
+                <jar destfile="${dist}/${application.title}.jar"
+                     basedir="${build}/classes"
+                     excludes="**/Test.class"
+                />        
+            </target>
+            <xsl:comment>
                     =================
                     EXECUTION SECTION
                     =================
-    </xsl:comment>
-        <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
-            <property name="application.args" value=""/>
-            <java fork="true" jvm="${{platform.fxhome}}/bin/visage${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}" jvmargs="${{run.jvmargs}}" failonerror="true">
-                <arg line="${{application.args}}"/>
-            </java>
-        </target>
-        <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
-            <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the execution."/>
-            <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
-            <property name="mobile.device" value="DefaultFxPhone1"/>
-            <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
-                <istrue value="${{jad.install}}"/>
-            </condition>
-            <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}" failonerror="true" logerror="true">
-                <arg value="${{run.jvmargs}}"/>
-                <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
-                <arg value="-Xdevice:${{mobile.device}}"/>
-            </exec>
-        </target>
-        <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
-            <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
-            <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/bin/visage${{binary.extension}}" failonerror="true" logerror="true">
-                <arg value="-profile"/>
-                <arg value="tv"/>
-                <arg value="-classpath"/>
-                <arg value="${{jar.file}}"/>
-                <arg line="${{run.jvmargs}}"/>
-                <arg value="${{main.class}}"/>
-            </exec>
-        </target>
-        <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
-            <makeurl property="applet.local.url" file="${{dist.dir}}/${{application.title}}.html"/>
-            <condition property="applet.url" value="${{codebase.url}}/${{application.title}}.html" else="${{applet.local.url}}">
-                <isset property="codebase.url"/>
-            </condition>
-            <nbbrowse url="${{applet.url}}"/>
-        </target>
-        <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
-            <condition property="javaws.home" value="/usr" else="${{java.home}}">
-                <os family="mac"/>
-            </condition>
-            <exec executable="${{javaws.home}}/bin/javaws" failonerror="true" logerror="true">
-                <env key="JAVAWS_VM_ARGS" value="${{run.jvmargs}}"/>
-                <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
-            </exec>
-        </target>
-        <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run,tv-run" description="Run an application." name="run"/>
-    <xsl:comment>
+            </xsl:comment>
+            <target depends="init,compile,jar" if="standard.execution.trigger" description="Run a main class." name="standard-run">
+                <property name="application.args" value=""/>
+                <java fork="true" jvm="${platform.visagehome}/bin/visage${binary.extension}" classpath="${dist.dir}/${application.title}.jar" classname="${main.class}" jvmargs="${run.jvmargs}" failonerror="true">
+                    <arg line="${application.args}"/>
+                </java>
+            </target>
+            <target depends="jar" if="midp.execution.trigger" description="Start MIDP execution" name="midp-run">
+                <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the execution."/>
+                <property name="jad.file" location="${dist.dir}/${application.title}.jad"/>
+                <property name="mobile.device" value="DefaultVisagePhone1"/>
+                <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
+                    <istrue value="${jad.install}"/>
+                </condition>
+                <exec executable="${platform.visagehome}/emulator/mobile/bin/emulator${binary.extension}" failonerror="true" logerror="true">
+                    <arg value="${run.jvmargs}"/>
+                    <arg value="${emulator.exec.arg}${jad.file}"/>
+                    <arg value="-Xdevice:${mobile.device}"/>
+                </exec>
+            </target>
+            <target depends="jar" if="tv.execution.trigger" description="Start TV execution" name="tv-run">
+                <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the execution."/>
+                <property name="jar.file" location='${dist.dir}/${application.title}.jar'/>
+                <exec executable="${platform.visagehome}/bin/visage${binary.extension}" failonerror="true" logerror="true">
+                    <arg value="-profile"/>
+                    <arg value="tv"/>
+                    <arg value="-classpath"/>
+                    <arg value="${jar.file}"/>
+                    <arg line="${run.jvmargs}"/>
+                    <arg value="${main.class}"/>
+                </exec>
+            </target>
+            <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
+                <makeurl property="applet.local.url" file="${dist.dir}/${application.title}.html"/>
+                <condition property="applet.url" value="${codebase.url}/${application.title}.html" else="${applet.local.url}">
+                    <isset property="codebase.url"/>
+                </condition>
+                <nbbrowse url="${applet.url}"/>
+            </target>
+            <target depends="jar"  if="jnlp.execution.trigger" description="Start javaws execution" name="jws-run">
+                <condition property="javaws.home" value="/usr" else="${java.home}">
+                    <os family="mac"/>
+                </condition>
+                <exec executable="${javaws.home}/bin/javaws" failonerror="true" logerror="true">
+                    <env key="JAVAWS_VM_ARGS" value="${run.jvmargs}"/>
+                    <arg file="${dist.dir}/${application.title}.jnlp"/>
+                </exec>
+            </target>
+            <target depends="jar" description="Start desktop execution" name="desktop-run">
+                <exec executable="${platform.visagehome}/bin/visage${binary.extension}" failonerror="true" logerror="true">
+                    <arg value="-client"/>
+                    <arg value="-cp" />
+                    <arg value="${dist}application.jar"/>
+                    <arg value="${main.class}"/>
+                </exec>
+            </target>
+            <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run,tv-run,desktop-run" description="Run an application." name="run"/>
+            <xsl:comment>
                     =================
                     DEBUGGING SECTION
                     =================
-    </xsl:comment>
-        <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger">
-            <nbjpdastart addressproperty="visage.address" name="${{application.title}}" connector="com.sun.visage.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
-                <classpath>
-                    <path path="${{javac.classpath}}"/>
-                </classpath>
-                <sourcepath>
-                    <path>
-                      <xsl:attribute name="path">
-                          <xsl:call-template name="createPath">
-                              <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
-                          </xsl:call-template>
-                      </xsl:attribute>
-                    </path>
-                </sourcepath>
-            </nbjpdastart>
-        </target>
-        <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger-stepinto">
-            <nbjpdastart addressproperty="visage.address" name="${{application.title}}" stopclassname="${{main.class}}" connector="com.sun.visage.jdi.connect.FXSocketListeningConnector" transport="dt_socket">
-                <classpath>
-                    <path path="${{javac.classpath}}"/>
-                </classpath>
-                <sourcepath>
-                    <path>
-                      <xsl:attribute name="path">
-                          <xsl:call-template name="createPath">
-                              <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
-                          </xsl:call-template>
-                      </xsl:attribute>
-                    </path>
-                </sourcepath>
-            </nbjpdastart>
-        </target>
-        <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
-            <property name="application.args" value=""/>
-            <java fork="true" jvm="${{platform.fxhome}}/bin/visage${{binary.extension}}" classpath="${{dist.dir}}/${{application.title}}.jar" classname="${{main.class}}">
-                <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${{visage.address}}"/>
-                <jvmarg line="${{run.jvmargs}}"/>
-                <syspropertyset>
-                    <propertyref prefix="run-sys-prop."/>
-                    <mapper from="run-sys-prop.*" to="*" type="glob"/>
-                </syspropertyset>
-                <arg line="${{application.args}}"/>
-            </java>
-        </target>
-        <target name="-debug-midp-debuggee" if="midp.execution.trigger">
-            <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the debugging."/>
-            <property name="jad.file" location="${{dist.dir}}/${{application.title}}.jad"/>
-            <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
-                <istrue value="${{jad.install}}"/>
-            </condition>
-            <script language="javascript"><![CDATA[
+            </xsl:comment>
+            <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger">
+                <nbjpdastart addressproperty="visage.address" name="${application.title}" connector="org.visage.jdi.connect.VisageSocketListeningConnector" transport="dt_socket">
+                    <classpath>
+                        <path path="${javac.classpath}"/>
+                    </classpath>
+                    <sourcepath>
+                        <path>
+                            <xsl:attribute name="path">
+                                <xsl:call-template name="createPath">
+                                    <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
+                                </xsl:call-template>
+                            </xsl:attribute>
+                        </path>
+                    </sourcepath>
+                </nbjpdastart>
+            </target>
+            <target depends="init" if="netbeans.home" unless="midp.execution.trigger" name="-debug-start-debugger-stepinto">
+                <nbjpdastart addressproperty="visage.address" name="${application.title}" stopclassname="${main.class}" connector="org.visage.jdi.connect.VisageSocketListeningConnector" transport="dt_socket">
+                    <classpath>
+                        <path path="${javac.classpath}"/>
+                    </classpath>
+                    <sourcepath>
+                        <path>
+                            <xsl:attribute name="path">
+                                <xsl:call-template name="createPath">
+                                    <xsl:with-param name="roots" select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots"/>
+                                </xsl:call-template>
+                            </xsl:attribute>
+                        </path>
+                    </sourcepath>
+                </nbjpdastart>
+            </target>
+            <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
+                <property name="application.args" value=""/>
+                <java fork="true" jvm="${platform.visagehome}/bin/visage${binary.extension}" classpath="${dist.dir}/${application.title}.jar" classname="${main.class}">
+                    <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${visage.address}"/>
+                    <jvmarg line="${run.jvmargs}"/>
+                    <syspropertyset>
+                        <propertyref prefix="run-sys-prop."/>
+                        <mapper from="run-sys-prop.*" to="*" type="glob"/>
+                    </syspropertyset>
+                    <arg line="${application.args}"/>
+                </java>
+            </target>
+            <target name="-debug-midp-debuggee" if="midp.execution.trigger">
+                <fail unless="emulator.available" message="Current platform does not include mobile device emulator necessary for the debugging."/>
+                <property name="jad.file" location="${dist.dir}/${application.title}.jad"/>
+                <condition property="emulator.exec.arg" value="-Xjam:install=" else="-Xdescriptor:">
+                    <istrue value="${jad.install}"/>
+                </condition>
+                <script language="javascript"><![CDATA[
                 importClass(java.net.Socket);
                 socket = new Socket();
                 socket.bind(null);
                 project.setNewProperty("visage.address", socket.getLocalPort());
                 socket.close();
-            ]]></script>
-            <parallel failonany="true">
-                <exec executable="${{platform.fxhome}}/emulator/mobile/bin/emulator${{binary.extension}}" failonerror="true" logerror="true">
-                    <arg value="${{run.jvmargs}}"/>
-                    <arg value="${{emulator.exec.arg}}${{jad.file}}"/>
+            ]]>
+                </script>
+                <parallel failonany="true">
+                    <exec executable="${platform.visagehome}/emulator/mobile/bin/emulator${binary.extension}" failonerror="true" logerror="true">
+                        <arg value="${run.jvmargs}"/>
+                        <arg value="${emulator.exec.arg}${jad.file}"/>
+                        <arg value="-Xdebug"/>
+                        <arg value="-Xrunjdwp:transport=dt_socket,address=${visage.address},server=y,suspend=y"/>
+                    </exec>
+                    <sequential>
+                        <sleep seconds="6"/>
+                        <nbjpdaconnect address="${visage.address}" name="${application.title}" transport="dt_socket">
+                            <classpath>
+                                <path path="${javac.classpath}"/>
+                            </classpath>
+                            <sourcepath>
+                                <path path="${src.dir}"/>
+                            </sourcepath>
+                        </nbjpdaconnect>
+                    </sequential>
+                </parallel>
+            </target>
+            <target name="-debug-tv-debuggee" if="tv.execution.trigger">
+                <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
+                <property name="jar.file" location='${dist.dir}/${application.title}.jar'/>
+                <exec executable="${platform.visagehome}/bin/visage${binary.extension}" failonerror="true" logerror="true">
                     <arg value="-Xdebug"/>
-                    <arg value="-Xrunjdwp:transport=dt_socket,address=${{visage.address}},server=y,suspend=y"/>
+                    <arg value="-Xrunjdwp:transport=dt_socket,address=${visage.address},server=n"/>
+                    <arg value="-profile"/>
+                    <arg value="tv"/>
+                    <arg value="-classpath"/>
+                    <arg value="${jar.file}"/>
+                    <arg line="${run.jvmargs}"/>
+                    <arg value="${main.class}"/>
                 </exec>
-                <sequential>
-                    <sleep seconds="6"/>
-                    <nbjpdaconnect address="${{visage.address}}" name="${{application.title}}" transport="dt_socket">
-                        <classpath>
-                            <path path="${{javac.classpath}}"/>
-                        </classpath>
-                        <sourcepath>
-                            <path path="${{src.dir}}"/>
-                        </sourcepath>
-                    </nbjpdaconnect>
-                </sequential>
-            </parallel>
-        </target>
-        <target name="-debug-tv-debuggee" if="tv.execution.trigger">
-            <fail unless="tvemulator.available" message="Current platform does not include tv emulator necessary for the debugging."/>
-            <property name="jar.file" location='${{dist.dir}}/${{application.title}}.jar'/>
-            <exec executable="${{platform.fxhome}}/bin/visage${{binary.extension}}" failonerror="true" logerror="true">
-                <arg value="-Xdebug"/>
-                <arg value="-Xrunjdwp:transport=dt_socket,address=${{visage.address}},server=n"/>
-                <arg value="-profile"/>
-                <arg value="tv"/>
-                <arg value="-classpath"/>
-                <arg value="${{jar.file}}"/>
-                <arg line="${{run.jvmargs}}"/>
-                <arg value="${{main.class}}"/>
-            </exec>
-        </target>
-        <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
-            <condition property="javaws.home" value="/usr" else="${{java.home}}">
-                <os family="mac"/>
-            </condition>
-            <exec executable="${{javaws.home}}/bin/javaws" failonerror="true" logerror="true">
-                <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${{visage.address}} ${{run.jvmargs}}"/>
-                <arg file="${{dist.dir}}/${{application.title}}.jnlp"/>
-            </exec>
-        </target>
-        <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee,-debug-tv-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
-        <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee,-debug-tv-debuggee" if="netbeans.home" name="debug-stepinto"/>
-    <xsl:comment>
+            </target>
+            <target if="jnlp.execution.trigger" name="-debug-javaws-debuggee">
+                <condition property="javaws.home" value="/usr" else="${java.home}">
+                    <os family="mac"/>
+                </condition>
+                <exec executable="${javaws.home}/bin/javaws" failonerror="true" logerror="true">
+                    <env key="JAVAWS_VM_ARGS" value="-Xdebug -Xnoagent -Djava.compiler=none -Xrunjdwp:transport=dt_socket,address=${visage.address} ${run.jvmargs}"/>
+                    <arg file="${dist.dir}/${application.title}.jnlp"/>
+                </exec>
+            </target>
+            <target depends="jar" description="Start desktop execution" name="-debug-desktop-debuggee">
+                <exec executable="${platform.visagehome}/bin/visage${binary.extension}" failonerror="true" logerror="true">
+                    <arg value="-Xdebug"/>
+                    <arg value="-Xrunjdwp:transport=dt_socket,address=${visage.address},server=n"/>
+                    <arg value="-client"/>
+                    <arg value="-cp" />
+                    <arg value="${dist}application.jar"/>
+                    <arg value="${main.class}"/>
+                </exec>
+            </target>
+            <target depends="init,compile,-debug-start-debugger,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee,-debug-tv-debuggee" description="Debug project in IDE." if="netbeans.home" name="debug"/>
+            <target depends="init,compile,-debug-start-debugger-stepinto,-debug-start-debuggee,-debug-javaws-debuggee,-debug-midp-debuggee,-debug-tv-debuggee" if="netbeans.home" name="debug-stepinto"/>
+            <xsl:comment>
                     ===============
                     JAVADOC SECTION
                     ===============
-    </xsl:comment>
-        <target depends="jar" name="-javadoc-build">
-            <mkdir dir="${{dist.javadoc.dir}}"/>
-            <javadoc author="${{javadoc.author}}" classpath="${{javac.classpath}}:${{build.dir}}/compiled" destdir="${{dist.javadoc.dir}}" executable="${{platform.fxhome}}/bin/visagedoc${{binary.extension}}" failonerror="true" private="${{javadoc.private}}" version="${{javadoc.version}}" useexternalfile="true"  encoding="${{source.encoding}}">
-                <xsl:for-each select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots/visageproject3:root">
-                    <fileset includes="**/*.fx">
-                        <xsl:attribute name="dir">
-                          <xsl:text>${</xsl:text>
-                          <xsl:value-of select="@id"/>
-                          <xsl:text>}</xsl:text>
-                        </xsl:attribute>
-                    </fileset>
-                </xsl:for-each>						
-            </javadoc>
-            <condition property="javadoc.available">
-                <and>
-                    <isset property="netbeans.home"/>
-                    <available file="${{dist.javadoc.dir}}/index.html"/>
-                </and>
-            </condition>
-        </target>
-        <target depends="init,-javadoc-build" if="javadoc.available" name="-javadoc-browse" unless="no.javadoc.preview">
-            <nbbrowse file="${{dist.javadoc.dir}}/index.html"/>
-        </target>
-        <target depends="init,-javadoc-build,-javadoc-browse" description="Build Javadoc." name="javadoc"/>
-    <xsl:comment>
+            </xsl:comment>
+            <target depends="jar" name="-javadoc-build">
+                <mkdir dir="${dist.javadoc.dir}"/>
+                <javadoc author="${javadoc.author}" classpath="${javac.classpath}:${build.dir}/compiled" destdir="${dist.javadoc.dir}" executable="${platform.visagehome}/bin/visagedoc${binary.extension}" failonerror="true" private="${javadoc.private}" version="${javadoc.version}" useexternalfile="true"  encoding="${source.encoding}">
+                    <xsl:for-each select="/p:project/p:configuration/visageproject3:data/visageproject3:source-roots/visageproject3:root">
+                        <fileset includes="**/*.visage">
+                            <xsl:attribute name="dir">
+                                <xsl:text>${</xsl:text>
+                                <xsl:value-of select="@id"/>
+                                <xsl:text>}</xsl:text>
+                            </xsl:attribute>
+                        </fileset>
+                    </xsl:for-each>						
+                </javadoc>
+                <condition property="javadoc.available">
+                    <and>
+                        <isset property="netbeans.home"/>
+                        <available file="${dist.javadoc.dir}/index.html"/>
+                    </and>
+                </condition>
+            </target>
+            <target depends="init,-javadoc-build" if="javadoc.available" name="-javadoc-browse" unless="no.javadoc.preview">
+                <nbbrowse file="${dist.javadoc.dir}/index.html"/>
+            </target>
+            <target depends="init,-javadoc-build,-javadoc-browse" description="Build Javadoc." name="javadoc"/>
+            <xsl:comment>
                     ===============
                     CLEANUP SECTION
                     ===============
-    </xsl:comment>
-        <target depends="init" name="deps-clean" unless="no.deps"/>
-        <target depends="init" name="-do-clean">
-            <delete dir="${{build.dir}}"/>
-            <delete dir="${{dist.dir}}"/>
-        </target>
-        <target name="-post-clean">
-        <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
-        <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
-        </target>
-        <target depends="init,deps-clean,-do-clean,-post-clean" description="Clean build products." name="clean"/>
-    </project>
+            </xsl:comment>
+            <target depends="init" name="deps-clean" unless="no.deps"/>
+            <target depends="init" name="-do-clean">
+                <delete dir="${build.dir}"/>
+                <delete dir="${dist.dir}"/>
+            </target>
+            <target name="-post-clean">
+                <xsl:comment> Empty placeholder for easier customization.</xsl:comment>
+                <xsl:comment> You can override this target in the ../build.xml file.</xsl:comment>
+            </target>
+            <target depends="init,deps-clean,-do-clean,-post-clean" description="Clean build products." name="clean"/>
+        </project>
     </xsl:template>
 
 
@@ -555,7 +559,7 @@ is divided into following sections:
                     </xsl:choose>
                 </xsl:variable>
                 <xsl:variable name="script" select="projdeps:script"/>
-                <ant target="{$subtarget}" inheritall="false" antfile="${{project.{$subproj}}}/{$script}"/>
+                <ant target="{$subtarget}" inheritall="false" antfile="${project.{$subproj}}/{$script}"/>
             </xsl:for-each>
             
         </target>

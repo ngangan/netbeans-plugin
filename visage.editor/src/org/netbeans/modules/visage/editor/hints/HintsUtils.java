@@ -45,7 +45,6 @@
 package org.netbeans.modules.visage.editor.hints;
 
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
-import com.sun.tools.visage.code.JavafxClassSymbol;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -61,6 +60,7 @@ import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.ElementUtilities;
 import org.netbeans.modules.visage.editor.VisageDocument;
 import org.openide.util.Exceptions;
+import org.visage.tools.code.VisageClassSymbol;
 
 /**
  *
@@ -310,10 +310,10 @@ final class HintsUtils {
     }
 
     static boolean isAnnon(Element element) {
-        if (!(element instanceof JavafxClassSymbol)) {
+        if (!(element instanceof VisageClassSymbol)) {
             return false;
         }
-        JavafxClassSymbol classSymbol = ((JavafxClassSymbol) element);
+        VisageClassSymbol classSymbol = ((VisageClassSymbol) element);
         if (!classSymbol.isLocal()) {
             return false;
         }
@@ -330,11 +330,11 @@ final class HintsUtils {
     }
 
     static boolean isInGuardedBlock(Document document, int position) {
-        VisageDocument fxdocument = null;
+        VisageDocument visagedocument = null;
         if (document instanceof VisageDocument) {
-            fxdocument = (VisageDocument) document;
+            visagedocument = (VisageDocument) document;
         }
-        if (fxdocument != null && fxdocument.isPosGuarded(position)) {
+        if (visagedocument != null && visagedocument.isPosGuarded(position)) {
             return true;
         }
 

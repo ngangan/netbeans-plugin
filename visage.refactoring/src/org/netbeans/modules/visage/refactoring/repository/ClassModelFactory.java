@@ -44,27 +44,6 @@
 
 package org.netbeans.modules.visage.refactoring.repository;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.FunctionDefinitionTree;
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.ImportTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.MemberSelectTree;
-import com.sun.visage.api.tree.ObjectLiteralPartTree;
-import com.sun.visage.api.tree.OnReplaceTree;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.SyntheticTree.SynthType;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.UnitTree;
-import com.sun.visage.api.tree.VariableTree;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGIdent;
-import com.sun.tools.visage.tree.VSGOverrideClassVar;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.VSGVar;
-import com.sun.tools.visage.tree.JavafxTreeInfo;
 import com.sun.tools.mjavac.tree.JCTree;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,7 +65,7 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.ClassIndex.SearchKind;
 import org.netbeans.api.visage.source.ClassIndex.SearchScope;
 import org.netbeans.api.visage.source.ClasspathInfo;
@@ -103,6 +82,27 @@ import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.modules.visage.project.VisageProject;
 import org.netbeans.modules.visage.refactoring.RefactoringSupport;
 import org.openide.filesystems.FileObject;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.ImportTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.ObjectLiteralPartTree;
+import org.visage.api.tree.OnReplaceTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.SyntheticTree.SynthType;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageIdent;
+import org.visage.tools.tree.VisageOverrideClassVar;
+import org.visage.tools.tree.VisageTree;
+import org.visage.tools.tree.VisageTreeInfo;
+import org.visage.tools.tree.VisageVar;
 
 /**
  *
@@ -134,22 +134,22 @@ final public class ClassModelFactory {
                 int endFQN = (int)positions.getEndPosition(node, pnt);
                 int startPos = startFQN;
                 int endPos = endFQN;
-                TokenSequence<VSGTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                TokenSequence<VisageTokenId> ts = cc.getTokenHierarchy().tokenSequence();
                 ts.move(startFQN);
                 while (ts.movePrevious()) {
-                    Token<VSGTokenId> t = ts.token();
+                    Token<VisageTokenId> t = ts.token();
                     startPos -= t.length();
-                    if (t.id() == VSGTokenId.PACKAGE) break;
+                    if (t.id() == VisageTokenId.PACKAGE) break;
                 }
                 ts.move(endFQN);
                 while (ts.moveNext()) {
-                    Token<VSGTokenId> t = ts.token();
+                    Token<VisageTokenId> t = ts.token();
                     endPos += t.length();
-                    if (t.id() == VSGTokenId.SEMI) break;
+                    if (t.id() == VisageTokenId.SEMI) break;
                 }
                 while (ts.moveNext()) {
-                    Token<VSGTokenId> t = ts.token();
-                    if (t.id() != VSGTokenId.WS) break;
+                    Token<VisageTokenId> t = ts.token();
+                    if (t.id() != VisageTokenId.WS) break;
                     endPos += t.length();
                     if (t.text().charAt(0) == '\n') break;
                 }
@@ -163,8 +163,8 @@ final public class ClassModelFactory {
         public Void visitClassDeclaration(ClassDeclarationTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitClassDeclaration(node, p);
 
-            Element e = ((VSGClassDeclaration)node).sym;
-            if (((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL || (!cc.getElementUtilities().isSynthetic(e) && ((VSGClassDeclaration)node).mods.getGenType() != SynthType.SYNTHETIC)) {
+            Element e = ((VisageClassDeclaration)node).sym;
+            if (((TypeElement)e).getNestingKind() == NestingKind.TOP_LEVEL || (!cc.getElementUtilities().isSynthetic(e) && ((VisageClassDeclaration)node).mods.getGenType() != SynthType.SYNTHETIC)) {
                 superTypes.addAll(node.getSupertypeList());
                 ElementDef def = getClassDef((TypeElement)e, p);
                 if (def != null) {
@@ -174,7 +174,7 @@ final public class ClassModelFactory {
                     }
                     for(ExpressionTree et : superTypes) {
 
-                        Element se = JavafxTreeInfo.symbolFor((VSGTree)et);
+                        Element se = VisageTreeInfo.symbolFor((VisageTree)et);
                         if (se != null) {
                             Tree t = cc.getTree(se);
                             if (t != null) {
@@ -223,13 +223,13 @@ final public class ClassModelFactory {
                     int endFQN = (int)positions.getEndPosition(cc.getCompilationUnit(), node.getQualifiedIdentifier());
 
                     boolean semiFound = false;
-                    TokenSequence<VSGTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+                    TokenSequence<VisageTokenId> ts = cc.getTokenHierarchy().tokenSequence();
                     ts.move(endPos);
                     while (ts.moveNext()) {
-                        Token<VSGTokenId> token = ts.token();
+                        Token<VisageTokenId> token = ts.token();
                         endPos += token.length();
                         if (!semiFound) {
-                            if (token.id() == VSGTokenId.SEMI) {
+                            if (token.id() == VisageTokenId.SEMI) {
                                 semiFound = true;
                                 continue;
                             }
@@ -265,13 +265,13 @@ final public class ClassModelFactory {
                 int endPos = (int)positions.getEndPosition(cc.getCompilationUnit(), node);
                 // workaround for bug in visagec reporting incorrect end position for an overridden variable
                 // not reporting it when it can be workaround ... what's the point, anyway?
-                Name n = ((VSGIdent)node).getName();
+                Name n = ((VisageIdent)node).getName();
                 if (n == null) return super.visitIdentifier(node, p); // #182370; visagec returns "null" as the name for identifier with certain kind of error
                 int expectedEndPos = startPos + n.length();
                 endPos = endPos > expectedEndPos ? endPos : expectedEndPos;
                 // *** tada ***
 
-                Element e = getElement((VSGTree)node);
+                Element e = getElement((VisageTree)node);
                 if (e != null) {
                     Tree t1 = cc.getTrees().getTree(e);
                     Tree t = cc.getTree(e);
@@ -337,7 +337,7 @@ final public class ClassModelFactory {
             int startFQN = findIdentifier(node, null, cc);
             int endFQN = startFQN + name.length();
 
-            Element e = getElement((VSGTree)node);
+            Element e = getElement((VisageTree)node);
             if (e != null) {
                 Tree t = cc.getTree(e);
                 if (t != null) {
@@ -361,7 +361,7 @@ final public class ClassModelFactory {
         public Void visitMemberSelect(MemberSelectTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitMemberSelect(node, p);
 
-            Element e = getElement((VSGTree)node);
+            Element e = getElement((VisageTree)node);
             if (e != null) {
                 ElementDef def = ElementDef.NULL;
                 switch (e.getKind()) {
@@ -400,7 +400,7 @@ final public class ClassModelFactory {
         public Void visitVariable(VariableTree node, ClassModel p) {
             if (isSynthetic(node)) return super.visitVariable(node, p);
 
-            Element e = getElement((VSGTree)node);
+            Element e = getElement((VisageTree)node);
             ElementDef def = getVarDef(e, p);
             if (def != null) {
                 p.addDef(def);
@@ -411,10 +411,10 @@ final public class ClassModelFactory {
 
         @Override
         public Void visitOnReplace(OnReplaceTree node, ClassModel p) {
-            ElementDef firstIndexDef = node.getFirstIndex() != null ? getVarDef(getElement((VSGTree)node.getFirstIndex()), p) : null;
-            ElementDef lastIndexDef = node.getLastIndex() != null ? getVarDef(getElement((VSGTree)node.getLastIndex()), p) : null;
-            ElementDef oldValueDef = node.getOldValue() != null ? getVarDef(getElement((VSGTree)node.getOldValue()), p) : null;
-            ElementDef newValuesDef = node.getNewElements() != null ? getVarDef(getElement((VSGTree)node.getNewElements()), p) : null;
+            ElementDef firstIndexDef = node.getFirstIndex() != null ? getVarDef(getElement((VisageTree)node.getFirstIndex()), p) : null;
+            ElementDef lastIndexDef = node.getLastIndex() != null ? getVarDef(getElement((VisageTree)node.getLastIndex()), p) : null;
+            ElementDef oldValueDef = node.getOldValue() != null ? getVarDef(getElement((VisageTree)node.getOldValue()), p) : null;
+            ElementDef newValuesDef = node.getNewElements() != null ? getVarDef(getElement((VisageTree)node.getNewElements()), p) : null;
 
             if (firstIndexDef != null) {
                 p.addDef(firstIndexDef);
@@ -472,15 +472,15 @@ final public class ClassModelFactory {
 
         final private Map<Object, ElementDef> defCache = new WeakHashMap<Object, ElementDef>();
 
-        private Element getElement(VSGTree t) {
-            Element e = JavafxTreeInfo.symbolFor(t);
+        private Element getElement(VisageTree t) {
+            Element e = VisageTreeInfo.symbolFor(t);
             if (e == null) {
-                // #VSGC-3789 workaround
-                if (t instanceof VSGOverrideClassVar) {
-                    e = ((VSGOverrideClassVar)t).sym;
-                } else if (t instanceof VSGVar) {
-                    // #VSGC-3917 workaround
-                    e = ((VSGVar)t).getSymbol();
+                // #VisageC-3789 workaround
+                if (t instanceof VisageOverrideClassVar) {
+                    e = ((VisageOverrideClassVar)t).sym;
+                } else if (t instanceof VisageVar) {
+                    // #VisageC-3917 workaround
+                    e = ((VisageVar)t).getSymbol();
                 }
             }
             if (e == null && LOG.isLoggable(Level.FINE)) {
@@ -541,16 +541,16 @@ final public class ClassModelFactory {
         }
 
         private ElementDef getMethodDef(ExecutableElement e, ClassModel p) {
-            Tree node = (VSGFunctionDefinition)cc.getTree(e);
+            Tree node = (VisageFunctionDefinition)cc.getTree(e);
             
-            boolean missingTree = (node == null || ((VSGFunctionDefinition)node).getName() == null);
+            boolean missingTree = (node == null || ((VisageFunctionDefinition)node).getName() == null);
 
             ElementDef edef = missingTree ? null : defCache.get(node);
             if (edef == null) {
                 String name = e.getSimpleName().toString();
                 int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
                 int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
-                int startFQN = missingTree ? -1 : findIdentifier(node, VSGTokenId.FUNCTION, cc);
+                int startFQN = missingTree ? -1 : findIdentifier(node, VisageTokenId.FUNCTION, cc);
                 int endFQN = missingTree ? -1 : startFQN + name.length();
                 if (e != null) {
                     PackageElement pe = ElementUtilities.enclosingPackageElement(e);
@@ -577,12 +577,12 @@ final public class ClassModelFactory {
             
             ElementDef edef = missingTree ? null : defCache.get(node);
             if (edef == null) {
-                boolean isSynth = missingTree ? cc.getElementUtilities().isSynthetic(te) : ((VSGClassDeclaration)node).mods.getGenType() == SynthType.SYNTHETIC;
+                boolean isSynth = missingTree ? cc.getElementUtilities().isSynthetic(te) : ((VisageClassDeclaration)node).mods.getGenType() == SynthType.SYNTHETIC;
 
                 int startPos = missingTree ? -1 : (int)positions.getStartPosition(cc.getCompilationUnit(), node);
                 int endPos = missingTree ? -1 : (int)positions.getEndPosition(cc.getCompilationUnit(), node);
 
-                int startFQN = missingTree ? -1 : findIdentifier(node, VSGTokenId.CLASS, cc);
+                int startFQN = missingTree ? -1 : findIdentifier(node, VisageTokenId.CLASS, cc);
                 String name = te.getSimpleName().toString();
                 PackageElement pe = ElementUtilities.enclosingPackageElement(te);
                 edef = new GlobalDef(
@@ -599,19 +599,19 @@ final public class ClassModelFactory {
             return edef;
         }
 
-        private int findIdentifier(Tree tree, VSGTokenId after, CompilationController cc) {
+        private int findIdentifier(Tree tree, VisageTokenId after, CompilationController cc) {
             int start = (int) cc.getTrees().getSourcePositions().getStartPosition(cc.getCompilationUnit(), tree);
-            TokenSequence<VSGTokenId> ts = cc.getTokenHierarchy().tokenSequence();
+            TokenSequence<VisageTokenId> ts = cc.getTokenHierarchy().tokenSequence();
             ts.move(start);
             boolean classFound = false;
 
             while (ts.moveNext()) {
-                Token<VSGTokenId> t = ts.token();
+                Token<VisageTokenId> t = ts.token();
                 if (t.id() == after) {
                     classFound = true;
                 } else {
                     if (after == null || classFound) {
-                        if (t.id() == VSGTokenId.IDENTIFIER) {
+                        if (t.id() == VisageTokenId.IDENTIFIER) {
                             break;
                         }
                     }

@@ -203,7 +203,7 @@ final public class ClassIndex {
         applyClassPaths(sourcePath, classPath, bootPath);
     }
 
-    final public static ClassIndex forClasspathInfo(ClasspathInfo cpi) {
+    public static ClassIndex forClasspathInfo(ClasspathInfo cpi) {
         return new ClassIndex(
             cpi.getClassPath(ClasspathInfo.PathKind.BOOT),
             cpi.getClassPath(ClasspathInfo.PathKind.COMPILE),

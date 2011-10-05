@@ -62,7 +62,6 @@ import org.netbeans.spi.project.support.ant.EditableProperties;
 import org.netbeans.spi.project.support.ant.PropertyUtils;
 
 import org.openide.ErrorManager;
-import org.openide.modules.SpecificationVersion;
 import org.openide.cookies.*;
 import org.openide.filesystems.*;
 import org.openide.filesystems.FileChangeAdapter;
@@ -92,8 +91,8 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
     private static final String JAVAC13 = "javac1.3";       //NOI18N
 
     static final String[] IMPORTANT_TOOLS = {
-//        "javac", // NOI18N
-        "java", // NOI18N
+//        "visagec", // NOI18N
+        "visage", // NOI18N
     };
     
     private static final String PLATFORM_DTD_ID = "-//NetBeans//DTD Visage PlatformDefinition 1.0//EN"; // NOI18N
@@ -125,6 +124,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
     private PlatformConvertor(XMLDataObject  object) {
         this.holder = object;
         this.holder.getPrimaryFile().addFileChangeListener( new FileChangeAdapter () {
+            @Override
             public void fileDeleted (final FileEvent fe) {
                 if (!defaultPlatform) {
                     try {
@@ -311,7 +311,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         String homePropName = createName(systemName,"home");      //NOI18N
         String bootClassPathPropName = createName(systemName,"bootclasspath");    //NOI18N
         String compilerType= createName (systemName,"compiler");  //NOI18N
-        String fxHomePropName = createName (systemName,"fxhome");  //NOI18N
+        String fxHomePropName = createName (systemName,"visagehome");  //NOI18N
 /*        
         if (props.getProperty(homePropName) != null || props.getProperty(bootClassPathPropName) != null
                 || props.getProperty(compilerType)!=null || props.getProperty(fxHomePropName)!=null){
@@ -328,7 +328,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
             File jdkHome = FileUtil.toFile ((FileObject)installFolders.iterator().next());
             props.setProperty(homePropName, jdkHome.getAbsolutePath());
             ClassPath bootCP = platform.getBootstrapLibraries();
-            StringBuffer sbootcp = new StringBuffer();
+            StringBuilder sbootcp = new StringBuilder();
             for (ClassPath.Entry entry : bootCP.entries()) {
                 URL url = entry.getURL();
                 if ("jar".equals(url.getProtocol())) {              //NOI18N
@@ -531,7 +531,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
                     propElement.setAttribute(ATTR_PROPERTY_VALUE,val);
                     element.appendChild(propElement);
                 } catch (CharConversionException e) {
-                    Logger.getLogger("global").log(Level.WARNING,"Cannot store property: " + n + " value: " + val);   //NOI18N
+                    Logger.getLogger("global").log(Level.WARNING, "Cannot store property: {0} value: {1}", new Object[]{n, val});   //NOI18N
                 }
             }
         }
@@ -564,12 +564,15 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
         private List<URL> path;
 
 
+        @Override
         public void startDocument () throws org.xml.sax.SAXException {
         }
         
+        @Override
         public void endDocument () throws org.xml.sax.SAXException {
         }
         
+        @Override
         public void startElement (String uri, String localName, String qName, org.xml.sax.Attributes attrs)
         throws org.xml.sax.SAXException {
             if (ELEMENT_PLATFORM.equals(qName)) {
@@ -609,6 +612,7 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
             }
         }
         
+        @Override
         public void endElement (String uri, String localName, String qName) throws org.xml.sax.SAXException {
             if (ELEMENT_PROPERTIES.equals(qName) ||
                 ELEMENT_SYSPROPERTIES.equals(qName)) {
@@ -627,12 +631,14 @@ public class PlatformConvertor implements Environment.Provider, InstanceCookie.O
             }
         }
 
+        @Override
         public void characters(char chars[], int start, int length) throws SAXException {
             if (this.buffer != null) {
                 this.buffer.append(chars, start, length);
             }
         }
         
+        @Override
         public org.xml.sax.InputSource resolveEntity(String publicId, String systemId)
         throws SAXException {
             if (PLATFORM_DTD_ID.equals (publicId)) {

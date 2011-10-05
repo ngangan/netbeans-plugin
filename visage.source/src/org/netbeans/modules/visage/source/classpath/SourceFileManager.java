@@ -92,7 +92,7 @@ public class SourceFileManager implements JavaFileManager {
                             if (entry.includes(file)) {
                                 JavaFileObject.Kind kind;
                                 final String ext = file.getExt();
-                                if (FileObjects.JAVAFX.equalsIgnoreCase(ext) || FileObjects.JAVA.equalsIgnoreCase(ext)) {
+                                if (FileObjects.VISAGE.equalsIgnoreCase(ext) || FileObjects.JAVA.equalsIgnoreCase(ext)) {
                                     kind = JavaFileObject.Kind.SOURCE;
                                 }
                                 else if (FileObjects.CLASS.equalsIgnoreCase(ext) || "sig".equalsIgnoreCase(ext)) { // NOI18N

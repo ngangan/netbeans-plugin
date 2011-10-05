@@ -43,28 +43,13 @@
  */
 package org.netbeans.api.visage.source;
 
-import com.sun.visage.api.tree.*;
-import com.sun.visage.api.tree.SyntheticTree.SynthType;
 import com.sun.source.tree.MethodTree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Type;
 import com.sun.tools.mjavac.tree.JCTree;
-import com.sun.tools.visage.api.JavafxcScope;
-import com.sun.tools.visage.code.JavafxFlags;
-import com.sun.tools.visage.comp.JavafxAttrContext;
-import com.sun.tools.visage.comp.JavafxEnv;
-import com.sun.tools.visage.comp.JavafxResolve;
-import com.sun.tools.visage.tree.VSGBreak;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGContinue;
-import com.sun.tools.visage.tree.VSGExpression;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGLiteral;
-import com.sun.tools.visage.tree.VSGModifiers;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.JavafxPretty;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.openide.filesystems.FileObject;
@@ -93,6 +78,29 @@ import java.util.logging.Logger;
 import javax.lang.model.SourceVersion;
 import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 import org.netbeans.modules.parsing.api.Source;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.Scope;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.SyntheticTree.SynthType;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.TypeClassTree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.api.VisagecScope;
+import org.visage.tools.comp.VisageAttrContext;
+import org.visage.tools.comp.VisageEnv;
+import org.visage.tools.comp.VisageResolve;
+import org.visage.tools.tree.VisageBreak;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageContinue;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageLiteral;
+import org.visage.tools.tree.VisagePretty;
+import org.visage.tools.tree.VisageTree;
 
 /**
  *
@@ -160,7 +168,7 @@ public final class TreeUtilities {
         public T getValue(long pos) {
             try {
                 cacheLock.readLock().lock();
-                if (entries.size() == 0) return null;
+                if (entries.isEmpty()) return null;
                 return findValue(pos, 0, entries.size() - 1);
             } finally {
                 cacheLock.readLock().unlock();
@@ -231,12 +239,12 @@ public final class TreeUtilities {
             return false;
         }
         final Tree leaf = path.getLeaf();
-        if (leaf instanceof VSGTree) {
-            VSGTree fxLeaf = (VSGTree)leaf;
+        if (leaf instanceof VisageTree) {
+            VisageTree fxLeaf = (VisageTree)leaf;
             SynthType type = fxLeaf.getGenType();
             return SynthType.SYNTHETIC.equals(type);
         }
-        if (LOGGABLE) log("isSynthetic returning false because the leaf is not VSGTree."); // NOI18N
+        if (LOGGABLE) log("isSynthetic returning false because the leaf is not VisageTree."); // NOI18N
         return false;
     }
 
@@ -248,10 +256,10 @@ public final class TreeUtilities {
 
         if (leaf.getVisageKind() == Tree.VisageKind.FUNCTION_DEFINITION) {
             //check for synthetic constructor:
-            return (((VSGFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
+            return (((VisageFunctionDefinition)leaf).mods.flags & (Flags.GENERATEDCONSTR | Flags.SYNTHETIC)) != 0L;
         }
         if (leaf.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
-            return (((VSGClassDeclaration)leaf).mods.flags & Flags.SYNTHETIC) != 0L; // anonymous inner classes in SOMA
+            return (((VisageClassDeclaration)leaf).mods.flags & Flags.SYNTHETIC) != 0L; // anonymous inner classes in SOMA
         }
 
         SourcePositions sp = parserResultImpl.getTrees().getSourcePositions();
@@ -307,7 +315,7 @@ public final class TreeUtilities {
 //            
 //            if (automap) {
 //                try {
-//                    TokenSequence<VSGTokenId> seq = ((SourceFileObject) info.getCompilationUnit().getSourceFile()).getTokenHierarchy().tokenSequence(VSGTokenId.language());
+//                    TokenSequence<VSGTokenId> seq = ((SourceFileObject) info.getCompilationUnit().getSourceFile()).getTokenHierarchy().tokenSequence(VisageTokenId.language());
 //                    new TranslateIdentifier(info, true, false, seq).translate(tree);
 //                } catch (IOException ex) {
 //                    Exceptions.printStackTrace(ex);
@@ -321,7 +329,7 @@ public final class TreeUtilities {
 //    }
 
     final private PositionCache<VisageTreePath> pathCache = new PositionCache();
-    final private PositionCache<TokenSequence<VSGTokenId>> tokenCache = new PositionCache();
+    final private PositionCache<TokenSequence<VisageTokenId>> tokenCache = new PositionCache();
 
     public VisageTreePath pathFor(long pos) {
         return pathFor(new VisageTreePath(parserResultImpl.getCompilationUnit()), pos);
@@ -400,7 +408,7 @@ public final class TreeUtilities {
 
                     if (start == end &&
                         tree.getVisageKind() != Tree.VisageKind.PARENTHESIZED && // this is a workaround for visagec bug setting PARENTHESIZED positions such as start == end
-                        (!(tree.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION && (((VSGClassDeclaration)tree).mods.flags & Flags.SYNTHETIC) != 0L))) // anonymous inner class is synthetic, start==end but we must follow it anyway
+                        (!(tree.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION && (((VisageClassDeclaration)tree).mods.flags & Flags.SYNTHETIC) != 0L))) // anonymous inner class is synthetic, start==end but we must follow it anyway
                         return null; // don't go this way; all subtrees are synthetic although they might not be flagged so
 
                     super.scan(tree, p);
@@ -460,7 +468,7 @@ public final class TreeUtilities {
                 if (tree != null) {
 //                    return (tree instanceof VSGLiteral && ((VSGLiteral)tree).value != null && ((VSGLiteral)tree).value.equals("\"\""));
                     // see #177301 - it seems that soma compiler now uses an empty string as an empty string literal value rather than ""
-                    return (tree instanceof VSGLiteral && ((VSGLiteral)tree).value != null && ((VSGLiteral)tree).value.equals(""));
+                    return (tree instanceof VisageLiteral && ((VisageLiteral)tree).value != null && ((VisageLiteral)tree).value.equals(""));
                 }
                 return false;
             }
@@ -480,8 +488,10 @@ public final class TreeUtilities {
             log("pathFor returning compilation unit for position: " + pos); // NOI18N
             return path;
         }
-        int start = (int)sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
-        int end   = (int)sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
+        long s = sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
+        int start = (int)s;
+        long e = sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
+        int end   = (int)e;
         while (start == -1 || pos < start || pos > end) {
             if (LOGGABLE) {
                 logger.finer("pathFor moving to parent: " + treeToString(parserResultImpl, path.getLeaf())); // NOI18N
@@ -493,8 +503,10 @@ public final class TreeUtilities {
             if (path.getLeaf() == path.getCompilationUnit()) {
                 break;
             }
-            start = (int)sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
-            end   = (int)sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
+            s = sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
+            start = (int)s;
+            e = sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), path.getLeaf());
+            end   = (int)e;
         }
         if (LOGGABLE) {
             log("pathFor(pos: " + pos + ") returning: " + treeToString(parserResultImpl, path.getLeaf())); // NOI18N
@@ -504,14 +516,14 @@ public final class TreeUtilities {
     
     /**Computes {@link Scope} for the given position.
      */
-    public JavafxcScope scopeFor(int pos) {
+    public VisagecScope scopeFor(int pos) {
         VisageTreePath path = pathFor(pos);
-        JavafxcScope scope = getScope(path);
+        VisagecScope scope = getScope(path);
         return scope;
     }
 
-    public JavafxcScope getScope(VisageTreePath p) {
-        JavafxcScope scope = null;
+    public VisagecScope getScope(VisageTreePath p) {
+        VisagecScope scope = null;
         while ((p != null) && (scope == null)) {
             try {
                 scope = parserResultImpl.getTrees().getScope(p);
@@ -538,7 +550,7 @@ public final class TreeUtilities {
      */
     public long[] findNameSpan(VariableTree var) {
         if (var == null || var.getName() == null) return null;
-        return findNameSpan(var.getName().toString(), var, VSGTokenId.VAR, VSGTokenId.DEF, VSGTokenId.PUBLIC_INIT, VSGTokenId.PUBLIC_READ);
+        return findNameSpan(var.getName().toString(), var, VisageTokenId.VAR, VisageTokenId.DEF, VisageTokenId.PUBLIC_INIT, VisageTokenId.PUBLIC_READ);
     }
 
     /**Find span of the {@link MethodTree#getName()} identifier in the source.
@@ -554,9 +566,9 @@ public final class TreeUtilities {
         if (method == null || isSynthetic(parserResultImpl.getCompilationUnit(), method)) {
             return null;
         }
-        VSGFunctionDefinition jcm = (VSGFunctionDefinition) method;
+        VisageFunctionDefinition jcm = (VisageFunctionDefinition) method;
         String name = jcm.name.toString();
-        return findNameSpan(name, method, VSGTokenId.ABSTRACT, VSGTokenId.BOUND, VSGTokenId.OVERRIDE, VSGTokenId.FUNCTION);
+        return findNameSpan(name, method, VisageTokenId.ABSTRACT, VisageTokenId.BOUND, VisageTokenId.OVERRIDE, VisageTokenId.FUNCTION);
     }
 
     public long[] findNameSpan(ClassDeclarationTree clazz) {
@@ -564,7 +576,7 @@ public final class TreeUtilities {
 
         String name = clazz.getSimpleName().toString();
 
-        return findNameSpan(name, clazz, VSGTokenId.ABSTRACT, VSGTokenId.CLASS, VSGTokenId.MIXIN);
+        return findNameSpan(name, clazz, VisageTokenId.ABSTRACT, VisageTokenId.CLASS, VisageTokenId.MIXIN);
     }
 
     public long[] findNameSpan(TypeClassTree type) {
@@ -572,28 +584,30 @@ public final class TreeUtilities {
 
         String name = type.toString();
 
-        return findNameSpan(name, type, VSGTokenId.ABSTRACT, VSGTokenId.CLASS, VSGTokenId.MIXIN);
+        return findNameSpan(name, type, VisageTokenId.ABSTRACT, VisageTokenId.CLASS, VisageTokenId.MIXIN);
     }
 
     /**Returns tokens for a given tree.
      */
-    public TokenSequence<VSGTokenId> tokensFor(Tree tree) {
+    public TokenSequence<VisageTokenId> tokensFor(Tree tree) {
         return tokensFor(tree, parserResultImpl.getTrees().getSourcePositions());
     }
     
     /**Returns tokens for a given tree. Uses specified {@link SourcePositions}.
      */
-    public TokenSequence<VSGTokenId> tokensFor(Tree tree, SourcePositions sourcePositions) {
-        int start = (int)sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), tree);
-        int end   = (int)sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), tree);
+    public TokenSequence<VisageTokenId> tokensFor(Tree tree, SourcePositions sourcePositions) {
+        long s = sourcePositions.getStartPosition(parserResultImpl.getCompilationUnit(), tree);
+        int start = (int)s;
+        long e = sourcePositions.getEndPosition(parserResultImpl.getCompilationUnit(), tree);
+        int end   = (int)e;
         if ((start == -1) || (end == -1)) {
             throw new RuntimeException("RE Cannot determine start and end for: " + treeToString(parserResultImpl, tree)); // NOI18N
         }
 
-        TokenSequence<VSGTokenId> t = tokenCache.getValue(start);
+        TokenSequence<VisageTokenId> t = tokenCache.getValue(start);
 
         if (t == null) {
-            t = ((TokenHierarchy<?>)parserResultImpl.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+            t = ((TokenHierarchy<?>)parserResultImpl.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
             tokenCache.addValue(t, start, end);
         }
         if (t == null) {
@@ -606,7 +620,7 @@ public final class TreeUtilities {
         Tree.VisageKind k = null;
         StringWriter s = new StringWriter();
         try {
-            new JavafxPretty(s, false).printExpr((VSGTree)t);
+            new VisagePretty(s, false).printExpr((VisageTree)t);
         } catch (Exception e) {
             if (LOGGABLE) logger.log(Level.FINE, "Unable to pretty print " + t.getVisageKind(), e); // NOI18N
         }
@@ -626,9 +640,9 @@ public final class TreeUtilities {
         
         switch (leaf.getVisageKind()) {
             case BREAK:
-                return (ExpressionTree) ((VSGBreak) leaf).target;
+                return (ExpressionTree) ((VisageBreak) leaf).target;
             case CONTINUE:
-                ExpressionTree target = (ExpressionTree) ((VSGContinue) leaf).target;
+                ExpressionTree target = (ExpressionTree) ((VisageContinue) leaf).target;
                 
                 if (target == null)
                     return null;
@@ -732,13 +746,13 @@ public final class TreeUtilities {
             log("   member == " + member); // NOI18N
             log("   type == " + type); // NOI18N
         }
-        if (scope instanceof JavafxcScope && member instanceof Symbol && type instanceof Type) {
-            JavafxResolve resolve = JavafxResolve.instance(parserResultImpl.getContext());
+        if (scope instanceof VisagecScope && member instanceof Symbol && type instanceof Type) {
+            VisageResolve resolve = VisageResolve.instance(parserResultImpl.getContext());
             if (LOGGABLE) log("     resolve == " + resolve); // NOI18N
-            Object env = ((JavafxcScope) scope).getEnv();
+            Object env = ((VisagecScope) scope).getEnv();
             @SuppressWarnings("unchecked")
-            JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-            if (LOGGABLE) log("     fxEnv == " + fxEnv); // NOI18N
+            VisageEnv<VisageAttrContext> fxEnv = (VisageEnv<VisageAttrContext>) env;
+            if (LOGGABLE) log("     visageEnv == " + fxEnv); // NOI18N
             boolean res = resolve.isAccessible(fxEnv, (Type) type, (Symbol) member);
             if (LOGGABLE) log("     returning " + res); // NOI18N
             return res;
@@ -761,13 +775,13 @@ public final class TreeUtilities {
             log("isAccessible scope == " + scope); // NOI18N
             log("   type == " + type); // NOI18N
         }
-        if (scope instanceof JavafxcScope &&  type instanceof Symbol.TypeSymbol) {
-            JavafxResolve resolve = JavafxResolve.instance(parserResultImpl.getContext());
+        if (scope instanceof VisagecScope &&  type instanceof Symbol.TypeSymbol) {
+            VisageResolve resolve = VisageResolve.instance(parserResultImpl.getContext());
             if (LOGGABLE) log("     resolve == " + resolve); // NOI18N
-            Object env = ((JavafxcScope) scope).getEnv();
+            Object env = ((VisagecScope) scope).getEnv();
             @SuppressWarnings("unchecked")
-            JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
-            if (LOGGABLE) log("     fxEnv == " + fxEnv); // NOI18N
+            VisageEnv<VisageAttrContext> fxEnv = (VisageEnv<VisageAttrContext>) env;
+            if (LOGGABLE) log("     visageEnv == " + fxEnv); // NOI18N
             boolean res = resolve.isAccessible(fxEnv, (Symbol.TypeSymbol) type);
             if (LOGGABLE) log("     returning " + res); // NOI18N
             return res;
@@ -783,17 +797,17 @@ public final class TreeUtilities {
      * @return
      */
     public boolean isStaticContext(Scope scope) {
-        Object env = ((JavafxcScope) scope).getEnv();
+        Object env = ((VisagecScope) scope).getEnv();
         @SuppressWarnings("unchecked")
-        JavafxEnv<JavafxAttrContext> fxEnv = (JavafxEnv<JavafxAttrContext>) env;
+        VisageEnv<VisageAttrContext> fxEnv = (VisageEnv<VisageAttrContext>) env;
 
         // #182138: Prevent NPE inside visagec
         if (fxEnv.outer == null) return true;
 
-        return JavafxResolve.isStatic(fxEnv);
+        return VisageResolve.isStatic(fxEnv);
     }
 
-    private long[] findNameSpan(String name, Tree t, VSGTokenId... allowedTokens) {
+    private long[] findNameSpan(String name, Tree t, VisageTokenId... allowedTokens) {
         if (!SourceVersion.isIdentifier(name)) {
             //names like "<error>", etc.
             return null;
@@ -805,17 +819,17 @@ public final class TreeUtilities {
         if (pos < 0)
             return null;
 
-        Set<VSGTokenId> allowedTokensSet = EnumSet.of(
-                VSGTokenId.WS,
-                VSGTokenId.PRIVATE,
-                VSGTokenId.PROTECTED,
-                VSGTokenId.PACKAGE,
-                VSGTokenId.PUBLIC,
-                VSGTokenId.STATIC);
+        Set<VisageTokenId> allowedTokensSet = EnumSet.of(
+                VisageTokenId.WS,
+                VisageTokenId.PRIVATE,
+                VisageTokenId.PROTECTED,
+                VisageTokenId.PACKAGE,
+                VisageTokenId.PUBLIC,
+                VisageTokenId.STATIC);
 
         allowedTokensSet.addAll(Arrays.asList(allowedTokens));
 
-        TokenSequence<VSGTokenId> tokenSequence = parserResultImpl.getTokenHierarchy().tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> tokenSequence = parserResultImpl.getTokenHierarchy().tokenSequence(VisageTokenId.language());
 
         tokenSequence.move(pos);
 
@@ -824,7 +838,7 @@ public final class TreeUtilities {
         while ((wasNext = tokenSequence.moveNext()) && allowedTokensSet.contains(tokenSequence.token().id()));
 
         if (wasNext) {
-            if (tokenSequence.token().id() == VSGTokenId.IDENTIFIER &&
+            if (tokenSequence.token().id() == VisageTokenId.IDENTIFIER &&
                 name.contentEquals(tokenSequence.token().text())) {
                 return new long[] {
                     tokenSequence.offset(),

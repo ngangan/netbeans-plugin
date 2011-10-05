@@ -43,11 +43,6 @@
  */
 package org.netbeans.modules.visage.editor;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.Tree.VisageKind;
-import com.sun.visage.api.tree.UnitTree;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,6 +62,11 @@ import org.netbeans.api.progress.ProgressUtils;
 import org.netbeans.editor.BaseAction;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  * Code selection according to syntax tree.

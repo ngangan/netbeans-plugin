@@ -42,17 +42,17 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.ReturnTree;
-import com.sun.visage.api.tree.Tree;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGType;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.ReturnTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageType;
 
 /**
  *
@@ -77,13 +77,13 @@ public class ReturnEnvironment extends VisageCompletionEnvironment<ReturnTree> {
     }
 
     private TypeMirror getSmartType(ReturnTree ui) {
-        VSGType r = null;
+        VisageType r = null;
         for (VisageTreePath tp = path; tp != null; tp = tp.getParentPath()) {
             Tree t = tp.getLeaf();
             if (LOGGABLE) log("  tree kind: " + t.getVisageKind()); // NOI18N
-            if (t instanceof VSGFunctionDefinition) {
-                VSGFunctionDefinition fDefTree = (VSGFunctionDefinition)t;
-                r = fDefTree.getVSGReturnType();
+            if (t instanceof VisageFunctionDefinition) {
+                VisageFunctionDefinition fDefTree = (VisageFunctionDefinition)t;
+                r = fDefTree.getVisageReturnType();
                 if (LOGGABLE) log("   return type == " + r); // NOI18N
             }
         }

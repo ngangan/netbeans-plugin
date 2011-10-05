@@ -44,19 +44,8 @@
 
 package org.netbeans.modules.visage.refactoring.impl.scanners;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.FunctionInvocationTree;
-import com.sun.visage.api.tree.InstantiateTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.MemberSelectTree;
-import com.sun.visage.api.tree.ObjectLiteralPartTree;
-import com.sun.visage.api.tree.TypeClassTree;
-import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.code.Flags;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.visage.code.JavafxFlags;
-import com.sun.tools.visage.tree.VSGInstanciate;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -70,6 +59,17 @@ import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.modules.visage.refactoring.impl.plugins.MoveRefactoringPlugin;
 import org.netbeans.modules.refactoring.api.Problem;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.InstantiateTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.ObjectLiteralPartTree;
+import org.visage.api.tree.TypeClassTree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.code.VisageFlags;
+import org.visage.tools.tree.VisageInstanciate;
 
 /**
  *
@@ -142,7 +142,7 @@ public class MoveProblemCollector<R, P> extends VisageTreePathScanner<R, P> {
 
     @Override
     public R visitInstantiate(InstantiateTree node, P p) {
-        TypeElement clzElement = (TypeElement)((VSGInstanciate)node).type.tsym;
+        TypeElement clzElement = (TypeElement)((VisageInstanciate)node).type.tsym;
         problem = chainProblems(problem,
             checkVisibilty(clzElement, new MoveProblemCallback() {
 
@@ -233,8 +233,8 @@ public class MoveProblemCollector<R, P> extends VisageTreePathScanner<R, P> {
 
     private boolean isAffected(Element e) {
         long flags =((Symbol)e).flags_field;
-        return (flags & (JavafxFlags.PACKAGE_ACCESS | Flags.PROTECTED)) != 0L &&
-               (flags & (JavafxFlags.PUBLIC_INIT | JavafxFlags.PUBLIC_READ)) == 0L; // for simplicity just check for any public modifier that can be used in addition with the protected modifier
+        return (flags & (VisageFlags.PACKAGE_ACCESS | Flags.PROTECTED)) != 0L &&
+               (flags & (VisageFlags.PUBLIC_INIT | VisageFlags.PUBLIC_READ)) == 0L; // for simplicity just check for any public modifier that can be used in addition with the protected modifier
     }
 
     private static Problem chainProblems(Problem p,Problem p1) {

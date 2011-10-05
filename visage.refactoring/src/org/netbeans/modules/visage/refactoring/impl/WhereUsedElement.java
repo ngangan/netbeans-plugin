@@ -43,23 +43,15 @@
  */
 package org.netbeans.modules.visage.refactoring.impl;
 
-import com.sun.visage.api.tree.VisageTreePath;
 import java.io.IOException;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Position.Bias;
-import org.netbeans.api.visage.lexer.VSGTokenId;
-import org.netbeans.api.visage.source.CompilationController;
-import org.netbeans.api.visage.source.VisageSource;
-import org.netbeans.api.visage.source.Task;
-import org.netbeans.api.lexer.Token;
-import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.editor.GuardedDocument;
 import org.netbeans.editor.Utilities;
+import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.netbeans.modules.visage.refactoring.impl.visagec.SourceUtils;
-import org.netbeans.modules.visage.refactoring.repository.ClassModelFactory;
 import org.netbeans.modules.visage.refactoring.repository.ElementDef;
 import org.netbeans.modules.visage.refactoring.repository.Usage;
-import org.netbeans.modules.refactoring.spi.SimpleRefactoringElementImplementation;
 import org.openide.cookies.EditorCookie;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;

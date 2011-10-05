@@ -35,7 +35,7 @@ import org.netbeans.modules.editor.indent.spi.ReformatTask;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.modules.visage.editor.format.VSGReformatTask;
+import org.netbeans.modules.visage.editor.format.VisageReformatTask;
 import org.openide.util.NbBundle;
 
 /**
@@ -56,6 +56,6 @@ public class ReformatTaskFactory implements ReformatTask.Factory {
         if (log.isLoggable(Level.FINE)) {
             log.fine(NbBundle.getBundle("org/netbeans/modules/visage/editor/Bundle").getString("Creating_reformat_factory")); // NOI18N
         }
-        return new VSGReformatTask(context);
+        return new VisageReformatTask(context);
     }
 }

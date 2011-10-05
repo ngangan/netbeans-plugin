@@ -42,28 +42,28 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.visage.code.JavafxTypes;
-import com.sun.tools.visage.tree.VSGInstanciate;
-import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
+import com.sun.tools.mjavac.code.Type;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import org.visage.tools.code.VisageTypes;
+import org.visage.tools.tree.VisageInstanciate;
 
 /**
  *
  * @author David Strupl
  */
-public class InstantiateEnvironment extends VisageCompletionEnvironment<VSGInstanciate> {
+public class InstantiateEnvironment extends VisageCompletionEnvironment<VisageInstanciate> {
     
     private static final Logger logger = Logger.getLogger(InstantiateEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGInstanciate it) throws IOException {
+    protected void inside(VisageInstanciate it) throws IOException {
         int pos = (int) sourcePositions.getStartPosition(root, it);
         int end = (int) sourcePositions.getEndPosition(root, it);
         if (LOGGABLE) log("inside InstantiateEnvironment " + it +  // NOI18N
@@ -88,7 +88,7 @@ public class InstantiateEnvironment extends VisageCompletionEnvironment<VSGInsta
         addMembers(tm, false, true, ":",controller.getTreeUtilities().getScope(path),true, true); // NOI18N
     }
 
-    public TypeMirror getSmartType(VSGInstanciate it) throws IOException {
+    public TypeMirror getSmartType(VisageInstanciate it) throws IOException {
         String s = it.getIdentifier().toString();
         TypeElement te = findTypeElement(s);
         TypeMirror type = te != null ? te.asType() : null;
@@ -97,7 +97,7 @@ public class InstantiateEnvironment extends VisageCompletionEnvironment<VSGInsta
             return null;
         }
         
-        JavafxTypes types = controller.getJavafxTypes();
+        VisageTypes types = controller.getVisageTypes();
         if (types.isSequence((Type) type)) {
             type = types.elementType((Type) type);
         } 

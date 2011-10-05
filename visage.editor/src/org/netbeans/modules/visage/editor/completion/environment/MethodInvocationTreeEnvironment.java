@@ -42,10 +42,8 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.*;
-
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
@@ -54,6 +52,11 @@ import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *
@@ -68,8 +71,8 @@ public class MethodInvocationTreeEnvironment extends VisageCompletionEnvironment
     protected void inside(FunctionInvocationTree t) throws IOException {
         if (LOGGABLE) log("inside MethodInvocationTree " + t); // NOI18N
         FunctionInvocationTree mi = t;
-        TokenSequence<VSGTokenId> ts = findLastNonWhitespaceToken(mi, offset);
-        if (ts == null || (ts.token().id() != VSGTokenId.LPAREN && ts.token().id() != VSGTokenId.COMMA)) {
+        TokenSequence<VisageTokenId> ts = findLastNonWhitespaceToken(mi, offset);
+        if (ts == null || (ts.token().id() != VisageTokenId.LPAREN && ts.token().id() != VisageTokenId.COMMA)) {
             SourcePositions sp = getSourcePositions();
             int lastTokenEndOffset = ts.offset() + ts.token().length();
             for (ExpressionTree arg : mi.getArguments()) {

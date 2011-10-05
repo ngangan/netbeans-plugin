@@ -49,7 +49,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 
 /**
  *
@@ -84,12 +84,12 @@ public class NewLineAndBraceAfterComplexStringTest  extends LexerTestBase {
     @Test
     public void testNewLineAndBraceAfterComplexString() throws Exception {
         setSource("\"{a}{b}\"\n}");
-        assertNextTokenIs(VSGTokenId.QUOTE_LBRACE_STRING_LITERAL, "\"{", 0);
-        assertNextTokenIs(VSGTokenId.IDENTIFIER, "a", 2);
-        assertNextTokenIs(VSGTokenId.RBRACE_LBRACE_STRING_LITERAL, "}{", 3);
-        assertNextTokenIs(VSGTokenId.IDENTIFIER, "b", 5);
-        assertNextTokenIs(VSGTokenId.RBRACE_QUOTE_STRING_LITERAL, "}\"", 6);
-        assertNextTokenIs(VSGTokenId.WS, "\n", 8);
-        assertNextTokenIs(VSGTokenId.RBRACE, "}", 9);
+        assertNextTokenIs(VisageTokenId.QUOTE_LBRACE_STRING_LITERAL, "\"{", 0);
+        assertNextTokenIs(VisageTokenId.IDENTIFIER, "a", 2);
+        assertNextTokenIs(VisageTokenId.RBRACE_LBRACE_STRING_LITERAL, "}{", 3);
+        assertNextTokenIs(VisageTokenId.IDENTIFIER, "b", 5);
+        assertNextTokenIs(VisageTokenId.RBRACE_QUOTE_STRING_LITERAL, "}\"", 6);
+        assertNextTokenIs(VisageTokenId.WS, "\n", 8);
+        assertNextTokenIs(VisageTokenId.RBRACE, "}", 9);
     }
 }

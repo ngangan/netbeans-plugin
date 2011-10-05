@@ -70,8 +70,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass001.fx",
+                "visage-prj-1",
+                "classes/FXTestClass001.visage",
                 4, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -82,8 +82,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass002.fx",
+                "visage-prj-1",
+                "classes/FXTestClass002.visage",
                 9, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -94,8 +94,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass002.fx",
+                "visage-prj-1",
+                "classes/FXTestClass002.visage",
                 11, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -106,8 +106,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass002.fx",
+                "visage-prj-1",
+                "classes/FXTestClass002.visage",
                 21, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -118,8 +118,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "public ", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass001.fx",
+                "visage-prj-1",
+                "classes/FXTestClass001.visage",
                 4, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -130,8 +130,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass003.fx",
+                "visage-prj-1",
+                "classes/FXTestClass003.visage",
                 11, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -142,8 +142,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass003.fx",
+                "visage-prj-1",
+                "classes/FXTestClass003.visage",
                 21, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -155,8 +155,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "var a : ", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClassVar1.fx",
+                "visage-prj-1",
+                "classes/FXTestClassVar1.visage",
                 4, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -167,8 +167,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "var a = ", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClassVar2.fx",
+                "visage-prj-1",
+                "classes/FXTestClassVar2.visage",
                 6, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -179,8 +179,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "a.", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass004.fx",
+                "visage-prj-1",
+                "classes/FXTestClass004.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -191,8 +191,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass005.fx",
+                "visage-prj-1",
+                "classes/FXTestClass005.visage",
                 8, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -203,8 +203,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "class testit extends visage.", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass006.fx",
+                "visage-prj-1",
+                "classes/FXTestClass006.visage",
                 7, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -215,8 +215,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "var b : ", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass007.fx",
+                "visage-prj-1",
+                "classes/FXTestClass007.visage",
                 19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -227,8 +227,8 @@ public class ClassCCTests extends CompletionTestPerformer {
                 "function Foo (a : ", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "classes/FXTestClass008.fx",
+                "visage-prj-1",
+                "classes/FXTestClass008.visage",
                 19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }

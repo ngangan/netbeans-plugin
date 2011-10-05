@@ -45,18 +45,6 @@
 
 package org.netbeans.modules.visage.editor.imports;
 
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.ImportTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.TriggerTree;
-import com.sun.visage.api.tree.TypeClassTree;
-import com.sun.visage.api.tree.VariableTree;
-import com.sun.tools.visage.tree.VSGExpression;
-import com.sun.tools.visage.tree.VSGIdent;
-import com.sun.tools.visage.tree.VSGOverrideClassVar;
-import com.sun.tools.visage.tree.VSGTypeClass;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -69,6 +57,18 @@ import javax.lang.model.type.TypeKind;
 import org.netbeans.api.visage.source.ClassIndex;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.ElementHandle;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.ImportTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.TriggerTree;
+import org.visage.api.tree.TypeClassTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageExpression;
+import org.visage.tools.tree.VisageIdent;
+import org.visage.tools.tree.VisageOverrideClassVar;
+import org.visage.tools.tree.VisageTypeClass;
 
 /**
  *
@@ -121,7 +121,7 @@ final public class ImportsWalker extends VisageTreePathScanner<Void, ImportsMode
              * However, this information is available so we'll just grab it (with some null-checks, of course)
              */
             if (e == null) {
-                e = ((VSGIdent)node).type != null ? ((VSGIdent)node).type.tsym : null;
+                e = ((VisageIdent)node).type != null ? ((VisageIdent)node).type.tsym : null;
             }
             processItem(e, nodeName, node, model);
         }
@@ -143,7 +143,7 @@ final public class ImportsWalker extends VisageTreePathScanner<Void, ImportsMode
              * However, this information is available so we'll just grab it (with some null-checks, of course)
              */
             if (e == null) {
-                VSGExpression clzName = ((VSGTypeClass)node).getClassName();
+                VisageExpression clzName = ((VisageTypeClass)node).getClassName();
                 if (clzName != null) {
                     e = clzName.type != null ? clzName.type.tsym : null;
                 }
@@ -167,7 +167,7 @@ final public class ImportsWalker extends VisageTreePathScanner<Void, ImportsMode
     @Override
     public Void visitTrigger(TriggerTree node, ImportsModel model) {
         if (node != null) {
-            Tree t = ((VSGOverrideClassVar)node).getInitializer();
+            Tree t = ((VisageOverrideClassVar)node).getInitializer();
             if (t != null) {
                 t.accept(this, model);
             }

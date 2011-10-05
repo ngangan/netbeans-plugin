@@ -104,8 +104,8 @@ public class UpdateProjectImpl implements UpdateImplementation {
             public Boolean run() {
                 synchronized (this) {
                     if (isCurrent == null) {
-                        if ((cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/1",true) != null) || // NOI18N
-                        (cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/2",true) != null)) { // NOI18N
+                        if ((cfg.getConfigurationFragment("data","http://visage.googlecode.com/1",true) != null) || // NOI18N
+                        (cfg.getConfigurationFragment("data","http://visage.googlecode.com/2",true) != null)) { // NOI18N
                             isCurrent = Boolean.FALSE;
                         } else {
                             isCurrent = Boolean.TRUE;
@@ -141,8 +141,8 @@ public class UpdateProjectImpl implements UpdateImplementation {
 
     public void saveUpdate(final EditableProperties props) throws IOException {
         this.helper.putPrimaryConfigurationData(getUpdatedSharedConfigurationData(),true);
-        this.cfg.removeConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/1",true); //NOI18N
-        this.cfg.removeConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/2",true); //NOI18N
+        this.cfg.removeConfigurationFragment("data","http://visage.googlecode.com/1",true); //NOI18N
+        this.cfg.removeConfigurationFragment("data","http://visage.googlecode.com/2",true); //NOI18N
         ProjectManager.getDefault().saveProject (this.project);
         synchronized(this) {
             this.isCurrent = Boolean.TRUE;
@@ -151,7 +151,7 @@ public class UpdateProjectImpl implements UpdateImplementation {
 
     public synchronized Element getUpdatedSharedConfigurationData () {
         if (cachedElement == null) {
-            Element  oldRoot = this.cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/1",true);    //NOI18N
+            Element  oldRoot = this.cfg.getConfigurationFragment("data","http://visage.googlecode.com/1",true);    //NOI18N
             if (oldRoot != null) {
                 Document doc = oldRoot.getOwnerDocument();
                 Element newRoot = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"data"); //NOI18N
@@ -168,7 +168,7 @@ public class UpdateProjectImpl implements UpdateImplementation {
                 newRoot.appendChild (testRoots);
                 cachedElement = updateMinAntVersion (newRoot, doc);
             } else {
-                oldRoot = this.cfg.getConfigurationFragment("data","http://www.netbeans.org/ns/visage-project/2",true);    //NOI18N
+                oldRoot = this.cfg.getConfigurationFragment("data","http://visage.googlecode.com/2",true);    //NOI18N
                 if (oldRoot != null) {
                     Document doc = oldRoot.getOwnerDocument();
                     Element newRoot = doc.createElementNS (VisageProjectType.PROJECT_CONFIGURATION_NAMESPACE,"data"); //NOI18N

@@ -56,9 +56,9 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.netbeans.api.editor.settings.SimpleValueNames;
-import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
 import org.netbeans.modules.visage.editor.format.CodeStyle;
-import org.netbeans.modules.visage.editor.format.VSGReformatTask;
+import org.netbeans.modules.visage.editor.format.VisageReformatTask;
 import static org.netbeans.modules.visage.editor.format.CodeStyle.*;
 import org.netbeans.modules.options.editor.spi.PreferencesCustomizer;
 import org.netbeans.modules.options.editor.spi.PreviewProvider;
@@ -529,7 +529,7 @@ public class FmtOptions {
                 previewPane.getAccessibleContext().setAccessibleName(NbBundle.getMessage(FmtOptions.class, "AN_Preview")); //NOI18N
                 previewPane.getAccessibleContext().setAccessibleDescription(NbBundle.getMessage(FmtOptions.class, "AD_Preview")); //NOI18N
                 previewPane.putClientProperty("HighlightsLayerIncludes", "^org\\.netbeans\\.modules\\.editor\\.lib2\\.highlighting\\.SyntaxHighlighting$"); //NOI18N
-                previewPane.setEditorKit(CloneableEditorSupport.getEditorKit(FXSourceUtils.MIME_TYPE_FX));
+                previewPane.setEditorKit(CloneableEditorSupport.getEditorKit(VisageSourceUtils.VISAGE_MIME_TYPE));
                 previewPane.setEditable(false);
             }
             return previewPane;
@@ -554,7 +554,7 @@ public class FmtOptions {
             if (!fail) {
                 CodeStyle codeStyle = codeStyleProducer.create(previewPrefs);
                 jep.setIgnoreRepaint(true);
-                jep.setText(VSGReformatTask.reformat(previewText, codeStyle));
+                jep.setText(VisageReformatTask.reformat(previewText, codeStyle));
                 jep.setIgnoreRepaint(false);
                 jep.scrollRectToVisible(new Rectangle(0, 0, 10, 10));
                 jep.repaint(100);

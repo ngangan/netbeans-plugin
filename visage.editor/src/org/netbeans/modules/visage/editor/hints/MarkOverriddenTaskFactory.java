@@ -43,7 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.VisageTreePathScanner;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
@@ -57,12 +56,13 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.swing.text.*;
 import javax.tools.Diagnostic;
-import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.openide.filesystems.FileObject;
 import org.openide.text.Annotation;
 import org.openide.text.NbDocument;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *
@@ -106,7 +106,7 @@ public final class MarkOverriddenTaskFactory extends VisageAbstractEditorHint {
                     for (Type classType : classSymbol.getInterfaces()) {
                         if (classType.asElement() instanceof ClassSymbol) {
                             ClassSymbol cs = ((ClassSymbol) classType.asElement());
-                            allElements.put(cs, FXSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) cs));
+                            allElements.put(cs, VisageSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) cs));
                         }
                     }
                     for (Element element : om.get(currentClass)) {
@@ -123,7 +123,7 @@ public final class MarkOverriddenTaskFactory extends VisageAbstractEditorHint {
                                         try {
                                             overrides = compilationInfo.getElements().overrides((ExecutableElement) element, (ExecutableElement) e, classSymbol);
                                         } catch (Exception ex) {
-                                            System.out.println("Workaround for issue: VSGC-4386"); //NOI18N
+                                            System.out.println("Workaround for issue: VisageC-4386"); //NOI18N
                                             System.out.println(ex.getMessage());
                                         }
                                     }

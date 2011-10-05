@@ -41,22 +41,9 @@
  */
 package org.netbeans.api.visage.source;
 
-import org.netbeans.modules.visage.source.CompilationInfoImpl;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
+import org.netbeans.modules.visage.source.CompilationInfoImpl;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.visage.api.JavafxcTrees;
-import com.sun.tools.visage.code.JavafxTypes;
-import com.sun.tools.visage.comp.JavafxEnter;
-import com.sun.tools.visage.comp.JavafxEnv;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGScript;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.VSGVar;
-import com.sun.tools.visage.tree.JavafxTreeScanner;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,6 +59,19 @@ import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.modules.parsing.api.Snapshot;
 import org.openide.filesystems.FileObject;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreeScanner;
+import org.visage.tools.api.VisagecTrees;
+import org.visage.tools.code.VisageTypes;
+import org.visage.tools.comp.VisageEnter;
+import org.visage.tools.comp.VisageEnv;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageScript;
+import org.visage.tools.tree.VisageTree;
+import org.visage.tools.tree.VisageVar;
 
 /**
  *
@@ -126,11 +126,11 @@ public class CompilationInfo {
     }
     
     /**
-     * Return the {@link com.sun.tools.visage.api.JavafxcTrees} service of the visagec represented by this {@link CompilationInfo}.
+     * Return the {@link com.sun.tools.visage.api.VisagecTrees} service of the visagec represented by this {@link CompilationInfo}.
      * @return visagec Trees service
      */
-    public JavafxcTrees getTrees() {
-        return JavafxcTrees.instance(impl.getJavafxcTaskImpl());
+    public VisagecTrees getTrees() {
+        return VisagecTrees.instance(impl.getVisagecTaskImpl());
     }
 
     public boolean isErrors() {
@@ -139,88 +139,83 @@ public class CompilationInfo {
 
     // XXX: hack around lack of support in compiler
     public VisageTreePath getPath(Element e) {
-        VSGTree tree = (VSGTree)getTree(e);
+        VisageTree tree = (VisageTree)getTree(e);
         return tree == null ? null : getTrees().getPath(getCompilationUnit(), tree);
     }
 
     public Tree getTree(Element e) {
         Symbol sym = (Symbol) e;
-        JavafxEnter enter = JavafxEnter.instance(impl.getContext());
-        JavafxEnv env = enter.getEnv(sym.enclClass());
+        VisageEnter enter = VisageEnter.instance(impl.getContext());
+        VisageEnv env = enter.getEnv(sym.enclClass());
         if (env == null) {
             return null;
         }
         return declarationFor(sym, env.tree);
     }
 
-    private static VSGTree declarationFor(final Symbol sym, final VSGTree tree) {
+    private static VisageTree declarationFor(final Symbol sym, final VisageTree tree) {
 
-        class DeclScanner extends JavafxTreeScanner {
+        class DeclScanner extends VisageTreeScanner {
 
-            VSGTree result = null;
+            VisageTree result = null;
 
-            public @Override void scan(VSGTree tree) {
+/*            public void scan(VisageTree tree) {
                 if (tree != null && result == null) {
-                    tree.accept(this);
+                    tree.accept(this,sym);
                 }
             }
-
-            public @Override void visitScript( VSGScript that) {
+*/
+/*            
+            public void visitScript( VisageScript that) {
                 if (that.packge == sym) {
                     result = that;
                 } else {
                     super.visitScript(that);
                 }
             }
-
-            public 
-            @Override
-            void visitClassDeclaration( VSGClassDeclaration that) {
+*/
+            public void visitClassDeclaration( VisageClassDeclaration that) {
                 if (that.sym == sym) {
                     result = that;
                 } else {
-                    super.visitClassDeclaration(that);
+                    super.visitClassDeclaration(that,sym);
                 }
             }
 
-            public 
-            @Override
-            void visitFunctionDefinition( VSGFunctionDefinition that) {
+            public void visitFunctionDefinition( VisageFunctionDefinition that) {
                 if (that.sym == sym) {
                     result = that;
                 } else {
-                    super.visitFunctionDefinition(that);
+                    super.visitFunctionDefinition(that,sym);
                 }
             }
 
-
-            public 
-            @Override
-            void visitVar( VSGVar that) {
+/*
+            public void visitVariable( VisageVar that) {
                 if (that.sym == sym) {
                     result = that;
                 } else {
-                    super.visitVar(that);
+                    super.visitVariable(that);
                 }
             }
-
+*/
 
         }
         DeclScanner s = new DeclScanner();
-        tree.accept(s);
+        tree.accept(s, sym);
         return s.result;
     }
 
     public Types getTypes() {
-        return impl.getJavafxcTaskImpl().getTypes();
+        return impl.getVisagecTaskImpl().getTypes();
     }
 
-    public JavafxTypes getJavafxTypes() {
-        return JavafxTypes.instance(impl.getContext());
+    public VisageTypes getVisageTypes() {
+        return VisageTypes.instance(impl.getContext());
     }
 
     public Elements getElements() {
-        return impl.getJavafxcTaskImpl().getElements();
+        return impl.getVisagecTaskImpl().getElements();
     }
 
     /**
@@ -273,7 +268,7 @@ public class CompilationInfo {
             return null;
         }
 
-        final JavafxcTrees trees = getTrees();
+        final VisagecTrees trees = getTrees();
         assert trees != null;
         List<? extends Tree> typeDecls = cu.getTypeDecls();
         VisageTreePath cuPath = new VisageTreePath(cu);

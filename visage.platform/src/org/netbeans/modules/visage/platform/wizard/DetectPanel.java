@@ -371,7 +371,14 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 //                 return;
 //            }
             File f = component.getFxFolder();
-            if (!(new File(f, "bin/visagepackager.exe").isFile() || new File(f, "bin/visagepackager").isFile()) || !new File(f, "lib/shared/visagec.jar").isFile() || !new File(f, "lib/shared/visagert.jar").isFile()) { // NOI18N
+//            if (!(new File(f, "bin/visagepackager.exe").isFile() || 
+//                  new File(f, "bin/visagepackager").isFile()) || 
+//                  !new File(f, "lib/shared/visagec.jar").isFile() || 
+//                  !new File(f, "lib/shared/visagert.jar").isFile()) { // NOI18N
+            if (!(new File(f, "bin/visage.exe").isFile() || 
+                  new File(f, "bin/visage").isFile()) || 
+                  !new File(f, "lib/shared/visagec.jar").isFile() || 
+                  !new File(f, "lib/shared/visagert.jar").isFile()) { // NOI18N
                 setErrorMessage("ERROR_WrongFxLocation"); //NOI18N
                  return;
             }

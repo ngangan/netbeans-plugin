@@ -44,7 +44,6 @@
 
 package org.netbeans.modules.visage.debugger.breakpoints;
 
-import com.sun.visage.jdi.event.FXEventQueue;
 import com.sun.jdi.VirtualMachine;
 import com.sun.jdi.event.EventQueue;
 import java.beans.PropertyChangeEvent;
@@ -61,6 +60,7 @@ import org.netbeans.api.debugger.Watch;
 import org.netbeans.api.debugger.jpda.JPDADebugger;
 import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
 import org.netbeans.spi.debugger.DebuggerServiceRegistration;
+import org.visage.jdi.event.VisageEventQueue;
 
 /**
  * Listens on DebuggerManager and:
@@ -160,8 +160,8 @@ public class PersistenceManager implements LazyDebuggerManagerListener {
 
                     VirtualMachine vm = impl.getVirtualMachine ();
                     EventQueue eq = vm.eventQueue();
-                    if (!(eq instanceof FXEventQueue)) return;
-                    FXEventQueue fxeq = (FXEventQueue)eq;
+                    if (!(eq instanceof VisageEventQueue)) return;
+                    VisageEventQueue fxeq = (VisageEventQueue)eq;
                     fxeq.setAllowEventControl(true);
                 }
             }

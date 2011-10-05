@@ -32,11 +32,6 @@
 package org.netbeans.modules.visage.refactoring.impl.plugins;
 
 import org.netbeans.modules.visage.refactoring.impl.plugins.elements.BaseRefactoringElementImplementation;
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.MemberSelectTree;
-import com.sun.tools.visage.code.JavafxFlags;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.File;
 import java.io.IOException;
@@ -60,7 +55,6 @@ import org.netbeans.modules.visage.refactoring.impl.plugins.elements.FixImportsE
 import org.netbeans.modules.visage.refactoring.impl.plugins.elements.UpdatePackageDeclarationElement;
 import org.netbeans.modules.visage.refactoring.repository.ClassModel;
 import org.netbeans.modules.visage.refactoring.repository.ElementDef;
-import org.netbeans.modules.visage.refactoring.repository.ImportEntry;
 import org.netbeans.modules.visage.refactoring.repository.ImportSet;
 import org.netbeans.modules.visage.refactoring.transformations.InsertTextTransformation;
 import org.netbeans.modules.visage.refactoring.transformations.RemoveTextTransformation;
@@ -82,6 +76,11 @@ import org.openide.loaders.DataObject;
 import org.openide.text.PositionBounds;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.code.VisageFlags;
 
 /**
  *
@@ -273,7 +272,7 @@ public class CopyRefactoringPlugin extends VisageRefactoringPlugin {
                         @Override
                         public Void visitIdentifier(IdentifierTree node, Void p) {
                             Element e = cc.getTrees().getElement(getCurrentPath());
-                            if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
+                            if (e != null && (((Symbol) e).flags_field & VisageFlags.PACKAGE_ACCESS) == VisageFlags.PACKAGE_ACCESS) {
                                 TypeElement topClass = VisageSourceUtils.getOutermostEnclosingTypeElement(e);
                                 String message = ""; // NOI18N
                                 if (e.getKind().isInterface() || e.getKind().isClass()) {
@@ -289,7 +288,7 @@ public class CopyRefactoringPlugin extends VisageRefactoringPlugin {
                         @Override
                         public Void visitMemberSelect(MemberSelectTree node, Void p) {
                             Element e = cc.getTrees().getElement(getCurrentPath());
-                            if (e != null && (((Symbol) e).flags_field & JavafxFlags.PACKAGE_ACCESS) == JavafxFlags.PACKAGE_ACCESS) {
+                            if (e != null && (((Symbol) e).flags_field & VisageFlags.PACKAGE_ACCESS) == VisageFlags.PACKAGE_ACCESS) {
                                 TypeElement topClass = VisageSourceUtils.getOutermostEnclosingTypeElement(e);
                                 String message = ""; // NOI18N
                                 if (e.getKind().isInterface() || e.getKind().isClass()) {

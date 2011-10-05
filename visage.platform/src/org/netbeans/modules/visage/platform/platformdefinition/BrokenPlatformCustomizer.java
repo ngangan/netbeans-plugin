@@ -49,7 +49,6 @@ import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
-import javax.swing.JLabel;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import org.openide.util.NbBundle;

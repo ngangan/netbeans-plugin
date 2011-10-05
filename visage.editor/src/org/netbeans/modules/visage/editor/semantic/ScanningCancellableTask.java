@@ -43,11 +43,11 @@
  */
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.support.CancellableTreePathScanner;
 import org.netbeans.api.visage.source.support.CancellableTreeScanner;
+import org.visage.api.tree.Tree;
 
 /**
  *

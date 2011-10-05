@@ -44,19 +44,14 @@
 
 package org.netbeans.modules.visage.fxd.composer.editor.completion.providers;
 
-import com.sun.visage.tools.fxd.schema.model.AbstractSchemaElement;
-import com.sun.visage.tools.fxd.schema.model.Element;
-import com.sun.visage.tools.fxd.schema.model.Enumeration;
-import com.sun.visage.tools.fxd.schema.model.FXDSchema;
-import com.sun.visage.tools.fxd.schema.model.PrimitiveType;
-import com.sun.visage.tools.fxd.schema.model.Property;
-import com.sun.visage.tools.fxd.schema.model.SchemaVisitor;
-import com.sun.visage.tools.fxd.schema.model.Type;
-import com.sun.visage.tools.fxd.schema.model.Value;
+import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.element.Element;
+import javax.lang.model.type.PrimitiveType;
 import javax.swing.text.BadLocationException;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenSequence;
@@ -69,6 +64,8 @@ import org.netbeans.modules.visage.fxd.composer.model.FXDFileModel;
 import org.netbeans.modules.visage.fxd.schemamodel.FXDSchemaHelper;
 import org.netbeans.modules.visage.fxd.schemamodel.FXDSchemaModelProvider;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
+import org.openide.nodes.Node.Property;
+import visage.reflect.VisageLocal.Value;
 
 /**
  *

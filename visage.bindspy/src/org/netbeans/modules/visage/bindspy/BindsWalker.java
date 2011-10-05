@@ -45,22 +45,21 @@
 
 package org.netbeans.modules.visage.bindspy;
 
-import com.sun.visage.api.JavafxBindStatus;
-import com.sun.visage.api.tree.ForExpressionInClauseTree;
-import com.sun.visage.api.tree.ForExpressionTree;
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.InstantiateTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.ObjectLiteralPartTree;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.VariableTree;
-import com.sun.tools.visage.tree.VSGForExpression;
-import com.sun.tools.visage.tree.VSGForExpressionInClause;
 import javax.swing.text.Document;
 import org.netbeans.api.visage.source.ClassIndex;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.modules.visage.bindspy.BindsModel.BindVariable;
 import org.openide.loaders.DataObject;
+import org.visage.api.VisageBindStatus;
+import org.visage.api.tree.ForExpressionInClauseTree;
+import org.visage.api.tree.ForExpressionTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.InstantiateTree;
+import org.visage.api.tree.ObjectLiteralPartTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageForExpressionInClause;
 
 /**
  *
@@ -119,7 +118,7 @@ public class BindsWalker extends VisageTreePathScanner<Void, BindsModel> {
             bindVariable.setEndPosition( end );
             model.addVariable( bindVariable );
 
-            final JavafxBindStatus bindStatus = node.getBindStatus();
+            final VisageBindStatus bindStatus = node.getBindStatus();
             // is bind
             if( bindStatus.isBound()) {
                 status = BIND;
@@ -135,8 +134,8 @@ public class BindsWalker extends VisageTreePathScanner<Void, BindsModel> {
     @Override
     public Void visitForExpression(ForExpressionTree node, BindsModel p) {
         Object o = node.getInClauses().get( 0 );
-        if( o instanceof VSGForExpressionInClause ) {
-            VSGForExpressionInClause ex = (VSGForExpressionInClause)o;
+        if( o instanceof VisageForExpressionInClause ) {
+            VisageForExpressionInClause ex = (VisageForExpressionInClause)o;
             scan( ex.getSequenceExpression(), p );
         }
         return super.visitForExpression(node, p);

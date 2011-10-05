@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 AutoUpdate-Show-In-Client: false
-OpenIDE-Module: org.netbeans.modules.visage.sdk.lin
-OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/visage/sdk/lin/Bundle.properties
+OpenIDE-Module: org.netbeans.modules.visage.sdk
+OpenIDE-Module-Layer: org/netbeans/modules/visage/sdk/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/netbeans/modules/visage/sdk/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.10
 OpenIDE-Module-Requires: org.openide.modules.os.Linux
 OpenIDE-Module-Provides: visage.sdk.v1_3, visage.sdk.v1_3_1
 FeaturesOnDemand-Proxy-Layer: false
- 

@@ -7,99 +7,94 @@
             <suite-component/>
             <module-dependencies/>
             <public-packages>
-                <subpackages>com.visage</subpackages>
-                <package>com.sun.embeddedswing</package>
-                <subpackages>com.sun.visage</subpackages>
-                <subpackages>com.sun.media.jmc</subpackages>
-                <subpackages>com.sun.media.jmcimpl</subpackages>
-                <package>com.sun.medialib.codec.mpad</package>
-                <subpackages>com.sun.scenario</subpackages>
-                <subpackages>com.sun.stylesheet</subpackages>
-                <subpackages>visage</subpackages>
+                <package>com.sun.javadoc</package>
+                <package>com.sun.source.tree</package>
+                <package>com.sun.source.util</package>
+                <package>com.sun.tools.javadoc</package>
+                <package>com.sun.tools.javadoc.resources</package>
+                <package>com.sun.tools.mjavac</package>
+                <package>com.sun.tools.mjavac.api</package>
+                <package>com.sun.tools.mjavac.code</package>
+                <package>com.sun.tools.mjavac.comp</package>
+                <package>com.sun.tools.mjavac.jvm</package>
+                <package>com.sun.tools.mjavac.main</package>
+                <package>com.sun.tools.mjavac.model</package>
+                <package>com.sun.tools.mjavac.parser</package>
+                <package>com.sun.tools.mjavac.processing</package>
+                <package>com.sun.tools.mjavac.resources</package>
+                <package>com.sun.tools.mjavac.sym</package>
+                <package>com.sun.tools.mjavac.tree</package>
+                <package>com.sun.tools.mjavac.util</package>
+                <package>com.sun.tools.mjavac.zip</package>
+                <package>javax.lang.model</package>
+                <package>javax.lang.model.element</package>
+                <package>javax.lang.model.type</package>
+                <package>javax.lang.model.util</package>
+                <package>javax.tools</package>
+                <package>org.antlr.runtime</package>
+                <package>org.antlr.runtime.tree</package>
+                <package>org.visage.animation</package>
+                <package>org.visage.api</package>
+                <package>org.visage.api.tree</package>
+                <package>org.visage.functions</package>
+                <package>org.visage.jdi</package>
+                <package>org.visage.jdi.connect</package>
+                <package>org.visage.jdi.event</package>
+                <package>org.visage.jdi.request</package>
+                <package>org.visage.runtime</package>
+                <package>org.visage.runtime.annotation</package>
+                <package>org.visage.runtime.async</package>
+                <package>org.visage.runtime.date</package>
+                <package>org.visage.runtime.liveconnect</package>
+                <package>org.visage.runtime.main</package>
+                <package>org.visage.runtime.refq</package>
+                <package>org.visage.runtime.resources</package>
+                <package>org.visage.runtime.sequence</package>
+                <package>org.visage.runtime.util</package>
+                <package>org.visage.runtime.util.backport</package>
+                <package>org.visage.tools</package>
+                <package>org.visage.tools.ant</package>
+                <package>org.visage.tools.antlr</package>
+                <package>org.visage.tools.api</package>
+                <package>org.visage.tools.code</package>
+                <package>org.visage.tools.comp</package>
+                <package>org.visage.tools.debug.expr</package>
+                <package>org.visage.tools.debug.tty</package>
+                <package>org.visage.tools.main</package>
+                <package>org.visage.tools.resources</package>
+                <package>org.visage.tools.script</package>
+                <package>org.visage.tools.tree</package>
+                <package>org.visage.tools.tree.xml</package>
+                <package>org.visage.tools.util</package>
+                <package>org.visage.tools.visagedoc</package>
+                <package>org.visage.tools.xmldoclet</package>
+                <package>org.visage.tools.xslhtml</package>
+                <package>visage.animation</package>
+                <package>visage.date</package>
+                <package>visage.lang</package>
+                <package>visage.reflect</package>
+                <package>visage.util</package>
+                <package>visage.visageunit</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>../visage-sdk/lib/shared/visagert.jar</runtime-relative-path>
                 <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/visagert.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/shared/fxdtools.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/fxdtools.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagejdi.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/visagejdi.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/shared/fxjdi.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/fxjdi.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagedoc.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/visagedoc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-io.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-io.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/shared/visagec.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/shared/visagec.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/fxdloader.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/fxdloader.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-common.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-sg-swing.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-sg-swing.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-geom.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-geom.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-anim.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-anim.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-sg-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-sg-common.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-swing.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-swing.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-common.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-common.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-controls.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-controls.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-charts.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-charts.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/visage-ui-desktop.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visage-ui-desktop.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/jmc.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/jmc.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/decora-runtime.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-runtime.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/decora-j2d.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-j2d.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/decora-j2d-rsl.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-j2d-rsl.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/prism/decora-prism.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/prism/decora-prism.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>../visage-sdk/lib/desktop/decora-jsw.jar</runtime-relative-path>
-                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/decora-jsw.jar</binary-origin>
+                <runtime-relative-path>../visage-sdk/lib/desktop/visagert-main.jar</runtime-relative-path>
+                <binary-origin>../build/netbeans/visage/visage-sdk/lib/desktop/visagert-main.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

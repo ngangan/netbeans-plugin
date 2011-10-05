@@ -42,18 +42,17 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.InstanceOfTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
-
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.*;
 
 import javax.lang.model.type.TypeMirror;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.InstanceOfTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *
@@ -72,9 +71,9 @@ public class InstanceOfTreeEnvironment extends VisageCompletionEnvironment<Insta
         int typePos = (int)sourcePositions.getStartPosition(root, t.getType()); // NOI18N
         if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos + "  offset == " + offset); // NOI18N
         if (offset >= typePos) {
-            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-            if ((last != null) && (last.token().id() == VSGTokenId.INSTANCEOF)){
+            if ((last != null) && (last.token().id() == VisageTokenId.INSTANCEOF)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
             }
             return;

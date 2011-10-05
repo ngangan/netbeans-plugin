@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
@@ -446,7 +447,7 @@ public final class PlatformUiSupport {
                     originalSourceLevel = new SpecificationVersion(initialSourceLevel);
                 } catch (NumberFormatException nfe) {
                     // if the javac.source has invalid value, do not preselect and log it.
-                    LOGGER.warning("Invalid javac.source: " + initialSourceLevel); // NOI18N
+                    LOGGER.log(Level.WARNING, "Invalid javac.source: {0}", initialSourceLevel); // NOI18N
                 }
             }
             if (initialTargetLevel != null && initialTargetLevel.length() > 0) {
@@ -457,7 +458,7 @@ public final class PlatformUiSupport {
                     }
                 } catch (NumberFormatException nfe) {
                     // if the javac.target has invalid value, do not preselect and log it
-                    LOGGER.warning("Invalid javac.target: "+initialTargetLevel); // NOI18N
+                    LOGGER.log(Level.WARNING, "Invalid javac.target: {0}", initialTargetLevel); // NOI18N
                 }
             }
             selectedSourceLevel = originalSourceLevel;

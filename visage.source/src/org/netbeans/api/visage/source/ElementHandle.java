@@ -46,7 +46,6 @@ import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Symtab;
 import com.sun.tools.mjavac.jvm.Target;
 import com.sun.tools.mjavac.model.JavacElements;
-import com.sun.tools.visage.api.JavafxcTaskImpl;
 
 import javax.lang.model.element.*;
 import javax.lang.model.type.*;
@@ -56,6 +55,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.tools.api.VisagecTaskImpl;
 
 /**
  * Represents a handle for {@link Element} which can be kept and later resolved
@@ -81,7 +81,7 @@ import java.util.logging.Logger;
  *    }
  * }, true);
  *
- * otherJavafxSource.runUserActionTask(new Task&lt;CompilationController>() {
+ * otherVisageSource.runUserActionTask(new Task&lt;CompilationController>() {
  *     public void run(CompilationController compilationController) {
  *         compilationController.toPhase(Phase.RESOLVED);
  *         Element element = elementHandle[0].resolve(compilationController);
@@ -171,7 +171,7 @@ public class ElementHandle<T extends Element> {
     }
     
     private T resolveImpl (final CompilationInfo ci) {
-        JavafxcTaskImpl jt = ci.impl().getJavafxcTaskImpl();
+        VisagecTaskImpl jt = ci.impl().getVisagecTaskImpl();
         switch (this.kind) {
             case PACKAGE:
                 assert signatures.length == 1;
@@ -241,7 +241,7 @@ public class ElementHandle<T extends Element> {
                     for (Element member : members) {
                         if (this.kind == member.getKind()) {
                             if (((Symbol)member).completer != null) {
-                                LOG.fine(member.getSimpleName().toString() + " in " + ci.getFileObject().getNameExt() + " has not got a complete type info. Completing...");
+                                LOG.log(Level.FINE, "{0} in {1} has not got a complete type info. Completing...", new Object[]{member.getSimpleName().toString(), ci.getFileObject().getNameExt()});
                                 ((Symbol)member).complete();
                             }
                             String[] desc = createFieldDescriptor((VariableElement)member);
@@ -523,7 +523,7 @@ public class ElementHandle<T extends Element> {
         return result;
     }
 
-    private static TypeElement getTypeElementByBinaryName (final String signature, final JavafxcTaskImpl jt) {
+    private static TypeElement getTypeElementByBinaryName (final String signature, final VisagecTaskImpl jt) {
         if (isArray(signature)) {
             return Symtab.instance(jt.getContext()).arrayClass;
         }
@@ -542,7 +542,7 @@ public class ElementHandle<T extends Element> {
         final StringBuilder result = new StringBuilder ();
         result.append (this.getClass().getSimpleName());
         result.append ('[');                                // NOI18N
-        result.append ("kind=" +this.kind.toString());      // NOI18N
+        result.append("kind=").append (this.kind.toString());      // NOI18N
         result.append ("; sigs=");                          // NOI18N
         for (String sig : this.signatures) {
             result.append (sig);
@@ -589,6 +589,7 @@ public class ElementHandle<T extends Element> {
     }
 
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -601,6 +602,7 @@ public class ElementHandle<T extends Element> {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int result;
         result = (kind != null ? kind.hashCode() : 0);

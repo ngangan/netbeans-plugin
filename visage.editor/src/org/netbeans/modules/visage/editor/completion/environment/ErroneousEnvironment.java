@@ -42,10 +42,10 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.tools.visage.tree.VSGErroneous;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.tree.VisageErroneous;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
@@ -56,14 +56,14 @@ import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuer
 /**
  * @author David Strupl
  */
-public class ErroneousEnvironment extends VisageCompletionEnvironment<VSGErroneous> {
+public class ErroneousEnvironment extends VisageCompletionEnvironment<VisageErroneous> {
     
     private static final Logger logger = Logger.getLogger(ErroneousEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGErroneous t) {
-        if (LOGGABLE) log("inside VSGErroneous " + t); // NOI18N
+    protected void inside(VisageErroneous t) {
+        if (LOGGABLE) log("inside VisageErroneous " + t); // NOI18N
         SourcePositions pos = controller.getTrees().getSourcePositions();
         long s = pos.getStartPosition(root, t);
         long e = pos.getEndPosition(root, t);

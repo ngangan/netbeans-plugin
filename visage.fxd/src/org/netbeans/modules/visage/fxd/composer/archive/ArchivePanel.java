@@ -59,7 +59,6 @@ import org.netbeans.modules.visage.fxd.composer.model.actions.AbstractFXDAction;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
-import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;

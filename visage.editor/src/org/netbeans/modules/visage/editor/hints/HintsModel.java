@@ -43,8 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
@@ -55,6 +53,8 @@ import java.util.HashSet;
 import java.util.Map;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.openide.text.Annotation;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
 
 final class HintsModel {
 

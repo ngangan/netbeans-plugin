@@ -43,13 +43,8 @@
  */
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.*;
-import com.sun.visage.api.tree.Tree.VisageKind;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.visage.code.JavafxFlags;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.api.lexer.Token;
@@ -65,6 +60,19 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.code.VisageFlags;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageFunctionDefinition;
 
 /**
  *
@@ -81,12 +89,12 @@ public class Utilities {
     public Utilities() {
     }
     
-    private static Token<VSGTokenId> findTokenWithText(CompilationInfo info, String text, int start, int end) {
+    private static Token<VisageTokenId> findTokenWithText(CompilationInfo info, String text, int start, int end) {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language()).subSequence(start, end);
+        TokenSequence<VisageTokenId> ts = th.tokenSequence(VisageTokenId.language()).subSequence(start, end);
         
         while (ts.moveNext()) {
-            Token<VSGTokenId> t = ts.token();
+            Token<VisageTokenId> t = ts.token();
             
             if (text.equals(t.text().toString())) {
                 return t;
@@ -104,7 +112,7 @@ public class Utilities {
         return lastLeft;
     }
     
-    private static Token<VSGTokenId> findIdentifierSpanImpl(CompilationInfo info, Tree decl, Tree lastLeft, List<? extends Tree> firstRight, String name, UnitTree cu, SourcePositions positions) {
+    private static Token<VisageTokenId> findIdentifierSpanImpl(CompilationInfo info, Tree decl, Tree lastLeft, List<? extends Tree> firstRight, String name, UnitTree cu, SourcePositions positions) {
         int declStart = (int) positions.getStartPosition(cu, decl);
         
         lastLeft = normalizeLastLeftTree(lastLeft);
@@ -145,7 +153,7 @@ public class Utilities {
         return findTokenWithText(info, name, start, end);
     }
     
-    private static Token<VSGTokenId> findIdentifierSpanImpl(CompilationInfo info, MemberSelectTree tree, UnitTree cu, SourcePositions positions) {
+    private static Token<VisageTokenId> findIdentifierSpanImpl(CompilationInfo info, MemberSelectTree tree, UnitTree cu, SourcePositions positions) {
         int start = (int)positions.getStartPosition(cu, tree);
         int endPosition = (int)positions.getEndPosition(cu, tree);
         
@@ -155,7 +163,7 @@ public class Utilities {
         String member = tree.getIdentifier().toString();
 
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = th.tokenSequence(VisageTokenId.language());
 
         if (ts.move(endPosition) == Integer.MAX_VALUE) {
             return null;
@@ -163,7 +171,7 @@ public class Utilities {
 
         if (ts.moveNext()) {
             while (ts.offset() >= start) {
-                Token<VSGTokenId> t = ts.token();
+                Token<VisageTokenId> t = ts.token();
                 if (member.equals(t.text().toString())) {
                     return t;
                 }
@@ -192,16 +200,16 @@ public class Utilities {
         }
     }
     
-    private static Token<VSGTokenId> findIdentifierSpanImpl(CompilationInfo info, VisageTreePath decl) {
+    private static Token<VisageTokenId> findIdentifierSpanImpl(CompilationInfo info, VisageTreePath decl) {
         TreeUtilities tu = TreeUtilities.create(info);
         if (tu.isSynthetic(decl))
             return null;
         
         Tree leaf = decl.getLeaf();
                 
-        if (leaf instanceof VSGFunctionDefinition) {
+        if (leaf instanceof VisageFunctionDefinition) {
             // XXX: should use FunctionDefinitionTree, but it lacks the API
-            VSGFunctionDefinition function = (VSGFunctionDefinition) leaf;
+            VisageFunctionDefinition function = (VisageFunctionDefinition) leaf;
             List<Tree> rightTrees = new ArrayList<Tree>();
 
             rightTrees.addAll(function.getParams());
@@ -210,10 +218,10 @@ public class Utilities {
 
             Name name = function.getName();
 
-            if (function.getVSGReturnType() == null)
+            if (function.getVisageReturnType() == null)
                 name = ((ClassDeclarationTree) decl.getParentPath().getLeaf()).getSimpleName();
 
-            return findIdentifierSpanImpl(info, leaf, function.getVSGReturnType(), rightTrees, name.toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
+            return findIdentifierSpanImpl(info, leaf, function.getVisageReturnType(), rightTrees, name.toString(), info.getCompilationUnit(), info.getTrees().getSourcePositions());
         }
         
         if (class2Kind.get(VariableTree.class).contains(leaf.getVisageKind())) {
@@ -254,7 +262,7 @@ public class Utilities {
         
         
         if (VisageKind.CLASS_DECLARATION == leaf.getVisageKind()) {
-            String name = ((VSGClassDeclaration) leaf).getName().toString();
+            String name = ((VisageClassDeclaration) leaf).getName().toString();
             
             if (name.length() == 0)
                 return null;
@@ -278,7 +286,7 @@ public class Utilities {
         final int[] result = new int[] {-1, -1};
         doc.render(new Runnable() {
             public void run() {
-                Token<VSGTokenId> t = findIdentifierSpan(info, doc, decl);
+                Token<VisageTokenId> t = findIdentifierSpan(info, doc, decl);
                 if (t != null) {
                     result[0] = t.offset(null);
                     result[1] = t.offset(null) + t.length();
@@ -289,9 +297,9 @@ public class Utilities {
         return result;
     }
     
-    public static Token<VSGTokenId> findIdentifierSpan(final CompilationInfo info, final Document doc, final VisageTreePath decl) {
+    public static Token<VisageTokenId> findIdentifierSpan(final CompilationInfo info, final Document doc, final VisageTreePath decl) {
         @SuppressWarnings("unchecked")
-        final Token<VSGTokenId>[] result = new Token[1];
+        final Token<VisageTokenId>[] result = new Token[1];
         doc.render(new Runnable() {
             public void run() {
                 result[0] = findIdentifierSpanImpl(info, decl);
@@ -398,7 +406,7 @@ public class Utilities {
         return result[0];
     }
     
-    private static Token<VSGTokenId> createHighlightImpl(CompilationInfo info, Document doc, VisageTreePath tree) {
+    private static Token<VisageTokenId> createHighlightImpl(CompilationInfo info, Document doc, VisageTreePath tree) {
         Tree leaf = tree.getLeaf();
 //        SourcePositions positions = info.getTrees().getSourcePositions();
 //        CompilationUnitTree cu = info.getCompilationUnit();
@@ -406,8 +414,8 @@ public class Utilities {
         //XXX: do not use instanceof:
         if (leaf instanceof VariableTree || 
 /*                leaf instanceof ClassTree || */
-                leaf instanceof VSGClassDeclaration || 
-                leaf instanceof VSGFunctionDefinition || 
+                leaf instanceof VisageClassDeclaration || 
+                leaf instanceof VisageFunctionDefinition || 
                 leaf instanceof MemberSelectTree) {
 //        Element element = info.getTrees().getElement(tree);
 //        ElementKind kind = element.getKind();
@@ -418,14 +426,14 @@ public class Utilities {
         int start = (int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), leaf);
         
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = th.tokenSequence(VisageTokenId.language());
         
         if (ts.move(start) == Integer.MAX_VALUE) {
             return null;
         }
         
         if (ts.moveNext()) {
-            if (ts.offset() == start && ts.token().id() == VSGTokenId.IDENTIFIER) {
+            if (ts.offset() == start && ts.token().id() == VisageTokenId.IDENTIFIER) {
                 return ts.token();
             }
         }
@@ -433,9 +441,9 @@ public class Utilities {
         return null;
     }
     
-    public static Token<VSGTokenId> getToken(final CompilationInfo info, final Document doc, final VisageTreePath tree) {
+    public static Token<VisageTokenId> getToken(final CompilationInfo info, final Document doc, final VisageTreePath tree) {
         @SuppressWarnings("unchecked")
-        final Token<VSGTokenId>[] result = new Token[1];
+        final Token<VisageTokenId>[] result = new Token[1];
         
         doc.render(new Runnable() {
             public void run() {
@@ -487,7 +495,7 @@ public class Utilities {
             return true;
         
         Symbol sy = (Symbol)el;
-        return el.getModifiers().contains(Modifier.PRIVATE) || (sy.flags() & JavafxFlags.SCRIPT_PRIVATE) > 0;
+        return el.getModifiers().contains(Modifier.PRIVATE) || (sy.flags() & VisageFlags.SCRIPT_PRIVATE) > 0;
     }
     
 

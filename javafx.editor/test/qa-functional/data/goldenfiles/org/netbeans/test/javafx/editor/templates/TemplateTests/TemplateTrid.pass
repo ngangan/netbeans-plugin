@@ -1,1 +1,0 @@
-trigger on delete e from ClassName.AttributeName {  }

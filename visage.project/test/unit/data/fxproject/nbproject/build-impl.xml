@@ -19,7 +19,7 @@ is divided into following sections:
   - cleanup
 
         -->
-<project xmlns:visageproject1="http://www.netbeans.org/ns/visage-project/1" xmlns:visageproject2="http://www.netbeans.org/ns/visage-project/2" xmlns:visageproject3="http://www.netbeans.org/ns/visage-project/3" basedir=".." default="default" name="fxproject-impl">
+<project xmlns:visageproject1="http://www.netbeans.org/ns/visage-project/1" xmlns:visageproject2="http://www.netbeans.org/ns/visage-project/2" xmlns:visageproject3="http://www.netbeans.org/ns/visage-project/3" basedir=".." default="default" name="visageproject-impl">
     <target depends="jar" description="Build whole project." name="default"/>
     <!--
                     ======================
@@ -50,7 +50,7 @@ is divided into following sections:
         <property file="nbproject/project.properties"/>
     </target>
     <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
-        <visageproject1:property name="platform.fxhome" value="platforms.${platform.active}.fxhome"/>
+        <visageproject1:property name="platform.visagehome" value="platforms.${platform.active}.visagehome"/>
         <visageproject1:property name="platform.javadoc.tmp" value="platforms.${platform.active}.javadoc"/>
         <condition property="platform.javadoc" value="${platform.home}/bin/javadoc">
             <equals arg1="${platform.javadoc.tmp}" arg2="$${platforms.${platform.active}.javadoc}"/>
@@ -121,8 +121,8 @@ is divided into following sections:
             </not>
         </condition>
         <property name="run.jvmargs" value=""/>
-        <available file="${platform.fxhome}/emulator/bin/emulator${binary.extension}" property="emulator.available"/>
-        <available file="${platform.fxhome}/tv/emulator/bin/cvm${binary.extension}" property="tvemulator.available"/>
+        <available file="${platform.visagehome}/emulator/bin/emulator${binary.extension}" property="emulator.available"/>
+        <available file="${platform.visagehome}/tv/emulator/bin/cvm${binary.extension}" property="tvemulator.available"/>
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization.-->
@@ -145,7 +145,7 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file.-->
     </target>
     <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-        <exec executable="${platform.fxhome}/bin/visagepackager${binary.extension}" failonerror="true">
+        <exec executable="${platform.visagehome}/bin/visagepackager${binary.extension}" failonerror="true">
             <arg value="-src"/>
             <arg value="${src.dir}"/>
             <arg value="-workdir"/>
@@ -193,39 +193,44 @@ is divided into following sections:
     -->
     <target depends="init,compile,jar" description="Run a main class." if="standard.execution.trigger" name="standard-run">
         <property name="application.args" value=""/>
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}" jvmargs="${run.jvmargs}">
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" failonerror="true" fork="true" jvm="${platform.visagehome}/bin/visage${binary.extension}" jvmargs="${run.jvmargs}">
             <arg line="${application.args}"/>
         </java>
     </target>
+<!--
     <target depends="jar" description="Start MIDP execution" if="midp.execution.trigger" name="midp-run">
         <fail message="Current platform does not include mobile device emulator necessary for the execution." unless="emulator.available"/>
         <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
-        <property name="mobile.device" value="DefaultFxPhone1"/>
+        <property name="mobile.device" value="DefaultVisagePhone1"/>
         <condition else="-Xdescriptor:" property="emulator.exec.arg" value="-Xjam:install=">
             <istrue value="${jad.install}"/>
         </condition>
-        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}" failonerror="true">
+        <exec executable="${platform.visagehome}/emulator/bin/emulator${binary.extension}" failonerror="true">
             <arg value="${run.jvmargs}"/>
             <arg value="${emulator.exec.arg}${jad.file}"/>
             <arg value="-Xdevice:${mobile.device}"/>
         </exec>
     </target>
+-->    
+<!--
     <target depends="jar" description="Start TV execution" if="tv.execution.trigger" name="tv-run">
         <fail message="Current platform does not include tv emulator necessary for the execution." unless="tvemulator.available"/>
         <property location="${dist.dir}/${application.title}.jar" name="jar.file"/>
-        <exec executable="${platform.fxhome}/tv/emulator/bin/cvm${binary.extension}" failonerror="true">
+        <exec executable="${platform.visagehome}/tv/emulator/bin/cvm${binary.extension}" failonerror="true">
             <arg value="-Dprism.verbose=true"/>
             <arg value="-Dprism.order=es1"/>
-            <arg value="-Djava.library.path=${platform.fxhome}/tv/emulator/bin"/>
-            <arg value="-Dsun.boot.library.path=${platform.fxhome}/tv/emulator/bin"/>
+            <arg value="-Djava.library.path=${platform.visagehome}/tv/emulator/bin"/>
+            <arg value="-Dsun.boot.library.path=${platform.visagehome}/tv/emulator/bin"/>
             <arg value="-Dvisage.toolkit=com.sun.visage.tk.prism.PrismToolkit"/>
-            <arg value="-Djava.security.policy=${platform.fxhome}/tv/emulator/lib/security/java_permissive.policy"/>
-            <arg value="-Xbootclasspath/a:${platform.fxhome}/lib/tv/visagert-cdc.jar:${jar.file}"/>
+            <arg value="-Djava.security.policy=${platform.visagehome}/tv/emulator/lib/security/java_permissive.policy"/>
+            <arg value="-Xbootclasspath/a:${platform.visagehome}/lib/tv/visagert-cdc.jar:${jar.file}"/>
             <arg value="com.sun.visage.runtime.main.Main"/>
             <arg value="${main.class}"/>
             <arg value="${run.jvmargs}"/>
         </exec>
     </target>
+-->
+<!--
     <target depends="init,jar" if="applet.execution.trigger" name="browser-run">
         <makeurl file="${dist.dir}/${application.title}.html" property="applet.local.url"/>
         <condition else="${applet.local.url}" property="applet.url" value="${codebase.url}/${application.title}.html">
@@ -233,6 +238,8 @@ is divided into following sections:
         </condition>
         <nbbrowse url="${applet.url}"/>
     </target>
+-->
+<!--
     <target depends="jar" description="Start javaws execution" if="jnlp.execution.trigger" name="jws-run">
         <condition else="${java.home}" property="javaws.home" value="/usr">
             <os family="mac"/>
@@ -242,7 +249,9 @@ is divided into following sections:
             <arg file="${dist.dir}/${application.title}.jnlp"/>
         </exec>
     </target>
-    <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run,tv-run" description="Run an application." name="run"/>
+-->    
+<!--    <target depends="init,compile,jar,standard-run,browser-run,jws-run,midp-run,tv-run" description="Run an application." name="run"/> -->
+    <target depends="init,compile,jar,standard-run" description="Run an application." name="run"/>
     <!--
                     =================
                     DEBUGGING SECTION
@@ -270,7 +279,7 @@ is divided into following sections:
     </target>
     <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
         <property name="application.args" value=""/>
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}">
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.visagehome}/bin/visage${binary.extension}">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${visage.address}"/>
             <jvmarg line="${run.jvmargs}"/>
             <syspropertyset>
@@ -286,7 +295,7 @@ is divided into following sections:
         <condition else="-Xdescriptor:" property="emulator.exec.arg" value="-Xjam:install=">
             <istrue value="${jad.install}"/>
         </condition>
-        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+        <exec executable="${platform.visagehome}/emulator/bin/emulator${binary.extension}">
             <arg value="${run.jvmargs}"/>
             <arg value="${emulator.exec.arg}${jad.file}"/>
             <arg value="-Xdebug"/>
@@ -314,8 +323,8 @@ is divided into following sections:
     -->
     <target depends="init" name="-javadoc-build">
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" encoding="${source.encoding}" executable="${platform.fxhome}/bin/visagedoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true" version="${javadoc.version}">
-            <fileset dir="${src.dir}" includes="**/*.fx"/>
+        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" encoding="${source.encoding}" executable="${platform.visagehome}/bin/visagedoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true" version="${javadoc.version}">
+            <fileset dir="${src.dir}" includes="**/*.visage"/>
         </javadoc>
         <condition property="javadoc.available">
             <and>

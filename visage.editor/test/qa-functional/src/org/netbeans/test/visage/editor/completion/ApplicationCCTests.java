@@ -70,8 +70,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication1.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication1.visage",
                 5, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -82,8 +82,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication1.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication1.visage",
                 7, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -94,8 +94,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication1.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication1.visage",
                 9, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -106,8 +106,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication1.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication1.visage",
                 14, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -118,8 +118,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "for (num in ", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication2.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication2.visage",
                 5, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -130,8 +130,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "Timeline{}.", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication3.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication3.visage",
                 5, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -142,8 +142,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication4.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication4.visage",
                 5, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -154,8 +154,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication5.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication5.visage",
                 7, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -166,8 +166,8 @@ public class ApplicationCCTests extends CompletionTestPerformer {
                 "style: ", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "applications/FXTestApplication6.fx",
+                "visage-prj-1",
+                "applications/FXTestApplication6.visage",
                 19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }

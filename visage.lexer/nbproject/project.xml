@@ -60,6 +60,15 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.modules.lexer</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>2</release-version>
+                        <specification-version>1.25</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.visage.platform</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -68,12 +77,11 @@ made subject to such option by the copyright holder.
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>org.netbeans.modules.lexer</code-name-base>
+                    <code-name-base>org.netbeans.modules.visage.runtime</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
-                        <release-version>2</release-version>
-                        <specification-version>1.25</specification-version>
+                        <implementation-version/>
                     </run-dependency>
                 </dependency>
             </module-dependencies>

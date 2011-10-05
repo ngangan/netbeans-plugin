@@ -44,11 +44,8 @@
 
 package org.netbeans.modules.visage.editor;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.visage.code.JavafxTypes;
 import java.io.IOException;
 import java.net.URL;
 import java.util.EnumSet;
@@ -62,9 +59,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.visage.editor.ElementOpen;
-import org.netbeans.api.visage.editor.FXSourceUtils;
-import org.netbeans.api.visage.editor.FXSourceUtils.URLResult;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils.URLResult;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.visage.source.VisageSource.Phase;
@@ -81,6 +78,9 @@ import org.openide.loaders.DataObject;
 import org.openide.text.Line;
 import org.openide.text.NbDocument;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.code.VisageTypes;
 
 /**
  *
@@ -132,7 +132,7 @@ public class GoToSupport {
                                 return;
 
                             @SuppressWarnings("unchecked")
-                            Token<VSGTokenId>[] token = new Token[1];
+                            Token<VisageTokenId>[] token = new Token[1];
                             int[] span = getIdentifierSpan(doc, off, token);
 
                             if (span == null) {
@@ -150,11 +150,11 @@ public class GoToSupport {
                             if (el == null) return;
 
                             if (tooltip) {
-                                result[0] = FXSourceUtils.getElementTooltip(controller.getJavafxTypes(), el);
+                                result[0] = VisageSourceUtils.getElementTooltip(controller.getVisageTypes(), el);
                                 return;
                             } else if (javadoc) {
                                 result[0] = null;
-                                final URLResult res = FXSourceUtils.getJavadoc(el, controller);
+                                final URLResult res = VisageSourceUtils.getJavadoc(el, controller);
                                 URL url = res != null ? res.url : null;
                                 if (url != null) {
                                     HtmlBrowser.URLDisplayer.getDefault().showURL(url);
@@ -167,7 +167,7 @@ public class GoToSupport {
                                     Type type = sym.asType();
 
                                     // handle sequences as their element type
-                                    JavafxTypes types = controller.getJavafxTypes();
+                                    VisageTypes types = controller.getVisageTypes();
                                     if (types.isSequence(type)) {
                                         type = types.elementType(type);
                                     }
@@ -223,9 +223,9 @@ public class GoToSupport {
     }
     
     
-    private static final Set<VSGTokenId> USABLE_TOKEN_IDS = EnumSet.of(VSGTokenId.IDENTIFIER, VSGTokenId.THIS, VSGTokenId.SUPER);
+    private static final Set<VisageTokenId> USABLE_TOKEN_IDS = EnumSet.of(VisageTokenId.IDENTIFIER, VisageTokenId.THIS, VisageTokenId.SUPER);
 
-    public static int[] getIdentifierSpan(Document doc, int offset, Token<VSGTokenId>[] token) {
+    public static int[] getIdentifierSpan(Document doc, int offset, Token<VisageTokenId>[] token) {
         if (getFileObject(doc) == null) {
             //do nothing if FO is not attached to the document - the goto would not work anyway:
             return null;
@@ -233,7 +233,7 @@ public class GoToSupport {
         
         TokenHierarchy th = TokenHierarchy.get(doc);
         @SuppressWarnings("unchecked")
-        TokenSequence<VSGTokenId> ts = (TokenSequence<VSGTokenId>) th.tokenSequence();
+        TokenSequence<VisageTokenId> ts = (TokenSequence<VisageTokenId>) th.tokenSequence();
 
         if (ts == null)
             return null;
@@ -242,7 +242,7 @@ public class GoToSupport {
         if (!ts.moveNext())
             return null;
         
-        Token<VSGTokenId> t = ts.token();
+        Token<VisageTokenId> t = ts.token();
         
         if (!USABLE_TOKEN_IDS.contains(t.id())) {
             ts.move(offset - 1);

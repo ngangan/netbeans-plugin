@@ -43,10 +43,6 @@
  */
 package org.netbeans.modules.visage.debug;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.TreePathScanner;
 import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -64,6 +60,8 @@ import org.openide.explorer.view.BeanTreeView;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *

@@ -44,11 +44,11 @@
 
 package org.netbeans.modules.visage.refactoring.impl.scanners;
 
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.VariableTree;
 import javax.lang.model.element.*;
 import org.netbeans.api.visage.source.CompilationInfo;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *

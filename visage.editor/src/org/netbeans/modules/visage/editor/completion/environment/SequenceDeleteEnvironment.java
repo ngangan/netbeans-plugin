@@ -43,37 +43,36 @@
 package org.netbeans.modules.visage.editor.completion.environment;
 
 
-import com.sun.tools.visage.tree.VSGSequenceDelete;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.lang.model.type.TypeKind;
+import org.visage.tools.tree.VisageSequenceDelete;
 
 /**
  *
  * @author Petr Nejedly
  */
-public class SequenceDeleteEnvironment extends VisageCompletionEnvironment<VSGSequenceDelete> {
+public class SequenceDeleteEnvironment extends VisageCompletionEnvironment<VisageSequenceDelete> {
 
     private static final Logger logger = Logger.getLogger(SequenceDeleteEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGSequenceDelete t) throws IOException {
+    protected void inside(VisageSequenceDelete t) throws IOException {
         if (LOGGABLE) {
-            logger.fine("inside VSGSequenceDelete " + t + "  offset == " + offset); // NOI18N
-            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("inside VisageSequenceDelete " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
         localResult(getSmartType(t));
     }
 
-    private TypeMirror getSmartType(VSGSequenceDelete t) throws IOException {
+    private TypeMirror getSmartType(VisageSequenceDelete t) throws IOException {
         TypeMirror type = null;
         return type;
     }

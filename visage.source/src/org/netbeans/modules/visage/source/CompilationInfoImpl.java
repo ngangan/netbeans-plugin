@@ -42,20 +42,21 @@
 
 package org.netbeans.modules.visage.source;
 
-import com.sun.visage.api.tree.UnitTree;
 import com.sun.source.tree.CompilationUnitTree;
 import com.sun.tools.mjavac.util.Context;
-import com.sun.tools.visage.api.JavafxcTaskImpl;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.visage.source.ClasspathInfo;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
 import org.netbeans.modules.parsing.api.Snapshot;
+import org.visage.api.tree.UnitTree;
+import org.visage.tools.api.VisagecTaskImpl;
 
 /**
  * Don't use! Should be private, needs some repackaging....
@@ -95,8 +96,8 @@ public class CompilationInfoImpl {
         return parserResultImpl.getCompilationUnit();
     }
 
-    public JavafxcTaskImpl getJavafxcTaskImpl() {
-        return parserResultImpl.getJavafxcTaskImpl();
+    public VisagecTaskImpl getVisagecTaskImpl() {
+        return parserResultImpl.getVisagecTaskImpl();
     }
     
     public TokenHierarchy getTokenHierarchy() {

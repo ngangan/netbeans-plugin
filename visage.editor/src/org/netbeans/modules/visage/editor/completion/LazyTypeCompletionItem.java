@@ -122,7 +122,7 @@ public class LazyTypeCompletionItem extends VisageCompletionItem implements Lazy
                                 }
                             }
                             if (e != null) {
-                                boolean isFx = controller.getJavafxTypes().isVSGClass((Symbol) e);
+                                boolean isFx = controller.getVisageTypes().isVisageClass((Symbol) e);
                                 delegate = VisageCompletionItem.createTypeItem(
                                     e, (DeclaredType)e.asType(),
                                     substitutionOffset,

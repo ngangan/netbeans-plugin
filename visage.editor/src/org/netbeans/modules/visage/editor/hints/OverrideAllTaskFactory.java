@@ -43,13 +43,8 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.VisageSource;
-import com.sun.tools.visage.code.JavafxClassSymbol;
-import com.sun.tools.visage.code.JavafxTypes;
 import com.sun.tools.mjavac.code.Symbol.ClassSymbol;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Symbol.VarSymbol;
@@ -63,11 +58,16 @@ import javax.lang.model.element.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.tools.Diagnostic;
-import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.code.VisageClassSymbol;
+import org.visage.tools.code.VisageTypes;
 
 /**
  *
@@ -199,8 +199,8 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
         JCDiagnostic jcDiagnostic = (JCDiagnostic) diagnostic;
         ClassSymbol classSymbol = null;
         for (Object arg : jcDiagnostic.getArgs()) {
-            if (arg instanceof JavafxClassSymbol) {
-                classSymbol = (JavafxClassSymbol) arg;
+            if (arg instanceof VisageClassSymbol) {
+                classSymbol = (VisageClassSymbol) arg;
                 return classSymbol;
             }
         }
@@ -299,7 +299,7 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
                 if (type == null) {
                     return;
                 }
-                type = erasureType(type, compilationInfo.getJavafxTypes());
+                type = erasureType(type, compilationInfo.getVisageTypes());
                 String importName = type.toString();
                 if (!type.isPrimitive() && !importName.equalsIgnoreCase("void") && importName.contains(".")) { //NOI18N
                     importName = removeBetween("()", importName); //NOI18N
@@ -341,7 +341,7 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
                         Iterator<VarSymbol> iterator = methodSymbol.getParameters().iterator();
                         while (iterator.hasNext()) {
                             VarSymbol var = iterator.next();
-                            String varType = getTypeString(var.asType(), compilationInfo.getJavafxTypes());
+                            String varType = getTypeString(var.asType(), compilationInfo.getVisageTypes());
                             method.append(var.getSimpleName()).append(" : ").append(varType); //NOI18N
                             if (iterator.hasNext()) {
                                 method.append(", "); //NOI18N
@@ -354,7 +354,7 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
                 //TODO Work around for methodSymbol.getReturnType() which throws NPE!
                 String returnType = null;
                 try {
-                    returnType = getTypeString(methodSymbol.getReturnType(), compilationInfo.getJavafxTypes());
+                    returnType = getTypeString(methodSymbol.getReturnType(), compilationInfo.getVisageTypes());
                 } catch (NullPointerException npe) {
                     npe.printStackTrace();
                 }
@@ -388,7 +388,7 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
         return name;
     }
 
-    private static Type erasureType(Type type, JavafxTypes types) {
+    private static Type erasureType(Type type, VisageTypes types) {
         if (types.isSequence(type)) {
             return type;
         }
@@ -396,7 +396,7 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
         return types.erasure(type);
     }
 
-    private static String getTypeString(Type type, JavafxTypes types) {
+    private static String getTypeString(Type type, VisageTypes types) {
         type = erasureType(type, types);
         String typeString = types.toVisageString(type);
         if (types.isArray(type)) {
@@ -434,7 +434,7 @@ public final class OverrideAllTaskFactory extends VisageAbstractEditorHint {
 //            elements = compilationInfo.getElements().getAllMembers(el);
 //        }
 
-        return FXSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) element);
+        return VisageSourceUtils.getAllMembers(compilationInfo.getElements(), (TypeElement) element);
     }
 
     private static String getNativeArrayClassSimpleName(String fqName) {

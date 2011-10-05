@@ -7,28 +7,28 @@
     <import file="nbproject/build-impl.xml"/>
 
     <condition property="isLin">
-      <or>
-        <isfalse value="${onlycurrplat}"/>
-        <and>
-          <os family="unix"/>
-          <os name="Linux"/>
-        </and>
-      </or>
+        <or>
+            <isfalse value="${onlycurrplat}"/>
+            <and>
+                <os family="unix"/>
+                <os name="Linux"/>
+            </and>
+        </or>
     </condition>
 
     <target name="delete-release-external" depends="basic-init">
-      <delete dir="release" quiet="true"/>
+        <delete dir="release" quiet="true"/>
     </target>    
 
     <target name="init-release-external" depends="basic-init,delete-release-external" if="isLin">
-      <property name="build.config" value="promoted"/>
-      <property file="../build-${build.config}.properties"/>
-      <mkdir dir="external"/>
-      <property name="offline" value="false"/>
-  		<get src="${visage-sdk.lin.url}" dest="external/visage_sdk-linux.zip" usetimestamp="true" verbose="true" ignoreerrors="${offline}"/>
-      <unzip src="external/visage_sdk-linux.zip" dest="release/visage-sdk">
-        <regexpmapper from="^(visage-sdk[^/]*/)?(.*)$" to="\2"/>
-      </unzip>
+        <property name="build.config" value="promoted"/>
+        <property file="../build-${build.config}.properties"/>
+        <mkdir dir="external"/>
+        <property name="offline" value="false"/>
+        <get src="${visage-sdk.lin.url}" dest="external/visage_sdk-linux.zip" usetimestamp="true" verbose="true" ignoreerrors="${offline}"/>
+        <unzip src="external/visage_sdk-linux.zip" dest="release/visage-sdk">
+            <regexpmapper from="^(visage-sdk[^/]*/)?(.*)$" to="\2"/>
+        </unzip>
     </target>
 
     <target name="release" depends="files-init" if="has.release.dir">

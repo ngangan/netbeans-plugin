@@ -31,15 +31,6 @@
 
 package org.netbeans.modules.visage.refactoring.impl.visagec;
 
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.UnitTree;
-import com.sun.tools.visage.api.JavafxcTrees;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.JavafxTreeInfo;
-import com.sun.tools.mjavac.code.Symbol;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -70,11 +61,6 @@ import java.util.logging.Logger;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -89,9 +75,7 @@ import org.netbeans.api.java.classpath.GlobalPathRegistry;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.java.queries.SourceForBinaryQuery;
 import org.netbeans.api.java.source.ClasspathInfo.PathKind;
-import org.netbeans.api.java.source.JavaSource;
-import org.netbeans.api.visage.lexer.VSGTokenId;
-import org.netbeans.api.visage.platform.VisagePlatform;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.ClassIndex;
 import org.netbeans.api.visage.source.ClasspathInfo;
 import org.netbeans.api.visage.source.ElementHandle;
@@ -102,12 +86,9 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.ui.OpenProjects;
 import org.netbeans.modules.visage.project.VisageProjectConstants;
 import org.netbeans.api.visage.source.ClasspathInfoProvider;
-import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.CompilationInfo;
-import org.netbeans.api.visage.source.ElementUtilities;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.visage.source.VisageSourceUtils;
-import org.netbeans.api.visage.source.Task;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -127,6 +108,13 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Utilities;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.tree.VisageTree;
+import org.visage.tools.tree.VisageTreeInfo;
 
 /**
  *
@@ -163,12 +151,12 @@ final public class SourceUtils {
 
     public static String getHtml(String text, int hilite) {
         StringBuffer buf = new StringBuffer();
-        TokenHierarchy tokenH = TokenHierarchy.create(text, VSGTokenId.language());
-        Lookup lookup = MimeLookup.getLookup(MimePath.get(VisageSourceUtils.JAVAFX_MIME_TYPE));
+        TokenHierarchy tokenH = TokenHierarchy.create(text, VisageTokenId.language());
+        Lookup lookup = MimeLookup.getLookup(MimePath.get(VisageSourceUtils.VISAGE_MIME_TYPE));
         FontColorSettings settings = lookup.lookup(FontColorSettings.class);
         TokenSequence tok = tokenH.tokenSequence();
         while (tok.moveNext()) {
-            Token<VSGTokenId> token = (Token) tok.token();
+            Token<VisageTokenId> token = (Token) tok.token();
             String category = token.id().primaryCategory();
             if (category == null) {
                 category = "whitespace"; //NOI18N
@@ -284,7 +272,7 @@ final public class SourceUtils {
                 }
             }
             // ---
-            for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(VisageProjectConstants.SOURCES_TYPE_JAVAFX)) {
+            for (SourceGroup sg : ProjectUtils.getSources(pr).getSourceGroups(VisageProjectConstants.SOURCES_TYPE_VISAGE)) {
                 if (fo==sg.getRootFolder() || (FileUtil.isParentOf(sg.getRootFolder(), fo) && sg.contains(fo))) {
                     return ClassPath.getClassPath(fo, ClassPath.SOURCE) != null;
                 }
@@ -459,7 +447,7 @@ final public class SourceUtils {
                 } else {
                     dependentRoots.add(sourceRoot);
                 }
-                for (SourceGroup root:ProjectUtils.getSources(p).getSourceGroups(VisageProjectConstants.SOURCES_TYPE_JAVAFX)) {
+                for (SourceGroup root:ProjectUtils.getSources(p).getSourceGroups(VisageProjectConstants.SOURCES_TYPE_VISAGE)) {
                     dependentRoots.add(URLMapper.findURL(root.getRootFolder(), URLMapper.INTERNAL));
                 }
             } else {
@@ -595,7 +583,7 @@ final public class SourceUtils {
                     return cpinfo;
                 }
             }
-            Future<Void> f = ParserManager.parseWhenScanFinished(VisageSourceUtils.JAVAFX_MIME_TYPE, new T());
+            Future<Void> f = ParserManager.parseWhenScanFinished(VisageSourceUtils.VISAGE_MIME_TYPE, new T());
             if (!f.isDone()) {
                 f.get();
             }
@@ -647,7 +635,7 @@ final public class SourceUtils {
     }
 
     /**
-     * Workaround for VSGC-3787
+     * Workaround for VisageC-3787
      * @param e
      * @return
      */
@@ -658,7 +646,7 @@ final public class SourceUtils {
             @Override
             public Void scan(Tree tree, Void p) {
                 if (result[0] != null) return null;
-                Element el = JavafxTreeInfo.symbolFor((VSGTree)tree);
+                Element el = VisageTreeInfo.symbolFor((VisageTree)tree);
                 if (e.equals(el)) {
                     result[0] = VisageTreePath.getPath(getCurrentPath(), tree);
                     return null;

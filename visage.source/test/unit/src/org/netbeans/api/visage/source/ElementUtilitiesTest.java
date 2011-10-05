@@ -42,13 +42,10 @@
 
 package org.netbeans.api.visage.source;
 
-import com.sun.visage.api.tree.Tree;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import org.netbeans.api.visage.source.VisageSource.Phase;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import static org.junit.Assert.*;

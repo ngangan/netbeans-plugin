@@ -58,7 +58,7 @@ made subject to such option by the copyright holder.
                     <attr name="template" boolvalue="true"/>
                     <attr name="instantiatingIterator" newvalue="org.netbeans.modules.visage.project.ui.wizards.NewVisageProjectWizardIterator"/>
                     <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.visage.project.ui.wizards.Bundle"/>
-                    <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/visage/project/ui/resources/fx.png"/>
+                    <attr name="SystemFileSystem.icon" urlvalue="nbresloc:/org/netbeans/modules/visage/project/ui/resources/visage.png"/>
                     <attr name="instantiatingWizardURL" urlvalue="nbresloc:/org/netbeans/modules/visage/project/ui/resources/emptyProject.html"/>
                 </file>
             </folder>

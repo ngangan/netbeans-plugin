@@ -43,7 +43,6 @@
  */
 package org.netbeans.modules.visage.debug;
 
-import com.sun.visage.api.tree.Tree;
 import java.util.ArrayList;
 import java.util.List;
 import javax.lang.model.element.Element;
@@ -51,6 +50,7 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.netbeans.api.visage.source.CompilationInfo;
+import org.visage.api.tree.Tree;
 
 /**
  *

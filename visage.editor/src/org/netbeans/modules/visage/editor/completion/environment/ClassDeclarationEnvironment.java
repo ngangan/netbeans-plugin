@@ -42,14 +42,13 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-
+import org.visage.tools.tree.VisageClassDeclaration;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
@@ -61,19 +60,19 @@ import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuer
  *
  * @author David Strupl
  */
-public class ClassDeclarationEnvironment extends VisageCompletionEnvironment<VSGClassDeclaration> {
+public class ClassDeclarationEnvironment extends VisageCompletionEnvironment<VisageClassDeclaration> {
     
     private static final Logger logger = Logger.getLogger(ClassDeclarationEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGClassDeclaration cldecl) throws IOException {
-        if (LOGGABLE) log("inside VSGClassDeclaration " + cldecl); // NOI18N
+    protected void inside(VisageClassDeclaration cldecl) throws IOException {
+        if (LOGGABLE) log("inside VisageClassDeclaration " + cldecl); // NOI18N
         if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, cldecl);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = ((TokenHierarchy<?>) controller.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
         ts.move(start);
         boolean afterLBrace = false;
         boolean afterExtends = false;

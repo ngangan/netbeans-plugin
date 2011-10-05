@@ -957,11 +957,11 @@ public class RefactoringActionsProvider extends ActionsImplementationProvider {
         return pt[1];
     }
 
-    private FileObject getJavaFile(final ElementDef edef, final FileObject fxFile, final AtomicBoolean cancelled) {
+    private FileObject getJavaFile(final ElementDef edef, final FileObject visageFile, final AtomicBoolean cancelled) {
         final FileObject[] javaFile = new FileObject[1];
         ProgressUtils.runOffEventDispatchThread(new Runnable() {
             public void run() {
-                javaFile[0] = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(fxFile));
+                javaFile[0] = org.netbeans.api.java.source.SourceUtils.getFile(edef.createHandle().toJava(), org.netbeans.api.java.source.ClasspathInfo.create(visageFile));
             }
         }, NbBundle.getMessage(RefactoringActionsProvider.class, "MSG_AccessingJavaIndex"), cancelled, true);
         return javaFile[0];

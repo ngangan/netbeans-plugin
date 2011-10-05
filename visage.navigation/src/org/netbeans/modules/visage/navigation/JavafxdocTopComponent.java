@@ -46,7 +46,7 @@ import java.awt.BorderLayout;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.netbeans.api.visage.editor.ElementJavadoc;
+import org.netbeans.api.visage.editor.ElementVisagedoc;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
@@ -80,7 +80,7 @@ public class JavafxdocTopComponent extends TopComponent {
         add( documentationPane, BorderLayout.CENTER );
     }
     
-    void setJavadoc( ElementJavadoc doc ){    
+    void setJavadoc( ElementVisagedoc doc ){    
         documentationPane.setData( doc );
     }
     

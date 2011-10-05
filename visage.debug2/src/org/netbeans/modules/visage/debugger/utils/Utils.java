@@ -45,8 +45,6 @@
 
 package org.netbeans.modules.visage.debugger.utils;
 
-import com.sun.visage.jdi.FXClassType;
-import com.sun.visage.jdi.FXObjectReference;
 import com.sun.jdi.Field;
 import com.sun.jdi.Value;
 import java.net.MalformedURLException;
@@ -64,6 +62,8 @@ import org.openide.filesystems.FileUtil;
 import org.openide.filesystems.URLMapper;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
+import org.visage.jdi.VisageClassType;
+import org.visage.jdi.VisageObjectReference;
 
 /**
  *
@@ -106,7 +106,7 @@ public class Utils {
     }
 
 
-    public static String getFXName( String url ) {
+    public static String getVisageName( String url ) {
         FileObject fo = getFileObjectFromUrl( url );
         if( fo != null ) {
             return fo.getNameExt();
@@ -114,32 +114,32 @@ public class Utils {
         return ( url == null ) ? null : url.toString();
     }
 
-    public static String getFXPath( String url ) {
+    public static String getVisagePath( String url ) {
         FileObject fo = getFileObjectFromUrl( url );
-        String fxRelativePath = null;
+        String visageRelativePath = null;
         if( fo == null ) return null;
         Project project = FileOwnerQuery.getOwner( fo );
 
         Sources s = ProjectUtils.getSources( project );
         SourceGroup[] sg = s.getSourceGroups( JavaProjectConstants.SOURCES_TYPE_JAVA );
         for( int i = 0; i < sg.length; i++ ) {
-            fxRelativePath = FileUtil.getRelativePath( sg[i].getRootFolder(), fo );
-            if( fxRelativePath != null ) break;
+            visageRelativePath = FileUtil.getRelativePath( sg[i].getRootFolder(), fo );
+            if( visageRelativePath != null ) break;
         }
         
-        return fxRelativePath;
+        return visageRelativePath;
     }
 
-    public static String getFXClassName( String url, int lineNumber ) {
-        String clsName = getFXPath(url);
-        if( clsName == null || !clsName.endsWith( ".fx" )) return null;
+    public static String getVisageClassName( String url, int lineNumber ) {
+        String clsName = getVisagePath(url);
+        if( clsName == null || !clsName.endsWith( ".visage" )) return null;
 
 
         clsName = clsName.substring( 0, clsName.length() - 3 ).replace( '/', '.' );
         return clsName;
     }
     
-    public static Value getClassValue( JPDADebuggerImpl debug, FXClassType classType, Field field ) {
+    public static Value getClassValue( JPDADebuggerImpl debug, VisageClassType classType, Field field ) {
         JPDAThreadImpl thread = (JPDAThreadImpl)debug.getCurrentThread();  
         if( thread == null ) {
             return null;
@@ -158,7 +158,7 @@ public class Utils {
         return value;
 }
     
-    public static Value getObjectValue( JPDADebuggerImpl debug, FXObjectReference classType, Field field ) {
+    public static Value getObjectValue( JPDADebuggerImpl debug, VisageObjectReference classType, Field field ) {
         JPDAThreadImpl thread = (JPDAThreadImpl)debug.getCurrentThread();  
         if( thread == null ) {
             return null;

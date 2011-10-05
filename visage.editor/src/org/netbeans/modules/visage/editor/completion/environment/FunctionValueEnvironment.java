@@ -42,29 +42,29 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGBlock;
-import com.sun.tools.visage.tree.VSGFunctionValue;
-import com.sun.tools.visage.tree.VSGType;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.tools.tree.VisageBlock;
+import org.visage.tools.tree.VisageFunctionValue;
+import org.visage.tools.tree.VisageType;
 
 /**
  *
  * @author David Strupl
  */
-public class FunctionValueEnvironment extends VisageCompletionEnvironment<VSGFunctionValue> {
+public class FunctionValueEnvironment extends VisageCompletionEnvironment<VisageFunctionValue> {
 
     private static final Logger logger = Logger.getLogger(FunctionValueEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGFunctionValue val) throws IOException {
-        if (LOGGABLE) log("inside VSGFunctionValue " + val); // NOI18N
+    protected void inside(VisageFunctionValue val) throws IOException {
+        if (LOGGABLE) log("inside VisageFunctionValue " + val); // NOI18N
         int startPos = (int) sourcePositions.getStartPosition(root, val);
-        VSGType retType = val.getVSGReturnType();
+        VisageType retType = val.getVisageReturnType();
         if (LOGGABLE) log("  offset == " + offset + "  startPos == " + startPos + " retType == " + retType); // NOI18N
         if ((offset < startPos) || (startPos == 0)) {
             if (LOGGABLE) log("  before block: return types"); // NOI18N
@@ -72,7 +72,7 @@ public class FunctionValueEnvironment extends VisageCompletionEnvironment<VSGFun
             addBasicTypes();
             return;
         }
-        VSGBlock bl = val.getBodyExpression();
+        VisageBlock bl = val.getBodyExpression();
         if (bl != null) {
             insideFunctionBlock(bl.getStatements());
         }

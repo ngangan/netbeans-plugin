@@ -42,12 +42,12 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.WhileLoopTree;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.WhileLoopTree;
 
 /**
  *

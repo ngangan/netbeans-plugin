@@ -42,11 +42,11 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.ImportTree;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.ImportTree;
 
 /**
  *

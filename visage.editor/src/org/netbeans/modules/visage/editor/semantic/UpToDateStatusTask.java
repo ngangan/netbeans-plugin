@@ -42,9 +42,8 @@
 
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.VisageTreePath;
 import java.io.IOException;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.lexer.TokenHierarchy;
@@ -81,6 +80,7 @@ import org.openide.cookies.LineCookie;
 import org.openide.loaders.DataObject;
 import org.openide.text.Line;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.VisageTreePath;
 /**
  *
  * @author David Strupl
@@ -103,7 +103,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
             "compiler.err.report.access" // NOI18N
     ));
 
-    private static final Set<VSGTokenId> WHITESPACE = EnumSet.of(VSGTokenId.COMMENT, VSGTokenId.DOC_COMMENT, VSGTokenId.LINE_COMMENT, VSGTokenId.WS);
+    private static final Set<VisageTokenId> WHITESPACE = EnumSet.of(VisageTokenId.COMMENT, VisageTokenId.DOC_COMMENT, VisageTokenId.LINE_COMMENT, VisageTokenId.WS);
     
     private AtomicBoolean cancel = new AtomicBoolean();
 
@@ -246,24 +246,24 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
         if (UNDERLINE_IDENTIFIER.contains(d.getCode())) {
             int offset = (int) getPrefferedPosition(info, d);
-            TokenSequence<VSGTokenId> ts = info.getTokenHierarchy().tokenSequence(VSGTokenId.language());
+            TokenSequence<VisageTokenId> ts = info.getTokenHierarchy().tokenSequence(VisageTokenId.language());
 
             int diff = ts.move(offset);
 
             if (ts.moveNext() && diff >= 0 && diff < ts.token().length()) {
-                Token<VSGTokenId> t = ts.token();
+                Token<VisageTokenId> t = ts.token();
 
-                if (t.id() == VSGTokenId.DOT) {
+                if (t.id() == VisageTokenId.DOT) {
                     while (ts.moveNext() && WHITESPACE.contains(ts.token().id()));
                     t = ts.token();
                 }
 
-                if (t.id() == VSGTokenId.NEW) {
+                if (t.id() == VisageTokenId.NEW) {
                     while (ts.moveNext() && WHITESPACE.contains(ts.token().id()));
                     t = ts.token();
                 }
 
-                if (t.id() == VSGTokenId.IDENTIFIER) {
+                if (t.id() == VisageTokenId.IDENTIFIER) {
                     int[] span = translatePositions(info, new int[] {ts.offset(), ts.offset() + t.length()});
 
                     if (span != null) {
@@ -343,11 +343,11 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
     }
 
     private int skipWhiteSpace(CompilationInfo info, int start) {
-        TokenSequence<VSGTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts =  ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
         ts.move(start);
         boolean nonWSFound = false;
         while (ts.moveNext()) {
-            if (ts.token().id() != VSGTokenId.WS) {
+            if (ts.token().id() != VisageTokenId.WS) {
                 nonWSFound = true;
                 break;
             }
@@ -368,7 +368,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
 
     public Token findUnresolvedElementToken(CompilationInfo info, int offset) throws IOException {
         TokenHierarchy<?> th = info.getTokenHierarchy();
-        TokenSequence<VSGTokenId> ts = th.tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = th.tokenSequence(VisageTokenId.language());
 
         if (ts == null) {
             return null;
@@ -378,18 +378,18 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
         if (ts.moveNext()) {
             Token t = ts.token();
 
-            if (t.id() == VSGTokenId.DOT) {
+            if (t.id() == VisageTokenId.DOT) {
                 ts.moveNext();
                 t = ts.token();
             } else {
-                if (t.id() == VSGTokenId.LT) {
+                if (t.id() == VisageTokenId.LT) {
                     ts.moveNext();
                     t = ts.token();
                 } else {
-                    if (t.id() == VSGTokenId.NEW || t.id() == VSGTokenId.WS) {
+                    if (t.id() == VisageTokenId.NEW || t.id() == VisageTokenId.WS) {
                         boolean cont = ts.moveNext();
 
-                        while (cont && ts.token().id() == VSGTokenId.WS) {
+                        while (cont && ts.token().id() == VisageTokenId.WS) {
                             cont = ts.moveNext();
                         }
 
@@ -401,7 +401,7 @@ class UpToDateStatusTask implements CancellableTask<CompilationInfo> {
                 }
             }
 
-            if (t.id() == VSGTokenId.IDENTIFIER) {
+            if (t.id() == VisageTokenId.IDENTIFIER) {
                 return ts.offsetToken();
             }
         }

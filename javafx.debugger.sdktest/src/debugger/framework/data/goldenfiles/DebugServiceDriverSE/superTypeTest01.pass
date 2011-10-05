@@ -1,5 +1,0 @@
-ClassType = j2se_tests.supertype.test01.SuperTypeTestCase01		 superType = class java.util.Vector (no class loader)
-ClassType = java.util.Vector		 superType = class java.util.AbstractList (no class loader)
-ClassType = java.util.AbstractList		 superType = class java.util.AbstractCollection (no class loader)
-ClassType = java.util.AbstractCollection		 superType = class java.lang.Object (no class loader)
-ClassType = java.lang.Object		 superType = null

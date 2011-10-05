@@ -80,7 +80,7 @@ public class ClassOutputBuffer extends SimpleJavaFileObject {
         return bytes;
     }
             
-    private final static String EXT = ".fx"; // NOI18N
+    private final static String EXT = ".visage"; // NOI18N
     static URI toURI(String name) {
         File file = new File(name);
         if (file.exists()) {
@@ -93,7 +93,7 @@ public class ClassOutputBuffer extends SimpleJavaFileObject {
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {
-                return URI.create("mfm:///com/sun/tools/visage/script/visage_source"); // NOI18N
+                return URI.create("mfm:///org/visage/tools/script/visage_source"); // NOI18N
             }
         }
     }

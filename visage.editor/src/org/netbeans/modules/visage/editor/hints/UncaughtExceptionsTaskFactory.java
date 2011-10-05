@@ -43,17 +43,11 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.CatchTree;
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
 import java.util.Collection;
 import java.util.HashSet;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.spi.editor.hints.HintsController;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.TryTree;
 import com.sun.tools.mjavac.code.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,6 +61,12 @@ import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.CatchTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.TryTree;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *

@@ -43,21 +43,21 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.BlockExpressionTree;
-import com.sun.visage.api.tree.CatchTree;
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.TryTree;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.visage.code.JavafxVarSymbol;
-import com.sun.tools.visage.tree.VSGFunctionInvocation;
 import java.util.*;
 import javax.lang.model.element.Element;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.modules.visage.editor.hints.HintsModel.Hint;
+import org.visage.api.tree.BlockExpressionTree;
+import org.visage.api.tree.CatchTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.TryTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.code.VisageVarSymbol;
+import org.visage.tools.tree.VisageFunctionInvocation;
 
 /**
  *
@@ -103,7 +103,7 @@ final class UncaughtExceptionsVisitor extends VisageTreePathScanner<Void, HintsM
             Element catchVarElement = compilationInfo.getTrees().getElement(path);
             Type catchType = null;
             if (catchVarElement != null) {
-                catchType = ((JavafxVarSymbol) catchVarElement).asType();
+                catchType = ((VisageVarSymbol) catchVarElement).asType();
             }
             for (Tree statement : throwsMap.keySet()) {
                 if (catchType != null) {
@@ -132,7 +132,7 @@ final class UncaughtExceptionsVisitor extends VisageTreePathScanner<Void, HintsM
         }
         Map<Tree, Collection<Type>> throwsMap = new HashMap<Tree, Collection<Type>>();
         for (ExpressionTree statement : statements) {
-            if (!(statement instanceof VSGFunctionInvocation)) {
+            if (!(statement instanceof VisageFunctionInvocation)) {
                 continue;
             }
             VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), statement);

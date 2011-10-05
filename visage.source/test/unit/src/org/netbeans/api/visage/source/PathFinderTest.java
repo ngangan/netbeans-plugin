@@ -41,9 +41,9 @@
  */
 
 package org.netbeans.api.visage.source;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
 import org.netbeans.api.visage.source.VisageSource.Phase;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *

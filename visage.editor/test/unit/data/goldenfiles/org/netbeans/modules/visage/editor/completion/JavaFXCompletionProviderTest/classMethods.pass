@@ -4,7 +4,7 @@ float currentRate
 visage.lang.Duration cycleDuration
 float framerate
 boolean interpolate
-com.sun.visage.runtime.sequence.Sequence<? extends visage.animation.KeyFrame> keyFrames
+org.visage.runtime.sequence.Sequence<? extends visage.animation.KeyFrame> keyFrames
 boolean paused
 float rate
 float repeatCount

@@ -11,9 +11,6 @@
 
 package org.netbeans.modules.visage.debugger.tablerendering;
 
-import com.sun.visage.jdi.FXField;
-import com.sun.visage.jdi.FXValue;
-import com.sun.visage.jdi.FXSequenceReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
 import java.awt.Component;
@@ -36,6 +33,9 @@ import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
 import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
 import org.openide.util.RequestProcessor;
+import org.visage.jdi.VisageField;
+import org.visage.jdi.VisageSequenceReference;
+import org.visage.jdi.VisageValue;
 
 /**
  *
@@ -199,7 +199,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
                 JPDAClassType ref = f.getDeclaringClass();            
                 JPDAClassTypeImpl refi = (JPDAClassTypeImpl)ref;
                 ReferenceType referenceType = refi.getType();
-                FXField field = (FXField)referenceType.fieldByName( f.getName());
+                VisageField field = (VisageField)referenceType.fieldByName( f.getName());
                 if( field != null ) {
                     bound = field.declaringType().isBound( field );
                     invalid = field.declaringType().isInvalid( field );
@@ -209,10 +209,10 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
 
                 if( !invalid || evaluateImmediate ) {
                     Value oo = v.getJDIValue();
-                    FXValue fxv = (FXValue)oo;
+                    VisageValue visagev = (VisageValue)oo;
                     labelValue.setText( f.getValue());
-                    if( fxv instanceof FXSequenceReference ) {
-                        FXSequenceReference sref = (FXSequenceReference)fxv;
+                    if( visagev instanceof VisageSequenceReference ) {
+                        VisageSequenceReference sref = (VisageSequenceReference)visagev;
                         labelValue.setText( labelValue.getText() + "(length= " + sref.length() + ")" );
                     }
                 } else {
@@ -239,7 +239,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             Field f = (Field)o;
             JDIVariable v = (JDIVariable)f;
             Value oo = v.getJDIValue();
-            FXValue fxv = (FXValue)oo;
+            VisageValue visagev = (VisageValue)oo;
 
             boolean bound = false;
             boolean invalid = false;
@@ -252,7 +252,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
             if( references.size() > 0  ) {
                 ReferenceType ref = references.get( 0 );
                 if( ref != null ) {
-                    FXField field = (FXField)ref.fieldByName( f.getName());
+                    VisageField field = (VisageField)ref.fieldByName( f.getName());
                     if( field != null ) {
                         bound = field.declaringType().isBound( field );
                         invalid = field.declaringType().isInvalid( field );
@@ -260,7 +260,7 @@ public class VariableCellRenderer extends javax.swing.JPanel implements TableCel
                 }
             }
             
-            if( bound || invalid || fxv instanceof FXSequenceReference ) {
+            if( bound || invalid || visagev instanceof VisageSequenceReference ) {
                 return this;
             }
             textValue.setText( f.getValue());

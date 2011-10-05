@@ -42,7 +42,7 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGBlock;
+import org.visage.tools.tree.VisageBlock;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,14 +53,14 @@ import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuer
  *
  * @author David Strupl
  */
-public class BlockExpressionEnvironment extends VisageCompletionEnvironment<VSGBlock> {
+public class BlockExpressionEnvironment extends VisageCompletionEnvironment<VisageBlock> {
 
     private static final Logger logger = Logger.getLogger(BlockExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGBlock bl) throws IOException {
-        if (LOGGABLE) log("inside VSGBlock " + bl); // NOI18N
+    protected void inside(VisageBlock bl) throws IOException {
+        if (LOGGABLE) log("inside VisageBlock " + bl); // NOI18N
         insideFunctionBlock(bl.getStatements());
     }
 

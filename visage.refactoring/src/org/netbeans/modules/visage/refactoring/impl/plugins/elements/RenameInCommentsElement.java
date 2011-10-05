@@ -49,7 +49,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.text.Document;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.Token;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
@@ -82,12 +82,12 @@ public class RenameInCommentsElement extends BaseRefactoringElementImplementatio
             EditorCookie ec = dobj.getCookie(EditorCookie.class);
             Document doc = ec.openDocument();
             TokenHierarchy th = TokenHierarchy.get(doc);
-            TokenSequence<VSGTokenId> ts = (TokenSequence<VSGTokenId>) th.tokenSequence();
+            TokenSequence<VisageTokenId> ts = (TokenSequence<VisageTokenId>) th.tokenSequence();
             ts.moveStart();
             int pos = 0;
             while (ts.moveNext()) {
-                Token<VSGTokenId> t = ts.token();
-                if (t.id() == VSGTokenId.COMMENT || t.id() == VSGTokenId.DOC_COMMENT) {
+                Token<VisageTokenId> t = ts.token();
+                if (t.id() == VisageTokenId.COMMENT || t.id() == VisageTokenId.DOC_COMMENT) {
                     int locPos = 0;
                     String tt = t.text().toString();
                     while (locPos > -1) {

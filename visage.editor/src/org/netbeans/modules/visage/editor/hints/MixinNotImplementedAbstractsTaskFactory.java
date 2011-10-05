@@ -45,13 +45,6 @@
 //TODO Not is used anymore this issue has been resolved in compiler
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.FunctionDefinitionTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.tools.visage.code.JavafxClassSymbol;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.ElementUtilities;
 import org.netbeans.api.visage.source.support.EditorAwareVisageSourceTaskFactory;
@@ -70,6 +63,13 @@ import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.code.VisageClassSymbol;
 
 /**
  *
@@ -153,10 +153,10 @@ public final class MixinNotImplementedAbstractsTaskFactory extends EditorAwareVi
                         npe.printStackTrace();
                         continue;
                     }
-                    if (mixinElement == null || !(mixinElement instanceof JavafxClassSymbol)) {
+                    if (mixinElement == null || !(mixinElement instanceof VisageClassSymbol)) {
                         continue;
                     }
-                    JavafxClassSymbol classSymbol = (JavafxClassSymbol) mixinElement;
+                    VisageClassSymbol classSymbol = (VisageClassSymbol) mixinElement;
                     Map<Element, Boolean> toOverrides = new HashMap<Element, Boolean>();
                     for (Element element : classSymbol.getEnclosedElements()) {
                         if (element instanceof ExecutableElement && element.getModifiers().contains(Modifier.ABSTRACT)) {

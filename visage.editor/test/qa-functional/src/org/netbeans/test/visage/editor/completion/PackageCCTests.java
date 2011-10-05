@@ -70,8 +70,8 @@ public class PackageCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "packages/FXTestEmpty.fx",
+                "visage-prj-1",
+                "packages/FXTestEmpty.visage",
                 1, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -82,8 +82,8 @@ public class PackageCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "packages/FXTestPackage.fx",
+                "visage-prj-1",
+                "packages/FXTestPackage.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }

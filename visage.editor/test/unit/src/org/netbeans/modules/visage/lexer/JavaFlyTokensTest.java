@@ -45,7 +45,7 @@
 package org.netbeans.modules.visage.lexer;
 
 import java.io.File;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.SourceTestBase;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
@@ -71,8 +71,8 @@ public class JavaFlyTokensTest extends SourceTestBase {
     }
 
     public void testFlyweightTokens() throws Exception {
-        String text = slurpDataFile("code.fx");
-        TokenHierarchy<?> hi = TokenHierarchy.create(text, VSGTokenId.language());
+        String text = slurpDataFile("code.visage");
+        TokenHierarchy<?> hi = TokenHierarchy.create(text, VisageTokenId.language());
         TokenSequence<? extends TokenId> ts = (TokenSequence<? extends TokenId>)hi.tokenSequence();
         
         System.out.println("Flyweight tokens: " + LexerTestUtilities.flyweightTokenCount(ts)

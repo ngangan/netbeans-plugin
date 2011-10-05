@@ -65,7 +65,7 @@ import org.openide.modules.InstalledFileLocator;
 public class DefaultPlatformImpl extends VisagePlatformImpl {
 
 
-    public static final String DEFAULT_PLATFORM_ANT_NAME = "default_fx_platform";           //NOI18N
+    public static final String DEFAULT_PLATFORM_ANT_NAME = "default_visage_platform";           //NOI18N
 
     private ClassPath standardLibs;
     
@@ -107,10 +107,12 @@ public class DefaultPlatformImpl extends VisagePlatformImpl {
         super(null,DEFAULT_PLATFORM_ANT_NAME, javaFolders, fxFolder, platformProperties, systemProperties, sources, javadoc);
     }
 
+    @Override
     public void setAntName(String antName) {
         throw new UnsupportedOperationException (); //Default platform ant name can not be changed
     }
     
+    @Override
     public String getDisplayName () {
         String displayName = super.getDisplayName();
         if (displayName == null) {
@@ -120,10 +122,12 @@ public class DefaultPlatformImpl extends VisagePlatformImpl {
         return displayName;
     }
     
+    @Override
     public void setDisplayName(String name) {
         throw new UnsupportedOperationException (); //Default platform name can not be changed
     }
 
+    @Override
     public ClassPath getStandardLibraries() {
         if (standardLibs != null)
             return standardLibs;

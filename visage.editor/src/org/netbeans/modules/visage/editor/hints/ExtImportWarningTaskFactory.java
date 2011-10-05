@@ -43,9 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.ImportTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
 import java.util.*;
 import javax.swing.text.Position;
 import org.netbeans.api.visage.source.CancellableTask;
@@ -54,6 +51,9 @@ import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.spi.editor.hints.*;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ImportTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *

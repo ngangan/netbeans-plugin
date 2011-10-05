@@ -42,9 +42,7 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGForExpression;
-
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
@@ -53,24 +51,25 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
+import org.visage.tools.tree.VisageForExpression;
 
 /**
  * seq[x | condition]
  * @author David Strupl
  */
-public class ForExpressionPredicateEnvironment extends VisageCompletionEnvironment<VSGForExpression> {
+public class ForExpressionPredicateEnvironment extends VisageCompletionEnvironment<VisageForExpression> {
     
     private static final Logger logger = Logger.getLogger(ForExpressionPredicateEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGForExpression foe) throws IOException {
+    protected void inside(VisageForExpression foe) throws IOException {
         if (LOGGABLE) log("inside ForExpressionPredicateEnvironment " + foe); // NOI18N
         if (LOGGABLE) log("  prefix: " + prefix); // NOI18N
         int start = (int)sourcePositions.getStartPosition(root, foe);
         if (LOGGABLE) log("  offset: " + offset); // NOI18N
         if (LOGGABLE) log("  start: " + start); // NOI18N
-        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = ((TokenHierarchy<?>)controller.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
         ts.move(start);
         boolean afterIdentifier = false;
         boolean afterPipe = false;

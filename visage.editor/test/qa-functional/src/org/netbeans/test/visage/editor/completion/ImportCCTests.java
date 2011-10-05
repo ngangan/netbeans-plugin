@@ -70,8 +70,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import ", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImport.fx",
+                "visage-prj-1",
+                "imports/FXTestImport.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -83,8 +83,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import java.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportJava.fx",
+                "visage-prj-1",
+                "imports/FXTestImportJava.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -95,8 +95,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "jav", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportJava2.fx",
+                "visage-prj-1",
+                "imports/FXTestImportJava2.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }
@@ -108,8 +108,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisage.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisage.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -120,8 +120,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.animation.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageAnimation.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageAnimation.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -133,8 +133,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.application.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageApplication.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageApplication.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -146,8 +146,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.async.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageAsync.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageAsync.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -158,8 +158,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.ext.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageExt.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageExt.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -171,8 +171,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.ext.swing.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageExtSwing.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageExtSwing.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -180,11 +180,11 @@ public class ImportCCTests extends CompletionTestPerformer {
     public void testFXImportVisageFXUnit() throws Exception {
         new CompletionTestCase(this).test(
                 outputWriter, logWriter, 
-                "import visage.fxunit.", // what should be typed in the editor
+                "import visage.visageunit.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageFXUnit.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageFXUnit.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -196,8 +196,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.input.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageInput.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageInput.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -209,8 +209,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.lang.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageLang.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageLang.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -221,8 +221,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.reflect.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageReflect.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageReflect.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -234,8 +234,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageScene.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageScene.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -246,8 +246,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.effect.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneEffect.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneEffect.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -258,8 +258,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.effect.light.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneEffectLight.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneEffectLight.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -271,8 +271,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.geometry.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneGeometry.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneGeometry.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -284,8 +284,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.image.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneImage.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneImage.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -296,8 +296,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.layout.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneLayout.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneLayout.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -308,8 +308,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.media.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneMedia.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneMedia.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -320,8 +320,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.paint.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageScenePaint.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageScenePaint.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -333,8 +333,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.text.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneText.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneText.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -345,8 +345,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.scene.transform.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageSceneTransform.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageSceneTransform.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -357,8 +357,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.util.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageUtil.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageUtil.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -369,8 +369,8 @@ public class ImportCCTests extends CompletionTestPerformer {
                 "import visage.s", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "imports/FXTestImportVisageS.fx",
+                "visage-prj-1",
+                "imports/FXTestImportVisageS.visage",
                 5, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }

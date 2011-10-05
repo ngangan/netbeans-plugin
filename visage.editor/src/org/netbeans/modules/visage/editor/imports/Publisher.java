@@ -34,7 +34,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.TokenHierarchy;
 import org.netbeans.api.lexer.TokenId;
 import org.netbeans.api.lexer.TokenSequence;
@@ -82,7 +82,7 @@ class Publisher implements Runnable {
     @SuppressWarnings("empty-statement")
     synchronized public void run() {
         // no need to guard against TS modifications, runs over locked Document
-        TokenSequence<VSGTokenId> ts = getTokenSequence(doc, 0);
+        TokenSequence<VisageTokenId> ts = getTokenSequence(doc, 0);
 
         // reformat not used for now
         Reformat reformat = null;
@@ -137,14 +137,14 @@ class Publisher implements Runnable {
     }
 
     @SuppressWarnings({"MethodWithMultipleLoops"})
-    private int moveBehindPackage(TokenSequence<VSGTokenId> ts) {
+    private int moveBehindPackage(TokenSequence<VisageTokenId> ts) {
         boolean wasWS = false;
         int lastNonWSOffset = 0;
         while (ts.moveNext()) {
-            VSGTokenId id = ts.token().id();
-            if (VSGTokenId.isComment(id)
-                    || id == VSGTokenId.WS) {
-                if (id == VSGTokenId.WS) {
+            VisageTokenId id = ts.token().id();
+            if (VisageTokenId.isComment(id)
+                    || id == VisageTokenId.WS) {
+                if (id == VisageTokenId.WS) {
                     if (!wasWS) {
                         lastNonWSOffset = ts.offset(); // don't decrement the offset; it makes the import appear inside the comments if there's no package declaration (#177269)
                         wasWS = true;
@@ -153,8 +153,8 @@ class Publisher implements Runnable {
                     wasWS= false;
                 }
                 continue;
-            } else if (id == VSGTokenId.PACKAGE) {
-                moveTo(ts, VSGTokenId.SEMI);
+            } else if (id == VisageTokenId.PACKAGE) {
+                moveTo(ts, VisageTokenId.SEMI);
                 return ts.offset() + 1;
             }
             break;
@@ -162,16 +162,16 @@ class Publisher implements Runnable {
         return lastNonWSOffset;
     }
 
-    private void moveTo(TokenSequence<VSGTokenId> ts, VSGTokenId id) {
+    private void moveTo(TokenSequence<VisageTokenId> ts, VisageTokenId id) {
         while (ts.moveNext()) {
             if (ts.token().id() == id) break;
         }
     }
 
     @SuppressWarnings({"unchecked"})
-    private static <VSGTokenId extends TokenId> TokenSequence<VSGTokenId> getTokenSequence(Document doc, int dotPos) {
+    private static <VisageTokenId extends TokenId> TokenSequence<VisageTokenId> getTokenSequence(Document doc, int dotPos) {
         TokenHierarchy<Document> th = TokenHierarchy.get(doc);
-        TokenSequence<VSGTokenId> ts = (TokenSequence<VSGTokenId>) th.tokenSequence();
+        TokenSequence<VisageTokenId> ts = (TokenSequence<VisageTokenId>) th.tokenSequence();
         ts.move(dotPos);
         return ts;
     }

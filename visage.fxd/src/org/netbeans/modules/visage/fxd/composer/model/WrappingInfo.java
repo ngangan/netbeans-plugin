@@ -43,9 +43,6 @@
  */
 package org.netbeans.modules.visage.fxd.composer.model;
 
-import com.sun.visage.tools.fxd.FXDRootElement;
-import com.sun.visage.tools.fxd.container.ContainerEntry;
-import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.util.ArrayList;
 import java.util.List;
 import org.netbeans.modules.editor.structure.api.DocumentElement;
@@ -57,10 +54,10 @@ import org.netbeans.modules.editor.structure.api.DocumentElement;
 public class WrappingInfo {
 
     private ContainerEntry m_entry;
-    private FXDRootElement m_root;
+    private VisageDRootElement m_root;
     private List<DocumentElement> m_unresolved;
 
-    public WrappingInfo(ContainerEntry ce, FXDRootElement root) {
+    public WrappingInfo(ContainerEntry ce, VisageDRootElement root) {
         m_entry = ce;
         m_root = root;
         m_unresolved = new ArrayList<DocumentElement>();
@@ -90,7 +87,7 @@ public class WrappingInfo {
      * returns stored root node
      * @return stored root node
      */
-    public FXDRootElement getRoot() {
+    public VisageDRootElement getRoot() {
         return m_root;
     }
 
@@ -98,11 +95,11 @@ public class WrappingInfo {
      * returns stored fxz archive
      * @return stored fxz archive
      */
-    public FXDContainer getFXZArchive(){
+    public VisageDContainer getVisageZArchive(){
         return m_entry.getContainer();
     }
 
-    protected void setRoot(FXDRootElement root){
+    protected void setRoot(VisageDRootElement root){
         m_root = root;
     }
 }

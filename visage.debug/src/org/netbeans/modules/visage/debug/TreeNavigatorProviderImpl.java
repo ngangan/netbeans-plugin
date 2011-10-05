@@ -43,7 +43,6 @@
  */
 package org.netbeans.modules.visage.debug;
 
-import com.sun.visage.api.tree.VisageTreePath;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
@@ -74,6 +73,7 @@ import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *

@@ -42,9 +42,6 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.tools.visage.tree.VSGErroneous;
-import com.sun.tools.visage.tree.VSGObjectLiteralPart;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
@@ -57,21 +54,24 @@ import java.util.logging.Logger;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.type.DeclaredType;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionItem;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.tree.VisageErroneous;
+import org.visage.tools.tree.VisageObjectLiteralPart;
 
 /**
  * @author David Strupl
  */
-public class ObjectLiteralPartEnvironment extends VisageCompletionEnvironment<VSGObjectLiteralPart> {
+public class ObjectLiteralPartEnvironment extends VisageCompletionEnvironment<VisageObjectLiteralPart> {
 
     // -J-Dorg.netbeans.modules.visage.editor.completion.environment.ObjectLiteralPartEnvironment.level=FINE
     private static final Logger logger = Logger.getLogger(ObjectLiteralPartEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGObjectLiteralPart t) throws IOException {
-        if (LOGGABLE) log("inside VSGObjectLiteralPart " + t + "  offset == " + offset); // NOI18N
+    protected void inside(VisageObjectLiteralPart t) throws IOException {
+        if (LOGGABLE) log("inside VisageObjectLiteralPart " + t + "  offset == " + offset); // NOI18N
 
-        if (t.getExpression() instanceof VSGErroneous
+        if (t.getExpression() instanceof VisageErroneous
                 && tryToUseSanitizedSource()) {
             return;
         }
@@ -96,7 +96,7 @@ public class ObjectLiteralPartEnvironment extends VisageCompletionEnvironment<VS
 
     }
 
-    private TypeMirror getSmartType(VSGObjectLiteralPart t) throws IOException {
+    private TypeMirror getSmartType(VisageObjectLiteralPart t) throws IOException {
         if (t.getExpression() == null) {
             return null;
         }

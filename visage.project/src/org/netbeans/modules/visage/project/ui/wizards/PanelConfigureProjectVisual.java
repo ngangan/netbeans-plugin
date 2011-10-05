@@ -102,7 +102,7 @@ public class PanelConfigureProjectVisual extends JPanel {
     }
     
     void read (WizardDescriptor d) {
-        NewVisageProjectWizardIterator.WizardType lastType = (NewVisageProjectWizardIterator.WizardType) d.getProperty("fxwizard-type");  //NOI18N
+        NewVisageProjectWizardIterator.WizardType lastType = (NewVisageProjectWizardIterator.WizardType) d.getProperty("visagewizard-type");  //NOI18N
         if (lastType == null || lastType != type) {
             //bugfix #46387 The type of project changed, reset values to defaults
             d.putProperty ("name", null); // NOI18N
@@ -114,7 +114,7 @@ public class PanelConfigureProjectVisual extends JPanel {
     }
     
     void store( WizardDescriptor d ) {
-        d.putProperty("fxwizard-type", type);   //NOI18N
+        d.putProperty("visagewizard-type", type);   //NOI18N
         projectLocationPanel.store( d );
         optionsPanel.store( d );   
         projectTypesPanel.store(d);

@@ -266,7 +266,7 @@ class InnerScrollPane extends JScrollPane {
 		case ACTION_ESCAPE:
 //                    LogRecord r = new LogRecord(Level.FINE, "COMPL_CANCEL"); // NOI18N
 //                    CompletionImpl.uilog(r);
-//                    JavafxfI.get().hideCompletion(false);
+//                    VisagefI.get().hideCompletion(false);
 		    break;
                 case ACTION_COMPLETION_UP:
                     view.up();

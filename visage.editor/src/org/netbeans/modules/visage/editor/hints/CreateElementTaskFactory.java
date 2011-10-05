@@ -43,20 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.FunctionInvocationTree;
-import com.sun.visage.api.tree.IdentifierTree;
-import com.sun.visage.api.tree.InstantiateTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.Tree;
-import com.sun.tools.visage.code.JavafxClassSymbol;
-import com.sun.tools.visage.tree.VSGBlock;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGVar;
-import com.sun.tools.visage.tree.VSGVarInit;
 import com.sun.tools.mjavac.util.JCDiagnostic;
 import java.io.IOException;
 import java.util.*;
@@ -82,6 +68,20 @@ import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.InstantiateTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.tools.code.VisageClassSymbol;
+import org.visage.tools.tree.VisageBlock;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageVar;
+import org.visage.tools.tree.VisageVarInit;
 
 /**
  *
@@ -92,8 +92,8 @@ public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
     private final AtomicBoolean cancel = new AtomicBoolean();
     private static final String ERROR_CODE = "compiler.err.cant.resolve.location"; //NOI18N
     private static final Logger LOGGER = Logger.getLogger(CreateElementTaskFactory.class.getName());
-    private static final String TEMPLATE_JAVAFX = "Templates/Visage/VisageClass.fx"; //NOI18N
-    private static final String JAVAFX_RUN = "public static synthetic function visage$run$"; //NOI18N
+    private static final String TEMPLATE_Visage = "Templates/Visage/VisageClass.visage"; //NOI18N
+    private static final String Visage_RUN = "public static synthetic function visage$run$"; //NOI18N
     private final Collection<ErrorDescription> errorDescriptions = new HashSet<ErrorDescription>();
 
     public CreateElementTaskFactory() {
@@ -185,8 +185,8 @@ public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
             public Void visitClassDeclaration(ClassDeclarationTree node, Void p) {
                 VisageTreePath path = compilationInfo.getTrees().getPath(compilationInfo.getCompilationUnit(), node);
                 Element element = compilationInfo.getTrees().getElement(path);
-                if (element instanceof JavafxClassSymbol) {
-                    JavafxClassSymbol classSymbol = (JavafxClassSymbol) element;
+                if (element instanceof VisageClassSymbol) {
+                    VisageClassSymbol classSymbol = (VisageClassSymbol) element;
                     currentClassFQN = classSymbol.className();
                     if (node.getExtends() != null) {
                         for (Tree tree : node.getExtends()) {
@@ -214,7 +214,7 @@ public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
             @Override
             public Void visitIdentifier(IdentifierTree node, Void p) {
                 if (currentClassFQN != null && checkPosition(node, diagnostic) && currentClassFQN.equals(classFQN[0])) {
-                    if (getCurrentPath().getParentPath().getLeaf() instanceof VSGBlock) {
+                    if (getCurrentPath().getParentPath().getLeaf() instanceof VisageBlock) {
                         array.add(Kind.LOCAL_VARIABLE);
                     }
                     array.add(Kind.VARIABLE);
@@ -436,7 +436,7 @@ public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
                         Iterator<Tree> iterator = currentClass.getClassMembers().iterator();
                         if (iterator.hasNext()) {
                             Tree tree = iterator.next();
-                            if (tree instanceof VSGVar) {
+                            if (tree instanceof VisageVar) {
                                 firstVar = tree;
                             }
                         }
@@ -455,14 +455,14 @@ public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
                             //TODO Workaround for this problem
 
                             for (Tree tree : currentClass.getClassMembers()) {
-                                if (tree instanceof VSGFunctionDefinition && tree.toString().contains(JAVAFX_RUN)) {
-                                    //position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(),((VSGFunctionDefinition) tree).getBodyExpression());
-                                    List<ExpressionTree> statements = ((VSGFunctionDefinition) tree).getBodyExpression().getStatements();
+                                if (tree instanceof VisageFunctionDefinition && tree.toString().contains(Visage_RUN)) {
+                                    //position[0] = (int) sourcePositions.getStartPosition(compilationInfo.getCompilationUnit(),((VisageFunctionDefinition) tree).getBodyExpression());
+                                    List<ExpressionTree> statements = ((VisageFunctionDefinition) tree).getBodyExpression().getStatements();
                                     if (!statements.isEmpty()) {
                                         ExpressionTree treeForPosition = statements.iterator().next();
                                         //FIXME Bug in compiler - getStartPostion and getEndPosition return same value!
                                         code.append("\n").append("var ").append(varName).append(";\n"); //NOI18N
-                                        if (treeForPosition instanceof VSGVarInit) {
+                                        if (treeForPosition instanceof VisageVarInit) {
                                             position[0] = (int) sourcePositions.getEndPosition(compilationInfo.getCompilationUnit(), treeForPosition);
                                         } else {
                                             code.append("\n"); //NOI18N
@@ -518,7 +518,7 @@ public final class CreateElementTaskFactory extends VisageAbstractEditorHint {
         }
 
         private static void createClass(CompilationInfo compilationInfo, JCDiagnostic diagnostic) throws DataObjectNotFoundException, IOException {
-            FileObject classTemplate = FileUtil.getConfigFile(TEMPLATE_JAVAFX); //NOI18N
+            FileObject classTemplate = FileUtil.getConfigFile(TEMPLATE_Visage); //NOI18N
             DataObject classTemplateDO = DataObject.find(classTemplate);
             DataObject od = classTemplateDO.createFromTemplate(DataFolder.findFolder(compilationInfo.getFileObject().getParent()), diagnostic.getArgs()[1].toString());
             OpenCookie openCookie = od.getCookie(OpenCookie.class);

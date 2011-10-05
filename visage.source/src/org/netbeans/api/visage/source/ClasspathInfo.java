@@ -41,7 +41,6 @@
  */
 package org.netbeans.api.visage.source;
 
-import com.sun.tools.visage.api.JavafxcTool;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.URL;
@@ -63,12 +62,13 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileStateInvalidException;
 import org.openide.util.Exceptions;
 import org.openide.util.WeakListeners;
+import org.visage.tools.api.VisagecTool;
 
 /**
  * @author nenik
  */
 public class ClasspathInfo {
-    public static final String FX_SOURCE = "classpath/fxsource"; // NOI18N
+    public static final String VISAGE_SOURCE = "classpath/visagesource"; // NOI18N
 
     private static final ClassPath EMPTY_PATH = ClassPathSupport.createClassPath(new URL[0]);
     
@@ -87,11 +87,11 @@ public class ClasspathInfo {
     public static ClasspathInfo create(FileObject fo) {
         ClassPath bootPath = ClassPath.getClassPath(fo, ClassPath.BOOT);
         ClassPath compilePath = ClassPath.getClassPath(fo, ClassPath.COMPILE);
-        ClassPath srcPath = ClassPathSupport.createProxyClassPath(ClassPath.getClassPath(fo, ClassPath.SOURCE), ClassPath.getClassPath(fo, FX_SOURCE));
+        ClassPath srcPath = ClassPathSupport.createProxyClassPath(ClassPath.getClassPath(fo, ClassPath.SOURCE), ClassPath.getClassPath(fo, VISAGE_SOURCE));
 
         if (bootPath == null) {
             //javac requires at least java.lang
-            bootPath = VisagePlatform.getDefaultFXPlatform().getBootstrapLibraries();
+            bootPath = VisagePlatform.getDefaultVisagePlatform().getBootstrapLibraries();
         }
         ClasspathInfo instance = new ClasspathInfo(bootPath, compilePath, srcPath);
         return instance;
@@ -173,7 +173,7 @@ public class ClasspathInfo {
     return l;
     }
      */
-    synchronized JavaFileManager getFileManager(JavafxcTool tool) {
+    synchronized JavaFileManager getFileManager(VisagecTool tool) {
         if (fileManager == null) {
             recalculateClassPaths();
             /*            List<URL> userJavaClasses = null;

@@ -197,7 +197,7 @@ public class AppletSupport {
 //                height = Integer.parseInt(ep.getProperty(VisageProjectProperties.APPLET_HEIGHT));
 //            }catch(NumberFormatException nfe) {
 //            }
-//            if (appletFile.getExt().equals("fx")) {
+//            if (appletFile.getExt().equals("visage")) {
 //                VisageProject project = (VisageProject) getProject(appletFile);
 //		if (project == null) {
 //		    project = (VisageProject)getProject(buildDir);
@@ -207,8 +207,8 @@ public class AppletSupport {
 //                distJAR = distJAR.substring(distJAR.indexOf('/') + 1);
 //                String libs = distJAR;
 //                try {
-//                    File fxFolder = new File(((VisagePlatform) VisageProjectUtil.getActivePlatform(activePlatform)).getVisageFolder().toURI());
-//                    String[] list = fxFolder.list(new FilenameFilter() {
+//                    File visageFolder = new File(((VisagePlatform) VisageProjectUtil.getActivePlatform(activePlatform)).getVisageFolder().toURI());
+//                    String[] list = visageFolder.list(new FilenameFilter() {
 //
 //                        public boolean accept(File dir, String name) {
 //                            if (name.endsWith(".jar")) {
@@ -282,7 +282,7 @@ public class AppletSupport {
             }catch(NumberFormatException nfe) {
 
             }
-            if (appletFile.getExt().equals("fx")) { // NOI18N
+            if (appletFile.getExt().equals("visage")) { // NOI18N
                 VisageProject project = (VisageProject) getProject(appletFile);
 
                 String distJAR = project.evaluator().getProperty("dist.jar"); // NOI18N
@@ -290,8 +290,8 @@ public class AppletSupport {
                 String libs = distJAR;
                 String[] list = {""}; // NOI18N
                 try {
-                    File fxFolder = new File(((VisagePlatform) VisageProjectUtil.getActivePlatform(activePlatform)).getVisageFolder().toURI());
-                    list = fxFolder.list(new FilenameFilter() {
+                    File visageFolder = new File(((VisagePlatform) VisageProjectUtil.getActivePlatform(activePlatform)).getVisageFolder().toURI());
+                    list = visageFolder.list(new FilenameFilter() {
 
                         public boolean accept(File dir, String name) {
                             if (name.endsWith(".jar")) { // NOI18N
@@ -418,7 +418,7 @@ public class AppletSupport {
      * @param file is a file to be filled
      * @param name is name of the applet                                     
      */
-    private static void fillInFile(PrintWriter writer, String name, String codebase, boolean isFX, String draggable, String java_args, String jnlpFileName, int width, int height) {
+    private static void fillInFile(PrintWriter writer, String name, String codebase, boolean isVisage, String draggable, String java_args, String jnlpFileName, int width, int height) {
         ResourceBundle bundle = NbBundle.getBundle(AppletSupport.class);
 
         writer.println("<HTML>"); // NOI18N
@@ -454,7 +454,7 @@ public class AppletSupport {
                 writer.print("<APPLET " + codebase + " code="); // NOI18N
 
             }
-            if (isFX) {
+            if (isVisage) {
                 writer.print("\"" + APPLET_MAIN_CLASS + "\""); // NOI18N
 
                 writer.println(" width="+width+" height="+height+">"); // NOI18N

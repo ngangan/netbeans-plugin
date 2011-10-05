@@ -64,7 +64,7 @@ public class FixItem implements CompletionItem {
     private final Object LOCK;
     private String elementHTMLForm;
     private static final int NORMAL = 0;
-    private static final int JAVAFX = -100;
+    private static final int Visage = -100;
     private int sortPriority;
 
     /**
@@ -77,7 +77,7 @@ public class FixItem implements CompletionItem {
         this.element = element;
         this.LOCK = lock;        
         elementHTMLForm = ITEM_COLOR + element + ITEM_END;
-        sortPriority = element.startsWith("visage.") ? JAVAFX : NORMAL; // NOI18N
+        sortPriority = element.startsWith("visage.") ? Visage : NORMAL; // NOI18N
     }
 
     /**

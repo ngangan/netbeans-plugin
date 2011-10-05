@@ -122,7 +122,7 @@ made subject to such option by the copyright holder.
 
     <folder name="Editors">
         <folder name="text">
-            <folder name="x-fx">
+            <folder name="x-visage">
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
                 <file name="org-netbeans-modules-visage-editor-semantic-HighlightsLayerFactoryImpl.instance"/>
@@ -180,7 +180,7 @@ made subject to such option by the copyright holder.
                 <folder name="FontsColors">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml"
+                            <file name="org-netbeans-modules-java-visage-editor-token-colorings.xml"
                                   url="resources/NetBeans-Visage-fontsColors.xml">
                                 <attr name="SystemFileSystem.localizingBundle"
                                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
@@ -189,7 +189,7 @@ made subject to such option by the copyright holder.
                     </folder>
                     <folder name="CityLights">
                         <folder name="Defaults">
-                            <file name="org-netbeans-modules-java-fx-editor-token-colorings.xml"
+                            <file name="org-netbeans-modules-java-visage-editor-token-colorings.xml"
                                   url="resources/CityLights-Visage-fontsColors.xml">
                                 <attr name="SystemFileSystem.localizingBundle"
                                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
@@ -213,13 +213,13 @@ made subject to such option by the copyright holder.
 
                 <folder name="Toolbars">
                     <folder name="Default">
-                        <file name="toggle-fx-preview-execution">
+                        <file name="toggle-visage-preview-execution">
                             <attr name="position" intvalue="1100"/>
                         </file>
-                        <!--<file name="toggle-reset-fx-preview-execution">
+                        <!--<file name="toggle-reset-visage-preview-execution">
                             <attr name="position" intvalue="1200"/>
                         </file>
-                        <file name="print-fx-preview">
+                        <file name="print-visage-preview">
                             <attr name="position" intvalue="1300"/>
                         </file>-->
                         <file name="SeparatorAfterReset.instance">
@@ -296,13 +296,13 @@ made subject to such option by the copyright holder.
     <folder name="OptionsDialog">
         <folder name="PreviewExamples">
             <folder name="text">
-                <file name="x-fx" url="resources/VisageExample"/>
+                <file name="x-visage" url="resources/VisageExample"/>
             </folder>
         </folder>
         <folder name="Editor">
             <folder name="MarkOccurrences">
                 <folder name="text">
-                    <folder name="x-fx">
+                    <folder name="x-visage">
                         <file name="VisageMarkOccurences.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.spi.options.OptionsPanelController"/>
                             <attr name="instanceCreate" newvalue="org.netbeans.modules.visage.editor.options.MarkOccurencesOptionsPanelController"/>
@@ -312,7 +312,7 @@ made subject to such option by the copyright holder.
             </folder>
             <folder name="Formatting">
                 <folder name="text">
-                    <folder name="x-fx">
+                    <folder name="x-visage">
                         <file name="TabsAndIndents.instance">
                             <attr name="instanceOf" stringvalue="org.netbeans.modules.options.editor.spi.PreferencesCustomizer$Factory"/>
                             <attr name="instanceCreate" methodvalue="org.netbeans.modules.visage.editor.format.ui.FmtTabsIndents.getController"/>
@@ -356,7 +356,7 @@ made subject to such option by the copyright holder.
 
     <folder name="Loaders">
         <folder name="text">
-            <folder name="x-fx">
+            <folder name="x-visage">
                 <attr name="SystemFileSystem.icon"
                       urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
                 <attr name="iconBase" stringvalue="/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
@@ -457,7 +457,7 @@ made subject to such option by the copyright holder.
     <folder name="Templates">
         <folder name="Visage">
             <attr name="position" intvalue="910"/>
-            <file name="VisageEmpty.fx" url="VisageEmpty.fx_">
+            <file name="VisageEmpty.visage" url="VisageEmpty.visage_">
                 <attr name="position" intvalue="100"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
@@ -471,7 +471,7 @@ made subject to such option by the copyright holder.
                 <attr name="SystemFileSystem.icon"
                       urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
-            <file name="VisageClass.fx" url="VisageClass.fx_">
+            <file name="VisageClass.visage" url="VisageClass.visage_">
                 <attr name="position" intvalue="200"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
@@ -486,7 +486,7 @@ made subject to such option by the copyright holder.
                       urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
 
-            <file name="VisageStage.fx" url="VisageStage.fx_">
+            <file name="VisageStage.visage" url="VisageStage.visage_">
                 <attr name="position" intvalue="300"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>
@@ -501,7 +501,7 @@ made subject to such option by the copyright holder.
                       urlvalue="nbresloc:/org/netbeans/modules/visage/dataloader/FX-filetype.png"/>
             </file>
 
-            <file name="VisageCustomNode.fx" url="VisageCustomNode.fx_">
+            <file name="VisageCustomNode.visage" url="VisageCustomNode.visage_">
                 <attr name="position" intvalue="400"/>
                 <attr name="SystemFileSystem.localizingBundle"
                       stringvalue="org.netbeans.modules.visage.dataloader.Bundle"/>

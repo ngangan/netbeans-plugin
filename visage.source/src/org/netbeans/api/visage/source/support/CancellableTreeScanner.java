@@ -43,9 +43,10 @@
  */
 package org.netbeans.api.visage.source.support;
 
-import com.sun.visage.api.tree.VisageTreeScanner;
-import com.sun.visage.api.tree.Tree;
+
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreeScanner;
 
 /**
  *
@@ -87,6 +88,7 @@ public class CancellableTreeScanner<R,P> extends VisageTreeScanner<R,P> {
 
     /** @inheritDoc
      */
+    @Override
     public R scan(Tree tree, P p) {
         if (isCanceled())
             return null;
@@ -96,6 +98,7 @@ public class CancellableTreeScanner<R,P> extends VisageTreeScanner<R,P> {
 
     /** @inheritDoc
      */
+    @Override
     public R scan(Iterable<? extends Tree> trees, P p) {
         if (isCanceled())
             return null;

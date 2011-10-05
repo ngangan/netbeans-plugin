@@ -217,14 +217,14 @@ made subject to such option by the copyright holder.
                 <package>org.netbeans.api.visage.platform</package>
                 <package>org.netbeans.modules.visage.platform</package>
                 <package>org.netbeans.modules.visage.platform.platformdefinition</package>
-                <package>com.sun.visage.api</package>
-                <package>com.sun.visage.api.tree</package>
-                <package>com.sun.visage.functions</package>
-                <package>com.sun.visage.runtime</package>
-                <package>com.sun.visage.runtime.annotation</package>
+                <package>org.visage.api</package>
+                <package>org.visage.api.tree</package>
+                <package>org.visage.functions</package>
+                <package>org.visage.runtime</package>
+                <package>org.visage.runtime.annotation</package>
                 <!-- <package>com.sun.visage.runtime.location</package> -->
-                <package>com.sun.visage.runtime.sequence</package>
-                <package>com.sun.visage.geom</package>
+                <package>org.visage.runtime.sequence</package>
+                <!--<package>org.visage.geom</package>-->
                 <package>com.sun.scenario.scenegraph</package>
                 <package>com.sun.source.tree</package>
                 <package>com.sun.source.util</package>

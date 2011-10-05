@@ -43,9 +43,6 @@
  */
 package org.netbeans.modules.visage.navigation;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.Tree.VisageKind;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import java.util.EnumSet;
@@ -54,8 +51,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.swing.SwingUtilities;
-import org.netbeans.api.visage.editor.ElementJavadoc;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.editor.ElementVisagedoc;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.CompilationInfo;
@@ -71,6 +68,9 @@ import org.netbeans.modules.parsing.api.Source;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  * This task is called every time the caret position changes in a Java editor.
@@ -89,10 +89,10 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private boolean canceled;
     private static ElementHandle<Element> lastEh;
     private static ElementHandle<Element> lastEhForNavigator;
-    private static final Set<? extends TokenId> TOKENS_TO_SKIP = EnumSet.of(VSGTokenId.WS,
-            VSGTokenId.COMMENT,
-            VSGTokenId.LINE_COMMENT,
-            VSGTokenId.DOC_COMMENT);
+    private static final Set<? extends TokenId> TOKENS_TO_SKIP = EnumSet.of(VisageTokenId.WS,
+            VisageTokenId.COMMENT,
+            VisageTokenId.LINE_COMMENT,
+            VisageTokenId.DOC_COMMENT);
 
     CaretListeningTask(CaretListeningFactory whichElementJavaSourceTaskFactory, FileObject fileObject) {
         this.caretListeningFactory = whichElementJavaSourceTaskFactory;
@@ -117,14 +117,14 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
         int lastPosition = CaretListeningFactory.getLastPosition(fileObject);
 
-        TokenSequence<VSGTokenId> ts = compilationInfo.getTokenHierarchy().tokenSequence();
+        TokenSequence<VisageTokenId> ts = compilationInfo.getTokenHierarchy().tokenSequence();
         boolean inJavadoc = false;
         int offset = ts.move(lastPosition);
         if (ts.moveNext() && ts.token() != null) {
 
             Token token = ts.token();
             TokenId tid = token.id();
-            if (tid == VSGTokenId.DOC_COMMENT) {
+            if (tid == VisageTokenId.DOC_COMMENT) {
                 inJavadoc = true;
             }
 
@@ -279,7 +279,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 //        });
 //    }
 
-    private void setJavadoc(final ElementJavadoc javadoc) {
+    private void setJavadoc(final ElementVisagedoc javadoc) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 JavafxdocTopComponent visagedocTopComponent = JavafxdocTopComponent.findInstance();
@@ -321,7 +321,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
 
         final boolean hasDeclaredType = asType.getKind() == TypeKind.DECLARED;
         if (hasDeclaredType) {
-            if (compilationInfo.getJavafxTypes().isVSGClass((Symbol) element)) {
+            if (compilationInfo.getVisageTypes().isVisageClass((Symbol) element)) {
                 FileObject fo = VisageSourceUtils.getFile(element, compilationInfo.getClasspathInfo());
                 if (fo != null) {
                     try {
@@ -344,7 +344,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                             }
                             if (eh != null) {
                                 Element e2 = eh.resolve(cc);
-                                setJavadoc(ElementJavadoc.create(cc, e2));
+                                setJavadoc(ElementVisagedoc.create(cc, e2));
                             }
                         }
                     });
@@ -355,10 +355,10 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
                 // nenik: do nothing, otherwise a bunch of exceptions can happen
                 // manowar: I have uncommened this since I need javadoc for java (not visage) classes as well
                 // no exceptions happen so far... but it need to be tested
-                setJavadoc(ElementJavadoc.create(compilationInfo, element));
+                setJavadoc(ElementVisagedoc.create(compilationInfo, element));
             }
         } else {
-            setJavadoc(ElementJavadoc.create(compilationInfo, element));
+            setJavadoc(ElementVisagedoc.create(compilationInfo, element));
         }
     }
 
@@ -546,7 +546,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         return e;
     }
 
-    private void skipTokens(TokenSequence<VSGTokenId> ts, Set<? extends TokenId> typesToSkip) {
+    private void skipTokens(TokenSequence<VisageTokenId> ts, Set<? extends TokenId> typesToSkip) {
         while (ts.moveNext()) {
             if (!typesToSkip.contains(ts.token().id())) {
                 return;

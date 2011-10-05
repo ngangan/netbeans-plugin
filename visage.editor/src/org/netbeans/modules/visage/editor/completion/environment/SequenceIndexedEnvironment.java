@@ -42,10 +42,8 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-
-import com.sun.tools.visage.tree.VSGSequenceIndexed;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.type.TypeMirror;
@@ -53,28 +51,29 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.type.TypeKind;
+import org.visage.tools.tree.VisageSequenceIndexed;
 
 /**
  *
  * @author Petr Nejedly
  */
-public class SequenceIndexedEnvironment extends VisageCompletionEnvironment<VSGSequenceIndexed> {
+public class SequenceIndexedEnvironment extends VisageCompletionEnvironment<VisageSequenceIndexed> {
 
     private static final Logger logger = Logger.getLogger(SequenceIndexedEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGSequenceIndexed t) throws IOException {
+    protected void inside(VisageSequenceIndexed t) throws IOException {
         if (LOGGABLE) {
-            logger.fine("inside VSGSequenceIndexed " + t + "  offset == " + offset); // NOI18N
-            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            logger.fine("inside VisageSequenceIndexed " + t + "  offset == " + offset); // NOI18N
+            TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             logger.fine("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
         }
         localResult(getSmartType(t));
 //        addValueKeywords();
     }
 
-    private TypeMirror getSmartType(VSGSequenceIndexed t) throws IOException {
+    private TypeMirror getSmartType(VisageSequenceIndexed t) throws IOException {
         // the target type is Number (int) as an sequence index
         TypeMirror type = controller.getTypes().getPrimitiveType(TypeKind.INT);
         return type;

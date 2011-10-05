@@ -32,7 +32,7 @@ package org.netbeans.modules.visage.editor;
 
 import org.netbeans.modules.editor.indent.spi.Context;
 import org.netbeans.modules.editor.indent.spi.IndentTask;
-import org.netbeans.modules.visage.editor.format.CompilerIndependentVSGIndentTask;
+import org.netbeans.modules.visage.editor.format.CompilerIndependentVisageIndentTask;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -53,6 +53,6 @@ public class IndentTaskFactory implements IndentTask.Factory {
         if (log.isLoggable(Level.FINE)) {
             log.fine("Creating indentation factory"); // NOI18N
         }
-        return new CompilerIndependentVSGIndentTask(context);
+        return new CompilerIndependentVisageIndentTask(context);
     }
 }

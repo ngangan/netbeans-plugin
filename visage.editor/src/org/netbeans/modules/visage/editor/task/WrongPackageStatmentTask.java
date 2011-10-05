@@ -30,10 +30,7 @@
  */
 package org.netbeans.modules.visage.editor.task;
 
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.SourcePositions;
-import com.sun.visage.api.tree.UnitTree;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.lexer.TokenSequence;
@@ -62,6 +59,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.UnitTree;
 
 /**
  * @author Rastislav Komara (<a href="mailto:moonko@netbeans.orgm">RKo</a>)
@@ -108,8 +108,8 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
         }
 
         if (project instanceof VisageProject) {
-            VisageProject fxp = (VisageProject) project;
-            FileObject[] sourceRoots = fxp.getFOSourceRoots();
+            VisageProject visagep = (VisageProject) project;
+            FileObject[] sourceRoots = visagep.getFOSourceRoots();
             List<Fix> fixes = new ArrayList<Fix>(2);
 
             for (FileObject sourceRoot : sourceRoots) {
@@ -241,11 +241,11 @@ class WrongPackageStatmentTask implements CancellableTask<CompilationInfo> {
             int end = (int) sp.getEndPosition(cu, pn) + 1;
 
             //noinspection unchecked
-            TokenSequence<VSGTokenId> ts = ci.getTokenHierarchy().tokenSequence();
+            TokenSequence<VisageTokenId> ts = ci.getTokenHierarchy().tokenSequence();
             ts.move(start);
             boolean finish = false;
             while (ts.movePrevious() || !finish) {
-                VSGTokenId id = ts.token().id();
+                VisageTokenId id = ts.token().id();
                 switch (id) {
                     case PACKAGE: {
                         start = ts.offset();

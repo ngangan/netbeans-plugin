@@ -43,10 +43,6 @@
  */
 package org.netbeans.modules.visage.debug;
 
-import com.sun.visage.api.tree.*;
-import com.sun.tools.visage.tree.VSGErroneous;
-import com.sun.tools.visage.tree.VSGTree;
-import com.sun.tools.visage.tree.JavafxPretty;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +56,66 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.AssignmentTree;
+import org.visage.api.tree.BinaryTree;
+import org.visage.api.tree.BlockExpressionTree;
+import org.visage.api.tree.BreakTree;
+import org.visage.api.tree.CatchTree;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.CompoundAssignmentTree;
+import org.visage.api.tree.ConditionalExpressionTree;
+import org.visage.api.tree.ContinueTree;
+import org.visage.api.tree.EmptyStatementTree;
+import org.visage.api.tree.ErroneousTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.ForExpressionInClauseTree;
+import org.visage.api.tree.ForExpressionTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.FunctionValueTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.ImportTree;
+import org.visage.api.tree.IndexofTree;
+import org.visage.api.tree.InitDefinitionTree;
+import org.visage.api.tree.InstanceOfTree;
+import org.visage.api.tree.InstantiateTree;
+import org.visage.api.tree.InterpolateValueTree;
+import org.visage.api.tree.KeyFrameLiteralTree;
+import org.visage.api.tree.LiteralTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.ModifiersTree;
+import org.visage.api.tree.ObjectLiteralPartTree;
+import org.visage.api.tree.OnReplaceTree;
+import org.visage.api.tree.ParenthesizedTree;
+import org.visage.api.tree.ReturnTree;
+import org.visage.api.tree.SequenceDeleteTree;
+import org.visage.api.tree.SequenceEmptyTree;
+import org.visage.api.tree.SequenceExplicitTree;
+import org.visage.api.tree.SequenceIndexedTree;
+import org.visage.api.tree.SequenceInsertTree;
+import org.visage.api.tree.SequenceRangeTree;
+import org.visage.api.tree.SequenceSliceTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.StringExpressionTree;
+import org.visage.api.tree.ThrowTree;
+import org.visage.api.tree.TimeLiteralTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.TriggerTree;
+import org.visage.api.tree.TryTree;
+import org.visage.api.tree.TypeAnyTree;
+import org.visage.api.tree.TypeCastTree;
+import org.visage.api.tree.TypeClassTree;
+import org.visage.api.tree.TypeFunctionalTree;
+import org.visage.api.tree.TypeUnknownTree;
+import org.visage.api.tree.UnaryTree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.VisageTreePathScanner;
+import org.visage.api.tree.WhileLoopTree;
+import org.visage.tools.tree.VisageErroneous;
+import org.visage.tools.tree.VisagePretty;
+import org.visage.tools.tree.VisageTree;
 
 /**
  * @author Jan Lahoda
@@ -82,7 +138,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
         Tree t = tree.getLeaf();
         StringWriter s = new StringWriter();
         try {
-            new JavafxPretty(s, false).printExpr((VSGTree)t);
+            new VisagePretty(s, false).printExpr((VisageTree)t);
         } catch (Exception e) {
             Logger.getLogger(TreeNode.class.getName()).log(Level.FINE, "Unable to pretty print " + t.getVisageKind(), e); // NOI18N
         }
@@ -620,7 +676,7 @@ public class TreeNode extends AbstractNode implements OffsetProvider {
 
             addCorrespondingType(below);
             addCorrespondingComments(below);
-            scan(((VSGErroneous)tree).errs, below);
+            scan(((VisageErroneous)tree).errs, below);
 
             d.add(new TreeNode(info, getCurrentPath(), below));
             return null;

@@ -53,7 +53,7 @@ public class DefaultPlatformTest extends VisageTestBase {
     }
 
     public void testDefaultPlatform() {
-        VisagePlatform platform = VisagePlatform.getDefaultFXPlatform();
+        VisagePlatform platform = VisagePlatform.getDefaultVisagePlatform();
         assertNotNull("have default platform", platform);
     }
 

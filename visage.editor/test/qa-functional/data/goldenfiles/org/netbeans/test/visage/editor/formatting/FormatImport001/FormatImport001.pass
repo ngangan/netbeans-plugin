@@ -1,4 +1,4 @@
-package fxprj2;
+package visageprj2;
 
 import visage.stage.Stage;
 import visage.scene.Scene;

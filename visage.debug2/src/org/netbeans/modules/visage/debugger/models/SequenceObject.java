@@ -1,6 +1,5 @@
 package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.visage.jdi.FXSequenceReference;
 import com.sun.jdi.ObjectReference;
 import com.sun.jdi.ReferenceType;
 import com.sun.jdi.Value;
@@ -16,6 +15,7 @@ import org.netbeans.modules.debugger.jpda.jdi.VMDisconnectedExceptionWrapper;
 import org.netbeans.modules.debugger.jpda.jdi.ValueWrapper;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.visage.jdi.VisageSequenceReference;
 
 public final class SequenceObject extends AbstractObjectVariable implements Field {
 
@@ -43,7 +43,7 @@ public final class SequenceObject extends AbstractObjectVariable implements Fiel
 
     public JPDAClassType getDeclaringClass() {
         try {
-            FXSequenceReference a = (FXSequenceReference) ((JDIVariable) parent).getJDIValue();
+            VisageSequenceReference a = (VisageSequenceReference) ((JDIVariable) parent).getJDIValue();
             return new JPDAClassTypeImpl(getDebugger(), (ReferenceType) ValueWrapper.type(a));
         } catch (InternalExceptionWrapper ex) {
             throw ex.getCause();

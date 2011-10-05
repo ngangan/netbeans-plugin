@@ -42,10 +42,7 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.ModifiersTree;
-import com.sun.visage.api.tree.Tree;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.TokenSequence;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
@@ -56,6 +53,9 @@ import java.util.EnumSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.ModifiersTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *
@@ -71,8 +71,8 @@ public class ModifiersTreeEnvironment extends VisageCompletionEnvironment<Modifi
         if (LOGGABLE) log("inside ModifiersTree " + t); // NOI18N
         ModifiersTree mods = t;
         Set<Modifier> m = EnumSet.noneOf(Modifier.class);
-        final TokenSequence<VSGTokenId> ts = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
-        VSGTokenId lastNonWhitespaceTokenId = null;
+        final TokenSequence<VisageTokenId> ts = getController().getTreeUtilities().tokensFor(mods, getSourcePositions());
+        VisageTokenId lastNonWhitespaceTokenId = null;
         while (ts.moveNext() && ts.offset() < offset) {
             lastNonWhitespaceTokenId = ts.token().id();
             switch (lastNonWhitespaceTokenId) {

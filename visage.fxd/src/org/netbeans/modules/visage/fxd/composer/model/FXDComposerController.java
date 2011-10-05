@@ -59,12 +59,7 @@ import org.netbeans.modules.visage.fxd.composer.model.actions.SelectActionFactor
 import org.netbeans.modules.visage.fxd.composer.preview.PreviewTopComponent;
 import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 
-
-import com.sun.visage.tools.fxd.loader.Profile;
 import java.util.Collection;
-import visage.fxd.FXDNode;
-import visage.scene.Node;
-import visage.scene.Scene;
 import javax.swing.JComponent;
 import org.netbeans.modules.visage.fxd.composer.source.SourceElement;
 

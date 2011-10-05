@@ -128,7 +128,7 @@ public final class Icons {
            
     private static String getIconName( ElementKind kind, String typeName, String extension, Collection<Modifier> modifiers ) {
         
-        StringBuffer fileName = new StringBuffer( typeName );
+        StringBuilder fileName = new StringBuilder( typeName );
         
         if ( modifiers.contains( Modifier.STATIC ) ) {
             fileName.append( "Static" ); // NOI18N

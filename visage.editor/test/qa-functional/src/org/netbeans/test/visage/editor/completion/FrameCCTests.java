@@ -70,8 +70,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/Frame001.fx",
+                "visage-prj-1",
+                "frame/Frame001.visage",
                 8, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -87,8 +87,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/Stage001.fx",
+                "visage-prj-1",
+                "frame/stage/Stage001.visage",
                 16, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -99,8 +99,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/Stage001.fx",
+                "visage-prj-1",
+                "frame/stage/Stage001.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -111,8 +111,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentArc1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentArc1.visage",
                 21, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -123,8 +123,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentCircle1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentCircle1.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -135,8 +135,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentEllipse1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentEllipse1.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -147,8 +147,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentImage1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentImage1.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -159,8 +159,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentImage1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentImage1.visage",
                 20, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -171,8 +171,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentLine1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentLine1.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -183,8 +183,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentPolygon1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentPolygon1.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -195,8 +195,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentRectangle1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentRectangle1.visage",
                 18, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -207,8 +207,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentText1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentText1.visage",
                 19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -219,8 +219,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentText1.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentText1.visage",
                 21, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -231,8 +231,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "fill: Color.", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/ContentColor.fx",
+                "visage-prj-1",
+                "frame/stage/content/ContentColor.visage",
                 23, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -243,8 +243,8 @@ public class FrameCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "frame/stage/content/LinearGradient1.fx",
+                "visage-prj-1",
+                "frame/stage/content/LinearGradient1.visage",
                 20, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }

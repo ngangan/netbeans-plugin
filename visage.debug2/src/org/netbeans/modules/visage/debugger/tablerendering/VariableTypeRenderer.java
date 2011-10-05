@@ -11,9 +11,6 @@
 
 package org.netbeans.modules.visage.debugger.tablerendering;
 
-import com.sun.visage.jdi.FXSequenceReference;
-import com.sun.visage.jdi.FXSequenceReference.Types;
-import com.sun.visage.jdi.FXValue;
 import com.sun.jdi.Value;
 import org.netbeans.api.debugger.jpda.Field;
 import java.awt.Component;
@@ -25,6 +22,9 @@ import org.netbeans.modules.debugger.jpda.expr.JDIVariable;
 import org.netbeans.modules.debugger.jpda.models.AbstractVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAThreadImpl;
 import org.openide.util.RequestProcessor;
+import org.visage.jdi.VisageSequenceReference;
+import org.visage.jdi.VisageSequenceReference.Types;
+import org.visage.jdi.VisageValue;
 
 /**
  *
@@ -135,7 +135,7 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                                     
             if( types.containsKey( fieldTypeName )) {
                 fieldTypeName = types.get( fieldTypeName );
-            } else if( "com.sun.visage.runtime.sequence.Sequence".equals( fieldTypeName )) {
+            } else if( "org.visage.runtime.sequence.Sequence".equals( fieldTypeName )) {
                 
                 JPDAThreadImpl thread = (JPDAThreadImpl)av.getDebugger().getCurrentThread();  
                 if( thread == null ) {
@@ -153,9 +153,9 @@ public class VariableTypeRenderer extends javax.swing.JPanel implements TableCel
                     }                
 
                     Value oo = v.getJDIValue();
-                    FXValue fxv = (FXValue)oo;
-                    if( fxv instanceof FXSequenceReference ) {
-                        FXSequenceReference seq = (FXSequenceReference)fxv;
+                    VisageValue visagev = (VisageValue)oo;
+                    if( visagev instanceof VisageSequenceReference ) {
+                        VisageSequenceReference seq = (VisageSequenceReference)visagev;
                         Types seqType = seq.getElementType();
                         if( Types.INT.equals( seqType )) {
                             fieldTypeName = "Integer[]"; // NOI18N

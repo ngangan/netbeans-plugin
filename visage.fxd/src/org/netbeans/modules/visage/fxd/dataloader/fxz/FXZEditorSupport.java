@@ -60,7 +60,6 @@ import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.text.CloneableEditorSupport;
 import org.openide.text.DataEditorSupport;
-import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.beans.PropertyChangeListener;
 import java.beans.VetoableChangeListener;
 import java.io.OutputStream;

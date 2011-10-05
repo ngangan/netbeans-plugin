@@ -85,8 +85,8 @@ public class Util {
     public static String PATH_SEPARATOR = "|";
     public static String FILE_SEPARATOR = "/";
     public static String _bundle = "org.netbeans.test.visage.editor.lib.Bundle";
-    public static String _category = Bundle.getStringTrimmed(_bundle, "javaFX");
-    public static String _project = Bundle.getStringTrimmed(_bundle, "javaFXProject");
+    public static String _category = Bundle.getStringTrimmed(_bundle, "Visage");
+    public static String _project = Bundle.getStringTrimmed(_bundle, "VisageProject");
     public static String _source = Bundle.getStringTrimmed(_bundle, "sourcePackages");
     public static String _main = Bundle.getStringTrimmed(_bundle, "mainFX");
     public static String _placeCodeHere = Bundle.getStringTrimmed(_bundle, "placeCodeHere");

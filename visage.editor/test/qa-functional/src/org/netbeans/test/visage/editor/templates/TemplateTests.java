@@ -116,7 +116,7 @@ public class TemplateTests extends VisageTestCase {
         "TemplateWh",
         "testCloseProject"}; //, "testIDELogForErrors"};
 
-    protected static final String PROJECT_NAME = "fx-prj-3";
+    protected static final String PROJECT_NAME = "visage-prj-3";
     protected final String DATA_DIR = this.getDataDirAsString();
     protected final String WORK_DIR = this.getWorkDirAsString();
     public File DIFF_FILE;
@@ -131,8 +131,8 @@ public class TemplateTests extends VisageTestCase {
         return NbModuleSuite.create(TemplateTests.class, ".*", ".*", TESTS);
     }
 
-    /** Open Project opens he fx-prj-2 project which contains the
-     * Format related .fx files
+    /** Open Project opens he visage-prj-2 project which contains the
+     * Format related .visage files
      */
     public void testOpenProject() {
         try {
@@ -179,17 +179,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateAb() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateAb.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateAb.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateAb.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateAb.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "ab";
@@ -202,7 +202,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateAb.fx");
+        setSource("visageprj3/TemplateAb.visage");
         getFile(DIFF_FILE, "TemplateAb.diff");
         getFile(REF_FILE, "TemplateAb.ref"); //Not used yet.
 
@@ -219,18 +219,18 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateAs() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateAs.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateAs.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         Util.sleep();
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateAs.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateAs.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "as";
@@ -243,7 +243,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateAs.fx");
+        setSource("visageprj3/TemplateAs.visage");
         getFile(DIFF_FILE, "TemplateAs.diff");
         getFile(REF_FILE, "TemplateAs.ref"); //Not used yet.
 
@@ -258,18 +258,18 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateBi() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateBi.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateBi.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         Util.sleep();
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateBi.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateBi.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "bi";
@@ -282,7 +282,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateBi.fx");
+        setSource("visageprj3/TemplateBi.visage");
         getFile(DIFF_FILE, "TemplateBi.diff");
         getFile(REF_FILE, "TemplateBi.ref"); //Not used yet.
 
@@ -297,17 +297,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateBo() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateBo.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateBo.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateBo.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateBo.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "Bo";
@@ -320,7 +320,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateBo.fx");
+        setSource("visageprj3/TemplateBo.visage");
         getFile(DIFF_FILE, "TemplateBo.diff");
         getFile(REF_FILE, "TemplateBo.ref"); //Not used yet.
 
@@ -335,17 +335,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateBr() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateBr.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateBr.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateBr.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateBr.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "br";
@@ -358,7 +358,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateBr.fx");
+        setSource("visageprj3/TemplateBr.visage");
         getFile(DIFF_FILE, "TemplateBr.diff");
         getFile(REF_FILE, "TemplateBr.ref"); //Not used yet.
 
@@ -373,17 +373,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateCa() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateCa.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateCa.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateCa.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateCa.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "ca";
@@ -396,7 +396,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateCa.fx");
+        setSource("visageprj3/TemplateCa.visage");
         getFile(DIFF_FILE, "TemplateCa.diff");
         getFile(REF_FILE, "TemplateCa.ref"); //Not used yet.
 
@@ -411,17 +411,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateCl() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateCl.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateCl.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateCl.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateCl.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "cl";
@@ -434,7 +434,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateCl.fx");
+        setSource("visageprj3/TemplateCl.visage");
         getFile(DIFF_FILE, "TemplateCl.diff");
         getFile(REF_FILE, "TemplateCl.ref"); //Not used yet.
 
@@ -449,17 +449,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateCn() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateCn.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateCn.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateCn.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateCn.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "cn";
@@ -472,7 +472,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateCn.fx");
+        setSource("visageprj3/TemplateCn.visage");
         getFile(DIFF_FILE, "TemplateCn.diff");
         getFile(REF_FILE, "TemplateCn.ref"); //Not used yet.
 
@@ -487,17 +487,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateDe() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateDe.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateDe.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateDe.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateDe.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "de";
@@ -510,7 +510,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateDe.fx");
+        setSource("visageprj3/TemplateDe.visage");
         getFile(DIFF_FILE, "TemplateDe.diff");
         getFile(REF_FILE, "TemplateDe.ref"); //Not used yet.
 
@@ -525,17 +525,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateDef() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateDef.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateDef.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateDef.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateDef.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "def";
@@ -548,7 +548,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateDef.fx");
+        setSource("visageprj3/TemplateDef.visage");
         getFile(DIFF_FILE, "TemplateDef.diff");
         getFile(REF_FILE, "TemplateDef.ref"); //Not used yet.
 
@@ -563,17 +563,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateEl() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateEl.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateEl.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateEl.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateEl.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "el";
@@ -586,7 +586,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateEl.fx");
+        setSource("visageprj3/TemplateEl.visage");
         getFile(DIFF_FILE, "TemplateEl.diff");
         getFile(REF_FILE, "TemplateEl.ref"); //Not used yet.
 
@@ -601,17 +601,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateEli() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateEli.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateEli.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateEli.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateEli.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "eli";
@@ -624,7 +624,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateEli.fx");
+        setSource("visageprj3/TemplateEli.visage");
         getFile(DIFF_FILE, "TemplateEli.diff");
         getFile(REF_FILE, "TemplateEli.ref"); //Not used yet.
 
@@ -639,17 +639,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateEx() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateEx.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateEx.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateEx.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateEx.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "ex";
@@ -662,7 +662,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateEx.fx");
+        setSource("visageprj3/TemplateEx.visage");
         getFile(DIFF_FILE, "TemplateEx.diff");
         getFile(REF_FILE, "TemplateEx.ref"); //Not used yet.
 
@@ -677,17 +677,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateFa() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateFa.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateFa.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateFa.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateFa.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "fa";
@@ -700,7 +700,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateFa.fx");
+        setSource("visageprj3/TemplateFa.visage");
         getFile(DIFF_FILE, "TemplateFa.diff");
         getFile(REF_FILE, "TemplateFa.ref"); //Not used yet.
 
@@ -715,17 +715,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateFi() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateFi.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateFi.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateFi.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateFi.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "fi";
@@ -738,7 +738,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateFi.fx");
+        setSource("visageprj3/TemplateFi.visage");
         getFile(DIFF_FILE, "TemplateFi.diff");
         getFile(REF_FILE, "TemplateFi.ref"); //Not used yet.
 
@@ -753,17 +753,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateFor() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateFor.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateFor.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateFor.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateFor.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "for";
@@ -776,7 +776,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateFor.fx");
+        setSource("visageprj3/TemplateFor.visage");
         getFile(DIFF_FILE, "TemplateFor.diff");
         getFile(REF_FILE, "TemplateFor.ref"); //Not used yet.
 
@@ -791,17 +791,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateFu() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateFu.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateFu.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateFu.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateFu.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "fu";
@@ -814,7 +814,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateFu.fx");
+        setSource("visageprj3/TemplateFu.visage");
         getFile(DIFF_FILE, "TemplateFu.diff");
         getFile(REF_FILE, "TemplateFu.ref"); //Not used yet.
 
@@ -829,17 +829,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateIf() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateIf.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateIf.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateIf.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateIf.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "if";
@@ -852,7 +852,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateIf.fx");
+        setSource("visageprj3/TemplateIf.visage");
         getFile(DIFF_FILE, "TemplateIf.diff");
         getFile(REF_FILE, "TemplateIf.ref"); //Not used yet.
 
@@ -867,17 +867,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateIfe() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateIfe.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateIfe.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateIfe.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateIfe.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "ife";
@@ -890,7 +890,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateIfe.fx");
+        setSource("visageprj3/TemplateIfe.visage");
         getFile(DIFF_FILE, "TemplateIfe.diff");
         getFile(REF_FILE, "TemplateIfe.ref"); //Not used yet.
 
@@ -905,17 +905,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateIm() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateIm.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateIm.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateIm.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateIm.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "im";
@@ -928,7 +928,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateIm.fx");
+        setSource("visageprj3/TemplateIm.visage");
         getFile(DIFF_FILE, "TemplateIm.diff");
         getFile(REF_FILE, "TemplateIm.ref"); //Not used yet.
 
@@ -943,17 +943,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateIn() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateIn.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateIn.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateIn.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateIn.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "In";
@@ -966,7 +966,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateIn.fx");
+        setSource("visageprj3/TemplateIn.visage");
         getFile(DIFF_FILE, "TemplateIn.diff");
         getFile(REF_FILE, "TemplateIn.ref"); //Not used yet.
 
@@ -981,17 +981,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateInd() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateInd.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateInd.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateInd.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateInd.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "ind";
@@ -1004,7 +1004,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateInd.fx");
+        setSource("visageprj3/TemplateInd.visage");
         getFile(DIFF_FILE, "TemplateInd.diff");
         getFile(REF_FILE, "TemplateInd.ref"); //Not used yet.
 
@@ -1019,17 +1019,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateIns() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateIns.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateIns.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateIns.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateIns.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "ins";
@@ -1042,7 +1042,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateIns.fx");
+        setSource("visageprj3/TemplateIns.visage");
         getFile(DIFF_FILE, "TemplateIns.diff");
         getFile(REF_FILE, "TemplateIns.ref"); //Not used yet.
 
@@ -1057,17 +1057,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateInsa() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateInsa.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateInsa.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateInsa.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateInsa.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "insa";
@@ -1080,7 +1080,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateInsa.fx");
+        setSource("visageprj3/TemplateInsa.visage");
         getFile(DIFF_FILE, "TemplateInsa.diff");
         getFile(REF_FILE, "TemplateInsa.ref"); //Not used yet.
 
@@ -1095,17 +1095,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateInsb() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateInsb.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateInsb.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateInsb.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateInsb.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "insb";
@@ -1118,7 +1118,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateInsb.fx");
+        setSource("visageprj3/TemplateInsb.visage");
         getFile(DIFF_FILE, "TemplateInsb.diff");
         getFile(REF_FILE, "TemplateInsb.ref"); //Not used yet.
 
@@ -1133,17 +1133,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateInv() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateInv.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateInv.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateInv.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateInv.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "inv";
@@ -1156,7 +1156,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateInv.fx");
+        setSource("visageprj3/TemplateInv.visage");
         getFile(DIFF_FILE, "TemplateInv.diff");
         getFile(REF_FILE, "TemplateInv.ref"); //Not used yet.
 
@@ -1171,17 +1171,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateIof() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateIof.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateIof.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateIof.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateIof.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "iof";
@@ -1194,7 +1194,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateIof.fx");
+        setSource("visageprj3/TemplateIof.visage");
         getFile(DIFF_FILE, "TemplateIof.diff");
         getFile(REF_FILE, "TemplateIof.ref"); //Not used yet.
 
@@ -1209,17 +1209,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateNu() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateNu.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateNu.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateNu.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateNu.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "Nu";
@@ -1232,7 +1232,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateNu.fx");
+        setSource("visageprj3/TemplateNu.visage");
         getFile(DIFF_FILE, "TemplateNu.diff");
         getFile(REF_FILE, "TemplateNu.ref"); //Not used yet.
 
@@ -1247,17 +1247,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplatePa() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplatePa.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplatePa.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplatePa.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplatePa.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "pa";
@@ -1270,7 +1270,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplatePa.fx");
+        setSource("visageprj3/TemplatePa.visage");
         getFile(DIFF_FILE, "TemplatePa.diff");
         getFile(REF_FILE, "TemplatePa.ref"); //Not used yet.
 
@@ -1285,17 +1285,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplatePe() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplatePe.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplatePe.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplatePe.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplatePe.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "pe";
@@ -1308,7 +1308,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplatePe.fx");
+        setSource("visageprj3/TemplatePe.visage");
         getFile(DIFF_FILE, "TemplatePe.diff");
         getFile(REF_FILE, "TemplatePe.ref"); //Not used yet.
 
@@ -1323,17 +1323,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplatePi() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplatePi.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplatePi.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplatePi.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplatePi.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "pi";
@@ -1346,7 +1346,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplatePi.fx");
+        setSource("visageprj3/TemplatePi.visage");
         getFile(DIFF_FILE, "TemplatePi.diff");
         getFile(REF_FILE, "TemplatePi.ref"); //Not used yet.
 
@@ -1361,17 +1361,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplatePr() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplatePr.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplatePr.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplatePr.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplatePr.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "pr";
@@ -1384,7 +1384,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplatePr.fx");
+        setSource("visageprj3/TemplatePr.visage");
         getFile(DIFF_FILE, "TemplatePr.diff");
         getFile(REF_FILE, "TemplatePr.ref"); //Not used yet.
 
@@ -1399,17 +1399,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplatePu() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplatePu.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplatePu.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplatePu.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplatePu.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "pu";
@@ -1422,7 +1422,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplatePu.fx");
+        setSource("visageprj3/TemplatePu.visage");
         getFile(DIFF_FILE, "TemplatePu.diff");
         getFile(REF_FILE, "TemplatePu.ref"); //Not used yet.
 
@@ -1437,17 +1437,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateRe() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateRe.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateRe.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateRe.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateRe.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "re";
@@ -1460,7 +1460,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateRe.fx");
+        setSource("visageprj3/TemplateRe.visage");
         getFile(DIFF_FILE, "TemplateRe.diff");
         getFile(REF_FILE, "TemplateRe.ref"); //Not used yet.
 
@@ -1475,17 +1475,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateSerr() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateSerr.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateSerr.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateSerr.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateSerr.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "serr";
@@ -1498,7 +1498,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateSerr.fx");
+        setSource("visageprj3/TemplateSerr.visage");
         getFile(DIFF_FILE, "TemplateSerr.diff");
         getFile(REF_FILE, "TemplateSerr.ref"); //Not used yet.
 
@@ -1513,17 +1513,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateSo() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateSo.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateSo.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateSo.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateSo.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "so";
@@ -1536,7 +1536,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateSo.fx");
+        setSource("visageprj3/TemplateSo.visage");
         getFile(DIFF_FILE, "TemplateSo.diff");
         getFile(REF_FILE, "TemplateSo.ref"); //Not used yet.
 
@@ -1551,17 +1551,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateSout() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateSout.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateSout.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateSout.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateSout.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "sout";
@@ -1574,7 +1574,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateSout.fx");
+        setSource("visageprj3/TemplateSout.visage");
         getFile(DIFF_FILE, "TemplateSout.diff");
         getFile(REF_FILE, "TemplateSout.ref"); //Not used yet.
 
@@ -1589,17 +1589,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateSt() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateSt.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateSt.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateSt.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateSt.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "St";
@@ -1612,7 +1612,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateSt.fx");
+        setSource("visageprj3/TemplateSt.visage");
         getFile(DIFF_FILE, "TemplateSt.diff");
         getFile(REF_FILE, "TemplateSt.ref"); //Not used yet.
 
@@ -1627,17 +1627,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTh() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTh.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTh.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTh.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTh.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "th";
@@ -1650,7 +1650,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTh.fx");
+        setSource("visageprj3/TemplateTh.visage");
         getFile(DIFF_FILE, "TemplateTh.diff");
         getFile(REF_FILE, "TemplateTh.ref"); //Not used yet.
 
@@ -1665,17 +1665,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTof() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTof.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTof.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTof.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTof.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "tof";
@@ -1688,7 +1688,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTof.fx");
+        setSource("visageprj3/TemplateTof.visage");
         getFile(DIFF_FILE, "TemplateTof.diff");
         getFile(REF_FILE, "TemplateTof.ref"); //Not used yet.
 
@@ -1703,17 +1703,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTr() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTr.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTr.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTr.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTr.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "tr";
@@ -1726,7 +1726,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTr.fx");
+        setSource("visageprj3/TemplateTr.visage");
         getFile(DIFF_FILE, "TemplateTr.diff");
         getFile(REF_FILE, "TemplateTr.ref"); //Not used yet.
 
@@ -1741,17 +1741,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTrid() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTrid.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTrid.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTrid.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTrid.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "trid";
@@ -1764,7 +1764,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTrid.fx");
+        setSource("visageprj3/TemplateTrid.visage");
         getFile(DIFF_FILE, "TemplateTrid.diff");
         getFile(REF_FILE, "TemplateTrid.ref"); //Not used yet.
 
@@ -1779,17 +1779,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTrii() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTrii.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTrii.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTrii.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTrii.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "trii";
@@ -1802,7 +1802,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTrii.fx");
+        setSource("visageprj3/TemplateTrii.visage");
         getFile(DIFF_FILE, "TemplateTrii.diff");
         getFile(REF_FILE, "TemplateTrii.ref"); //Not used yet.
 
@@ -1817,17 +1817,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTrin() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTrin.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTrin.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTrin.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTrin.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "trin";
@@ -1840,7 +1840,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTrin.fx");
+        setSource("visageprj3/TemplateTrin.visage");
         getFile(DIFF_FILE, "TemplateTrin.diff");
         getFile(REF_FILE, "TemplateTrin.ref"); //Not used yet.
 
@@ -1855,18 +1855,18 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTrir() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTrir.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTrir.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         Util.sleep();
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTrir.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTrir.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "trir";
@@ -1879,7 +1879,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTrir.fx");
+        setSource("visageprj3/TemplateTrir.visage");
         getFile(DIFF_FILE, "TemplateTrir.diff");
         getFile(REF_FILE, "TemplateTrir.ref"); //Not used yet.
 
@@ -1894,18 +1894,18 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateTw() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateTw.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateTw.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         Util.sleep();
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateTw.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateTw.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "tw";
@@ -1918,7 +1918,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateTw.fx");
+        setSource("visageprj3/TemplateTw.visage");
         getFile(DIFF_FILE, "TemplateTw.diff");
         getFile(REF_FILE, "TemplateTw.ref"); //Not used yet.
 
@@ -1933,17 +1933,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateVar() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateVar.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateVar.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateVar.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateVar.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "var";
@@ -1956,7 +1956,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateVar.fx");
+        setSource("visageprj3/TemplateVar.visage");
         getFile(DIFF_FILE, "TemplateVar.diff");
         getFile(REF_FILE, "TemplateVar.ref"); //Not used yet.
 
@@ -1971,17 +1971,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateWe() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateWe.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateWe.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateWe.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateWe.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "we";
@@ -1994,7 +1994,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateWe.fx");
+        setSource("visageprj3/TemplateWe.visage");
         getFile(DIFF_FILE, "TemplateWe.diff");
         getFile(REF_FILE, "TemplateWe.ref"); //Not used yet.
 
@@ -2009,17 +2009,17 @@ public class TemplateTests extends VisageTestCase {
     public void TemplateWh() {
         new QueueTool().waitEmpty();
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj3|TemplateWh.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
+        String path = PROJECT_NAME + "|Source Packages|visageprj3|TemplateWh.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
         new QueueTool().waitEmpty();
-        fxsource.callPopup();
+        visagesource.callPopup();
         new QueueTool().waitEmpty();
         new JPopupMenuOperator().pushMenu("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("TemplateWh.fx");
+        TopComponentOperator main = new TopComponentOperator("TemplateWh.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         String text = "wh";
@@ -2032,7 +2032,7 @@ public class TemplateTests extends VisageTestCase {
         Util.sleep();
 
         //Diff
-        setSource("fxprj3/TemplateWh.fx");
+        setSource("visageprj3/TemplateWh.visage");
         getFile(DIFF_FILE, "TemplateWh.diff");
         getFile(REF_FILE, "TemplateWh.ref"); //Not used yet.
 

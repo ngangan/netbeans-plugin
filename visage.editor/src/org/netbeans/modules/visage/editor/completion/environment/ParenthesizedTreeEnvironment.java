@@ -42,14 +42,14 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.ParenthesizedTree;
-import com.sun.visage.api.tree.Tree;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.ParenthesizedTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *

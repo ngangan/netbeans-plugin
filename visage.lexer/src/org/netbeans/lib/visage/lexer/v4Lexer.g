@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Sun Microsystems, Inc.  All Rights Reserved.
+ * Copyright 2007-2009 Sun Microsystems, Inc.  All Rights Reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,28 +26,29 @@
 //
 // @author Jim Idle
 //
-// Version 4 of the grammar reverts to a spearate lexer and parser grammar without a separate
+// Version 4 of the grammar reverts to a separate lexer and parser grammar without a separate
 // ANTLR based AST walker. This is because this is the easiest way (at the time of writing)
 // to confine error recovery to the smallest possible set of side effects on the resulting
-// JavafxTree. This is important for down stream tools such as code completion, which require
+// VisageTree. This is important for down stream tools such as code completion, which require
 // as much of the AST as is possible to produce if they are to be effective.
 // 
-// The lexer is spearated from teh paresr because ANTLR cannot specify separate 
+// The lexer is separated from the parser because ANTLR cannot specify separate
 // superclasses for the lexer and the parser and v4 requires a different lexer
-// superClass to the v3 lexer but must co-exits with the v3 lexer.
+// superClass to the v3 lexer but must coexist with the v3 lexer.
 //
 // Derived from prior versions by:
 //
 // @author Robert Field
 // @author Zhiqun Chen
+// @author Stephen Chin
 //
 lexer grammar v4Lexer;
 
 options { 
 
 	// Rather than embed lexer oriented Java code in this grammar, just to override
-	// methods in the ANTLR base recognizer and derviative classes, we
-	// instruct ANTLR to generate a class which is dervied from our own
+    // methods in the ANTLR base recognizer and derivative classes, we
+    // instruct ANTLR to generate a class which is derived from our own
 	// super class. The super class is where we embody any code that does
 	// not require direct access to the terminals and methods generated 
 	// to implement the lexer.
@@ -69,7 +70,7 @@ package org.netbeans.lib.visage.lexer;
 import com.sun.tools.mjavac.util.Context;
 import com.sun.tools.mjavac.util.Convert;
 import com.sun.tools.mjavac.util.Log;
-import com.sun.tools.visage.util.MsgSym;
+import org.visage.tools.util.MsgSym;
 
 }
 
@@ -108,10 +109,12 @@ BEFORE			: 'before';
 BIND			: 'bind';
 BOUND			: 'bound';
 BREAK			: 'break';
+CASCADE         : 'cascade';
 CATCH			: 'catch';
 CLASS			: 'class';
 CONTINUE		: 'continue';
 DEF				: 'def';
+DEFAULT         : 'default';
 DELETE			: 'delete';
 ELSE			: 'else';
 EXCLUSIVE		: 'exclusive';
@@ -130,6 +133,7 @@ INIT			: 'init';
 INSERT			: 'insert';
 INSTANCEOF		: 'instanceof';
 INTO			: 'into';
+INVALIDATE      : 'invalidate';
 INVERSE			: 'inverse';
 LAST			: 'last';
 LAZY			: 'lazy';
@@ -183,6 +187,7 @@ RBRACKET	: ']';
 SEMI		: ';';
 COMMA		: ',';
 DOT			: '.';
+NULLCHECK   : '!.';
 EQEQ		: '==';
 EQ			: '=';
 GT			: '>';
@@ -274,7 +279,7 @@ STRING_LITERAL
 										
 							// Report the error
 							//
-							log.error(sPos, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                            log.error(sPos, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
 										
 							// Always use a defined string as the value
 							//
@@ -315,7 +320,7 @@ STRING_LITERAL
 							
 							// Report the error
 							//
-							log.error(sPos, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                            log.error(sPos, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
 							
 							// Always use a defined string as the value
 							//
@@ -384,7 +389,7 @@ RBRACE_QUOTE_STRING_LITERAL
 							('\n'|'\r'|EOF) // Badly formed string
 							
 							{
-								log.error(eStringStart, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                                log.error(eStringStart, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
 								input.rewind();
 								setText(getText() + "\"");
 							}
@@ -407,7 +412,7 @@ RBRACE_QUOTE_STRING_LITERAL
 					| { input.mark(); }
 						('\n'|'\r'|EOF) // Badly formed string
 						{
-							log.error(eStringStart, MsgSym.MESSAGE_JAVAFX_UNTERMINATED_STRING);
+                            log.error(eStringStart, MsgSym.MESSAGE_VISAGE_UNTERMINATED_STRING);
 							input.rewind();
 							setText(getText() + "'");
 						}
@@ -476,7 +481,7 @@ DoubleQuoteBody
 			| '\\' .
 			| '}'
 				{
-					log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_UNESCAPED_RBRACE);
+                    log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_UNESCAPED_RBRACE);
 				}
 			
 		 )*  
@@ -491,7 +496,7 @@ SingleQuoteBody
 			| '\\' .
 			| '}'
 				{
-					log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_UNESCAPED_RBRACE);
+                    log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_UNESCAPED_RBRACE);
 				}
 		)*  
 	;
@@ -552,10 +557,10 @@ TranslationKeyBody
  
 //------------------------------------------------------------
 // Numeric literals.
-// These are handled specailly to reduce lexer complexity and
+// These are handled specially to reduce lexer complexity and
 // negate the need to override standard ANTLR lexing methods.
-// This improves performance and enhance readibility.
-// The following fragmetn rules are to documetn the types and
+// This improves performance and enhances readability.
+// The following fragment rules are to document the types and
 // to provide a lexer symbol for the token type. The actual
 // parsing is carried out in the FLOATING_POINT_LITERAL rule.
 //
@@ -567,10 +572,66 @@ TranslationKeyBody
 //
 fragment	TIME_LITERAL 		: 	;
 
+// Length literals are meant for expressing screen layouts.
+// This includes both physical and relative measurements.
+//
+// Physical measurements are expressed in terms of the size of the
+// final rendered version.  They are appropriate where the screen
+// characteristics are well known, but suffer from scaling issues where
+// the distance to the display varies greatly (such as cell phone vs. TV).
+// Supported measures include:
+// * in - inches: 1in is 1 physical inch
+// * cm - centimeters: 1cm is 1/2.54 of an inch
+// * mm - millimeters: 1mm is 1/10th of a centimeter
+// * pt - points: 1pt is equal to 1/72 of an inch
+// * pc - picas: 1pc is equal to 12 points
+//
+// Relative measurements are expressed in terms of other scaling factors such
+// as the font size, container size, or pixel density of the screen.
+// Supported measures include:
+// * em - Length measure relative to text height.  Historically the height
+// of the "M" ligature in the given font, this usually refers to the reference
+// font height.
+// * ex - Length measure relative to half the text height.  Historically the
+// height of the lowercase "x" in the given font, this will be set to half of
+// an "em" where no font information is available.
+// * px - A reference pixel on the given display device.  This will always be
+// precisely 1 device dependent pixel based on the resolution of the target device.
+// This measure is useful where exact pixel reproduction is required or the
+// device characteristics are known in advance.
+// * dp - A density-independent pixel that is scaled to accommodate the display
+// characteristics.  This will usually be a fixed multiple of device pixels,
+// while accounting for screen resolution and viewing distance.  On platforms
+// where density-independent pixels are not supported, 1dp will be the same
+// as 1px.
+// * sp - A scale-independent pixel that is relative to the user chosen scaling
+// factor.  For the default scale 1sp equals 1dp, with fractional multiples up
+// or down based on the scaling factor.  This is most often used to update the
+// font sizes based on user scaling, but can also be used for layout and
+// to scale graphics.  On platforms that do not support scaling, 1sp will
+// always equal 1dp (and likely 1px).
+// * % - A length measure relative to the container.  100% would be the full
+// length of the container and values between 100 and 0 would be fractionally
+// smaller.  If there is no valid reference for the container, this will be
+// treated as a length of 0.
+//
+fragment    LENGTH_LITERAL      :   ;
+
+// Angle measurements for specifying bends, angles, or alignment.
+//
+// * deg - Angle in degrees.  Negative and fractional values are allowed.  Will
+// be standardized to be between 0 and 360.
+// * rad - Angle in radians.  Radians normally require no units, but for typing
+// purposes must have this extension to be used where an angle is required.
+// * turn - A geometric turn representing 1 full revolution.  1turn is equal to
+// 360deg or Math.PI*2rad.
+//
+fragment    ANGLE_LITERAL       :   ;
+
 // Decimal literals may not have leading zeros unless
 // they are just the constant 0. They are integer only.
 // In order to do more accurate error processing, these
-// numeric literlas may merge into one rule that overrides
+// numeric literals may merge into one rule that overrides
 // the type.
 //
 fragment	DECIMAL_LITERAL 	:	;
@@ -584,7 +645,7 @@ fragment	OCTAL_LITERAL 		: 	;
 // more valid hex digits following them. The problem with specifying
 // it like this is that a string such as 0x will cause a lexing error
 // rather than a parse or semantic error, which is probably better
-// and so this may change (see comments assocaited with DECIMAL_LITERAL)
+// and so this may change (see comments associated with DECIMAL_LITERAL)
 //
 fragment	HEX_LITERAL 		:	;
 
@@ -592,8 +653,8 @@ fragment	HEX_LITERAL 		:	;
 // This rule is in fact the proxy rule for all types of numeric
 // literals. ANTLR lexers are LL recognizers rather than pattern
 // matchers such as flex. Hence we want to hand craft this rule
-// to guide it through all the possible combinatsion of digits and
-// dots in the most efficent way.
+// to guide it through all the possible combination of digits and
+// dots in the most efficient way.
 //
 // This rule presents all the decision points in definite order,
 // giving the scanner little hard work to do to select the
@@ -651,7 +712,7 @@ FLOATING_POINT_LITERAL
     			  	  		{
     			  	  			// Error - malformed hex constant
     			  	  			//
-    			  	  			log.error(sPos, MsgSym.MESSAGE_JAVAFX_HEX_MALFORMED);
+                                log.error(sPos, MsgSym.MESSAGE_VISAGE_HEX_MALFORMED);
     			  	  			setText("0");
     			  	  		}
     			  	  		else
@@ -680,7 +741,7 @@ FLOATING_POINT_LITERAL
     			  	  				{ 
     			  	  					// Error - malformed hex constant
     			  	  					//
-    			  	  					log.error(sPos, MsgSym.MESSAGE_JAVAFX_HEX_FLOAT);
+                                        log.error(sPos, MsgSym.MESSAGE_VISAGE_HEX_FLOAT);
     			  	  					setText("0");
     			  	  				}
     			  	  		|
@@ -690,7 +751,7 @@ FLOATING_POINT_LITERAL
     			  	|	// If no digits follow 0x then it is an error
     			  		//
     			  		{
-    			  			log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_HEX_MISSING);
+                            log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_HEX_MISSING);
     			  			setText("0");
     			  		}
     			  		
@@ -721,7 +782,7 @@ FLOATING_POINT_LITERAL
     					
     					if	(rangeError)
     					{
-    						log.error(sPos, MsgSym.MESSAGE_JAVAFX_OCTAL_MALFORMED);
+                            log.error(sPos, MsgSym.MESSAGE_VISAGE_OCTAL_MALFORMED);
     						setText("0");
     					}
     					else
@@ -743,7 +804,7 @@ FLOATING_POINT_LITERAL
     			  	  		'.' Digits?	
     			  	  		
     			  	  			{ 
-    			  	  				log.error(sPos, MsgSym.MESSAGE_JAVAFX_OCTAL_FLOAT);
+                                    log.error(sPos, MsgSym.MESSAGE_VISAGE_OCTAL_FLOAT);
     			  	  				setText("0");
     			  	  			}
     			  	  	|
@@ -757,11 +818,27 @@ FLOATING_POINT_LITERAL
     				{ $type = TIME_LITERAL; }
     				
   				
+                |   // Length sequence specifier means this was 0 length
+                    // in whatever units.
+                    //
+                    ('in' | 'cm' | 'mm' | 'pt' | 'pc' | 'em' | 'ex' | 'px' | 'dp' | 'sp' | '%')
+
+                    { $type = LENGTH_LITERAL; }
+
+
+                |   // Angle sequence specifier means this was 0 angle
+                    // in whatever units.
+                    //
+                    ('deg' | 'rad' | 'turn')
+
+                    { $type = ANGLE_LITERAL; }
+
+
     			|	// We can of course have 0.nnnnn
     				//
     				{ input.LA(2) != '.'}?=> '.' 
     					(
-    						  // Decimal, but possibly time
+                              // Decimal, but possibly time, length, or angle
     						  //
     						  Digits Exponent?
     						  
@@ -770,6 +847,16 @@ FLOATING_POINT_LITERAL
     				
 				    					{ $type = TIME_LITERAL; }
 				    				
+
+                                    |   ('in' | 'cm' | 'mm' | 'pt' | 'pc' | 'em' | 'ex' | 'px' | 'dp' | 'sp' | '%')
+
+                                        { $type = LENGTH_LITERAL; }
+
+
+                                    |   ('deg' | 'rad' | 'turn')
+
+                                        { $type = ANGLE_LITERAL; }
+                                    
 				    				| 	// Just 0.nnn
 				    					//
 				    					{ $type = FLOATING_POINT_LITERAL; }
@@ -804,8 +891,8 @@ FLOATING_POINT_LITERAL
     			{ input.LA(2) != '.'}?=>
     			
     				(
-    				  // HAving determined that this is not a range, we check to 
-    				  // see that it looks like something that shoudl be a float.
+                      // Having determined that this is not a range, we check to
+                      // see that it looks like something that should be a float.
     				  // We can have an expression such as 1.intVal() and so that
     				  // needs to be '1' '.' 'intVal' '(' ')'
     				  // Note that 1.exxxx will always find an erroneous scientific
@@ -820,6 +907,16 @@ FLOATING_POINT_LITERAL
     				
 				    		{ $type = TIME_LITERAL; }
 				    				
+
+                        |   ('in' | 'cm' | 'mm' | 'pt' | 'pc' | 'em' | 'ex' | 'px' | 'dp' | 'sp' | '%')
+
+                            { $type = LENGTH_LITERAL; }
+
+
+                        |   ('deg' | 'rad' | 'turn')
+
+                            { $type = ANGLE_LITERAL; }
+                                    
 				    	| 	// Just n.nnn
 				    					//
 				    		{ $type = FLOATING_POINT_LITERAL; }
@@ -842,6 +939,15 @@ FLOATING_POINT_LITERAL
     				
 				    		{ $type = TIME_LITERAL; }
 				    
+                        |   ('in' | 'cm' | 'mm' | 'pt' | 'pc' | 'em' | 'ex' | 'px' | 'dp' | 'sp' | '%')
+
+                            { $type = LENGTH_LITERAL; }
+
+
+                        |   ('deg' | 'rad' | 'turn')
+
+                            { $type = ANGLE_LITERAL; }
+
 				    	| Exponent				
 				    	
 				    		{
@@ -863,7 +969,7 @@ FLOATING_POINT_LITERAL
     |
     	'.'
     	
-    		(	  // Float, but is it a time?
+            (     // Float, but is it a time, length, or angle?
     			  //
     			  Digits Exponent?
     			  
@@ -872,6 +978,16 @@ FLOATING_POINT_LITERAL
     			 
     			 			{ $type = TIME_LITERAL; }
     			 			
+
+                        |   ('in' | 'cm' | 'mm' | 'pt' | 'pc' | 'em' | 'ex' | 'px' | 'dp' | 'sp' | '%')
+
+                            { $type = LENGTH_LITERAL; }
+
+
+                        |   ('deg' | 'rad' | 'turn')
+
+                            { $type = ANGLE_LITERAL; }
+                            
     			 		| 	// Just  floating point
     			 			//
     			 			{ $type = FLOATING_POINT_LITERAL; }
@@ -892,7 +1008,6 @@ FLOATING_POINT_LITERAL
     		)
     ;
 
-	
 fragment
 Digits	
 	:	('0'..'9')+ 
@@ -904,19 +1019,68 @@ Exponent
 	
 			(
 				  Digits
-				| 	{ 
-						log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_EXPONENT_MALFORMED); 
+                |   // Match an error in the exponent, but exclude characters
+                    // used in numeric literals (e.g. '5em')
+                    //
+                    ~('m'|'x'|'0'..'9') {
+                        log.error(getCharIndex()-2, MsgSym.MESSAGE_VISAGE_EXPONENT_MALFORMED);
 						setText("0.0");
 					}
 			)
  	;
 
-// Identifiers are any sequence of vharacters considered
+COLOR_LITERAL
+@init
+{
+    // Indicates out of range digit
+    //
+    boolean rangeError = false;
+
+    // First character of rule
+    //
+    int     sPos = getCharIndex();
+}
+    :   '#'
+        // We consume any letters and digits that follow #
+        // and control the error that we issue.
+        (
+            ('0'..'9'|'a'..'f'|'A'..'F'|'|')      // Valid Hex Color
+        |   ('g'..'z'|'G'..'Z')                   // Invalid Hex Color
+
+            {
+                rangeError = true;  // Signal at least one bad digit
+            }
+        )+
+        {
+            if  (rangeError)
+            {
+                // Error - malformed hex constant
+                //
+                log.error(sPos, MsgSym.MESSAGE_VISAGE_COLOR_WRONG_CHARACTERS);
+                setText("#000");
+            }
+            else
+            {
+                if (! checkColorString(getText(), sPos))
+                {
+                    setText("#000");
+                }
+            }
+        }
+        |   // If no digits follow # then it is an error
+            //
+            {
+                log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_COLOR_MISSING);
+                setText("#000");
+            }
+    ;
+
+// Identifiers are any sequence of characters considered
 // to be alphanumeric in the Java specification. Identifiers
 // that cannot match this pattern may be 'quoted' by surrounding
 // them with '<<' and '>>' - this allows external references to
 // methods, properties and so on , where the external language
-// does not restrict the identifer names to such a pattern or does
+// does not restrict the identifier names to such a pattern or does
 // not regard Visage keywords as invalid identifiers.
 //
 IDENTIFIER 
@@ -979,7 +1143,7 @@ COMMENT
     :   '/*' ( options {greedy=false;} : . )* '*/' 
     
     	{
-                if (getText().startsWith("/**")) {
+                if (getText().startsWith("/**") && !getText().startsWith("/**/")) {
                     $type = DOC_COMMENT;
                 }
     		$channel=HIDDEN;
@@ -1017,11 +1181,11 @@ INVALIDC
 			
 				// Something very strange happened
 				//
-				log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_BAD_CHARACTER, "<unknown>");
+                log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_BAD_CHARACTER, "<unknown>");
 				
 			} else {
 			
-				log.error(getCharIndex()-1, MsgSym.MESSAGE_JAVAFX_BAD_CHARACTER, getCharErrorDisplay( disp.charAt(0) ) );
+                log.error(getCharIndex()-1, MsgSym.MESSAGE_VISAGE_BAD_CHARACTER, getCharErrorDisplay( disp.charAt(0) ) );
 			}
 		}
 	;

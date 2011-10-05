@@ -47,8 +47,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.netbeans.modules.visage.fxd.dataloader.fxz.FXZDataObject;
 
-import com.sun.visage.tools.fxd.loader.Profile;
-import com.sun.visage.tools.fxd.container.FXDContainer;
 import org.netbeans.modules.visage.fxd.composer.misc.FXDComposerUtils;
 
 /**

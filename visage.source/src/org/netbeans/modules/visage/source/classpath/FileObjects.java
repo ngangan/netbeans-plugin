@@ -87,7 +87,7 @@ public class FileObjects {
     public static final Comparator<JavaFileObject> SIMPLE_NAME_FILEOBJECT_COMPARATOR = new SimpleNameFileObjectComparator();
   */  
     
-    public static final String JAVAFX  = "fx"; //VisageDataLoader.FX_EXTENSION; // NOI18N
+    public static final String VISAGE  = "visage"; //VisageDataLoader.FX_EXTENSION; // NOI18N
     public static final String JAVA  = "java"; // NOI18N
     public static final String CLASS = "class"; //ClassDataLoader.CLASS_EXTENSION; // NOI18N
     public static final String JAR   = "jar";  //NOI18N
@@ -373,7 +373,7 @@ public class FileObjects {
             return JavaFileObject.Kind.OTHER;
         }
         String lcextension = extension.toLowerCase();
-        if (FileObjects.JAVAFX.equals(lcextension) || FileObjects.JAVA.equals(lcextension)) {
+        if (FileObjects.VISAGE.equals(lcextension) || FileObjects.JAVA.equals(lcextension)) {
                 return JavaFileObject.Kind.SOURCE;
         }
         if (FileObjects.CLASS.equals(lcextension) || FileObjects.SIG.equals(lcextension)) {

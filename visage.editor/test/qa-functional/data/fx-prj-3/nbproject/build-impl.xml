@@ -19,7 +19,7 @@ is divided into following sections:
   - cleanup
 
         -->
-<project xmlns:visageproject1="http://www.netbeans.org/ns/visage-project/1" xmlns:visageproject2="http://www.netbeans.org/ns/visage-project/2" xmlns:visageproject3="http://www.netbeans.org/ns/visage-project/3" basedir=".." default="default" name="fx-prj-3-impl">
+<project xmlns:visageproject1="http://www.netbeans.org/ns/visage-project/1" xmlns:visageproject2="http://www.netbeans.org/ns/visage-project/2" xmlns:visageproject3="http://www.netbeans.org/ns/visage-project/3" basedir=".." default="default" name="visage-prj-3-impl">
     <target depends="jar" description="Build whole project." name="default"/>
     <!--
                     ======================
@@ -50,7 +50,7 @@ is divided into following sections:
         <property file="nbproject/project.properties"/>
     </target>
     <target depends="-pre-init,-init-private,-init-user,-init-project" name="-do-init">
-        <visageproject1:property name="platform.fxhome" value="platforms.${platform.active}.fxhome"/>
+        <visageproject1:property name="platform.visagehome" value="platforms.${platform.active}.visagehome"/>
         <visageproject1:property name="platform.javadoc.tmp" value="platforms.${platform.active}.javadoc"/>
         <condition property="platform.javadoc" value="${platform.home}/bin/javadoc">
             <equals arg1="${platform.javadoc.tmp}" arg2="$${platforms.${platform.active}.javadoc}"/>
@@ -128,7 +128,7 @@ is divided into following sections:
         <!-- You can override this target in the ../build.xml file.-->
     </target>
     <target depends="init,deps-jar,-pre-compile" name="-do-compile">
-        <exec executable="${platform.fxhome}/bin/visagepackager${binary.extension}" failonerror="true">
+        <exec executable="${platform.visagehome}/bin/visagepackager${binary.extension}" failonerror="true">
             <arg value="-src"/>
             <arg value="${src.dir}"/>
             <arg value="-workdir"/>
@@ -172,11 +172,11 @@ is divided into following sections:
                     =================
     -->
     <target depends="init,compile,jar" description="Run a main class." if="standard.execution.trigger" name="standard-run">
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}"/>
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.visagehome}/bin/visage${binary.extension}"/>
     </target>
     <target depends="jar" description="Start MIDP execution" if="midp.execution.trigger" name="midp-run">
         <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
-        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+        <exec executable="${platform.visagehome}/emulator/bin/emulator${binary.extension}">
             <arg value="-Xdescriptor:${jad.file}"/>
         </exec>
     </target>
@@ -232,7 +232,7 @@ is divided into following sections:
         </nbvisagestart>
     </target>
     <target depends="init,compile" if="standard.execution.trigger" name="-debug-start-debuggee">
-        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.fxhome}/bin/visage${binary.extension}">
+        <java classname="${main.class}" classpath="${dist.dir}/${application.title}.jar" fork="true" jvm="${platform.visagehome}/bin/visage${binary.extension}">
             <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${visage.address}"/>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
@@ -242,7 +242,7 @@ is divided into following sections:
     </target>
     <target if="midp.execution.trigger" name="-debug-midp-debuggee">
         <property location="${dist.dir}/${application.title}.jad" name="jad.file"/>
-        <exec executable="${platform.fxhome}/emulator/bin/emulator${binary.extension}">
+        <exec executable="${platform.visagehome}/emulator/bin/emulator${binary.extension}">
             <arg value="-Xdescriptor:${jad.file}"/>
             <arg value="-Xdebug"/>
             <arg value="-Xrunjdwp:transport=dt_socket,address=${visage.address},server=n"/>
@@ -263,8 +263,8 @@ is divided into following sections:
     -->
     <target depends="init" name="-javadoc-build">
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" executable="${platform.fxhome}/bin/visagedoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true">
-            <fileset dir="${src.dir}" includes="**/*.fx"/>
+        <javadoc author="${javadoc.author}" classpath="${javac.classpath}" destdir="${dist.javadoc.dir}" executable="${platform.visagehome}/bin/visagedoc${binary.extension}" failonerror="true" private="${javadoc.private}" useexternalfile="true">
+            <fileset dir="${src.dir}" includes="**/*.visage"/>
         </javadoc>
         <condition property="javadoc.available">
             <and>

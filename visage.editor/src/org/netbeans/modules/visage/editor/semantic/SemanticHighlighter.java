@@ -41,12 +41,11 @@
  */
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.*;
 
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.TreeUtilities;
@@ -70,6 +69,15 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.FunctionInvocationTree;
+import org.visage.api.tree.IdentifierTree;
+import org.visage.api.tree.MemberSelectTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *
@@ -98,7 +106,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
     }
 
     private boolean process(CompilationInfo info) {
-        Document doc = FXSourceUtils.getDocument(file);
+        Document doc = VisageSourceUtils.getDocument(file);
         if (doc == null) {
             return false;
         }
@@ -106,8 +114,8 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
         identifiers.clear(); // clear cache
         List<Result> result = new ArrayList<Result>();
         UnitTree compilationUnit = info.getCompilationUnit();
-        VisageThreeVisitor javaFXThreeVisitor = new VisageThreeVisitor(info, doc, cancel);
-        javaFXThreeVisitor.scan(compilationUnit, result);
+        VisageThreeVisitor VisageThreeVisitor = new VisageThreeVisitor(info, doc, cancel);
+        VisageThreeVisitor.scan(compilationUnit, result);
         if (cancel.get()) {
             return true;
         }
@@ -208,7 +216,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
         @Override
         public Void visitFunctionDefinition(FunctionDefinitionTree tree, List<Result> list) {
-//            String name = ((VSGFunctionDefinition) tree).getName().toString();
+//            String name = ((VisageFunctionDefinition) tree).getName().toString();
 
             SourcePositions sourcePositions = info.getTrees().getSourcePositions();
             long start = sourcePositions.getStartPosition(info.getCompilationUnit(), getCurrentPath().getLeaf());
@@ -219,12 +227,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             Element element = info.getTrees().getElement(getCurrentPath());
-            Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
+            Set<Modifier> modifiers = VisageSourceUtils.getModifiers(element);
 
-            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VisageTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 Token t = ts.token();
-                if (VSGTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
+                if (VisageTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
 
@@ -257,9 +265,9 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             Element element = info.getTrees().getElement(getCurrentPath());
-            Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
+            Set<Modifier> modifiers = VisageSourceUtils.getModifiers(element);
 
-            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VisageTokenId> ts = tu.tokensFor(tree);
             Token name = null;
 
             ts.moveEnd();
@@ -267,12 +275,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             while (ts.movePrevious()) {
                 Token t = ts.token();
                 if (!metLBrace) {
-                    metLBrace = VSGTokenId.LPAREN.equals(t.id());
+                    metLBrace = VisageTokenId.LPAREN.equals(t.id());
                     if (!metLBrace) {
                         continue;
                     }
                 }
-                if (VSGTokenId.IDENTIFIER.equals(t.id())) {
+                if (VisageTokenId.IDENTIFIER.equals(t.id())) {
                     start = ts.offset();
                     name = t; // last identifier followed left parenthis is a name
                     break;
@@ -309,9 +317,9 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             Element element = info.getTrees().getElement(getCurrentPath());
-            Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
+            Set<Modifier> modifiers = VisageSourceUtils.getModifiers(element);
 
-            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VisageTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 // do not highlight parameters and local variables
                 if (element != null && !element.getKind().isField()) {
@@ -319,7 +327,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 }
 
                 Token t = ts.token();
-                if (VSGTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
+                if (VisageTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
 
@@ -352,9 +360,9 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             Element element = info.getTrees().getElement(getCurrentPath());
-            Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
+            Set<Modifier> modifiers = VisageSourceUtils.getModifiers(element);
 
-            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VisageTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 // do not highlight parameters, local variables and packages
                 if (element == null || (element != null && !element.getKind().isField())) {
@@ -362,7 +370,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
                 }
 
                 Token t = ts.token();
-                if (VSGTokenId.IDENTIFIER.equals(t.id())) {
+                if (VisageTokenId.IDENTIFIER.equals(t.id())) {
                     start = ts.offset();
                     end = start + t.length();
 
@@ -395,12 +403,12 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             }
 
             Element element = info.getTrees().getElement(getCurrentPath());
-            Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
+            Set<Modifier> modifiers = VisageSourceUtils.getModifiers(element);
 
-            TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
+            TokenSequence<VisageTokenId> ts = tu.tokensFor(tree);
             while (ts.moveNext()) {
                 Token t = ts.token();
-                if (VSGTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
+                if (VisageTokenId.IDENTIFIER.equals(t.id())) { // first identifier is a name
                     start = ts.offset();
                     end = start + t.length();
 
@@ -435,13 +443,13 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
             boolean handled = false;
             Element element = info.getTrees().getElement(getCurrentPath());
             if (element != null) {
-                TokenSequence<VSGTokenId> ts = tu.tokensFor(tree);
+                TokenSequence<VisageTokenId> ts = tu.tokensFor(tree);
 
                 while (ts.moveNext()) {
                     Token t = ts.token();
                     String tokenStr = t.text().toString();
 
-                    if (VSGTokenId.IDENTIFIER.equals(t.id())) {
+                    if (VisageTokenId.IDENTIFIER.equals(t.id())) {
                         start = ts.offset();
                         VisageTreePath subPath = tu.pathFor(getCurrentPath(), (int) start);
                         Element subElement = info.getTrees().getElement(subPath);
@@ -454,7 +462,7 @@ public class SemanticHighlighter implements CancellableTask<CompilationInfo> {
 
                                 if (tokenStr.equals(subElementName)) {
                                     handled = true;
-                                    Set<Modifier> modifiers = FXSourceUtils.getModifiers(element);
+                                    Set<Modifier> modifiers = VisageSourceUtils.getModifiers(element);
                                     start = ts.offset();
                                     end = start + t.length();
 

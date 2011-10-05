@@ -212,7 +212,7 @@ class OpenedEditors implements PropertyChangeListener {
         boolean            allowJavaExtension = false;
         
         if (mimeTypes == null) {
-            mimeTypes = new String[] {"text/x-fx"}; // NOI18N
+            mimeTypes = new String[] {"text/x-visage"}; // NOI18N
             allowJavaExtension = true;
         }
         
@@ -233,7 +233,7 @@ class OpenedEditors implements PropertyChangeListener {
                 continue;
             }
             
-            if (allowJavaExtension && "java".equals(f.getExt())) { // NOI18N
+            if (allowJavaExtension && "visage".equals(f.getExt())) { // NOI18N
                 result.add(f);
                 continue;
             }

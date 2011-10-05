@@ -43,9 +43,6 @@
  */
 package org.netbeans.modules.visage.fxd.schemamodel;
 
-import com.sun.visage.tools.fxd.container.scene.fxd.FXDException;
-import com.sun.visage.tools.fxd.schema.model.FXDSchema;
-import com.sun.visage.tools.fxd.schema.model.FXDSchemaException;
 import java.io.IOException;
 import java.net.URL;
 import org.openide.filesystems.FileObject;
@@ -61,7 +58,7 @@ public class FXDSchemaModelProvider {
     public static final String FXD_ROOT_NAME = "FXD"; //NOI18N
     public static final String FXD_CONTENT_NAME = "content"; //NOI18N
 
-    public static final String FXD_SCHEMA_FILE = "/com/sun/visage/tools/fxd/schema/fxd-schema.fxdl"; //NOI18N
+    public static final String FXD_SCHEMA_FILE = "/org/visage/tools/fxd/schema/fxd-schema.fxdl"; //NOI18N
 
     private static FXDSchema m_schema;
 

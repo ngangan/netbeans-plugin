@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.visage.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/visage-project/3">
-            <name>fx-prj-3</name>
+            <name>visage-prj-3</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <source-roots>
                 <root id="src.dir"/>

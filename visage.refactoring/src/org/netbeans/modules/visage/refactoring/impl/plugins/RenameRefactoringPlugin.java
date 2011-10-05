@@ -31,9 +31,6 @@
 
 package org.netbeans.modules.visage.refactoring.impl.plugins;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Scope;
-import com.sun.visage.api.tree.Tree;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -64,7 +61,6 @@ import org.netbeans.modules.visage.refactoring.impl.plugins.elements.RenameOccur
 import org.netbeans.modules.visage.refactoring.impl.scanners.LocalVarScanner;
 import org.netbeans.modules.visage.refactoring.repository.ClassModel;
 import org.netbeans.modules.visage.refactoring.repository.ElementDef;
-import org.netbeans.modules.visage.refactoring.repository.GlobalDef;
 import org.netbeans.modules.visage.refactoring.repository.Usage;
 import org.netbeans.modules.visage.refactoring.transformations.ReplaceTextTransformation;
 import org.netbeans.modules.visage.refactoring.transformations.Transformation;
@@ -77,6 +73,9 @@ import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.visage.api.tree.Scope;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *

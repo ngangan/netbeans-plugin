@@ -41,8 +41,6 @@
  */
 package org.netbeans.api.visage.editor;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
 import com.sun.tools.mjavac.code.Symbol;
 import java.io.IOException;
 import org.netbeans.modules.visage.editor.*;
@@ -60,6 +58,8 @@ import org.netbeans.api.visage.source.VisageSourceUtils;
 import org.netbeans.api.visage.source.Task;
 import org.openide.filesystems.FileObject;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *
@@ -142,7 +142,7 @@ public final class ElementOpen {
         TypeElement tel = getEnclosingClassElement(el);
         ElementHandle elh = ElementHandle.create(el);
 
-        if (!comp.getJavafxTypes().isVSGClass((Symbol) tel)) { // java
+        if (!comp.getVisageTypes().isVisageClass((Symbol) tel)) { // java
             return openThroughJavaSupport(comp.getFileObject(), elh);
         }
         // Find the source file

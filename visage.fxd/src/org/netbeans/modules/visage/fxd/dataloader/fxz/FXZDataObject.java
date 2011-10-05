@@ -44,7 +44,6 @@
 
 package org.netbeans.modules.visage.fxd.dataloader.fxz;
 
-import com.sun.visage.tools.fxd.container.FXDContainer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;

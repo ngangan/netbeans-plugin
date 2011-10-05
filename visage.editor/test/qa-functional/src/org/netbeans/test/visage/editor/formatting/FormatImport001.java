@@ -69,7 +69,7 @@ public class FormatImport001 extends VisageTestCase {
         "testCloseProject"}; //, "testIDELogForErrors"};
     public static String _bundle = "org.netbeans.test.visage.editor.lib.Bundle";
 
-    protected static final String PROJECT_NAME = "fx-prj-2";
+    protected static final String PROJECT_NAME = "visage-prj-2";
     protected final String DATA_DIR = this.getDataDirAsString();
     protected final String WORK_DIR = this.getWorkDirAsString();
     protected File DIFF_FILE;
@@ -84,8 +84,8 @@ public class FormatImport001 extends VisageTestCase {
         return NbModuleSuite.create(FormatImport001.class, ".*", ".*", TESTS);
     }
 
-    /** Open Project opens he fx-prj-2 project which contains the
-     * Format related .fx files
+    /** Open Project opens he visage-prj-2 project which contains the
+     * Format related .visage files
      */
     public void testOpenProject() {
         try {
@@ -122,15 +122,15 @@ public class FormatImport001 extends VisageTestCase {
 
     public void FormatImport001() {
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj2|FormatImport001.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
-        fxsource.callPopup();
+        String path = PROJECT_NAME + "|Source Packages|visageprj2|FormatImport001.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
+        visagesource.callPopup();
         new JPopupMenuOperator().pushMenuNoBlock("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("FormatImport001.fx");
+        TopComponentOperator main = new TopComponentOperator("FormatImport001.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         //Format, Save and Close
@@ -144,7 +144,7 @@ public class FormatImport001 extends VisageTestCase {
         main.closeWindow();
 
         //Diff
-        setSource("fxprj2/FormatImport001.fx");
+        setSource("visageprj2/FormatImport001.visage");
         getFile(DIFF_FILE, "FormatImport001.diff");
         getFile(REF_FILE, "FormatImport001.ref"); //Not used yet.
 
@@ -158,15 +158,15 @@ public class FormatImport001 extends VisageTestCase {
 
     public void BackgroundImage() {
         ProjectsTabOperator pto = new ProjectsTabOperator();
-        String path = PROJECT_NAME + "|Source Packages|fxprj2|BackgroundImage.fx";
-        Node fxsource = new Node(pto.invoke().tree(), path);
-        fxsource.callPopup();
+        String path = PROJECT_NAME + "|Source Packages|visageprj2|BackgroundImage.visage";
+        Node visagesource = new Node(pto.invoke().tree(), path);
+        visagesource.callPopup();
         new JPopupMenuOperator().pushMenuNoBlock("Open");
         new QueueTool().waitEmpty();
         log("File path: " + path + " opened in editor.");
 
         // get Editor
-        TopComponentOperator main = new TopComponentOperator("BackgroundImage.fx");
+        TopComponentOperator main = new TopComponentOperator("BackgroundImage.visage");
         JEditorPaneOperator editor = new JEditorPaneOperator(main);
 
         //Format, Save and Close
@@ -180,7 +180,7 @@ public class FormatImport001 extends VisageTestCase {
         main.closeWindow();
 
         //Diff
-        setSource("fxprj2/BackgroundImage.fx");
+        setSource("visageprj2/BackgroundImage.visage");
         getFile(DIFF_FILE, "BackgroundImage.diff");
         getFile(REF_FILE, "BackgroundImage.ref"); //Not used yet.
 

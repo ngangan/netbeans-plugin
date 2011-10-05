@@ -59,5 +59,5 @@ public final class ResourceMarker {
                 + '/' +resourName; // NOI18N
     }
     
-    public static final String PROJECT_ICO = "fx.png"; // NOI18N
+    public static final String PROJECT_ICO = "visage.png"; // NOI18N
 }

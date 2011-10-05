@@ -42,19 +42,10 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.OverrideClassVarTree;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.VariableTree;
 import com.sun.tools.mjavac.code.Type;
-import com.sun.tools.visage.code.JavafxTypes;
-import com.sun.tools.visage.tree.VSGErroneousType;
 
-import com.sun.tools.visage.tree.VSGSelect;
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.LAZY_KEYWORD;
 
@@ -63,6 +54,15 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.lang.model.element.TypeElement;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.OverrideClassVarTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VariableTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.code.VisageTypes;
+import org.visage.tools.tree.VisageErroneousType;
+import org.visage.tools.tree.VisageSelect;
 
 /**
  * @author David Strupl
@@ -93,32 +93,32 @@ public class VariableTreeEnvironment extends VisageCompletionEnvironment<Variabl
         if (type == null) {
             typePos = 0;
         } else {
-            typePos = type.getVisageKind() == Tree.VisageKind.ERRONEOUS && ((VSGErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+            typePos = type.getVisageKind() == Tree.VisageKind.ERRONEOUS && ((VisageErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
         }
         if (LOGGABLE) log("  isLocal == " + isLocal + "  type == " + type + "  typePos == " + typePos); // NOI18N
         if (offset <= typePos) {
-            TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+            TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
             if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-            if ((last != null) && (last.token().id() == VSGTokenId.COLON)){
+            if ((last != null) && (last.token().id() == VisageTokenId.COLON)){
                 addLocalAndImportedTypes(null, null, null, false, getSmartType(t));
                 addBasicTypes();
             }
             return;
         }
-        TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
+        TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getEndPosition(root, type), offset);
         if (LOGGABLE) log("    last(2) == " + (last == null ? "null" : last.token().id())); // NOI18N
-        if ((last != null) && (last.token().id() == VSGTokenId.EQ ||
-                last.token().id() == VSGTokenId.BIND  ||
-                last.token().id() == VSGTokenId.LAZY)) {
+        if ((last != null) && (last.token().id() == VisageTokenId.EQ ||
+                last.token().id() == VisageTokenId.BIND  ||
+                last.token().id() == VisageTokenId.LAZY)) {
             localResult(getSmartType(t));
             addValueKeywords();
-            if (last.token().id() == VSGTokenId.BIND) {
+            if (last.token().id() == VisageTokenId.BIND) {
                 addKeyword(LAZY_KEYWORD, null, false);
             }
         }
         ExpressionTree initializer = t.getInitializer();
-        if (initializer instanceof VSGSelect) {
-            String typeS = ((VSGSelect) initializer).getExpression().toString();
+        if (initializer instanceof VisageSelect) {
+            String typeS = ((VisageSelect) initializer).getExpression().toString();
             addAllTypes(null, false, typeS);
         }
         addLocalMembersAndVars(getSmartType(t));
@@ -139,7 +139,7 @@ public class VariableTreeEnvironment extends VisageCompletionEnvironment<Variabl
         }
         
         // handle sequences as their element type
-        JavafxTypes types = controller.getJavafxTypes();
+        VisageTypes types = controller.getVisageTypes();
         if (types.isSequence((Type) type)) {
             type = types.elementType((Type) type);
         } 

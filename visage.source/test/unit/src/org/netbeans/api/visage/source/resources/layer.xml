@@ -53,9 +53,9 @@ made subject to such option by the copyright holder.
     </folder>
     <folder name="Editors">
         <folder name="text">
-            <folder name="x-fx">
+            <folder name="x-visage">
                 <file name="language.instance">
-                    <attr name="instanceCreate" methodvalue="org.netbeans.api.visage.lexer.VSGTokenId.language"/>
+                    <attr name="instanceCreate" methodvalue="org.netbeans.api.visage.lexer.VisageTokenId.language"/>
                     <attr name="instanceOf" stringvalue="org.netbeans.api.lexer.Language"/>
                 </file>
             </folder>

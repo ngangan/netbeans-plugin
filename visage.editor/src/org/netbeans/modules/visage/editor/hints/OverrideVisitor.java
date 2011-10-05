@@ -44,16 +44,16 @@
 
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.ClassDeclarationTree;
-import com.sun.visage.api.tree.FunctionDefinitionTree;
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.SourcePositions;
 import com.sun.tools.mjavac.code.Symbol.MethodSymbol;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.lang.model.element.Element;
 import org.netbeans.api.visage.source.CompilationInfo;
+import org.visage.api.tree.ClassDeclarationTree;
+import org.visage.api.tree.FunctionDefinitionTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *

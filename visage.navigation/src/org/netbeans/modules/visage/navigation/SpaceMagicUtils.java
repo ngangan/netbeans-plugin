@@ -41,15 +41,7 @@
  */
 package org.netbeans.modules.visage.navigation;
 
-import com.sun.visage.api.tree.ExpressionTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.Tree.VisageKind;
-import com.sun.visage.api.tree.UnitTree;
 import com.sun.tools.mjavac.code.Symbol;
-import com.sun.tools.visage.api.JavafxcTrees;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -58,9 +50,16 @@ import javax.lang.model.element.Element;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.ElementHandle;
-import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.visage.source.Task;
 import org.openide.util.Exceptions;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.api.VisagecTrees;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageFunctionDefinition;
 
 /**
  * Only quintessentially pure space magic is here.
@@ -134,18 +133,18 @@ public final class SpaceMagicUtils {
      */
     public static List<Element> getSpiritualMembers(final CompilationInfo info) {
         final List<Element> elements = new ArrayList<Element>();
-        final JavafxcTrees trees = info.getTrees();
+        final VisagecTrees trees = info.getTrees();
         final UnitTree cut = info.getCompilationUnit();
 
         for (Tree tt : cut.getTypeDecls()) {
             VisageKind kk = tt.getVisageKind();
             if (kk == VisageKind.CLASS_DECLARATION) {
-                VSGClassDeclaration cd = (VSGClassDeclaration) tt;
+                VisageClassDeclaration cd = (VisageClassDeclaration) tt;
 
                 for (Tree jct : cd.getClassMembers()) {
                     VisageKind k = jct.getVisageKind();
                     if (k == VisageKind.FUNCTION_DEFINITION) {
-                        VSGFunctionDefinition fdt = (VSGFunctionDefinition) jct;
+                        VisageFunctionDefinition fdt = (VisageFunctionDefinition) jct;
                         if (MAGIC_FUNCTION.equals(fdt.name.toString())) {
 
                             for (ExpressionTree st : fdt.getBodyExpression().getStatements()) {
@@ -166,10 +165,10 @@ public final class SpaceMagicUtils {
 
     // This is too advanced magic at the moment, maybe will work later on
 
-//        JavafxcTrees trees = info.getTrees();
+//        VisagecTrees trees = info.getTrees();
 //        TreePath path = trees.getPath(e);
-//        VSGFunctionDefinition tree = (VSGFunctionDefinition) trees.getTree(e);
-//        VSGBlockExpression bodyExpression = tree.getBodyExpression();
+//        VisageFunctionDefinition tree = (VisageFunctionDefinition) trees.getTree(e);
+//        VisageBlockExpression bodyExpression = tree.getBodyExpression();
 //        for (StatementTree st : bodyExpression.getStatements()) {
 //            if (canceled.get()) {
 //                return;

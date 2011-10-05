@@ -63,7 +63,7 @@ import junit.framework.Assert;
 
 import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.platform.VisagePlatform;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.junit.NbTestCase;
@@ -170,7 +170,7 @@ public class SourceTestBase extends NbTestCase {
             }
         };
         Lkp.initLookups(new Object[] {repository, /*loader, */ cpp, mdp});
-        TestLanguageProvider.register(VSGTokenId.language());
+        TestLanguageProvider.register(VisageTokenId.language());
 
 /*        File cacheFolder = new File(getWorkDir(), "var/cache/index");
         cacheFolder.mkdirs();
@@ -301,7 +301,7 @@ public class SourceTestBase extends NbTestCase {
         DataObject dobj = DataObject.find(fo);
         EditorCookie ec = dobj.getCookie(EditorCookie.class);
         Document doc = ec.openDocument();
-        doc.putProperty(Language.class, VSGTokenId.language());
+        doc.putProperty(Language.class, VisageTokenId.language());
 
         final Exception[] exc = new Exception[1];
         src.runUserActionTask(new CancellableTask<CompilationController>() {

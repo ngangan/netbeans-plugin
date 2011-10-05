@@ -43,8 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.rename;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree.VisageKind;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -80,7 +78,7 @@ import org.netbeans.api.editor.mimelookup.MimePath;
 import org.netbeans.api.editor.settings.AttributesUtilities;
 import org.netbeans.api.editor.settings.EditorStyleConstants;
 import org.netbeans.api.editor.settings.FontColorSettings;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.visage.source.VisageSourceUtils;
@@ -106,6 +104,8 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *
@@ -248,15 +248,15 @@ public class InstantRenamePerformer implements DocumentListener, KeyListener {
         
         doc.render(new Runnable() {
             public void run() {
-                TokenSequence<VSGTokenId> ts = VisageSourceUtils.getJavaTokenSequence(info.getTokenHierarchy(), caret);
+                TokenSequence<VisageTokenId> ts = VisageSourceUtils.getJavaTokenSequence(info.getTokenHierarchy(), caret);
                 
                 ts.move(caret);
                 
                 if (ts.moveNext() && ts.token()!=null) {
-                    if (ts.token().id() == VSGTokenId.IDENTIFIER) {
+                    if (ts.token().id() == VisageTokenId.IDENTIFIER) {
                         adjustedCaret[0] = ts.offset() + ts.token().length() / 2 + 1;
-                    } else if (ts.token().id() == VSGTokenId.COMMENT) {
-                        TokenSequence<VSGTokenId> jdts = ts.embedded(VSGTokenId.language());
+                    } else if (ts.token().id() == VisageTokenId.COMMENT) {
+                        TokenSequence<VisageTokenId> jdts = ts.embedded(VisageTokenId.language());
 //                        if (jdts != null && JavadocImports.isInsideReference(jdts, caret)) {
 //                            jdts.move(caret);
 //                            if (jdts.moveNext() && jdts.token().id() == JavadocTokenId.IDENT) {

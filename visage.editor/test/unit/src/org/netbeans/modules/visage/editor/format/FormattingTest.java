@@ -49,7 +49,7 @@ import javax.swing.text.Document;
 import org.netbeans.api.editor.mimelookup.MimeLookup;
 import org.netbeans.api.java.lexer.JavaTokenId;
 import org.netbeans.api.visage.editor.TestUtilities;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CompilationController;
 import org.netbeans.api.visage.source.VisageSource;
 import org.netbeans.api.visage.source.Task;
@@ -84,7 +84,7 @@ public class FormattingTest extends NbTestCase {
     // XXX: disabled now, cf. issue #175439
     public void DISABLED_testVariable() throws Exception {
         // TODO move initialization part to separate method
-        testFile = new File(getWorkDir(), "Test.fx");
+        testFile = new File(getWorkDir(), "Test.visage");
         TestUtilities.copyStringToFile(testFile,
                 "package org.netbeans.visage.test;\n\n" +
                 "public class Test {\n" +
@@ -99,8 +99,8 @@ public class FormattingTest extends NbTestCase {
         assertNotNull(ec);
         final Document doc = ec.openDocument();
         assertNotNull(doc);
-        doc.putProperty(Language.class, VSGTokenId.language());
-        doc.putProperty("mimeType", "text/x-fx");
+        doc.putProperty(Language.class, VisageTokenId.language());
+        doc.putProperty("mimeType", "text/x-visage");
 
         VisageSource src = VisageSource.forDocument(doc);
         src.runUserActionTask(new Task<CompilationController>() {
@@ -112,7 +112,7 @@ public class FormattingTest extends NbTestCase {
 
         // TODO use visage preferences when will be available
         Preferences preferences = MimeLookup.getLookup(JavaTokenId.language().mimeType()).lookup(Preferences.class);
-//        Preferences preferences = MimeLookup.getLookup(VSGTokenId.language().mimeType()).lookup(Preferences.class);
+//        Preferences preferences = MimeLookup.getLookup(VisageTokenId.language().mimeType()).lookup(Preferences.class);
         assertNotNull(preferences);
         preferences.putBoolean("placeNewLineAfterModifiers", false);
         preferences.putBoolean("spaceAroundAssignOps", true);

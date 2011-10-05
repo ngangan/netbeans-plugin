@@ -42,9 +42,6 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.AssignmentTree;
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +49,9 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import org.netbeans.api.lexer.TokenUtilities;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import org.visage.api.tree.AssignmentTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  *

@@ -70,8 +70,8 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 "var ", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "declarations/TopLvlVar1.fx",
+                "visage-prj-1",
+                "declarations/TopLvlVar1.visage",
                 3, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -82,8 +82,8 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "declarations/TopLvlVar2.fx",
+                "visage-prj-1",
+                "declarations/TopLvlVar2.visage",
                 8, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -94,8 +94,8 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "declarations/Animation001.fx",
+                "visage-prj-1",
+                "declarations/Animation001.visage",
                 7, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -106,8 +106,8 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "declarations/Animation001.fx",
+                "visage-prj-1",
+                "declarations/Animation001.visage",
                 10, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -118,8 +118,8 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 "", // what should be typed in the editor
                 false, 
                 getDataDir(),
-                "fx-prj-1",
-                "declarations/Animation001.fx",
+                "visage-prj-1",
+                "declarations/Animation001.visage",
                 12, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);        
     }
@@ -130,8 +130,8 @@ public class DeclarationCCTests extends CompletionTestPerformer {
                 "var C6 = Color.rgb( ", // what should be typed in the editor
                 false,
                 getDataDir(),
-                "fx-prj-1",
-                "declarations/TopLvlVar3.fx",
+                "visage-prj-1",
+                "declarations/TopLvlVar3.visage",
                 19, // line number where the cursor should be
                 CompletionProvider.COMPLETION_QUERY_TYPE);
     }

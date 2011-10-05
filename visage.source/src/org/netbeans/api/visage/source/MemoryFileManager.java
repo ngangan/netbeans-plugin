@@ -127,14 +127,14 @@ public class MemoryFileManager implements JavaFileManager {
 	String binaryName;
         
 	public String getBinaryName() {
-	    return binaryName.equals("__FX_SCRIPT__.fx") ? "__FX_SCRIPT__" : binaryName; // NOI18N
+	    return binaryName.equals("__VISAGE_SCRIPT__.visage") ? "__VISAGE_SCRIPT__" : binaryName; // NOI18N
 	}
 
         StringInputBuffer(String name, String code) {
             super(toURI(name), Kind.SOURCE);
             this.code = code;
 	    binaryName = name;
-            isFXSourceFile = name.endsWith(".fx"); // NOI18N
+            isFXSourceFile = name.endsWith(".visage"); // NOI18N
         }
         
         @Override
@@ -232,7 +232,7 @@ public class MemoryFileManager implements JavaFileManager {
         throw new UnsupportedOperationException("Not supported yet."); // NOI18N
     }
     
-    private final static String EXT = ".fx"; // NOI18N
+    private final static String EXT = ".visage"; // NOI18N
     static URI toURI(String name) {
         File file = new File(name);
         if (file.exists()) {
@@ -245,7 +245,7 @@ public class MemoryFileManager implements JavaFileManager {
                 if(name.endsWith(EXT)) newUri.replace(newUri.length() - EXT.length(), newUri.length(), EXT);
                 return URI.create(newUri.toString());
             } catch (Exception exp) {
-                return URI.create("mfm:///com/sun/tools/visage/script/visage_source"); // NOI18N
+                return URI.create("mfm:///org/visage/tools/script/visage_source"); // NOI18N
             }
         }
     }

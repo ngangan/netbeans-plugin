@@ -44,6 +44,7 @@
 package org.netbeans.modules.visage.platform.platformdefinition;
 
 import java.text.MessageFormat;
+import java.util.logging.Level;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.spi.java.classpath.support.ClassPathSupport;
 import java.util.*;
@@ -120,7 +121,7 @@ public class Util {
      * @return String
      */
     public static String normalizeName (String displayName) {
-        StringBuffer normalizedName = new StringBuffer ();
+        StringBuilder normalizedName = new StringBuilder ();
         for (int i=0; i< displayName.length(); i++) {
             char c = displayName.charAt(i);
             if (Character.isJavaIdentifierPart(c) || c =='-' || c =='.') { // NOI18N
@@ -181,7 +182,7 @@ public class Util {
         if (extPath == null) {
             return null;
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringTokenizer tk = new StringTokenizer (extPath, File.pathSeparator);
         while (tk.hasMoreTokens()) {
             File extFolder = FileUtil.normalizeFile(new File(tk.nextToken()));
@@ -203,7 +204,7 @@ public class Util {
                     }
                     FileObject fo = FileUtil.toFileObject(f);
                     if (fo == null) {
-                        Logger.getLogger(Util.class.getName()).warning("Cannot create FileObject for file: "+f.getAbsolutePath()+" exists: " + f.exists()); // NOI18N
+                        Logger.getLogger(Util.class.getName()).log(Level.WARNING, "Cannot create FileObject for file: {0} exists: {1}", new Object[]{f.getAbsolutePath(), f.exists()}); // NOI18N
                         continue;
                     }
                     if (!FileUtil.isArchiveFile(fo)) {

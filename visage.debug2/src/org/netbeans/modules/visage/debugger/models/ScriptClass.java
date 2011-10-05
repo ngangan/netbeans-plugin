@@ -5,9 +5,6 @@
 
 package org.netbeans.modules.visage.debugger.models;
 
-import com.sun.visage.jdi.FXClassType;
-import com.sun.visage.jdi.FXObjectReference;
-import com.sun.visage.jdi.FXPrimitiveType;
 import com.sun.jdi.ClassNotLoadedException;
 import com.sun.jdi.Value;
 import java.util.ArrayList;
@@ -19,6 +16,9 @@ import org.netbeans.api.debugger.jpda.ObjectVariable;
 import org.netbeans.modules.debugger.jpda.JPDADebuggerImpl;
 import org.netbeans.modules.debugger.jpda.models.AbstractObjectVariable;
 import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
+import org.visage.jdi.VisageClassType;
+import org.visage.jdi.VisageObjectReference;
+import org.visage.jdi.VisagePrimitiveType;
 
 /**
  *
@@ -26,10 +26,10 @@ import org.netbeans.modules.debugger.jpda.models.JPDAClassTypeImpl;
  */
 public class ScriptClass extends AbstractObjectVariable implements ObjectVariable, Field {
 
-    FXClassType scriptClass;
-    FXObjectReference objectReference;
+    VisageClassType scriptClass;
+    VisageObjectReference objectReference;
     
-    public ScriptClass( JPDADebuggerImpl debugger, Value value, FXClassType scriptClass, FXObjectReference objectReference ) {        
+    public ScriptClass( JPDADebuggerImpl debugger, Value value, VisageClassType scriptClass, VisageObjectReference objectReference ) {        
         super( debugger, value, "script" );
         this.scriptClass = scriptClass;
         this.objectReference = objectReference;
@@ -53,10 +53,10 @@ public class ScriptClass extends AbstractObjectVariable implements ObjectVariabl
             com.sun.jdi.Field f = fields.get(  i );
             try {
                 if( !f.isStatic()) continue;
-                if( f.type() instanceof FXPrimitiveType ) {
-                    result.add( new ScriptFieldVariable( getDebugger(), f, scriptClass, "FX" + f.name(), objectReference )); // NOI18N
+                if( f.type() instanceof VisagePrimitiveType ) {
+                    result.add( new ScriptFieldVariable( getDebugger(), f, scriptClass, "Visage" + f.name(), objectReference )); // NOI18N
                 } else {
-                    result.add( new ScriptObjectVariable( getDebugger(), f, scriptClass, "FX" + f.name(), objectReference )); // NOI18N
+                    result.add( new ScriptObjectVariable( getDebugger(), f, scriptClass, "Visage" + f.name(), objectReference )); // NOI18N
                 }
             } catch( ClassNotLoadedException ex ) {
                 ex.printStackTrace();

@@ -55,10 +55,11 @@ import java.util.StringTokenizer;
 
 public class FileObjectPropertyEditor extends PropertyEditorSupport {
 
+    @Override
     public String getAsText() {
         try {
             List fileobjs = (List) this.getValue();
-            StringBuffer result = new StringBuffer ();
+            StringBuilder result = new StringBuilder ();
             boolean first = true;
             for (Iterator it = fileobjs.iterator(); it.hasNext();) {
                 FileObject fo = (FileObject) it.next ();
@@ -80,6 +81,7 @@ public class FileObjectPropertyEditor extends PropertyEditorSupport {
         }
     }
 
+    @Override
     public void setAsText(String text) throws IllegalArgumentException {
         try {
             List<FileObject> fileObjs = new ArrayList<FileObject> ();

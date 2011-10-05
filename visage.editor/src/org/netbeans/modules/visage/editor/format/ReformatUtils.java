@@ -43,10 +43,14 @@
  */
 package org.netbeans.modules.visage.editor.format;
 
-import com.sun.visage.api.tree.*;
-import com.sun.visage.api.tree.Tree.VisageKind;
 import java.util.EnumSet;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
+import org.visage.api.tree.BlockExpressionTree;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.ModifiersTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.VisageTreePath;
 
 /**
  * Reformatter utilities.
@@ -55,48 +59,48 @@ import org.netbeans.api.visage.lexer.VSGTokenId;
  */
 public final class ReformatUtils {
 
-    public static EnumSet<VSGTokenId> RESERVED_KEYWORDS = EnumSet.of(VSGTokenId.ABSTRACT,
-            VSGTokenId.AFTER, VSGTokenId.AND, VSGTokenId.AS, VSGTokenId.ASSERT,
-            VSGTokenId.AT, VSGTokenId.ATTRIBUTE, VSGTokenId.BEFORE, VSGTokenId.BIND,
-            VSGTokenId.BOUND, VSGTokenId.BREAK, VSGTokenId.CATCH, VSGTokenId.CLASS,
-            VSGTokenId.CONTINUE, VSGTokenId.DEF, VSGTokenId.DELETE, VSGTokenId.ELSE,
-            VSGTokenId.EXCLUSIVE, VSGTokenId.EXTENDS, VSGTokenId.FALSE, VSGTokenId.FINALLY,
-            VSGTokenId.FOR, VSGTokenId.FROM, VSGTokenId.FUNCTION, VSGTokenId.IF,
-            VSGTokenId.IMPORT, VSGTokenId.INDEXOF, VSGTokenId.INSERT, VSGTokenId.INSTANCEOF,
-            VSGTokenId.LAZY, VSGTokenId.MIXIN, VSGTokenId.MOD, VSGTokenId.NATIVEARRAY,
-            VSGTokenId.NEW, VSGTokenId.NOT, VSGTokenId.NULL, VSGTokenId.OR,
-            VSGTokenId.OVERRIDE, VSGTokenId.PACKAGE, VSGTokenId.PRIVATE, VSGTokenId.PROTECTED,
-            VSGTokenId.PUBLIC, VSGTokenId.PUBLIC_INIT, VSGTokenId.PUBLIC_READ, VSGTokenId.RETURN,
-            VSGTokenId.REVERSE, VSGTokenId.SIZEOF, VSGTokenId.STATIC, VSGTokenId.SUPER,
-            VSGTokenId.THEN, VSGTokenId.THIS, VSGTokenId.THROW, VSGTokenId.TRUE,
-            VSGTokenId.TRY, VSGTokenId.TYPEOF, VSGTokenId.VAR, VSGTokenId.WHILE);
+    public static EnumSet<VisageTokenId> RESERVED_KEYWORDS = EnumSet.of(VisageTokenId.ABSTRACT,
+            VisageTokenId.AFTER, VisageTokenId.AND, VisageTokenId.AS, VisageTokenId.ASSERT,
+            VisageTokenId.AT, VisageTokenId.ATTRIBUTE, VisageTokenId.BEFORE, VisageTokenId.BIND,
+            VisageTokenId.BOUND, VisageTokenId.BREAK, VisageTokenId.CATCH, VisageTokenId.CLASS,
+            VisageTokenId.CONTINUE, VisageTokenId.DEF, VisageTokenId.DELETE, VisageTokenId.ELSE,
+            VisageTokenId.EXCLUSIVE, VisageTokenId.EXTENDS, VisageTokenId.FALSE, VisageTokenId.FINALLY,
+            VisageTokenId.FOR, VisageTokenId.FROM, VisageTokenId.FUNCTION, VisageTokenId.IF,
+            VisageTokenId.IMPORT, VisageTokenId.INDEXOF, VisageTokenId.INSERT, VisageTokenId.INSTANCEOF,
+            VisageTokenId.LAZY, VisageTokenId.MIXIN, VisageTokenId.MOD, VisageTokenId.NATIVEARRAY,
+            VisageTokenId.NEW, VisageTokenId.NOT, VisageTokenId.NULL, VisageTokenId.OR,
+            VisageTokenId.OVERRIDE, VisageTokenId.PACKAGE, VisageTokenId.PRIVATE, VisageTokenId.PROTECTED,
+            VisageTokenId.PUBLIC, VisageTokenId.PUBLIC_INIT, VisageTokenId.PUBLIC_READ, VisageTokenId.RETURN,
+            VisageTokenId.REVERSE, VisageTokenId.SIZEOF, VisageTokenId.STATIC, VisageTokenId.SUPER,
+            VisageTokenId.THEN, VisageTokenId.THIS, VisageTokenId.THROW, VisageTokenId.TRUE,
+            VisageTokenId.TRY, VisageTokenId.TYPEOF, VisageTokenId.VAR, VisageTokenId.WHILE);
 
-    public static EnumSet<VSGTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(VSGTokenId.FIRST,
-            VSGTokenId.IN, VSGTokenId.INIT, VSGTokenId.INTO, VSGTokenId.INVERSE,
-            VSGTokenId.LAST, VSGTokenId.ON, VSGTokenId.POSTINIT, VSGTokenId.REPLACE,
-            VSGTokenId.STEP, VSGTokenId.TRIGGER, VSGTokenId.TWEEN, VSGTokenId.WHERE,
-            VSGTokenId.WITH, VSGTokenId.INVALIDC);
+    public static EnumSet<VisageTokenId> NON_RESERVED_KEYWORDS = EnumSet.of(VisageTokenId.FIRST,
+            VisageTokenId.IN, VisageTokenId.INIT, VisageTokenId.INTO, VisageTokenId.INVERSE,
+            VisageTokenId.LAST, VisageTokenId.ON, VisageTokenId.POSTINIT, VisageTokenId.REPLACE,
+            VisageTokenId.STEP, VisageTokenId.TRIGGER, VisageTokenId.TWEEN, VisageTokenId.WHERE,
+            VisageTokenId.WITH, VisageTokenId.INVALIDC);
 
-    public static EnumSet<VSGTokenId> MODIFIER_KEYWORDS = EnumSet.of(VSGTokenId.PRIVATE,
-            VSGTokenId.PACKAGE, VSGTokenId.PROTECTED, VSGTokenId.PUBLIC,
-            VSGTokenId.PUBLIC_READ, VSGTokenId.PUBLIC_INIT, VSGTokenId.STATIC,
-            VSGTokenId.ABSTRACT, VSGTokenId.NATIVEARRAY, VSGTokenId.MIXIN,
-            VSGTokenId.OVERRIDE, VSGTokenId.BOUND);
+    public static EnumSet<VisageTokenId> MODIFIER_KEYWORDS = EnumSet.of(VisageTokenId.PRIVATE,
+            VisageTokenId.PACKAGE, VisageTokenId.PROTECTED, VisageTokenId.PUBLIC,
+            VisageTokenId.PUBLIC_READ, VisageTokenId.PUBLIC_INIT, VisageTokenId.STATIC,
+            VisageTokenId.ABSTRACT, VisageTokenId.NATIVEARRAY, VisageTokenId.MIXIN,
+            VisageTokenId.OVERRIDE, VisageTokenId.BOUND);
 
-    public static EnumSet<VSGTokenId> NON_STRING_LITERALS = EnumSet.of(VSGTokenId.TRUE,
-            VSGTokenId.FALSE, VSGTokenId.NULL, VSGTokenId.DECIMAL_LITERAL,
-            VSGTokenId.FLOATING_POINT_LITERAL, VSGTokenId.HEX_LITERAL,
-            VSGTokenId.OCTAL_LITERAL);
+    public static EnumSet<VisageTokenId> NON_STRING_LITERALS = EnumSet.of(VisageTokenId.TRUE,
+            VisageTokenId.FALSE, VisageTokenId.NULL, VisageTokenId.DECIMAL_LITERAL,
+            VisageTokenId.FLOATING_POINT_LITERAL, VisageTokenId.HEX_LITERAL,
+            VisageTokenId.OCTAL_LITERAL);
 
-    public static EnumSet<VSGTokenId> STRING_LITERALS = EnumSet.of(VSGTokenId.STRING_LITERAL,
-            VSGTokenId.QUOTE_LBRACE_STRING_LITERAL, VSGTokenId.RBRACE_LBRACE_STRING_LITERAL,
-            VSGTokenId.RBRACE_QUOTE_STRING_LITERAL);
+    public static EnumSet<VisageTokenId> STRING_LITERALS = EnumSet.of(VisageTokenId.STRING_LITERAL,
+            VisageTokenId.QUOTE_LBRACE_STRING_LITERAL, VisageTokenId.RBRACE_LBRACE_STRING_LITERAL,
+            VisageTokenId.RBRACE_QUOTE_STRING_LITERAL);
 
-    public static EnumSet<VSGTokenId> VARIABLE_KEYWORDS = EnumSet.of(VSGTokenId.VAR,
-            VSGTokenId.DEF, VSGTokenId.ATTRIBUTE);
+    public static EnumSet<VisageTokenId> VARIABLE_KEYWORDS = EnumSet.of(VisageTokenId.VAR,
+            VisageTokenId.DEF, VisageTokenId.ATTRIBUTE);
 
-    public static EnumSet<VSGTokenId> OPERATOR_KEYWORDS = EnumSet.of(VSGTokenId.AND,
-            VSGTokenId.OR, VSGTokenId.MOD);
+    public static EnumSet<VisageTokenId> OPERATOR_KEYWORDS = EnumSet.of(VisageTokenId.AND,
+            VisageTokenId.OR, VisageTokenId.MOD);
 
     public static boolean containsOneExpressionOnly(ExpressionTree tree) {
         if (tree == null) {
@@ -131,7 +135,7 @@ public final class ReformatUtils {
     }
 
     // TODO check flags when it will work
-    public static boolean hasModifiers(ModifiersTree mods, VSGTokenId firstToken) {
+    public static boolean hasModifiers(ModifiersTree mods, VisageTokenId firstToken) {
         if (!MODIFIER_KEYWORDS.contains(firstToken)) { //#179502
             return false;
         }

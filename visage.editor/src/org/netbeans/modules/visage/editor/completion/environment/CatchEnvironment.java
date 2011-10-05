@@ -42,13 +42,9 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.CatchTree;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.VariableTree;
-import com.sun.tools.visage.tree.VSGErroneousType;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import javax.lang.model.element.TypeElement;
@@ -57,6 +53,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.CatchTree;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VariableTree;
+import org.visage.tools.tree.VisageErroneousType;
 
 /**
  *
@@ -73,12 +73,12 @@ public class CatchEnvironment extends VisageCompletionEnvironment<CatchTree> {
         VariableTree var = t.getParameter();
         if (var != null) {
             Tree type = var.getType();
-            int typePos = type.getVisageKind() == Tree.VisageKind.ERRONEOUS && ((VSGErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
+            int typePos = type.getVisageKind() == Tree.VisageKind.ERRONEOUS && ((VisageErroneousType) type).getErrorTrees().isEmpty() ? (int) sourcePositions.getEndPosition(root, type) : (int) sourcePositions.getStartPosition(root, type);
             if (LOGGABLE) log("  type == " + type + "  typePos == " + typePos); // NOI18N
             if (offset <= typePos) {
-                TokenSequence<VSGTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
+                TokenSequence<VisageTokenId> last = findLastNonWhitespaceToken((int) sourcePositions.getStartPosition(root, t), offset);
                 if (LOGGABLE) log("    last(1) == " + (last == null ? "null" : last.token().id())); // NOI18N
-                if ((last != null) && (last.token().id() == VSGTokenId.COLON)){
+                if ((last != null) && (last.token().id() == VisageTokenId.COLON)){
                     addLocalAndImportedTypes(null, null, null, false, getSmartType());
                 }
                 return;

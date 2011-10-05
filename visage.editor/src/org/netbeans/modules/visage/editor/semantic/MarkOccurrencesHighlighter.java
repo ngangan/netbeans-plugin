@@ -43,12 +43,8 @@
  */
 package org.netbeans.modules.visage.editor.semantic;
 
-import com.sun.visage.api.tree.*;
-import com.sun.visage.api.tree.Tree.VisageKind;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
 import org.netbeans.api.editor.settings.AttributesUtilities;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.visage.source.CancellableTask;
 import org.netbeans.api.visage.source.CompilationInfo;
 import org.netbeans.api.visage.source.TreeUtilities;
@@ -79,7 +75,17 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.ElementFilter;
-import org.netbeans.api.visage.editor.FXSourceUtils;
+import org.netbeans.api.visage.editor.VisageSourceUtils;
+import org.visage.api.tree.ExpressionTree;
+import org.visage.api.tree.ForExpressionTree;
+import org.visage.api.tree.SourcePositions;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.Tree.VisageKind;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.api.tree.WhileLoopTree;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageFunctionDefinition;
 
 /**
  *
@@ -203,13 +209,13 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                 VisageTreePath gpTypePath = pTypePath.getParentPath();
                 if (gpTypePath != null) {
                     VisageTreePath ggpTypePath = gpTypePath.getParentPath();
-                    if (getVSGKind(ggpTypePath) == VisageKind.FUNCTION_DEFINITION &&
-                            getVSGKind(gpTypePath) == VisageKind.FUNCTION_VALUE &&
-                            getVSGKind(pTypePath) == VisageKind.TYPE_CLASS &&
-                            getVSGKind(typePath) == VisageKind.IDENTIFIER) {
+                    if (getVisageKind(ggpTypePath) == VisageKind.FUNCTION_DEFINITION &&
+                            getVisageKind(gpTypePath) == VisageKind.FUNCTION_VALUE &&
+                            getVisageKind(pTypePath) == VisageKind.TYPE_CLASS &&
+                            getVisageKind(typePath) == VisageKind.IDENTIFIER) {
 
-                        VSGFunctionDefinition decl = (VSGFunctionDefinition) ggpTypePath.getLeaf();
-                        Tree type = decl.getVSGReturnType();
+                        VisageFunctionDefinition decl = (VisageFunctionDefinition) ggpTypePath.getLeaf();
+                        Tree type = decl.getVisageReturnType();
 
                         if (pref.getBoolean(MarkOccurencesSettings.EXIT, true) && isIn(cu, info.getTrees().getSourcePositions(), type, caretPosition)) {
                             MethodExitDetector med = new MethodExitDetector();
@@ -246,7 +252,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
         // extends/implements clause
         if (pref.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true)) {
-            if (typePath != null && getVSGKind(typePath) == VisageKind.TYPE_CLASS) {
+            if (typePath != null && getVisageKind(typePath) == VisageKind.TYPE_CLASS) {
                 boolean isExtends = true;
                 boolean isImplements = false;
 //                boolean isExtends = ctree.getExtendsClause() == typePath.getLeaf();
@@ -272,7 +278,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             if (isCancelled())
                 return null;
 
-            TokenSequence<VSGTokenId> ts = info.getTokenHierarchy().tokenSequence(VSGTokenId.language());
+            TokenSequence<VisageTokenId> ts = info.getTokenHierarchy().tokenSequence(VisageTokenId.language());
 
             if (ts != null && tp.getLeaf().getVisageKind() == VisageKind.CLASS_DECLARATION && typePath != null) {
                 int bodyStart = Utilities.findBodyStart(tp.getLeaf(), cu, info.getTrees().getSourcePositions(), doc);
@@ -281,9 +287,9 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                     ts.move(caretPosition);
 
                     if (ts.moveNext()) {
-                        if (pref.getBoolean(MarkOccurencesSettings.OVERRIDES, true) && ts.token().id() == VSGTokenId.EXTENDS) {
+                        if (pref.getBoolean(MarkOccurencesSettings.OVERRIDES, true) && ts.token().id() == VisageTokenId.EXTENDS) {
 //                            Tree superClass = ((ClassTree) tp.getLeaf()).getExtendsClause();
-                            Tree superClass = typePath.getParentPath() != null ? (VSGClassDeclaration) typePath.getParentPath().getLeaf() : null;
+                            Tree superClass = typePath.getParentPath() != null ? (VisageClassDeclaration) typePath.getParentPath().getLeaf() : null;
 
                             if (superClass != null) {
                                 Element superType = info.getTrees().getElement(new VisageTreePath(tp, superClass));
@@ -294,7 +300,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
                             }
                         }
 
-//                        if (pref.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true) && ts.token().id() == VSGTokenId.IMPLEMENTS) {
+//                        if (pref.getBoolean(MarkOccurencesSettings.IMPLEMENTS, true) && ts.token().id() == VisageTokenId.IMPLEMENTS) {
 //                            List<? extends Tree> superClasses = ((ClassTree) tp.getLeaf()).getImplementsClause();
 //
 //                            if (superClasses != null) {
@@ -366,7 +372,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
     private List<int[]> detectMethodsForClass(CompilationInfo info, Document document, VisageTreePath clazz, List<TypeElement> superTypes, TypeElement thisType) {
         List<int[]> highlights = new ArrayList<int[]>();
-        VSGClassDeclaration clazzTree = (VSGClassDeclaration) clazz.getLeaf();
+        VisageClassDeclaration clazzTree = (VisageClassDeclaration) clazz.getLeaf();
         TypeElement jlObject = info.getElements().getTypeElement("java.lang.Object"); // NOI18N
 
         OUTER: for (Tree member: clazzTree.getMembers()) {
@@ -380,7 +386,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
 
                 if (el.getKind() == ElementKind.METHOD) {
                     for (TypeElement superType : superTypes) {
-                        for (ExecutableElement ee : ElementFilter.methodsIn(FXSourceUtils.getAllMembers(info.getElements(), superType))) {
+                        for (ExecutableElement ee : ElementFilter.methodsIn(VisageSourceUtils.getAllMembers(info.getElements(), superType))) {
                             if (info.getElements().overrides((ExecutableElement) el, ee, thisType) && (superType.getKind().isClass() || !ee.getEnclosingElement().equals(jlObject))) {
                                 Token t = Utilities.getToken(info, document, path);
                                 if (t != null) {
@@ -485,7 +491,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
             return null;
         }
 
-        TokenSequence<VSGTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(VSGTokenId.language());
+        TokenSequence<VisageTokenId> ts = ((TokenHierarchy<?>) info.getTokenHierarchy()).tokenSequence(VisageTokenId.language());
         ts.move((int) info.getTrees().getSourcePositions().getStartPosition(info.getCompilationUnit(), target));
         if (ts.moveNext()) {
             result.add(new int[]{ts.offset(), ts.offset() + ts.token().length()});
@@ -510,7 +516,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         if (block != null) {
             ts.move((int) info.getTrees().getSourcePositions().getEndPosition(info.getCompilationUnit(), block));
 
-            if (ts.movePrevious() && ts.token().id() == VSGTokenId.RBRACE) {
+            if (ts.movePrevious() && ts.token().id() == VisageTokenId.RBRACE) {
                 result.add(new int[]{ts.offset(), ts.offset() + ts.token().length()});
             }
         }
@@ -541,7 +547,7 @@ public class MarkOccurrencesHighlighter implements CancellableTask<CompilationIn
         return bag;
     }
     
-    private static VisageKind getVSGKind(VisageTreePath tp) {
+    private static VisageKind getVisageKind(VisageTreePath tp) {
         return (tp == null || tp.getLeaf() == null) ? null : tp.getLeaf().getVisageKind();
     }
 

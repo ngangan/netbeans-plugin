@@ -43,9 +43,9 @@
  */
 package org.netbeans.api.visage.source.support;
 
-import com.sun.visage.api.tree.VisageTreePathScanner;
-import com.sun.visage.api.tree.Tree;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePathScanner;
 
 /**
  *

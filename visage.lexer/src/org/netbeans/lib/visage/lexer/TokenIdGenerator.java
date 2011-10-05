@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.TreeMap;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.api.lexer.Language;
 
 /**
@@ -61,7 +61,7 @@ public class TokenIdGenerator {
             System.exit(-1);
         }
         BufferedReader r = null;
-        Language<VSGTokenId> language = VSGTokenId.language();
+        Language<VisageTokenId> language = VisageTokenId.language();
         Map<String, TokenIdDesc> name2Desc = new TreeMap<String, TokenIdDesc>();
         try {
             r = new BufferedReader(new FileReader(tokenF));
@@ -72,11 +72,11 @@ public class TokenIdGenerator {
                 String[] elements = line.split("=");
                 String name = elements[0];
                 String category;
-                VSGTokenId id = language.tokenId(name);
+                VisageTokenId id = language.tokenId(name);
                 if (id != null) {
                     category = id.primaryCategory();
                 } else {
-                    category = VSGTokenId.UNKNOWN.primaryCategory();
+                    category = VisageTokenId.UNKNOWN.primaryCategory();
                 }
                 name2Desc.put(name, new TokenIdDesc(name, category, Integer.parseInt(elements[1])));
             }

@@ -42,13 +42,13 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
-import com.sun.visage.api.tree.UnitTree;
-import com.sun.tools.visage.tree.VSGClassDeclaration;
-import com.sun.tools.visage.tree.VSGFunctionDefinition;
-import com.sun.tools.visage.tree.VSGVar;
 
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.UnitTree;
+import org.visage.api.tree.VisageTreePath;
+import org.visage.tools.tree.VisageClassDeclaration;
+import org.visage.tools.tree.VisageFunctionDefinition;
+import org.visage.tools.tree.VisageVar;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -56,7 +56,7 @@ import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
 import org.netbeans.api.lexer.TokenSequence;
-import org.netbeans.api.visage.lexer.VSGTokenId;
+import org.netbeans.api.visage.lexer.VisageTokenId;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 import static org.netbeans.modules.visage.editor.completion.VisageCompletionQuery.*;
 
@@ -84,8 +84,8 @@ public class CompilationUnitEnvironment extends VisageCompletionEnvironment<Unit
         if (offset <= sourcePositions.getStartPosition(root, pkg)) {
             addPackages(getPrefix());
         } else {
-            TokenSequence<VSGTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
-            if (first != null && first.token().id() == VSGTokenId.SEMI) {
+            TokenSequence<VisageTokenId> first = findFirstNonWhitespaceToken((int) sourcePositions.getEndPosition(root, pkg), offset);
+            if (first != null && first.token().id() == VisageTokenId.SEMI) {
                 addKeywordsForCU(ut);
                 if (!hasPublicDecls) {
                     addKeywordsForStatement();
@@ -104,15 +104,15 @@ public class CompilationUnitEnvironment extends VisageCompletionEnvironment<Unit
         if (LOGGABLE) log("hasPublicDeclarations"); // NOI18N
         for (Tree tr : ut.getTypeDecls()) {
             if (tr.getVisageKind() == Tree.VisageKind.CLASS_DECLARATION) {
-                VSGClassDeclaration cl = (VSGClassDeclaration)tr;
+                VisageClassDeclaration cl = (VisageClassDeclaration)tr;
                 if (LOGGABLE) log("   cl " + cl); // NOI18N
                 VisageTreePath tp = VisageTreePath.getPath(root, cl);
                 if (controller.getTreeUtilities().isSynthetic(tp)) {
                     if (LOGGABLE) log("       isSynthetic "); // NOI18N
                     for (Tree t : cl.getClassMembers()) {
                         if (LOGGABLE) log("   t == " + t); // NOI18N
-                        if (t instanceof VSGFunctionDefinition) {
-                            VSGFunctionDefinition fd = (VSGFunctionDefinition)t;
+                        if (t instanceof VisageFunctionDefinition) {
+                            VisageFunctionDefinition fd = (VisageFunctionDefinition)t;
                             if (LOGGABLE) log("   fd == " + fd); // NOI18N
                             VisageTreePath fp = VisageTreePath.getPath(root, fd);
                             if (controller.getTreeUtilities().isSynthetic(fp)) {
@@ -124,16 +124,16 @@ public class CompilationUnitEnvironment extends VisageCompletionEnvironment<Unit
                                 return true;
                             }
                         }
-                        if (t instanceof VSGVar) {
-                            VSGVar v = (VSGVar)t;
+                        if (t instanceof VisageVar) {
+                            VisageVar v = (VisageVar)t;
                             if (LOGGABLE) log("   v == " + v); // NOI18N
                             if (v.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
                                 if (LOGGABLE) log("   returning true because of " + v); // NOI18N
                                 return true;
                             }
                         }
-                        if (t instanceof VSGClassDeclaration) {
-                            VSGClassDeclaration inner = (VSGClassDeclaration)t;
+                        if (t instanceof VisageClassDeclaration) {
+                            VisageClassDeclaration inner = (VisageClassDeclaration)t;
                             if (LOGGABLE) log("   inner == " + inner); // NOI18N
                             if (inner.getModifiers().getFlags().contains(Modifier.PUBLIC)) {
                                 if (LOGGABLE) log("   returning true because of " + inner); // NOI18N

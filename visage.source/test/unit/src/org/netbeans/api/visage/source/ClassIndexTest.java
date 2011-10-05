@@ -61,11 +61,11 @@ public class ClassIndexTest extends SourceTestBase {
 
         final Set<String> expectedTypes = new HashSet<String>();
         expectedTypes.addAll(Arrays.asList(new String[]{
-            "com.sun.visage.scene.control.caspian.ColorTransition",
-            "com.sun.visage.scene.paint.MultipleGradientPaint.ColorSpaceType",
+            "org.visage.scene.control.caspian.ColorTransition",
+            "org.visage.scene.paint.MultipleGradientPaint.ColorSpaceType",
             "com.sun.scenario.effect.ColorAdjust",
-            "com.sun.visage.tools.fxd.reflector.visage.scene.effect.ColorAdjustReflector",
-            "com.sun.visage.tools.fxd.reflector.visage.scene.paint.ColorReflector",
+//            "com.sun.visage.tools.fxd.reflector.visage.scene.effect.ColorAdjustReflector",
+//            "com.sun.visage.tools.fxd.reflector.visage.scene.paint.ColorReflector",
             "com.sun.stylesheet.types.ColorConverter",
             "visage.scene.effect.ColorAdjust",
             "com.sun.scenario.effect.Color4f",

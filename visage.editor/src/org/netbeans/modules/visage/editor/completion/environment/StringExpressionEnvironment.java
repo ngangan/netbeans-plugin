@@ -42,25 +42,25 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGStringExpression;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
 
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.visage.tools.tree.VisageStringExpression;
 
 /**
  *
  * @author David Strupl
  */
-public class StringExpressionEnvironment extends VisageCompletionEnvironment<VSGStringExpression> {
+public class StringExpressionEnvironment extends VisageCompletionEnvironment<VisageStringExpression> {
 
     private static final Logger logger = Logger.getLogger(StringExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGStringExpression bl) throws IOException {
-        if (LOGGABLE) log("inside VSGStringExpression " + bl); // NOI18N
+    protected void inside(VisageStringExpression bl) throws IOException {
+        if (LOGGABLE) log("inside VisageStringExpression " + bl); // NOI18N
         localResult(null);
         addKeywordsForStatement();
     }

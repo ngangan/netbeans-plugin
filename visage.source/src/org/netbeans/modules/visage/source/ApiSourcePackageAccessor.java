@@ -44,13 +44,13 @@
 
 package org.netbeans.modules.visage.source;
 
-import com.sun.tools.visage.api.JavafxcTool;
 import javax.tools.JavaFileManager;
 import org.netbeans.api.visage.source.ClasspathInfo;
 import org.netbeans.api.visage.source.ElementUtilities;
 import org.netbeans.api.visage.source.VisageParserResult;
 import org.netbeans.api.visage.source.TreeUtilities;
 import org.netbeans.modules.visage.source.parsing.VisageParserResultImpl;
+import org.visage.tools.api.VisagecTool;
 
 /**
  * Accessor for the package-private functionality.
@@ -81,7 +81,7 @@ public abstract class ApiSourcePackageAccessor {
 
     public abstract VisageParserResult createResult(VisageParserResultImpl impl);
     
-    public abstract JavaFileManager getFileManager(ClasspathInfo cpInfo, JavafxcTool tool);
+    public abstract JavaFileManager getFileManager(ClasspathInfo cpInfo, VisagecTool tool);
 
     public abstract ElementUtilities createElementUtilities(VisageParserResultImpl resultImpl);
 

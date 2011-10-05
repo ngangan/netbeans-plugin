@@ -1,6 +1,0 @@
-package applications;
-
-function fooo() { }
-
-
-

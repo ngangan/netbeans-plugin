@@ -9,6 +9,16 @@
 
     <import file="nbproject/build-impl.xml"/>
 
+    <property name="jarpack-task.jar" value="${basedir}/pack200task.jar"/>
+
+    <target name="jarpack-tasks">
+        <taskdef name="pack200"
+                classname="com.sun.tools.apache.ant.pack200.Pack200Task"
+                classpath="${jarpack-task.jar}" />
+        <taskdef name="unpack200"
+                classname="com.sun.tools.apache.ant.pack200.Unpack200Task"
+                classpath="${jarpack-task.jar}" />
+    </target>
     <property name="nbroot" location="."/>
 
     <property name="onlycurrplat" value="false"/>
@@ -44,8 +54,8 @@
       </or>
     </condition>
 
-    <target name="-is-local-netbeans">
-        <available file="../nbbuild/netbeans" type="dir" property="local-netbeans-is-available"/>
+    <target name="-is-local-netbeans" depends="-init-build-properties">
+        <available file="../nbbuild/netbeans" type="dir" property="local-netbeans-is-available"/> 
     </target>
 
     <target name="-copy-local-netbeans" if="local-netbeans-is-available" depends="-is-local-netbeans">
@@ -57,6 +67,7 @@
     </target>
 
     <target name="-calculate-netbeans-url" unless="netbeans.binaries.url" depends="-copy-local-netbeans">
+        <echo message="Calculating Netbeans URL" />
         <get src="${netbeans.base.url}" dest="netbeans.html" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
         <loadfile srcfile="netbeans.html" property="netbeans.binaries.url">
             <filterchain>
@@ -72,8 +83,8 @@
                 </tokenfilter>
             </filterchain>
         </loadfile>
-        <echo>netbeans.binaries.url resolved to ${netbeans.binaries.url}</echo>
-        <echo>netbeans.testdist.url resolved to ${netbeans.testdist.url}</echo>
+        <echo message="netbeans.binaries.url resolved to ${netbeans.binaries.url}"/>
+        <echo message="netbeans.testdist.url resolved to ${netbeans.testdist.url}"/>
     </target>
 
     <target name="-check-ergonomics">
@@ -100,23 +111,42 @@
     <target name="-get-ergonomics-url" unless="no.ergonomics" depends="-calculate-ergonomics-url"/>
     
     <target name="get-ergonomics" unless="no.ergonomics" depends="-check-ergonomics,-get-ergonomics-url">
-        <get src="${ergonomics.binaries.url}" dest="ergonomics.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
-        <unzip src="ergonomics.zip" dest="build/netbeans"/>
+        <get src="${ergonomics.binaries.url}" dest="ergonomics.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/> 
+        <unzip src="ergonomics.zip" dest="builpre-buid/netbeans"/>
     </target>
     
-    <target name="get-netbeans" unless="local-netbeans-is-available" depends="-calculate-netbeans-url">
+    <target name="get-netbeans" unless="local-netbeans-is-available" depends="jarpack-tasks,-calculate-netbeans-url">
         <parallel failonany="true">
             <sequential>
-                <get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+<!--		<get src="${netbeans.binaries.url}" dest="netbeans.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}" maxtime="0"/>-->
                 <unzip src="netbeans.zip" dest="build"/>
             </sequential>
             <sequential>
-                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+<!--                <get src="${netbeans.testdist.url}" dest="testdist.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>-->
                 <unzip src="testdist.zip" dest="build/testdist"/>
             </sequential>
             <sequential>
                 <!-- TODO: get visage.zip -->
+<!--            <get src="${visage.binaries.url}" dest="visage.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/> -->
                 <unzip src="visage.zip" dest="build/netbeans/visage/visage-sdk"/>
+            </sequential>
+            <sequential>
+                <get src="${pack200task.jar}" dest="pack200task.jar" usetimestamp="{use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+                <get src="${junit4-nbm}" dest="onl-junit4.nbm" usetimestamp="{use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+                <unzip src="onl-junit4.nbm" dest="build/tmp"/>
+                <copy todir="build/netbeans/platform">
+                    <fileset dir="build/tmp/netbeans"/>
+                </copy>
+                <copy file="junit-4.8.2.jar" todir="build/netbeans/platform/modules/ext" />
+                <unpack200 src="build/netbeans/platform/modules/org-netbeans-libs-junit4.jar.pack.gz" dest="build/netbeans/platform/modules/org-netbeans-libs-junit4.jar" />
+
+                <delete dir="build/tmp"/>
+<!--                <get src="${ant-nbm}" dest="onl-nbi-ant.nbm" usetimestamp="{use.timestamp}" verbose="true" ignoreerrors="${offline}"/>-->
+                <unzip src="onl-nbi-ant.nbm" dest="build/tmp"/>
+                <copy todir="build/netbeans/harness">
+                    <fileset dir="build/tmp/netbeans"/>
+                </copy>
+                
             </sequential>
         </parallel>
         <antcall target="get-ergonomics"/>
@@ -124,22 +154,22 @@
 
     <target name="get-sdk-win" if="isWin">
         <mkdir dir="visage.sdk.win/external"/>
-        <get src="${visage-sdk.win.url}" dest="visage.sdk.win/external/visage_sdk-windows.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <get src="${visage-sdk.win.url}" dest="visage.sdk.win/external/visage_sdk.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="get-sdk-mac" if="isMacOSX">
         <mkdir dir="visage.sdk.mac/external"/>
-        <get src="${visage-sdk.mac.url}" dest="visage.sdk.mac/external/visage_sdk-macosx.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <get src="${visage-sdk.mac.url}" dest="visage.sdk.mac/external/visage_sdk.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="get-sdk-lin" if="isLin">
         <mkdir dir="visage.sdk.lin/external"/>
-        <get src="${visage-sdk.lin.url}" dest="visage.sdk.lin/external/visage_sdk-linux.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <get src="${visage-sdk.lin.url}" dest="visage.sdk.lin/external/visage_sdk.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="get-sdk-sol" if="isSol">
         <mkdir dir="visage.sdk.sol/external"/>
-        <get src="${visage-sdk.sol.url}" dest="visage.sdk.sol/external/visage_sdk-solaris.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
+        <get src="${visage-sdk.sol.url}" dest="visage.sdk.sol/external/visage_sdk.zip" usetimestamp="${use.timestamp}" verbose="true" ignoreerrors="${offline}"/>
     </target>
 
     <target name="files-init" depends="-release.files,-pre-build"/>
@@ -191,15 +221,15 @@
     <target name="-pre-build" depends="-init-build-properties">
         <delete dir="build"/>
         <mkdir dir="build"/>
-<!--        <parallel failonany="true">-->
+        <parallel failonany="true">
             <antcall target="get-netbeans"/>
+            <antcall target="get-sdk-lin" />
 <!--
             <antcall target="get-sdk-win" />
             <antcall target="get-sdk-mac" />
-            <antcall target="get-sdk-lin" />
             <antcall target="get-sdk-sol" />
 -->
-<!--        </parallel>-->
+        </parallel>
         <concat>
            <filelist dir="build/netbeans/visage/visage-sdk" files="timestamp"/>
         </concat>

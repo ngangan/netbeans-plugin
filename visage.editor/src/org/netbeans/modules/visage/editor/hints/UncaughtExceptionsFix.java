@@ -43,7 +43,6 @@
  */
 package org.netbeans.modules.visage.editor.hints;
 
-import com.sun.visage.api.tree.SourcePositions;
 import com.sun.tools.mjavac.code.Type;
 import java.util.Iterator;
 import javax.swing.text.BadLocationException;
@@ -54,6 +53,7 @@ import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.Fix;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
+import org.visage.api.tree.SourcePositions;
 
 /**
  *

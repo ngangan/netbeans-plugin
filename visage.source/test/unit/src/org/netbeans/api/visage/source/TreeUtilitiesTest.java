@@ -42,9 +42,8 @@
 
 package org.netbeans.api.visage.source;
 
-import com.sun.visage.api.tree.VisageTreePath;
-import com.sun.visage.api.tree.Tree;
-import java.io.File;
+import org.visage.api.tree.Tree;
+import org.visage.api.tree.VisageTreePath;
 import java.util.HashMap;
 import java.util.Map;
 import org.netbeans.api.visage.source.VisageSource.Phase;

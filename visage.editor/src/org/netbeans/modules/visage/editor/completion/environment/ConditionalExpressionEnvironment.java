@@ -42,23 +42,23 @@
 
 package org.netbeans.modules.visage.editor.completion.environment;
 
-import com.sun.tools.visage.tree.VSGIfExpression;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.modules.visage.editor.completion.VisageCompletionEnvironment;
+import org.visage.tools.tree.VisageIfExpression;
 
 /**
  *
  * @author Miloslav Metelka
  */
-public class ConditionalExpressionEnvironment extends VisageCompletionEnvironment<VSGIfExpression> {
+public class ConditionalExpressionEnvironment extends VisageCompletionEnvironment<VisageIfExpression> {
 
     private static final Logger logger = Logger.getLogger(ConditionalExpressionEnvironment.class.getName());
     private static final boolean LOGGABLE = logger.isLoggable(Level.FINE);
 
     @Override
-    protected void inside(VSGIfExpression ifExp) throws IOException {
+    protected void inside(VisageIfExpression ifExp) throws IOException {
         localResult(null);
     }
 
