@@ -422,7 +422,7 @@ public class ClassMemberPanelUI extends JPanel implements ExplorerManager.Provid
                 public void run() {
                     if (null != me) {
                         ElementVisagedoc doc = getDocumentation(me.getPoint());
-                        JavafxdocTopComponent tc = JavafxdocTopComponent.findInstance();
+                        VisagedocTopComponent tc = VisagedocTopComponent.findInstance();
                         if (null != tc) {
                             tc.open();
                             tc.setJavadoc(doc);

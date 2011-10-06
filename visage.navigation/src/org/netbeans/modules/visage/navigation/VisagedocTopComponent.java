@@ -58,11 +58,11 @@ import org.openide.windows.WindowManager;
  * @author Sandip V. Chitale (Sandip.Chitale@Sun.Com)
  * @author Anton Chechel - visage modifications
  */
-public class JavafxdocTopComponent extends TopComponent {
+public class VisagedocTopComponent extends TopComponent {
 
-    private static final Logger LOGGER = Logger.getLogger(JavafxdocTopComponent.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(VisagedocTopComponent.class.getName());
     
-    private static JavafxdocTopComponent instance;
+    private static VisagedocTopComponent instance;
     /** path to the icon used by the component and its open action */
     public static final String ICON_PATH = "org/netbeans/modules/visage/navigation/resources/javadoc_action.png"; // NOI18N
     
@@ -70,9 +70,9 @@ public class JavafxdocTopComponent extends TopComponent {
     
     private DocumentationScrollPane documentationPane;
     
-    private JavafxdocTopComponent() {
-        setName(NbBundle.getMessage(JavafxdocTopComponent.class, "CTL_JavafxdocTopComponent")); // NOI18N
-        setToolTipText(NbBundle.getMessage(JavafxdocTopComponent.class, "HINT_JavafxdocTopComponent")); // NOI18N
+    private VisagedocTopComponent() {
+        setName(NbBundle.getMessage(VisagedocTopComponent.class, "CTL_JavafxdocTopComponent")); // NOI18N
+        setToolTipText(NbBundle.getMessage(VisagedocTopComponent.class, "HINT_JavafxdocTopComponent")); // NOI18N
         setIcon(Utilities.loadImage(ICON_PATH, true));
         
         documentationPane = new DocumentationScrollPane( false );
@@ -98,25 +98,25 @@ public class JavafxdocTopComponent extends TopComponent {
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link findInstance}.
      */
-    public static synchronized JavafxdocTopComponent getDefault() {
+    public static synchronized VisagedocTopComponent getDefault() {
         if (instance == null) {
-            instance = new JavafxdocTopComponent();
+            instance = new VisagedocTopComponent();
         }
         return instance;
     }
     
     /**
-     * Obtain the JavafxdocTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the VisagedocTopComponent instance. Never call {@link #getDefault} directly!
      */
-    public static synchronized JavafxdocTopComponent findInstance() {
+    public static synchronized VisagedocTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
         if (win == null) {
             LOGGER.log(Level.WARNING, 
                        "Cannot find MyWindow component. It will not be located properly in the window system."); // NOI18N
             return getDefault();
         }
-        if (win instanceof JavafxdocTopComponent) {
-            return (JavafxdocTopComponent)win;
+        if (win instanceof VisagedocTopComponent) {
+            return (VisagedocTopComponent)win;
         }
         LOGGER.log(Level./* Shut up! Logged dozens of times in every session. */FINE,
                 "There seem to be multiple components with the '" + PREFERRED_ID + // NOI18N
@@ -164,7 +164,7 @@ public class JavafxdocTopComponent extends TopComponent {
     final static class ResolvableHelper implements Serializable {
         private static final long serialVersionUID = 1L;
         public Object readResolve() {
-            return JavafxdocTopComponent.getDefault();
+            return VisagedocTopComponent.getDefault();
         }
     }
     

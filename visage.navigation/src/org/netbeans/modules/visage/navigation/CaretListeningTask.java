@@ -107,7 +107,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
         resume();
 
         boolean navigatorShouldUpdate = ClassMemberPanel.getInstance() != null; // XXX set by navigator visible
-        boolean javadocShouldUpdate = JavafxdocTopComponent.shouldUpdate();
+        boolean javadocShouldUpdate = VisagedocTopComponent.shouldUpdate();
 //        boolean declarationShouldUpdate = DeclarationTopComponent.shouldUpdate();
 
         if (isCancelled() || (!navigatorShouldUpdate && !javadocShouldUpdate)) {
@@ -282,7 +282,7 @@ public class CaretListeningTask implements CancellableTask<CompilationInfo> {
     private void setJavadoc(final ElementVisagedoc javadoc) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                JavafxdocTopComponent visagedocTopComponent = JavafxdocTopComponent.findInstance();
+                VisagedocTopComponent visagedocTopComponent = VisagedocTopComponent.findInstance();
                 if (visagedocTopComponent != null && visagedocTopComponent.isOpened()) {
                     visagedocTopComponent.setJavadoc(javadoc);
                 }
